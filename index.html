@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HOPVAN — Học Văn thông minh</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts + Icons + Anime.js -->
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+  <style>
+    :root{
+      --bg-cream:#fffcf8;
+      --soft-orange:#fdecd9;
+      --accent:#f59e0b;
+      --grad-btn:linear-gradient(90deg,#fca96a,#fcd5b5);
+    }
+    body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg-cream);color:#1f2937}
+
+    /* Button */
+    .btn-cta{background:var(--grad-btn);color:#fff;font-weight:700;
+      padding:.9rem 1.7rem;border-radius:9999px;box-shadow:0 6px 18px rgba(252,169,106,.3);
+      transition:all .35s ease;display:inline-block;position:relative;overflow:hidden}
+    .btn-cta:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 10px 28px rgba(252,169,106,.45)}
+    .btn-cta::after{content:"";position:absolute;top:0;left:-70%;width:60%;height:100%;
+      background:rgba(255,255,255,.3);transform:skewX(-20deg);transition:.5s}
+    .btn-cta:hover::after{left:130%}
+
+    /* Hero */
+    .hero-soft{background:linear-gradient(135deg,#fffaf5,#fff7ed)}
+    .hero-illus{border-radius:20px;box-shadow:0 20px 50px rgba(15,23,42,.08);
+      transform-origin:center;transition:transform .5s ease,filter .5s ease}
+    .hero-illus:hover{transform:translateY(-8px) scale(1.05);filter:brightness(1.05)}
+
+    /* Card */
+    .card{background:#fff;border:1px solid rgba(245,158,11,.08);
+      border-radius:20px;padding:2rem;box-shadow:0 10px 25px rgba(15,23,42,.04);
+      transition:transform .35s ease,box-shadow .35s ease}
+    .card:hover{transform:translateY(-8px) scale(1.02);
+      box-shadow:0 20px 45px rgba(15,23,42,.12)}
+
+    /* Reveal */
+    .reveal{opacity:0;transform:translateY(30px) scale(.96)}
+    .reveal.show{opacity:1;transform:translateY(0) scale(1);transition:all .9s cubic-bezier(.17,.84,.44,1)}
+
+    /* Hero title letters */
+    .letter{display:inline-block;opacity:0;transform:translateY(1.2em) rotateZ(15deg)}
+
+    /* --- Hero background gradient nhẹ, chậm rãi --- */
+.hero-soft {
+  background: linear-gradient(135deg, #fffdf8, #fff7ed, #fdebd3);
+  background-size: 300% 300%;
+  animation: bgMove 25s ease infinite;
+}
+@keyframes bgMove {
+  0% {background-position:0% 50%}
+  50% {background-position:100% 50%}
+  100% {background-position:0% 50%}
+}
+
+
+/* --- CTA Button hover glow nhẹ --- */
+.btn-cta:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(250,150,80,.35);
+}
+
+/* --- Card tilt & shadow tinh tế --- */
+.card {
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 15px 30px rgba(0,0,0,.08);
+}
+
+/* --- Scroll reveal với blur nhẹ --- */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  filter: blur(6px);
+  transition: all .9s cubic-bezier(.17,.84,.44,1);
+}
+.reveal.show {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* Blob element animation(Hero): nhịp nhẹ nhàng */
+@keyframes pulseSlow {
+  0%,100% { transform: scale(1); opacity: .9 }
+  50% { transform: scale(1.05); opacity: 1 }
+}
+.animate-pulse-slow {
+  animation: pulseSlow 8s ease-in-out infinite;
+}
+
+
+/* Gạch vàng dưới tiêu đề */
+.highlight-line {
+  height: 3px;
+  width: 140px;
+  background: #facc15; /* vàng tươi */
+  border-radius: 2px;
+}
+
+/* Pattern chấm trang trí */
+.bg-dots {
+  background-image: radial-gradient(currentColor 1.5px, transparent 1.5px);
+  background-size: 12px 12px;
+  color: #f59e0b;
+}
+
+.how-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.05);
+  width: 260px;
+  position: relative;
+}
+
+/* Circle giữa */
+.circle-center {
+  width: 200px;
+  height: 200px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,.06);
+  position: relative;
+  z-index: 5;
+}
+
+/* Badge */
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  color: #f97316;
+  border: 1px solid #f97316;
+  border-radius: 6px;
+  padding: 2px 6px;
+  margin-top: 4px;
+}
+
+/* Line */
+.how-box.left::after,
+.how-box.right::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  background: #ddd;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+/* Box bên trái → line chạy qua tới sát vòng tròn */
+.how-box.left::after {
+  right: -60px;       /* chỉnh cho line nối đúng viền */
+  width: 60px;
+}
+
+/* Box bên phải → line chạy qua tới sát vòng tròn */
+.how-box.right::after {
+  left: -60px;
+  width: 60px;
+}
+
+/* Chấm nhỏ ở đầu line */
+.how-box.left::before,
+.how-box.right::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  background: #f97316;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+.how-box.left::before {
+  right: -65px;
+}
+
+.how-box.right::before {
+  left: -65px;
+}
+
+
+/* ====== PC & Tablet (mặc định) ====== */
+.how-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.05);
+  width: 260px;
+  position: relative;
+}
+
+.circle-center {
+  width: 200px;
+  height: 200px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,.06);
+  position: relative;
+  z-index: 5;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  color: #f97316;
+  border: 1px solid #f97316;
+  border-radius: 6px;
+  padding: 2px 6px;
+  margin-top: 4px;
+}
+
+/* Line PC */
+.how-box.left::after,
+.how-box.right::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  background: #ddd;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.how-box.left::after {
+  right: -60px;
+  width: 60px;
+}
+
+.how-box.right::after {
+  left: -60px;
+  width: 60px;
+}
+
+/* Chấm ở cuối line */
+.how-box.left::before,
+.how-box.right::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  background: #f97316;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+.how-box.left::before {
+  right: -65px;
+}
+
+.how-box.right::before {
+  left: -65px;
+}
+
+/* ====== MOBILE ====== */
+@media (max-width: 768px) {
+  #how .grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  /* Box full width */
+  .how-box {
+    width: 100%;
+    max-width: 320px;
+    justify-content: flex-start;
+  }
+
+  /* Circle co lại */
+  .circle-center {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto;
+  }
+
+  /* Ẩn line nối */
+  .how-box::after,
+  .how-box::before {
+    display: none;
+  }
+}
+
+
+ /*Hover cho tất cả */
+ :root {
+  --bg-cream: #fffcf8;
+  --soft-orange: #fdecd9;
+  --accent: #f59e0b;
+  --grad-btn: linear-gradient(90deg,#fca96a,#fcd5b5);
+}
+
+body {
+  font-family: 'Be Vietnam Pro', sans-serif;
+  background: var(--bg-cream);
+  color: #1f2937;
+}
+
+/* === BUTTON === */
+.btn-cta {
+  background: var(--grad-btn);
+  color: #fff;
+  font-weight: 700;
+  padding: .9rem 1.7rem;
+  border-radius: 9999px;
+  box-shadow: 0 6px 18px rgba(252,169,106,.3);
+  transition: all .35s ease;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+}
+.btn-cta:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 10px 28px rgba(252,169,106,.45);
+}
+.btn-cta::after {
+  content:"";
+  position:absolute;
+  top:0;left:-70%;
+  width:60%;height:100%;
+  background:rgba(255,255,255,.3);
+  transform:skewX(-20deg);
+  transition:.5s;
+}
+.btn-cta:hover::after { left:130% }
+
+/* === HERO === */
+.hero-soft {
+  background: linear-gradient(135deg,#fffdf8,#fff7ed,#fdebd3);
+  background-size: 300% 300%;
+  animation: bgMove 25s ease infinite;
+}
+@keyframes bgMove {
+  0% {background-position:0% 50%}
+  50% {background-position:100% 50%}
+  100% {background-position:0% 50%}
+}
+.hero-soft img,
+.hero-soft .btn-cta,
+.hero-soft h1,
+.hero-soft p {
+  transition: transform .35s ease;
+}
+.hero-soft img:hover {
+  transform: scale(1.04) rotate(1deg);
+}
+.hero-soft h1:hover,
+.hero-soft p:hover {
+  transform: translateY(-4px);
+}
+
+/* === FEATURES (có shadow rõ ràng hơn) === */
+.card {
+  background: #fff;
+  border-radius: 18px;
+  transition: transform .35s ease, box-shadow .35s ease;
+}
+.card:hover {
+  /* Chỉ scale, không translate */
+  transform: scale(1.03);
+  box-shadow: 0 18px 38px rgba(0,0,0,.15);
+}
+
+/* === HOW === */
+.how-box {
+  background: #fff;
+  border-radius: 18px;
+  transition: transform .35s ease, box-shadow .35s ease;
+}
+.how-box:hover {
+  transform: scale(1.02); /* không translateY */
+  box-shadow: 0 15px 35px rgba(0,0,0,.12);
+}
+
+/* === ABOUT (chỉ scale nhẹ, không shadow) === */
+#about .grid > div {
+  background: #fff;
+  border-radius: 18px;
+  transition: transform .35s ease;
+}
+#about .grid > div:hover {
+  transform: translateY(-6px) scale(1.03);
+  /* không shadow */
+}
+
+/* === CTA === */
+.cta-section .image-box {
+  background: #fff;
+  border-radius: 18px;
+  transition: transform .35s ease, box-shadow .35s ease;
+}
+.cta-section .image-box:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(0,0,0,.12);
+}
+.cta-section {
+  position: relative;
+  overflow: hidden;
+}
+.cta-section::after {
+  content:"";
+  position:absolute;
+  bottom:0; left:0;
+  width:100%; height:100px;
+  background:#333;
+  clip-path: polygon(0 70%,100% 0,100% 100%,0 100%);
+}
+
+/* === REVEAL (scroll animation) === */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px) scale(.96);
+  filter: blur(8px);
+}
+.reveal.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+  transition: all .9s cubic-bezier(.17,.84,.44,1);
+}
+
+/* Fade + slide xuất hiện */
+.fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.9s cubic-bezier(.17,.84,.44,1);
+}
+.fade-up.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Hero image / text */
+.hero-fade {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.9s ease-out;
+}
+.hero-fade.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* FEATURE CARD hover */
+.card:hover {
+  transform: translateY(-6px) scale(1.03) !important; /* !important để override scroll */
+  box-shadow: 0 18px 38px rgba(0,0,0,.15);
+}
+
+/* HOW BOX hover */
+.how-box:hover {
+  transform: translateY(-6px) scale(1.03) !important;
+  box-shadow: 0 15px 35px rgba(0,0,0,.12);
+}
+
+#hero-particles {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; /* tránh cản tương tác */
+  z-index: 0;
+}
+
+
+/* Hover nhẹ cho logo giữa */
+.circle-center {
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.circle-center:hover {
+  transform: scale(1.05);       /* zoom nhẹ */
+  box-shadow: 0 15px 35px rgba(0,0,0,0.12); /* shadow tinh tế */
+}
+
+
+
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-gray-100">
+  <div class="max-w-6xl mx-auto flex items-center justify-between py-4 px-6">
+    <a href="#" class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#ffd7b5] to-[#fca96a] flex items-center justify-center shadow-sm">
+        <i data-feather="book-open" class="text-white w-5 h-5"></i>
+      </div>
+      <div>
+        <div class="text-lg font-extrabold" style="color:var(--accent)">HOPVAN</div>
+        <div class="text-xs text-gray-500 -mt-1">Học Văn thông minh</div>
+      </div>
+    </a>
+    <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-700">
+    <a href="#features" class="hover:text-[var(--accent)]">Tính năng</a>
+    <a href="#how" class="hover:text-[var(--accent)]">Cách học</a>
+    <a href="#about" class="hover:text-[var(--accent)]">Về chúng tôi</a>
+    <a href="log.html" class="btn-cta ml-2">Bắt đầu miễn phí</a>
+    </nav>
+    <button id="mobile-toggle" class="md:hidden p-2 text-gray-700">
+      <i data-feather="menu"></i>
+    </button>
+  </div>
+  <div id="mobile-menu" class="hidden md:hidden border-t border-gray-100">
+    <div class="px-6 py-4 flex flex-col gap-3">
+      <a href="#features">Tính năng</a>
+      <a href="#how">Cách học</a>
+      <a href="#about">Về chúng tôi</a>
+      <a href="log.html" class="btn-cta text-center">Bắt đầu miễn phí</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero-soft min-h-[90vh] relative flex items-center">
+<canvas id="hero-softlights" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;"></canvas>
+  <div class="relative z-10 max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center px-6 py-16">
+    
+<!-- Left: Text -->
+<div class="hero-fade">
+  <h1 class="text-4xl md:text-6xl font-extrabold leading-tight tracking-wide text-gray-900 hero-title">
+    <span class="text-[var(--accent)]">HOPVAN</span>
+  </h1>
+  <p class="mt-6 text-lg text-gray-600 leading-relaxed tracking-wide">
+    AI giúp bạn phân tích tác phẩm, luyện viết và tạo đề — tất cả cá nhân hóa để tiến bộ nhanh hơn.
+  </p>
+  <div class="mt-6">
+    <a href="log.html" class="btn-cta">Bắt đầu học</a>
+  </div>
+</div>
+
+<!-- Right: Image -->
+<div class="flex justify-center md:justify-end hero-fade">
+  <img src="IMG/HOME/HERO.PNG" alt="Ảnh minh họa"/>
+</div>
+
+
+
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="py-20 bg-white min-h-[76vh] flex items-center">
+  <div class="max-w-6xl mx-auto px-6 fade-up">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold">Tính năng nổi bật</h2>
+      <p class="text-gray-600 mt-2">Công cụ hỗ trợ học Văn toàn diện.</p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-8">
+<div class="card fade-up">
+  <i data-feather="book" class="w-8 h-8 text-[var(--accent)] mb-4"></i>
+  <h3 class="font-semibold mb-2">Phân tích tác phẩm</h3>
+  <p class="text-gray-600 text-sm">AI giải thích chủ đề, nhân vật, ngôn ngữ, ý nghĩa tầng sâu.</p>
+</div>
+<div class="card fade-up">
+  <i data-feather="book" class="w-8 h-8 text-[var(--accent)] mb-4"></i>
+        <h3 class="font-semibold mb-2">Luyện viết & sửa văn</h3>
+        <p class="text-gray-600 text-sm">Viết đoạn văn, luận điểm; AI gợi ý cấu trúc, chỉnh lỗi.</p>
+      </div>
+<div class="card fade-up">
+  <i data-feather="book" class="w-8 h-8 text-[var(--accent)] mb-4"></i>
+        <h3 class="font-semibold mb-2">Tạo đề & chấm tự động</h3>
+        <p class="text-gray-600 text-sm">Sinh đề, câu hỏi & hỗ trợ chấm bài nhanh chóng.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how" class="py-28 bg-[#fff9f3] text-lg">
+  <div class="relative grid grid-cols-3 items-center max-w-7xl mx-auto px-8">
+    
+    <!-- Cột trái -->
+    <div class="flex flex-col gap-24 items-end">
+<div class="how-box left mt-10 fade-up">
+  <img src="img/home/page 2/img-book1.svg" alt="Sách" class="w-14 h-14">
+  <span class="text-base md:text-lg font-medium">Sách điện tử tương tác hấp dẫn</span>
+</div>
+<div class="how-box left relative -top-3 fade-up">
+        <img src="img/home/page 2/img-book2.svg" alt="Thư viện" class="w-14 h-14">
+        <div>
+          <span class="text-base md:text-lg font-medium">Thư viện bài tập phong phú</span>
+          <div class="badge mt-1">Sắp ra mắt</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logo giữa -->
+    <div class="flex justify-center">
+      <div class="circle-center fade-up">
+        <img src="img/home/page 2/updated_logo2.svg" alt="Logo" class="w-52 h-auto">
+      </div>
+    </div>
+
+    <!-- Cột phải -->
+    <div class="flex flex-col gap-24 items-start">
+<div class="how-box right mt-10 fade-up">
+        <img src="img/home/page 2/img-book3.svg" alt="Kho bài giảng" class="w-14 h-14">
+        <span class="text-base md:text-lg font-medium">Kho bài giảng điện tử hữu ích</span>
+      </div>
+<div class="how-box right fade-up">
+        <img src="img/home/page 2/img-book4.svg" alt="Lớp học" class="w-14 h-14">
+        <div>
+          <span class="text-base md:text-lg font-medium">Lớp học trực tuyến tiện lợi</span>
+          <div class="badge mt-1">Sắp ra mắt</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+
+<!-- ABOUT -->
+<section id="about" class="py-20 bg-white fade-up">
+  <div class="max-w-6xl mx-auto px-6 text-center">
+    <!-- Tiêu đề -->
+    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-3">
+      <span class="text-[var(--accent)]">VĂN.AI</span>
+    </h2>
+    <p class="text-xl md:text-2xl font-semibold text-gray-800 mb-12">
+      Phát triển phẩm chất và năng lực học sinh
+    </p>
+
+    <!-- 3 khối tính năng -->
+    <div class="grid md:grid-cols-3 gap-10">
+      
+      <!-- Box 1 -->
+      <div class="text-center px-6 fade-up">
+        <div class="mb-4 flex justify-center">
+          <img src="img/home/page 1/book1.svg" alt="Icon 1" class="w-16 h-16">
+        </div>
+        <h3 class="font-bold text-lg mb-2">
+          Nội dung bám sát Chương trình GDPT 2018
+        </h3>
+        <p class="text-gray-600 text-sm leading-relaxed">
+          Xây dựng bởi đội ngũ tác giả giàu kinh nghiệm về giáo dục phổ thông,
+          tham gia biên soạn Chương trình Giáo dục phổ thông 2018 của Bộ Giáo dục và Đào tạo.
+        </p>
+      </div>
+
+      <!-- Box 2 -->
+      <div class="text-center px-6 fade-up">
+        <div class="mb-4 flex justify-center">
+          <img src="img/home/page 1/book2.svg" alt="Icon 2" class="w-16 h-16">
+        </div>
+        <h3 class="font-bold text-lg mb-2">
+          SGK điện tử tương tác
+        </h3>
+        <p class="text-gray-600 text-sm leading-relaxed">
+          Tương tác trực tiếp tạo thuận lợi cho người học, giúp việc học trở nên sinh động và hiệu quả.
+        </p>
+      </div>
+
+      <!-- Box 3 -->
+      <div class="text-center px-6 fade-up">
+        <div class="mb-4 flex justify-center">
+          <img src="img/home/page 1/book3.svg" alt="Icon 3" class="w-16 h-16">
+        </div>
+        <h3 class="font-bold text-lg mb-2">
+          Kho bài tập tiện ích
+        </h3>
+        <p class="text-gray-600 text-sm leading-relaxed">
+          Bài tập tương tác phong phú, kèm lời giải chi tiết,
+          hỗ trợ học sinh, giáo viên và phụ huynh trong quá trình học tập.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- CTA -->
+<section class="cta-section relative bg-[#fff7ef] py-24 overflow-hidden">
+  <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center relative z-10">
+    
+    <!-- Text -->
+    <div class="text-left fade-up">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 leading-snug">
+        Trải nghiệm đầy đủ<br>tính năng HOPVAN
+      </h2>
+      <div class="highlight-line mt-3 mb-8"></div>
+      <a href="log.html" class="btn-cta">Bắt đầu miễn phí</a>
+    </div>
+
+<!-- Container hình ảnh -->
+<div class="relative w-full h-[300px] fade-up">
+  <!-- Ảnh lớn (sát mép phải) -->
+  <div class="absolute bottom-0 right-0 w-[360px] rounded-2xl overflow-hidden border-8 border-white shadow-lg">
+    <img src="img/home/1.jpg" alt="Học sinh 2" class="w-full h-auto">
+  </div>
+
+  <!-- Ảnh nhỏ (tự do chỉnh vị trí) -->
+  <div class="absolute top-0 left-0 w-[260px] rounded-2xl overflow-hidden border-8 border-white shadow-lg">
+    <img src="img/home/1.jpg" alt="Học sinh 1" class="w-full h-auto">
+  </div>
+</div>
+
+      <!-- Pattern chấm -->
+      <div class="absolute right-0 top-1/3 w-32 h-32 bg-dots opacity-30"></div>
+    </div>
+
+  </div>
+
+
+<!-- FOOTER -->
+<script>
+  fetch("footer.html")
+    .then(res => res.text())
+    .then(data => document.getElementById("footer").innerHTML = data);
+</script>
+
+<script>
+  feather.replace();
+
+  // Mobile menu
+  const toggle=document.getElementById("mobile-toggle");
+  const menu=document.getElementById("mobile-menu");
+  toggle.addEventListener("click",()=>{
+    menu.classList.toggle("hidden");
+    toggle.querySelector("i").setAttribute("data-feather",menu.classList.contains("hidden")?"menu":"x");
+    feather.replace();
+  });
+
+  // Reveal on scroll
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting) e.target.classList.add("show");
+    })
+  },{threshold:.2});
+  document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+
+  // Hero title animation
+  const hero=document.querySelector(".hero-title");
+  hero.innerHTML=hero.textContent.replace(/\S/g,"<span class='letter'>$&</span>");
+  anime.timeline({loop:false})
+    .add({targets:'.letter',translateY:["1.2em",0],opacity:[0,1],duration:800,delay:(el,i)=>40*i,easing:"easeOutExpo"});
+</script>
+
+<script>// Animation khi scroll (fade-up / hero-fade / reveal)
+const appearOnScroll = new IntersectionObserver((entries, observer) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      entry.target.classList.add("show");
+      observer.unobserve(entry.target);
+    }
+  });
+}, {threshold: 0.2});
+
+// Áp dụng cho tất cả element cần xuất hiện
+document.querySelectorAll(".fade-up, .hero-fade, .reveal").forEach(el => {
+  appearOnScroll.observe(el);
+});
+</script>
+
+<script>
+const canvas = document.getElementById('hero-softlights');
+const ctx = canvas.getContext('2d');
+let width = canvas.width = window.innerWidth;
+let height = canvas.height = window.innerHeight;
+
+class LightDot {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.x = Math.random() * width;
+    this.y = Math.random() * height;
+    this.size = Math.random() * 6 + 2;
+    this.speed = Math.random() * 0.3 + 0.1;
+    this.opacity = Math.random() * 0.4 + 0.1;
+  }
+  update() {
+    this.y -= this.speed;
+    if(this.y < -10) this.reset();
+    // Nhấp nháy nhẹ
+    this.opacity += (Math.random()-0.5)*0.02;
+    if(this.opacity < 0.05) this.opacity = 0.05;
+    if(this.opacity > 0.5) this.opacity = 0.5;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(250,180,120,${this.opacity})`;
+    ctx.fill();
+  }
+}
+
+const lights = [];
+for(let i=0; i<40; i++) lights.push(new LightDot());
+
+function animate() {
+  ctx.clearRect(0,0,width,height);
+  lights.forEach(l=>{
+    l.update();
+    l.draw();
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+window.addEventListener('resize', ()=>{
+  width = canvas.width = window.innerWidth;
+  height = canvas.height = window.innerHeight;
+});
+</script>
+
+
+</body>
+</html>
