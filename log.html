@@ -173,16 +173,20 @@
     }
   });
 
-  // Xử lý khi bấm nút Google
-  const googleBtn = document.getElementById("google-login-btn");
-  googleBtn.addEventListener("click", async () => {
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (err) {
-      console.error("Google login error:", err);
-      alert("Không thể đăng nhập bằng Google");
-    }
-  });
+// Xử lý login bằng Google
+const googleBtn = document.getElementById("google-login-btn");
+googleBtn.addEventListener("click", async () => {
+  const provider = new GoogleAuthProvider();
+  try {
+    await signInWithPopup(auth, provider);
+    console.log("Login Google thành công!");
+    window.location.href = "/student/index.html"; // redirect sau khi login
+  } catch (err) {
+    console.error("Google login error:", err);
+    alert("Lỗi đăng nhập Google: " + err.message);
+  }
+});
+
 </script>
 
 
