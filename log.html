@@ -153,42 +153,5 @@
 };
   </script>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } 
-    from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-  import { firebaseConfig } from "./firebase-config.js"; 
-
-  // Khởi tạo Firebase
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
-
-  // Kiểm tra nếu user đã login rồi thì tự chuyển sang trang học sinh
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      console.log("Đăng nhập thành công:", user.displayName);
-      window.location.href = "/student/index.html"; 
-    }
-  });
-
-// Xử lý login bằng Google
-const googleBtn = document.getElementById("google-login-btn");
-googleBtn.addEventListener("click", async () => {
-  const provider = new GoogleAuthProvider();
-  try {
-    await signInWithPopup(auth, provider);
-    console.log("Login Google thành công!");
-    window.location.href = "/student/index.html"; // redirect sau khi login
-  } catch (err) {
-    console.error("Google login error:", err);
-    alert("Lỗi đăng nhập Google: " + err.message);
-  }
-});
-
-</script>
-
-
 </body>
 </html>
