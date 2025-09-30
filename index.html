@@ -1,9 +1,18 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>HOPVAN — Học Văn thông minh</title>
+  <meta name="google-site-verification" content="73dRIdwl0wADm4SOV2_fm4zWOu8ZbaaJQbfiFdVc09g" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOPVAN - Học văn thông minh</title>
+  <meta property="og:title" content="HOPVAN - Học văn thông minh" />
+  <meta property="og:description" content="HOPVAN - Học văn thông minh" />
+  <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+  <meta property="og:url" content="https://hopvan.netlify.app" />
+  <meta property="og:type" content="article" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/webp" href="LOGO.WEBP" />
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -527,7 +536,7 @@ body {
     <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-700">
     <a href="#features" class="hover:text-[var(--accent)]">Tính năng</a>
     <a href="#how" class="hover:text-[var(--accent)]">Cách học</a>
-    <a href="#about" class="hover:text-[var(--accent)]">Về chúng tôi</a>
+    <a href="#" class="hover:text-[var(--accent)]">Dùng thử miễn phí</a>
     <a href="log.html" class="btn-cta ml-2">Bắt đầu miễn phí</a>
     </nav>
     <button id="mobile-toggle" class="md:hidden p-2 text-gray-700">
@@ -538,12 +547,15 @@ body {
     <div class="px-6 py-4 flex flex-col gap-3">
       <a href="#features">Tính năng</a>
       <a href="#how">Cách học</a>
-      <a href="#about">Về chúng tôi</a>
+      <a href="#">Dùng thử miễn phí</a>
       <a href="log.html" class="btn-cta text-center">Bắt đầu miễn phí</a>
     </div>
   </div>
 </header>
 
+<body class="flex flex-col min-h-screen">
+    <!-- Main content -->
+  <div id="main-content" class="flex-1">
 <!-- HERO -->
 <section class="hero-soft min-h-[90vh] relative flex items-center">
 <canvas id="hero-softlights" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;"></canvas>
@@ -621,7 +633,7 @@ body {
     <!-- Logo giữa -->
     <div class="flex justify-center">
       <div class="circle-center fade-up">
-        <img src="img/home/page 2/updated_logo2.svg" alt="Logo" class="w-52 h-auto">
+        <img src="img/home/page 2/updated_logo2.webp" alt="Logo" class="w-52 h-auto">
       </div>
     </div>
 
@@ -736,15 +748,17 @@ body {
     </div>
 
   </div>
-
+</div>
 
 <!-- FOOTER -->
-<script>
-  fetch("footer.html")
-    .then(res => res.text())
-    .then(data => document.getElementById("footer").innerHTML = data);
-</script>
+<div id="footer"></div>
 
+  <script>
+    // Load footer
+    fetch("footer.html")
+      .then(res => res.text())
+      .then(data => document.getElementById("footer").innerHTML = data);
+  </script>
 <script>
   feather.replace();
 
