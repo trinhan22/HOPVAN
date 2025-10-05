@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta name="google-site-verification" content="73dRIdwl0wADm4SOV2_fm4zWOu8ZbaaJQbfiFdVc09g" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>HOPVAN - Học văn thông minh</title>
+  <meta property="og:title" content="HOPVAN - Học văn thông minh" />
+  <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+  <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+  <meta property="og:url" content="https://hopvan.netlify.app" />
+  <meta property="og:type" content="article" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/webp" href="LOGO.WEBP" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Feather icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --accent: #ffc291;
+      --accent2: #fcd5b5;
+    }
+
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Gradient text animation */
+    @keyframes shine {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #ffffff, #fff6ec, #ffffff);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shine 3.5s linear infinite;
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s ease-in-out;
+    }
+    .fade-up.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 1.25rem;
+      padding: 3rem 2rem;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .card:hover {
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+    }
+
+    .card i {
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      width: 72px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      margin-right: auto;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+    .card:hover i {
+      transform: scale(1.2) rotate(5deg);
+      color: #fcbf49;
+    }
+
+    .card h3 {
+      font-size: 1.6rem;
+      margin-bottom: 0.75rem;
+      font-weight: 800;
+      color: #333;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover h3 {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 10px rgba(255,255,255,0.6);
+    }
+
+    .text-gray-600 {
+      color: #64748b;
+      font-size: 1rem;
+    }
+
+    h2 {
+      font-size: 3.6rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+    }
+    h2:hover {
+      background: linear-gradient(90deg, #fff, #fef4e6, #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shine 2s linear infinite;
+      text-shadow: 0 0 18px rgba(255,255,255,0.9);
+    }
+
+    p.sub {
+      font-size: 1.35rem;
+      color: #fff;
+      opacity: 0.95;
+      margin-top: 1rem;
+      transition: all 0.3s ease;
+    }
+    p.sub:hover {
+      text-shadow: 0 0 14px rgba(255,255,255,0.8);
+    }
+
+    .gradient-text {
+  background: #ffffff;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: all 0.4s ease;
+}
+
+/* Hiệu ứng loé sáng khi hover */
+.gradient-text:hover {
+  filter: brightness(1.4) drop-shadow(0 0 10px #fcd5b5);
+}
+
+/* Tiêu đề chính */
+h2.gradient-text {
+  font-size: 3.2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+  padding-top: 10px; /* ✅ thêm khoảng trống để không bị khyết */
+  background: #ffffff;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: all 0.4s ease;
+}
+
+
+/* Dòng mô tả phụ */
+p.sub.gradient-text {
+  font-size: 1.4rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+/* Khi hover vào toàn bộ khối, chữ cũng sáng */
+.text-center:hover .gradient-text {
+  filter: brightness(1.5) drop-shadow(0 0 12px #fcd5b5);
+  transform: scale(1.02);
+}
+
+  </style>
+</head>
+<body>
+
+  <section id="features" class="py-20 w-full">
+    <div class="max-w-6xl mx-auto px-6 fade-up">
+      <div class="text-center mb-16">
+        <h2 class="gradient-text">Trải nghiệm dùng thử miễn phí</h2>
+        <p class="sub gradient-text">Kho bài giảng rộng lớn và AI chữa bài thông minh</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-10 text-center">
+
+        <!-- Card 1 -->
+        <a href="../log.html" class="card fade-up block">
+          <i data-feather="book"></i>
+          <h3>Kho bài giảng rộng lớn</h3>
+          <p class="text-gray-600">Khám phá hàng trăm bài giảng trực quan, dễ hiểu.</p>
+        </a>
+
+        <!-- Card 2 -->
+        <a href="ai/index.html" class="card fade-up block">
+          <i data-feather="cpu"></i>
+          <h3>AI chữa bài thông minh</h3>
+          <p class="text-gray-600">Làm bài và nhận phản hồi chi tiết, được hỗ trợ bởi AI.</p>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      feather.replace();
+
+      // Hiệu ứng fade-up
+      const fadeEls = document.querySelectorAll(".fade-up");
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) entry.target.classList.add("show");
+        });
+      }, { threshold: 0.2 });
+      fadeEls.forEach(el => observer.observe(el));
+    });
+  </script>
+
+</body>
+</html>
