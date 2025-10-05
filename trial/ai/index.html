@@ -1,91 +1,127 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Gia Sư Văn Học</title>
   <style>
-    body {
+    /* ===== RESET & BASE ===== */
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
       font-family: "Poppins", sans-serif;
-      background: linear-gradient(90deg, #fce3cb, #fcded1);
-      display: flex;
+    }
+
+    body {
+      background: linear-gradient(135deg, #fce3cb, #fcd5b5, #f8b79e);
       height: 100vh;
-      color: #333;
-    }
-
-    .container {
       display: flex;
-      width: 100%;
-      height: 100%;
-      gap: 10px;
-      padding: 20px;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
     }
 
+    /* ===== MAIN CONTAINER ===== */
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      width: 90%;
+      max-width: 1100px;
+      height: 80vh;
+      /* --- xoá nền mờ --- */
+      background: none; 
+      border-radius: 25px;
+      padding: 30px;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== LEFT & RIGHT COLUMNS ===== */
     .column {
-      flex: 1;
       display: flex;
       flex-direction: column;
-      background: #fffaf7;
+      background: white;
       border-radius: 20px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      padding: 25px;
+      transition: 0.3s ease;
     }
 
     .column:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
     }
 
     h2 {
-      text-align: center;
       background: linear-gradient(90deg, #fca96a, #fcd5b5);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 10px;
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 15px;
     }
 
     textarea {
       flex: 1;
       resize: none;
-      padding: 15px;
-      border-radius: 12px;
-      border: 1px solid #f5c4a5;
-      background: #fff8f3;
-      font-size: 15px;
+      border: 1.5px solid #f3c19c;
+      border-radius: 15px;
+      padding: 16px;
+      font-size: 1rem;
+      background: #fffaf6;
+      transition: 0.2s ease;
       outline: none;
-      transition: border 0.2s ease;
     }
 
     textarea:focus {
-      border: 1px solid #fca96a;
+      border-color: #fca96a;
+      box-shadow: 0 0 8px rgba(252, 169, 106, 0.4);
     }
 
     button {
-      margin-top: 10px;
-      padding: 12px;
+      margin-top: 18px;
+      padding: 13px;
       border: none;
-      border-radius: 12px;
-      cursor: pointer;
+      border-radius: 15px;
       background: linear-gradient(90deg, #fca96a, #fcd5b5);
       color: white;
-      font-weight: bold;
-      transition: transform 0.2s, box-shadow 0.2s;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
     }
 
     button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      transform: scale(1.05);
+      box-shadow: 0 6px 12px rgba(252, 169, 106, 0.3);
     }
 
+    /* ===== RESPONSE BOX ===== */
     #aiResponse {
       flex: 1;
-      background: #fff8f4;
-      border-radius: 12px;
-      padding: 15px;
+      background: #fffaf6;
+      border: 1.5px solid #f3c19c;
+      border-radius: 15px;
+      padding: 16px;
+      font-size: 1rem;
+      color: #444;
+      line-height: 1.6;
       overflow-y: auto;
-      border: 1px solid #f5c4a5;
+      white-space: pre-wrap;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 850px) {
+      .container {
+        grid-template-columns: 1fr;
+        height: auto;
+        padding: 20px;
+      }
     }
   </style>
 </head>
@@ -93,52 +129,53 @@
   <div class="container">
     <!-- CỘT TRÁI -->
     <div class="column">
-      <h2>💬 Câu hỏi hoặc bài viết của bạn</h2>
-      <textarea id="userInput" placeholder="Nhập đoạn văn, câu hỏi hoặc bài viết bạn muốn AI nhận xét..."></textarea>
+      <h2>✏️ Nhập câu hỏi hoặc bài viết của bạn</h2>
+      <textarea id="userInput" placeholder="Nhập nội dung bạn muốn AI nhận xét hoặc phân tích..."></textarea>
       <button onclick="sendToAI()">Gửi đến Gia sư Văn học</button>
     </div>
 
     <!-- CỘT PHẢI -->
     <div class="column">
-      <h2>📖 Phản hồi từ Gia sư Văn học</h2>
-      <div id="aiResponse">AI sẽ viết lại và nhận xét đoạn văn tại đây...</div>
+      <h2>📖 Phản hồi từ Gia sư</h2>
+      <div id="aiResponse">AI sẽ phản hồi tại đây...</div>
     </div>
   </div>
 
-<script>
-  async function sendMessageToDeepSeek(message) {
-    const API_KEY = "sk-7732d4d8f0db42a2a99ae0ddcfd67055"; // ví dụ: sk-xxxxxxx
-    const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat", // model mặc định
-        messages: [
-          { role: "system", content: "Bạn là gia sư Văn học, giúp học sinh phân tích, viết lại và nhận xét bài viết." },
-          { role: "user", content: message }
-        ]
-      })
-    });
+  <script>
+async function sendToAI() {
+  const input = document.getElementById("userInput").value.trim();
+  const output = document.getElementById("aiResponse");
 
-    if (!response.ok) {
-      console.error("❌ Kết nối thất bại:", response.statusText);
-      alert("⚠️ Lỗi kết nối hoặc API Key không hợp lệ.");
-      return;
-    }
-
-    const data = await response.json();
-    console.log("✅ Phản hồi từ DeepSeek:", data);
-    document.getElementById("aiResponse").innerText = data.choices[0].message.content;
+  if (!input) {
+    output.innerHTML = "⚠️ Vui lòng nhập nội dung trước khi gửi!";
+    return;
   }
 
-  // Ví dụ test
-  sendMessageToDeepSeek("Phân tích bài thơ Đất Nước của Nguyễn Khoa Điềm");
-</script>
+  output.innerHTML = "<em>⏳ Đang xử lý...</em>";
 
-<div id="aiResponse" style="white-space: pre-wrap; margin-top: 10px;"></div>
+  try {
+    // --- Gọi server proxy Node.js ---
+const response = await fetch("https://ai-server-o47i664hj-nhans-projects-0c2bb639.vercel.app", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    messages: [
+      { role: "system", content: "Bạn là gia sư Văn học..." },
+      { role: "user", content: input }
+    ]
+  })
+});
 
+
+    if (!response.ok) throw new Error("API trả về lỗi: " + response.status);
+
+    const data = await response.json();
+    output.innerHTML = data.choices[0].message.content;
+  } catch (error) {
+    console.error(error);
+    output.innerHTML = "❌ Có lỗi khi kết nối với Deepseek API.";
+  }
+}
+  </script>
 </body>
 </html>
