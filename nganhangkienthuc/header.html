@@ -6,52 +6,52 @@
   <title>Header</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&display=swap" rel="stylesheet">
   <style>
+/* Reset và font cơ bản */
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #fff;
+  zoom: 90%;
+}
 
+/* 🔹 Thanh trên cùng (Topbar) */
+.topbar {
+  background-color: #f8f8f8;
+  font-size: 12px;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
 
-    body {
-      margin: 0;
-      font-family: 'Montserrat', sans-serif;
-      background-color: #fff;
-      zoom: 90%;
-    }
+.topbar .left,
+.topbar .right {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
 
-    /* 🔹 Thanh trên cùng */
-    .topbar {
-      background-color: #f8f8f8;
-      font-size: 12px;
-      color: #333;
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 20px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
+.topbar .social-icons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
 
-    .topbar .left,
-    .topbar .right {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-    }
+.topbar .social-icons img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
 
-    .topbar .social-icons {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
+.topbar .label {
+  font-weight: 500;
+  color: #444;
+  font-size: 13px;
+}
 
-    .topbar .social-icons img {
-      width: 20px;
-      height: 20px;
-      object-fit: contain;
-    }
-
-    .topbar .label {
-      font-weight: 500;
-      color: #444;
-      font-size: 13px;
-    }
-
+/* Banner */
 .hero-banner {
   background-image: url('background.webp');
   background-size: cover;
@@ -66,81 +66,21 @@
   }
 }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 30px;
-      background: #ffffff;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-
-    .search-box {
-      display: flex;
-      align-items: center;
-      border: 1.5px solid #ccc;
-      border-radius: 4px;
-      padding: 4px 8px;
-      background: #fff;
-    }
-
-    .search-box button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 16px;
-      margin-right: 4px;
-      color: #666;
-    }
-
-    .search-box input {
-      border: none;
-      outline: none;
-      font-size: 14px;
-      background: transparent;
-      width: 140px;
-    }
-
-    .logo-center {
-      display: flex;
-      align-items: center;
-      text-align: center;
-    }
-
-    .logo-center img {
-      height: 50px;
-    }
-
-    .header-right {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .header-button {
-      background: #ffe600;
-      color: #000;
-      font-size: 12px;
-      font-weight: 600;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    nav {
-      display: flex;
-      gap: 10px;
-      padding: 10px 0;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
+/* 🔹 Navigation (ĐÃ SỬA LỖI CĂN GIỮA VÀ STICKY) */
+nav {
+  display: flex;
+  width: 100%; /* Đảm bảo chiếm toàn bộ chiều rộng để căn giữa */
+  gap: 10px;
+  padding: 10px 0;
+  justify-content: center; /* ⬅️ LỆNH QUAN TRỌNG: Căn giữa các mục menu */
+  flex-wrap: wrap;
+  
+  /* Nếu bạn muốn menu dính cố định khi cuộn */
+  position: sticky; 
+  top: 0;
+  z-index: 1000;
+  background-color: #fff; /* Đảm bảo không nhìn thấy nội dung phía dưới */
+}
 
 nav a {
   text-decoration: none;
@@ -154,90 +94,52 @@ nav a {
 
 nav a:hover,
 nav a.active {
-  color: #ff8529; /* 🔥 Đổi màu chữ khi hover */
+  color: #fca96a; 
 }
 
+/* 🔹 Header (Chứa Logo và User Info) */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Đẩy Logo sang trái, User Info sang phải */
+  padding: 10px 30px; 
+  background-color: #ffffff; 
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  position: relative; /* Dùng position:relative thay vì sticky để tránh xung đột với nav */
+  z-index: 999;
+}
 
-    @media (max-width: 768px) {
-      header {
-        flex-direction: column;
-        align-items: center;
-        padding: 10px;
-      }
+/* Logo ở bên trái */
+.logo-left {
+    flex-shrink: 0; 
+    margin-right: 20px;
+}
 
-      .search-box input {
-        width: 100px;
-      }
+.logo-left img {
+    height: 80px; /* Điều chỉnh kích thước logo */
+    vertical-align: middle;
+}
 
-      .logo-center img {
-        height: 40px;
-      }
+/* Header Right (Thông tin người dùng) */
+.header-right {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; 
+    margin-left: 20px;
+}
 
-      .header-right {
-        margin-top: 10px;
-      }
-
-      nav a {
-        font-size: 11px;
-        padding: 6px 8px;
-      }
-
-      .topbar {
-        flex-direction: column;
-        gap: 6px;
-        text-align: center;
-      }
-    }
-
-    .nav-underline {
-  width: 1010px;              /* 🔸 Chiều dài thanh line (bạn có thể đổi) */
+/* Thanh gạch dưới */
+.nav-underline {
+  width: 1010px;              
   height: 2px;
-  background-color: #fca96a; /* 🔸 Màu theo yêu cầu */
-  margin: 0 auto 15px auto;  /* 🔸 Căn giữa và tạo khoảng cách dưới */
+  background-color: #fca96a; 
+  margin: 0 auto 15px auto;  
   border-radius: 2px;
 }
 
-    .search-box {
-  display: flex;
-  align-items: center;
-  border: 1px solid #f8f8f8;
-  border-radius: 20px;     /* quay lại bo tròn */
-  padding: 5px 12px;
-  background: #f0f0f0;
-}
-
-.logo-center {
-  display: flex;
-  align-items: center;
-  margin-left: -50px;         /* ✅ Dịch trái trên desktop */
-}
-
-.logo-center img {
-  height: 90px;
-  object-fit: contain;
-}
-
-/* 🔽 Khi màn hình nhỏ: logo sẽ tự căn giữa */
-@media (max-width: 768px) {
-  .logo-center {
-    justify-content: center;
-    margin-left: 0;          /* ❌ Xóa dịch trái */
-    margin-top: 8px;         /* tùy chọn: thêm khoảng cách nếu cần */
-  }
-}
-
-@media (max-width: 768px) {
-  .nav-underline {
-    width: 400px; /* ✅ thu nhỏ còn 1/2 */
-  }
-}
-
-.header-right {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
+/* 🔹 Style chung cho Header Button */
 .header-button {
   display: flex;
   align-items: center;
@@ -253,101 +155,36 @@ nav a.active {
 }
 
 .header-button:hover {
-  background: #fca96a;
+  background: #ff9d59;
 }
 
-@media (max-width: 768px) {
-  .header-right {
-    display: none;
-  }
-}
-
-nav {
-  display: flex;
-  gap: 10px;
-  padding: 10px 0;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-nav a {
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
-  color: #222;
-  padding: 11px 17px;
-  transition: color 0.3s ease;
-  text-transform: uppercase;
-}
-
-/* Hover và active */
-nav a:hover,
-nav a.active {
-  color: #fca96a;
-}
-
-/* 🔻 Responsive chỉnh riêng cho mobile */
-@media (max-width: 768px) {
-  nav a {
-    font-size: 11.5px;        /* Chữ nhỏ hơn */
-    padding: 6px 10px;        /* Giảm padding để không chiếm quá nhiều chiều ngang */
-    line-height: 1.4;         /* Giãn dòng nhẹ */
-  }
-
-  nav {
-    gap: 8px;                 /* Thu nhỏ khoảng cách giữa các mục */
-  }
-
-  .nav-underline {
-    width: 315px;             /* Thanh underline dưới menu cũng thu lại */
-  }
-}
-
-/* header-right: đảm bảo căn chỉnh tốt */
-.header-right {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    width: 30%; /* Điều chỉnh để cân bằng với search-box */
-}
-
-/* user-info-dropdown: chứa avatar và tên, đồng thời là điểm kích hoạt dropdown */
+/* 🔹 Dropdown và User Info */
 .user-info-dropdown {
     position: relative;
-    display: flex; /* Sử dụng flex để căn chỉnh avatar và tên */
+    display: flex; 
     align-items: center;
-    cursor: pointer; /* Cho biết đây là một phần tử có thể tương tác */
-    padding: 5px 10px; /* Thêm padding để dễ nhấp hơn */
-    border-radius: 9999px; /* Tạo hình bầu dục hoặc tròn nếu avatar tròn */
+    cursor: pointer; 
+    padding: 5px 10px; 
+    border-radius: 9999px; 
     transition: background-color 0.2s ease;
 }
-.user-info-dropdown:hover {
-    background-color: rgba(255, 255, 255, 0.2); /* Hiệu ứng hover nhẹ */
-}
-
-/* Ảnh đại diện người dùng */
 .user-profile-pic {
     width: 32px; 
     height: 32px; 
-    border-radius: 50%; /* Làm tròn hoàn hảo */
+    border-radius: 50%; 
     border: 2px solid #fff;
     object-fit: cover;
-    margin-right: 8px; /* Khoảng cách giữa avatar và tên */
-    transition: transform 0.2s ease;
+    margin-right: 8px; 
 }
-
-/* Tên người dùng */
 .user-name {
-    color: #fff; /* Màu chữ trắng */
+    color: #333; /* Đổi màu tên người dùng sang đen */
     font-weight: 600;
-    font-size: 1rem;
-    white-space: nowrap; /* Ngăn tên bị xuống dòng */
-    overflow: hidden; /* Ẩn phần tên nếu quá dài */
-    text-overflow: ellipsis; /* Hiển thị dấu ba chấm nếu tên quá dài */
-    max-width: 120px; /* Giới hạn độ dài tên để không bị tràn */
+    font-size: 0.9rem;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    max-width: 120px;
 }
-
-/* Dropdown menu */
 .dropdown-content {
     display: none;
     position: absolute;
@@ -363,91 +200,116 @@ nav a.active {
     padding: 5px 0;
     border: 1px solid #eee;
 }
-
-/* Hiển thị dropdown khi hover */
 .user-info-dropdown:hover .dropdown-content {
     display: block;
 }
-
-/* Các liên kết trong dropdown */
 .dropdown-content a {
     color: #333;
     padding: 10px 15px;
     text-decoration: none;
-    display: flex; /* Dùng flex để căn chỉnh icon và chữ */
+    display: flex; 
     align-items: center;
     font-size: 1rem;
     font-weight: 500;
 }
-
 .dropdown-content a:hover {
     background-color: #f5f5f5;
 }
-
-/* Định dạng đặc biệt cho nút Đăng xuất */
 .dropdown-content a#signout-link {
-    color: #fca96a; /* Màu đỏ */
+    color: #fca96a; 
     font-weight: 600;
 }
-
 .dropdown-content a#signout-link:hover {
-    background-color: #fbecec; /* Nền đỏ nhạt khi hover */
-    color: #ff923e; /* Đỏ đậm hơn khi hover */
+    background-color: #fbecec; 
+    color: #ff923e; 
 }
-
-/* Icon trong dropdown */
 .dropdown-content a svg {
-    margin-right: 8px; /* Khoảng cách giữa icon và chữ */
+    margin-right: 8px; 
     width: 20px;
     height: 20px;
-    stroke: currentColor; /* Icon sẽ dùng màu của text */
+    stroke: currentColor; 
     stroke-width: 2;
 }
 
-/* Tìm và thay thế CSS cho HEADER, search-box và logo-center cũ */
-
-header {
-    display: flex;
+/* 🔹 Responsive */
+@media (max-width: 768px) {
+  .hero-banner {
+    height: 140px;
+  }
+  
+  header {
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between; /* Đẩy các phần tử ra hai bên */
-    padding: 10px 30px; /* Điều chỉnh padding cho header */
-    background-color: #f8f8f8; /* Giữ màu header của bạn */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 10px;
+  }
+  
+  .logo-left img {
+    height: 40px;
+  }
+
+  .header-right {
+    margin-top: 10px;
+    display: flex; /* Hiện lại nếu bạn ẩn ở desktop */
+  }
+
+  nav a {
+    font-size: 11.5px;
+    padding: 6px 10px;
+    line-height: 1.4;
+  }
+
+  nav {
+    gap: 8px;
+  }
+
+  .nav-underline {
+    width: 90%; /* Thu nhỏ thanh line */
+    max-width: 350px;
+  }
+  
+  .topbar {
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
+  }
+
+  .header-right {
+    /* Đảm bảo nút đăng nhập hiển thị trên mobile */
+    display: flex;
+    justify-content: center;
     width: 100%;
-    position: relative; /* Quan trọng để các phần tử con hoạt động */
-    z-index: 99;
+  }
 }
 
-/* Logo ở bên trái */
-.logo-left {
-    order: 1; /* Thứ tự 1: Ở ngoài cùng bên trái */
-    flex-shrink: 0; /* Ngăn logo bị co lại */
-    margin-right: 20px;
+/* 🔹 Navigation Links */
+/* Thiết lập cơ bản */
+nav a {
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: #222 !important; /* MÀU CHỮ BÌNH THƯỜNG: Đen (Dùng !important để đảm bảo) */
+  padding: 11px 17px;
+  transition: color 0.3s ease; 
+  text-transform: uppercase;
+  background-color: transparent !important; /* Đảm bảo không có nền */
 }
 
-.logo-left img {
-    height: 100px; /* Điều chỉnh kích thước logo */
-    vertical-align: middle;
+/* 🔹 Hover Effect: Chữ chuyển sang màu cam */
+nav a:hover {
+  color: #fca96a !important; /* MÀU HOVER: Cam */
+  background-color: transparent !important; 
 }
 
-/* Header Right (Thông tin người dùng) ở bên phải */
-.header-right {
-    order: 3; /* Thứ tự 3: Ở ngoài cùng bên phải */
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end; 
-    margin-left: 20px;
+/* 🔹 Active (Link đang được chọn) */
+nav a.active {
+  color: #fca96a !important; /* MÀU ACTIVE: Cam */
+  background-color: transparent !important;
 }
-
-/* Bạn cần kiểm tra lại các style đã có cho .header-button và các thành phần khác 
-   để đảm bảo chúng không bị conflict với bố cục Flexbox mới. */
-  </style>
+</style>
 </head>
 <body>
 
-  <!-- 🔸 Header -->
-<header>
+  <header>
 
     <div class="logo-left"> 
         <a href="index.html">
@@ -455,6 +317,14 @@ header {
         </a>
     </div>
 
+    <nav>
+        <a href="../index.html">TRANG CHỦ</a>
+        <a href="../nganhangkienthuc/index.html" class="active">NGÂN HÀNG KIẾN THỨC</a>
+        <a href="../phongluyenviet/">PHÒNG LUYỆN VIẾT</a>
+        <a href="../congdongvanhoc/">CỘNG ĐỒNG VĂC HỌC</a>
+        <a href="../game">GAME HOÁ & HÀNH TRÌNH HỌC TẬP</a>
+    </nav>
+    
     <div class="header-right">
         <div id="user-info">
             <a href="index.html" class="header-button" title="Đăng nhập" id="login-button">
@@ -467,18 +337,6 @@ header {
     </div>
 
 </header>
-
-
-  <!-- 🔸 Navigation -->
-  <nav>
-    <a href="../index.html">TRANG CHỦ</a>
-    <a href="../nganhangkienthuc/index.html" class="active">NGÂN HÀNG KIẾN THỨC</a>
-    <a href="../phongluyenviet/">PHÒNG LUYỆN VIẾT</a>
-    <a href="../congdongvanhoc/">CỘNG ĐỒNG VĂN HỌC</a>
-    <a href="../game">GAME HOÁ & HÀNH TRÌNH HỌC TẬP</a>
-  </nav>
-
-  <div class="nav-underline"></div>
 
 
 <script>
