@@ -154,7 +154,7 @@ nav a {
 
 nav a:hover,
 nav a.active {
-  color: #ff6347; /* 🔥 Đổi màu chữ khi hover */
+  color: #ff8529; /* 🔥 Đổi màu chữ khi hover */
 }
 
 
@@ -190,9 +190,9 @@ nav a.active {
     }
 
     .nav-underline {
-  width: 905px;              /* 🔸 Chiều dài thanh line (bạn có thể đổi) */
+  width: 1010px;              /* 🔸 Chiều dài thanh line (bạn có thể đổi) */
   height: 2px;
-  background-color: #ff6347; /* 🔸 Màu theo yêu cầu */
+  background-color: #fca96a; /* 🔸 Màu theo yêu cầu */
   margin: 0 auto 15px auto;  /* 🔸 Căn giữa và tạo khoảng cách dưới */
   border-radius: 2px;
 }
@@ -242,7 +242,7 @@ nav a.active {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #ff7f47;
+  background: #fca96a;
   padding: 6px 12px;
   border-radius: 24px;
   font-size: 12px;
@@ -253,7 +253,7 @@ nav a.active {
 }
 
 .header-button:hover {
-  background: #ff6347;
+  background: #fca96a;
 }
 
 @media (max-width: 768px) {
@@ -283,7 +283,7 @@ nav a {
 /* Hover và active */
 nav a:hover,
 nav a.active {
-  color: #ff6347;
+  color: #fca96a;
 }
 
 /* 🔻 Responsive chỉnh riêng cho mobile */
@@ -386,13 +386,13 @@ nav a.active {
 
 /* Định dạng đặc biệt cho nút Đăng xuất */
 .dropdown-content a#signout-link {
-    color: #e53e3e; /* Màu đỏ */
+    color: #fca96a; /* Màu đỏ */
     font-weight: 600;
 }
 
 .dropdown-content a#signout-link:hover {
     background-color: #fbecec; /* Nền đỏ nhạt khi hover */
-    color: #c53030; /* Đỏ đậm hơn khi hover */
+    color: #ff923e; /* Đỏ đậm hơn khi hover */
 }
 
 /* Icon trong dropdown */
@@ -403,25 +403,54 @@ nav a.active {
     stroke: currentColor; /* Icon sẽ dùng màu của text */
     stroke-width: 2;
 }
+
+/* Tìm và thay thế CSS cho HEADER, search-box và logo-center cũ */
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Đẩy các phần tử ra hai bên */
+    padding: 10px 30px; /* Điều chỉnh padding cho header */
+    background-color: #f8f8f8; /* Giữ màu header của bạn */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 100%;
+    position: relative; /* Quan trọng để các phần tử con hoạt động */
+    z-index: 99;
+}
+
+/* Logo ở bên trái */
+.logo-left {
+    order: 1; /* Thứ tự 1: Ở ngoài cùng bên trái */
+    flex-shrink: 0; /* Ngăn logo bị co lại */
+    margin-right: 20px;
+}
+
+.logo-left img {
+    height: 100px; /* Điều chỉnh kích thước logo */
+    vertical-align: middle;
+}
+
+/* Header Right (Thông tin người dùng) ở bên phải */
+.header-right {
+    order: 3; /* Thứ tự 3: Ở ngoài cùng bên phải */
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; 
+    margin-left: 20px;
+}
+
+/* Bạn cần kiểm tra lại các style đã có cho .header-button và các thành phần khác 
+   để đảm bảo chúng không bị conflict với bố cục Flexbox mới. */
   </style>
 </head>
 <body>
 
   <!-- 🔸 Header -->
 <header>
-    <form class="search-box" action="https://www.google.com/search" method="get" target="_blank">
-        <button type="submit">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="11" cy="11" r="7" stroke="black" stroke-width="2"/>
-                <line x1="16" y1="16" x2="22" y2="22" stroke="black" stroke-width="2"/>
-            </svg>
-        </button>
-        <input type="text" name="q" placeholder="Tìm kiếm..." />
-    </form>
 
-
-    <div class="logo-center">
-        <a href="index.html">
+    <div class="logo-left"> 
+        <a href="fpcnews.html">
             <img src="../IMG/HOME/PAGE 2/updated_logo2.webp" alt="FPC Logo" />
         </a>
     </div>
@@ -442,13 +471,11 @@ nav a.active {
 
   <!-- 🔸 Navigation -->
   <nav>
-    <a href="index.html">TRANG CHỦ</a>
-    <a href="fpcnews.html" class="active">FPC NEWS</a>
-    <a href="fpcnews.html#humans">HUMANS OF FPC</a>
-    <a href="index.html#mentor">MENTOR</a>
-    <a href="index.html#bcn">BAN CHỦ NHIỆM</a>
-    <a href="index.html#ungtuyen">ỨNG TUYỂN</a>
-    <a href="index.html#contact">CONTACT</a>
+    <a href="../index.html">TRANG CHỦ</a>
+    <a href="fpcnews.html" class="active">NGÂN HÀNG KIẾN THỨC</a>
+    <a href="fpcnews.html#humans">PHÒNG LUYỆN VIẾT</a>
+    <a href="index.html#mentor">CỘNG ĐỒNG VĂN HỌC</a>
+    <a href="index.html#bcn">GAME HOÁ & HÀNH TRÌNH HỌC TẬP</a>
   </nav>
 
   <div class="nav-underline"></div>
