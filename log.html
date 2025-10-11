@@ -196,7 +196,7 @@
       const provider = new GoogleAuthProvider();
       try {
         await signInWithPopup(auth, provider);
-        window.location.href = "/student/index.html";
+        window.location.href = "../student/index.html";
       } catch (err) {
         console.error("Google login error:", err);
         alert("Lỗi đăng nhập Google: " + err.message);
