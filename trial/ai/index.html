@@ -8,10 +8,12 @@
   <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
   <link href="../LOGO.WEBP" rel="icon" type="logo-white.png"/>
   
-  <!-- Font Montserrat và Tải Tailwind CSS -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Tải Lucide Icons -->
+  
   <script src="https://unpkg.com/lucide@latest"></script> 
+  
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
@@ -23,6 +25,7 @@
         --bg-light: #f7f9fc; /* Light gray background */
         --border-color: #e5e7eb;
         --shadow-subtle: 0 10px 30px rgba(0, 0, 0, 0.08);
+        --shadow-focus: 0 0 0 3px rgba(252, 169, 106, 0.4);
     }
     * {
       margin: 0;
@@ -39,8 +42,17 @@
         min-height: 100vh;
         padding: 1rem;
     }
+    
+    /* Hiệu ứng xuất hiện cho toàn bộ container */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .main-container {
+        animation: fadeIn 0.6s ease-out forwards;
+    }
 
-    /* Single Box Container - The main wrapper */
+    /* Main Container */
     .main-container {
         display: flex;
         flex-direction: column; /* Stack vertically on mobile */
@@ -66,41 +78,39 @@
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
+        transition: all 0.3s ease;
     }
     @media (min-width: 768px) {
         .left-panel {
             flex: 0 0 350px; /* ~30% width on desktop */
-            border-right: 1px solid var(--border-color); /* The divider line */
-            max-height: 90vh; /* Match main container height */
+            border-right: 1px solid var(--border-color);
+            max-height: 90vh;
             overflow-y: auto;
         }
     }
 
     /* Right Panel (Output/Results) */
     .right-panel {
-        flex: 1; /* Takes up remaining space */
+        flex: 1;
         padding: 1.5rem;
         max-height: 90vh;
         overflow-y: auto;
     }
 
-    /* Textarea styling */
-    #prompt-input {
-        resize: none;
-        min-height: 120px;
-        border: 1px solid var(--border-color);
-        transition: border-color 0.2s;
+    /* General Transition for Inputs */
+    input, select, textarea {
+        transition: all 0.2s ease-in-out;
     }
-    #prompt-input:focus {
-        border-color: var(--primary-color);
+    input:focus, select:focus, textarea:focus {
+        border-color: var(--primary-color) !important;
         outline: none;
-        box-shadow: 0 0 0 1px var(--primary-color);
+        box-shadow: var(--shadow-focus) !important;
     }
-    
-    /* Disabled Mode Styling (Vô sắc) */
+
+    /* Disabled Mode Styling */
     .mode-disabled {
-        color: #9ca3af !important; /* Gray text */
-        background-color: #f3f4f6 !important; /* Lighter background */
+        color: #9ca3af !important;
+        background-color: #f3f4f6 !important;
         cursor: not-allowed;
     }
     .mode-disabled:hover {
@@ -108,7 +118,6 @@
     }
 
     /* === BUTTONS & CONTROLS === */
-    /* Custom CSS cho Nút Gửi (Gradient và Hover Effect) */
     .send-button {
         background-image: linear-gradient(to right, #fca96a 0%, #ff8c4a 100%); 
         border: none;
@@ -117,41 +126,57 @@
     }
     .send-button:hover:not(:disabled) {
         background-image: linear-gradient(to right, #ff8c4a 0%, #fca96a 100%);
-        transform: translateY(-1px);
+        transform: translateY(-2px);
         box-shadow: 0 6px 12px rgba(252, 169, 106, 0.5);
     }
     .send-button:disabled {
-        background-image: linear-gradient(to right, #fcd5b5 0%, #ffc099 100%);
+        background-image: linear-gradient(to right, #e4e4e4 0%, #cccccc 100%);
+        box-shadow: none;
+        transform: translateY(0);
         cursor: not-allowed;
     }
-    /* Upload Button Style */
+
     .upload-button-label {
-        background-color: var(--secondary-color);
+        background-color: #fff;
         color: var(--dark-text);
-        transition: background-color 0.2s;
-        border: 1px solid var(--primary-color);
+        transition: all 0.2s ease;
+        border: 1px solid var(--border-color);
     }
     .upload-button-label:hover {
-        background-color: #ff9d59;
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
         color: white;
+        transform: translateY(-1px);
     }
 
-    /* === OUTPUT STYLING (Markdown rendering) === */
-    #chat-output h2 {
-        font-size: 1.5rem;
-        font-weight: 700;
+    /* === OUTPUT STYLING (For Marked.js) === */
+    #chat-output {
+      line-height: 1.7; /* Tăng khoảng cách dòng cho dễ đọc */
+    }
+    #chat-output h1, #chat-output h2, #chat-output h3 {
+        color: var(--dark-text);
         margin-top: 1.5rem;
         margin-bottom: 0.5rem;
-        color: var(--dark-text);
-        border-bottom: 2px solid var(--secondary-color);
-        padding-bottom: 5px;
+        font-weight: 700;
     }
-    #chat-output h3 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-top: 1rem;
-        margin-bottom: 0.25rem;
-        color: #4a5568;
+    #chat-output h1 { font-size: 1.8rem; }
+    #chat-output h2 { font-size: 1.5rem; border-bottom: 2px solid var(--secondary-color); padding-bottom: 5px; }
+    #chat-output h3 { font-size: 1.25rem; }
+    #chat-output p { margin-bottom: 1rem; }
+    #chat-output strong { color: #2d3748; }
+    #chat-output ul, #chat-output ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+    
+    /* Typing Cursor Effect */
+    @keyframes blink {
+        50% { opacity: 0; }
+    }
+    .typing-cursor {
+        display: inline-block;
+        width: 8px;
+        height: 1.2rem;
+        background-color: var(--dark-text);
+        animation: blink 1s step-end infinite;
+        vertical-align: bottom;
     }
   </style>
 </head>
@@ -159,122 +184,81 @@
     
     <main class="main-container">
         
-        <!-- Cột Trái: Controls (Modes, Upload, Input) -->
         <div class="left-panel">
             <h2 class="text-xl font-extrabold text-[var(--dark-text)]">HOPVAN AI</h2>
             
-            <!-- Vùng chọn Modes -->
             <div>
                 <label for="ai-mode" class="block text-sm font-semibold mb-2 text-gray-700">Chọn Cấp độ Phản hồi:</label>
                 <select 
                     id="ai-mode" 
-                    class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition duration-150 shadow-sm"
+                    class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] shadow-sm"
                 >
-                    <!-- Chế độ Cơ bản (Available) -->
-                    <option value="co_ban" class="text-green-600 font-bold">
-                         ✨ CƠ BẢN (Dùng thử)
-                    </option>
-                    <!-- Chế độ Pro (Disabled) -->
-                    <option value="thong_thao" disabled class="mode-disabled">
-                        🏆 THÔNG THẠO (Đăng nhập)
-                    </option>
-                    <option value="sang_tao" disabled class="mode-disabled">
-                        🎨 SÁNG TẠO (Đăng nhập)
-                    </option>
-                    <option value="hoc_thuat" disabled class="mode-disabled">
-                        📚 HỌC THUẬT (Đăng nhập)
-                    </option>
+                    <option value="co_ban" class="text-green-600 font-bold">✨ CƠ BẢN (Dùng thử)</option>
+                    <option value="thong_thao" disabled class="mode-disabled">🏆 THÔNG THẠO (Đăng nhập)</option>
+                    <option value="sang_tao" disabled class="mode-disabled">🎨 SÁNG TẠO (Đăng nhập)</option>
+                    <option value="hoc_thuat" disabled class="mode-disabled">📚 HỌC THUẬT (Đăng nhập)</option>
                 </select>
                 <p id="mode-info" class="text-xs mt-1 text-gray-500 italic">Cấp độ: Cung cấp kiến thức cốt lõi, dễ hiểu.</p>
             </div>
 
-            <!-- Vùng Upload Docs -->
             <div class="border p-4 rounded-lg bg-gray-50 border-gray-200">
                 <label class="block text-sm font-semibold mb-2 text-gray-700">Tải lên Tài liệu (Docs):</label>
                 <input type="file" id="doc-upload" class="hidden" accept=".txt,.pdf,.doc,.docx">
                 <div class="flex items-center gap-3">
-                    <label for="doc-upload" class="upload-button-label text-white font-semibold py-2 px-4 rounded-lg transition duration-200 cursor-pointer">
-                        <i data-lucide="paperclip" class="h-5 w-5 mr-2 inline-block"></i> Tải file lên
+                    <label for="doc-upload" class="upload-button-label font-semibold py-2 px-4 rounded-lg cursor-pointer flex items-center">
+                        <i data-lucide="paperclip" class="h-4 w-4 mr-2"></i> Tải file
                     </label>
-                    <p id="doc-status" class="text-xs text-gray-600 flex-1">
-                        Chưa có tài liệu.
-                    </p>
+                    <p id="doc-status" class="text-xs text-gray-600 flex-1">Chưa có tài liệu.</p>
                 </div>
             </div>
 
-            <!-- Vùng Input -->
             <div class="flex flex-col flex-grow">
                 <label for="prompt-input" class="block text-sm font-semibold mb-2 text-gray-700">Nhập Yêu cầu:</label>
                 <textarea 
                     id="prompt-input" 
                     placeholder="Nhập yêu cầu của bạn (ví dụ: Phân tích nhân vật Chí Phèo)" 
-                    class="w-full p-4 rounded-xl transition duration-150 shadow-inner text-gray-800 flex-grow"
+                    class="w-full p-4 rounded-xl border border-gray-300 shadow-inner text-gray-800 flex-grow"
+                    rows="5"
                 ></textarea>
                 
-                <div class="mt-4 flex justify-between items-center">
-                    <p id="error-message" class="text-red-500 text-sm hidden"></p>
+                <div class="mt-4 flex flex-col items-center">
+                    <p id="error-message" class="text-red-500 text-sm hidden mb-2"></p>
                     <button 
                         id="send-button" 
-                        class="send-button text-white font-semibold py-3 px-8 rounded-lg transition duration-300 transform w-full"
+                        class="send-button text-white font-semibold py-3 px-8 rounded-lg w-full flex items-center justify-center"
                     >
-                        <i data-lucide="send" class="h-5 w-5 mr-2 inline-block"></i> Gửi Yêu Cầu
+                        <i data-lucide="send" class="h-5 w-5 mr-2"></i>
+                        <span>Gửi Yêu Cầu</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Cột Phải: Output (Kết quả phản hồi) -->
         <div class="right-panel">
-            <h2 class="text-xl font-extrabold text-[var(--dark-text)] mb-4 border-b pb-2 border-gray-100">Kết Quả Phản Hồi</h2>
+            <h2 class="text-xl font-extrabold text-[var(--dark-text)] mb-4 border-b pb-2 border-gray-200">Kết Quả Phản Hồi</h2>
             
-            <!-- Khung hiển thị kết quả -->
-            <div 
-                id="chat-output" 
-                class="rounded-xl text-gray-700"
-            >
-                <p class="text-center text-gray-500 italic p-10">
+            <div id="chat-output" class="text-gray-700">
+                <div class="text-center text-gray-500 italic p-10">
                     <svg class="mx-auto h-8 w-8 text-[var(--primary-color)] mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                     Kết quả từ HOPVAN AI sẽ hiển thị ở đây. <br>Hãy bắt đầu bằng chế độ **CƠ BẢN**!
-                </p>
+                </div>
             </div>
         </div>
     </main>
     
-    <!-- JavaScript Logic -->
     <script type="module">
-        // Định nghĩa các Modes (Chế độ) và System Prompt tương ứng
         const MODES = {
-            co_ban: {
-                name: "Cơ bản",
-                status: "available",
-                info: "Cung cấp kiến thức cốt lõi, dễ hiểu. Phù hợp cho ôn tập cơ bản.",
-                prompt: "Bạn là gia sư Văn học Tiếng Việt tập trung vào cung cấp các kiến thức cốt lõi, cơ bản và dễ hiểu nhất. Phản hồi phải có bố cục rõ ràng và dễ đọc (sử dụng Markdown).",
-            },
-            thong_thao: {
-                name: "Thông Thạo",
-                status: "disabled",
-                info: "Cung cấp phân tích chuyên sâu, phức tạp.",
-                prompt: "...",
-            },
-            sang_tao: {
-                name: "Sáng Tạo",
-                status: "disabled",
-                info: "Hỗ trợ luyện viết, tạo ý tưởng, chỉnh sửa bài viết.",
-                prompt: "...",
-            },
-            hoc_thuat: {
-                name: "Học thuật",
-                status: "disabled",
-                info: "Đánh giá, trích dẫn học thuật chuyên ngành.",
-                prompt: "...",
-            },
+            co_ban: { name: "Cơ bản", status: "available", info: "Cung cấp kiến thức cốt lõi, dễ hiểu. Phù hợp cho ôn tập cơ bản.", prompt: "Bạn là gia sư Văn học Tiếng Việt tập trung vào cung cấp các kiến thức cốt lõi, cơ bản và dễ hiểu nhất. Phản hồi phải có bố cục rõ ràng, sử dụng Markdown để định dạng (tiêu đề, danh sách, in đậm)."},
+            thong_thao: { name: "Thông Thạo", status: "disabled", info: "Cung cấp phân tích chuyên sâu, phức tạp.", prompt: "..."},
+            sang_tao: { name: "Sáng Tạo", status: "disabled", info: "Hỗ trợ luyện viết, tạo ý tưởng, chỉnh sửa bài viết.", prompt: "..."},
+            hoc_thuat: { name: "Học thuật", status: "disabled", info: "Đánh giá, trích dẫn học thuật chuyên ngành.", prompt: "..."}
         };
 
-        // Global state variables
         let isProcessing = false;
         let uploadedDoc = null; 
+        let typingInterval = null; // Biến để kiểm soát hiệu ứng gõ chữ
 
         document.addEventListener('DOMContentLoaded', () => {
             const promptInput = document.getElementById('prompt-input');
@@ -288,62 +272,35 @@
             
             lucide.createIcons();
 
-            // Initial mode info display
             modeInfo.textContent = MODES[modeSelector.value].info;
-
-            // Update mode info on change
             modeSelector.addEventListener('change', () => {
                 modeInfo.textContent = MODES[modeSelector.value].info;
             });
             
-            // === File Upload Handling ===
             docUpload.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
                     if (file.size > 5 * 1024 * 1024) { // Limit to 5MB
                         docStatus.innerHTML = `<span class="text-red-500 font-bold">Lỗi:</span> File quá lớn (Max 5MB).`;
-                        docStatus.classList.remove('bg-green-100');
                         uploadedDoc = null;
-                        e.target.value = null; // Reset input file
+                        e.target.value = null;
                         return;
                     }
-
-                    uploadedDoc = {
-                        name: file.name,
-                        size: (file.size / 1024 / 1024).toFixed(2)
-                    };
-
-                    docStatus.innerHTML = `<span class="font-bold text-green-600">File đã tải:</span> ${uploadedDoc.name} (${uploadedDoc.size} MB). <br>AI sẽ dùng nội dung này làm ngữ cảnh.`;
-                    docStatus.classList.add('bg-green-100', 'p-2', 'rounded');
-                    docStatus.classList.remove('text-gray-600');
-
-                    // Read content for text-based files
+                    uploadedDoc = { name: file.name, size: (file.size / 1024 / 1024).toFixed(2) };
+                    docStatus.innerHTML = `<span class="font-bold text-green-600">File đã tải:</span> ${uploadedDoc.name} (${uploadedDoc.size} MB).`;
                     if (file.type === 'text/plain') {
                         const reader = new FileReader();
-                        reader.onload = (e) => {
-                            uploadedDoc.content = e.target.result;
-                        };
+                        reader.onload = (e) => { uploadedDoc.content = e.target.result; };
                         reader.readAsText(file);
                     } else {
-                         // Placeholder for PDF/DOCX (actual parsing needs server-side processing)
-                        docStatus.innerHTML = `<span class="font-bold text-yellow-600">File tải lên:</span> ${uploadedDoc.name} (${uploadedDoc.size} MB). <br>AI chỉ dùng tên file làm gợi ý.`;
+                        docStatus.innerHTML += `<br><span class="text-yellow-600">Lưu ý: AI chỉ dùng tên file PDF/DOCX.</span>`;
                     }
-
                 } else {
                     uploadedDoc = null;
                     docStatus.innerHTML = `Chưa có tài liệu.`;
-                    docStatus.classList.remove('bg-green-100', 'p-2', 'rounded');
-                    docStatus.classList.add('text-gray-600');
                 }
             });
 
-            // Auto-adjust textarea height on input
-            promptInput.addEventListener('input', () => {
-                promptInput.style.height = 'auto';
-                promptInput.style.height = promptInput.scrollHeight + 'px';
-            });
-            
-            // Event Listeners for Chat
             sendButton.addEventListener('click', handleAIChat);
             promptInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
@@ -352,64 +309,68 @@
                 }
             });
 
-            // Function to get the system prompt based on selected mode
             function getSystemPrompt(modeKey) {
-                return MODES[modeKey] ? MODES[modeKey].prompt : MODES.co_ban.prompt;
+                return MODES[modeKey]?.prompt || MODES.co_ban.prompt;
+            }
+            
+            // **Hàm mới: Tạo hiệu ứng gõ chữ**
+            function typeWriter(element, text, onComplete) {
+                let i = 0;
+                element.innerHTML = ""; // Xóa nội dung cũ
+                if (typingInterval) clearInterval(typingInterval);
+
+                typingInterval = setInterval(() => {
+                    if (i < text.length) {
+                        element.innerHTML = marked.parse(text.substring(0, i + 1) + '<span class="typing-cursor"></span>');
+                        i++;
+                        element.scrollTop = element.scrollHeight; // Tự động cuộn xuống
+                    } else {
+                        clearInterval(typingInterval);
+                        element.innerHTML = marked.parse(text); // Hiển thị đầy đủ khi hoàn tất
+                        if (onComplete) onComplete();
+                    }
+                }, 10); // Tốc độ gõ chữ (ms)
             }
 
-            // Function to handle AI chat request
             async function handleAIChat() {
                 const modeKey = modeSelector.value;
                 const mode = MODES[modeKey];
                 const rawInput = promptInput.value.trim();
                 
-                // 1. Validation
                 if (mode.status === 'disabled') {
-                    errorMessage.textContent = `❌ Chế độ ${mode.name} (PRO) chưa khả dụng trong bản dùng thử. Vui lòng chọn Cơ bản.`;
+                    errorMessage.textContent = `❌ Chế độ ${mode.name} (PRO) chưa khả dụng trong bản dùng thử.`;
                     errorMessage.classList.remove('hidden');
                     return;
                 }
-
                 if (!rawInput) {
                     errorMessage.textContent = "Vui lòng nhập nội dung yêu cầu.";
                     errorMessage.classList.remove('hidden');
                     return;
                 }
+                if (isProcessing) return;
                 
-                if (isProcessing) {
-                    return;
-                }
-                
-                // 2. State & UI Update (Loading)
                 errorMessage.classList.add('hidden');
                 isProcessing = true;
                 sendButton.disabled = true;
-                sendButton.classList.add('opacity-60', 'cursor-not-allowed');
-                sendButton.innerHTML = `<svg class="animate-spin h-5 w-5 mr-3 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg> Đang Xử Lý...`;
-
-                // Display loading state in output
+                sendButton.innerHTML = `<svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Đang Xử Lý...</span>`;
+                
+                // Hiển thị trạng thái loading tinh tế hơn
                 chatOutput.innerHTML = `<div class="p-4 text-center text-gray-500 italic">
-                                            <p class="text-lg font-bold text-[var(--primary-color)]">Đang tạo phản hồi...</p>
-                                            <p class="mt-1">Chế độ hiện tại: ${mode.name}</p>
+                                            <p class="font-semibold text-[var(--primary-color)]">Đang kết nối tới HOPVAN AI...</p>
+                                            <div class="mt-2 text-sm">Chế độ: <span class="font-bold">${mode.name}</span></div>
                                         </div>`;
 
-                // 3. Construct Prompt (with Docs)
                 let userPrompt = rawInput;
-                if (uploadedDoc && uploadedDoc.content) {
-                    userPrompt = `${rawInput}\n\n[NGỮ CẢNH TỪ TÀI LIỆU (${uploadedDoc.name})]:\n${uploadedDoc.content}`;
-                } else if (uploadedDoc) {
-                    userPrompt = `${rawInput}\n\n[NGỮ CẢNH TỪ TÀI LIỆU (Tên: ${uploadedDoc.name})]:\n[Không thể đọc nội dung (PDF/DOCX). Vui lòng trả lời dựa trên tên tài liệu và kiến thức của bạn.]`;
+                if (uploadedDoc) {
+                    userPrompt += uploadedDoc.content 
+                        ? `\n\n[NGỮ CẢNH TỪ TÀI LIỆU (${uploadedDoc.name})]:\n${uploadedDoc.content}`
+                        : `\n\n[NGỮ CẢNH TỪ TÀI LIỆU (Tên: ${uploadedDoc.name})]:\n[Không thể đọc nội dung. Vui lòng trả lời dựa trên tên tài liệu và kiến thức của bạn.]`;
                 }
 
                 const systemPrompt = getSystemPrompt(modeKey);
 
-                // 4. API Call Logic (using DeepSeek Vercel API)
                 try {
                     const API_URL = "https://ai-20tzpas10-nhans-projects-0c2bb639.vercel.app/api/deepseek"; 
-                    
                     const response = await fetch(API_URL, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -422,46 +383,39 @@
                     });
 
                     if (!response.ok) {
-                        try {
-                            const errorDetails = await response.json(); 
-                            throw new Error("API lỗi: " + (errorDetails.error || response.statusText));
-                        } catch (e) {
-                            throw new Error("API lỗi: " + response.status + ". (Kiểm tra URL API)");
-                        }
+                        const errorDetails = await response.json().catch(() => ({}));
+                        throw new Error(`API Lỗi ${response.status}: ${errorDetails.error || response.statusText}`);
                     }
 
                     const data = await response.json();
-                    let responseText = data.text || "Xin lỗi, tôi không nhận được phản hồi hợp lệ.";
+                    const responseText = data.text || "Xin lỗi, không nhận được phản hồi hợp lệ.";
 
-                    // 5. Render Output (Markdown to HTML)
-                    responseText = responseText
-                        .replace(/^### (.*)$/gm, '<h3 class="text-xl font-semibold mt-4 mb-2 text-gray-800">$1</h3>')
-                        .replace(/^## (.*)$/gm, '<h2 class="text-2xl font-bold mt-5 mb-3 text-gray-800">$1</h2>')
-                        .replace(/^# (.*)$/gm, '<h1 class="text-3xl font-extrabold mt-6 mb-4 text-gray-800">$1</h1>')
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\n/g, '<br>');
-
-                    // Display result
-                    chatOutput.innerHTML = `<div class="p-4">${responseText}</div>`;
+                    // **Sử dụng hiệu ứng gõ chữ để hiển thị kết quả**
+                    const resultContainer = document.createElement('div');
+                    chatOutput.innerHTML = '';
+                    chatOutput.appendChild(resultContainer);
                     
-                    // Scroll to bottom
-                    document.getElementById('chat-output').scrollTop = document.getElementById('chat-output').scrollHeight;
+                    typeWriter(resultContainer, responseText, () => {
+                        // Callback này sẽ chạy khi gõ chữ xong
+                        resetUI();
+                    });
                     
-                    // Clear input
                     promptInput.value = "";
-                    promptInput.style.height = '120px'; // Reset height
+                    promptInput.style.height = 'auto';
 
                 } catch (error) {
                     console.error("Lỗi: ", error);
-                    chatOutput.innerHTML = `<div class="p-4"><p class="text-red-600 font-medium">❌ Đã xảy ra lỗi:</p><p>${error.message}</p><p class="mt-2 text-sm text-gray-500">Vui lòng kiểm tra lại URL API, kết nối mạng hoặc thử lại sau.</p></div>`;
-                } finally {
-                    // 6. Reset State & UI
-                    isProcessing = false;
-                    sendButton.disabled = false;
-                    sendButton.classList.remove('opacity-60', 'cursor-not-allowed');
-                    sendButton.innerHTML = `<i data-lucide="send" class="h-5 w-5 mr-2 inline-block"></i> Gửi Yêu Cầu`;
-                    lucide.createIcons(); // Re-create icon after innerHTML change
+                    chatOutput.innerHTML = `<div class="p-4 text-red-600 bg-red-50 rounded-lg"><p class="font-bold">❌ Đã xảy ra lỗi:</p><p>${error.message}</p></div>`;
+                    resetUI(); // Reset UI ngay cả khi có lỗi
                 }
+            }
+
+            // Hàm riêng để reset UI
+            function resetUI() {
+                isProcessing = false;
+                sendButton.disabled = false;
+                sendButton.innerHTML = `<i data-lucide="send" class="h-5 w-5 mr-2"></i> <span>Gửi Yêu Cầu</span>`;
+                lucide.createIcons();
             }
         });
     </script>
