@@ -10,21 +10,12 @@
         <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
         <meta property="og:url" content="https://hopvan.netlify.app" />
         <meta property="og:type" content="article" />
-        <!-- Favicon -->
         <link href="../LOGO.WEBP" rel="icon" type="logo-white.png"/>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
 
         <link href="css/style_index_blocks.min.css" rel="stylesheet">
         <link href="css/style_custom_only.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
-        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-        <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-          <![endif]-->
-
-        <!-- fonts -->
         <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="font-awesome-4.0.3/css/font-awesome.min.css">
 
@@ -33,39 +24,39 @@
     <style>
 /* 1. CSS Ghi đè cho Avatar trong Header (.headernav .avt) */
 .headernav .avt .avatar {
-    width: 40px; /* Kích thước khung avatar nhỏ gọn trong header */
-    height: 40px;
-    border-radius: 50%;
+    width: 40px !important; /* Buộc kích thước header avatar */
+    height: 40px !important;
+    border-radius: 50% !important;
     overflow: hidden; 
     padding: 0; 
     margin: 0 0 0 10px; 
 }
 
 .headernav .avt .avatar img {
-    width: 100%; 
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-    box-shadow: none;
-    display: block;
+    width: 100% !important; 
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    box-shadow: none !important;
+    display: block !important;
 }
 
-/* 2. CSS Ghi đè cho Avatar trong Form Trả lời (.post .userinfo) */
+/* 2. CSS SỬA LỖI cho Avatar trong BÀI POST/BÌNH LUẬN (.post .userinfo) */
 .post .userinfo .avatar {
-    width: 70px; /* Kích thước trong form trả lời/đăng bài */
-    height: 70px;
-    border-radius: 50%;
+    width: 50px !important; /* Kích thước cho avatar bài viết/bình luận/form trả lời */
+    height: 50px !important;
+    border-radius: 50% !important;
     overflow: hidden;
     padding: 0;
 }
 
 .post .userinfo .avatar img {
-    width: 100%; 
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-    box-shadow: none;
-    display: block;
+    width: 100% !important; 
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    box-shadow: none !important;
+    display: block !important;
 }
 </style>
 
@@ -163,9 +154,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <div class="container-fluid">
 
-            <!-- //Slider -->
-
-
             <div class="headernav">
                 <div class="container">
                     <div class="row">
@@ -223,14 +211,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div class="row">
                         <div class="col-lg-8 col-md-8">
 
-                            <!-- POST -->
                             <div class="post beforepagination">
                                 <div class="topwrap">
                                     <div class="userinfo pull-left">
-                                        <div class="avatar">
-                                            <img src="images/avatar.jpg" alt="" />
-                                            <div class="status green">&nbsp;</div>
-                                        </div>
+                                        <a href="06_profile.html">
+                                            <div class="avatar">
+                                                <img src="images/avatar.jpg" alt="" />
+                                                <div class="status green">&nbsp;</div>
+                                            </div>
+                                        </a>
 
                                         <div class="icons">
                                             <img src="images/icon1.jpg" alt="" /><img src="images/icon4.jpg" alt="" /><img src="images/icon5.jpg" alt="" /><img src="images/icon6.jpg" alt="" />
@@ -263,9 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                                     <div class="clearfix"></div>
                                 </div>
-                            </div><!-- POST -->
-
-                            <div class="paginationf">
+                            </div><div class="paginationf">
                                 <div class="pull-left"><a href="#" class="prevnext"><i class="fa fa-angle-left"></i></a></div>
                                 <div class="pull-left">
                                     <ul class="paginationforum">
@@ -288,14 +275,15 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <div class="clearfix"></div>
                             </div>
 
-                            <!-- POST -->
                             <div class="post">
                                 <div class="topwrap">
                                     <div class="userinfo pull-left">
-                                        <div class="avatar">
-                                            <img src="images/avatar2.jpg" alt="" />
-                                            <div class="status red">&nbsp;</div>
-                                        </div>
+                                        <a href="06_profile.html">
+                                            <div class="avatar">
+                                                <img src="images/avatar2.jpg" alt="" />
+                                                <div class="status red">&nbsp;</div>
+                                            </div>
+                                        </a>
 
                                         <div class="icons">
                                             <img src="images/icon3.jpg" alt="" /><img src="images/icon4.jpg" alt="" /><img src="images/icon5.jpg" alt="" /><img src="images/icon6.jpg" alt="" />
@@ -327,18 +315,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
                                     <div class="clearfix"></div>
                                 </div>
-                            </div><!-- POST -->
-
-
-
-                            <!-- POST -->
-                            <div class="post">
+                            </div><div class="post">
                                 <div class="topwrap">
                                     <div class="userinfo pull-left">
-                                        <div class="avatar">
-                                            <img src="images/avatar3.jpg" alt="" />
-                                            <div class="status red">&nbsp;</div>
-                                        </div>
+                                        <a href="06_profile.html">
+                                            <div class="avatar">
+                                                <img src="images/avatar3.jpg" alt="" />
+                                                <div class="status red">&nbsp;</div>
+                                            </div>
+                                        </a>
 
                                         <div class="icons">
                                             <img src="images/icon3.jpg" alt="" /><img src="images/icon4.jpg" alt="" /><img src="images/icon5.jpg" alt="" /><img src="images/icon6.jpg" alt="" />
@@ -347,8 +332,8 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <div class="posttext pull-left">
 
                                         <blockquote>
-                                            <span class="original">Đã trả lời bình luận của - theguy_21:</span>
-                                            Theo kinh nghiệm của mình, bạn nên bắt đầu bằng việc cho nhân vật một 'vết thương' hoặc một 'bí mật' từ quá khứ. Chính những điều này sẽ tạo ra mâu thuẫn bên trong, buộc họ phải hành động một cách phi logic hoặc bất ngờ trong hiện tại. Điều đó giúp nhân vật 'thật' hơn nhiều!
+                                            <span class="original">Original Posted by - StoryTeller:</span>
+                                            Chia sẻ hay quá! Thử áp dụng 'vết thương' tâm lý xem sao.
                                         </blockquote>
                                         <p>Hoặc bạn có thể cho nhân vật một **mục tiêu rõ ràng nhưng lại có những giới hạn đạo đức/xã hội** cản trở họ. Ví dụ: Rất muốn thành công nhưng lại quá lương thiện để dùng thủ đoạn. Chính sự giằng xé đó sẽ khiến nhân vật trở nên 'tròn' và đáng nhớ hơn. Đừng ngại cho nhân vật phạm sai lầm!</p>
                                     </div>
@@ -375,19 +360,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
                                     <div class="clearfix"></div>
                                 </div>
-                            </div><!-- POST -->
-
-
-
-                            <!-- POST -->
-                            <div class="post">
+                            </div><div class="post">
                                 <form action="#" class="form" >
                                     <div class="topwrap">
                                         <div class="userinfo pull-left">
-                                            <div class="avatar">
-                                                <img src="images/avatar4.jpg" alt="" />
-                                                <div class="status red">&nbsp;</div>
-                                            </div>
+                                            <a id="reply-profile-link" href="06_profile.html">
+                                                <div class="avatar">
+                                                    <img id="reply-user-avatar" src="images/avatar4.jpg" alt="" />
+                                                    <div class="status red">&nbsp;</div>
+                                                </div>
+                                            </a>
 
                                             <div class="icons">
                                                 <img src="images/icon3.jpg" alt="" /><img src="images/icon4.jpg" alt="" /><img src="images/icon5.jpg" alt="" /><img src="images/icon6.jpg" alt="" />
@@ -395,8 +377,8 @@ document.addEventListener("DOMContentLoaded", () => {
                                         </div>
                                         <div class="posttext pull-left">
                                             <div class="textwraper">
-                                                <div class="postreply">Bình luận:</div>
-                                                <textarea name="reply" id="reply" placeholder="Nhập bình luận của bạn"></textarea>
+                                                <div class="postreply">Post a Reply</div>
+                                                <textarea name="reply" id="reply" placeholder="Type your message"></textarea>
                                             </div>
                                         </div>
                                         <div class="clearfix"></div>
@@ -408,12 +390,12 @@ document.addEventListener("DOMContentLoaded", () => {
                                         </div>
 
                                         <div class="pull-left">
-                                            <label for="note"> Gửi email cho tôi khi có ai đó phản hồi</label>
+                                            <label for="note"> Email me when some one post a reply</label>
                                         </div>
 
                                         <div class="pull-right postreply">
                                             <div class="pull-left smile"><a href="#"><i class="fa fa-smile-o"></i></a></div>
-                                            <div class="pull-left"><button class="btn btn-primary">Bình luận</button></div>
+                                            <div class="pull-left"><button class="btn btn-primary">Post Reply</button></div>
                                             <div class="clearfix"></div>
                                         </div>
 
@@ -421,29 +403,51 @@ document.addEventListener("DOMContentLoaded", () => {
                                         <div class="clearfix"></div>
                                     </div>
                                 </form>
-                            </div><!-- POST -->
-
-
-                        </div>
+                            </div></div>
                         <div class="col-lg-4 col-md-4">
 
-                            <!-- -->
                             <div class="sidebarblock">
-                                <h3>Thể loại</h3>
+                                <h3>Categories</h3>
                                 <div class="divline"></div>
                                 <div class="blocktxt">
                                     <ul class="cats">
-                                        <li><a href="#">Văn học <span class="badge pull-right">20</span></a></li>
-                                        <li><a href="#">Giải đáp thắc mắc <span class="badge pull-right">10</span></a></li>
-                                        <li><a href="#">Tâm sự <span class="badge pull-right">50</span></a></li>
-                                        <li><a href="#">Giải bài tập <span class="badge pull-right">36</span></a></li>
-                                        <li><a href="#">Chia sẻ tài liệu <span class="badge pull-right">41</span></a></li>
-                                        <li><a href="#">Tips học bài hiệu quả <span class="badge pull-right">11</span></a></li>
-                                        <li><a href="#">Tìm người dạy kèm <span class="badge pull-right">21</span></a></li>
-                                        <li><a href="#">Tìm gia sư <span class="badge pull-right">10</span></a></li>
-                                        <li><a href="#">Không xác định <span class="badge pull-right">5</span></a></li>
+                                        <li><a href="#">Technology <span class="badge pull-right">20</span></a></li>
+                                        <li><a href="#">Medecine<span class="badge pull-right">10</span></a></li>
+                                        <li><a href="#">Techinica STEM Fest<span class="badge pull-right">50</span></a></li>
+                                        <li><a href="#">Cambridge School<span class="badge pull-right">36</span></a></li>
+                                        <li><a href="#">Misc &amp; Others <span class="badge pull-right">41</span></a></li>
+                                        <li><a href="#">Unknown<span class="badge pull-right">11</span></a></li>
+                                        <li><a href="#">2K Unofficial Forums <span class="badge pull-right">5</span></a></li>
                                     </ul>
                                 </div>
+                            </div>
+
+                            <div class="sidebarblock">
+                                <h3>Major Links</h3>
+                                <div class="divline"></div>
+                                <div class="blocktxt">
+                                    <a href="index.html">About BluePad INC</a>
+                                </div>
+                                <div class="divline"></div>
+                                <div class="blocktxt">
+                                    <a href="index.html">Contact Us</a>
+                                </div>
+                                <div class="divline"></div>
+                                <div class="blocktxt">
+                                    <a href="05_login.html">Login</a>  |  <a href="04_new_account.html">Register</a>
+                                </div>
+                            </div>
+                            <div class="sidebarblock">
+                                <h3>Brought to you by BluePad</h3>
+                                <div class="divline"></div>
+                                <div class="blocktxt">
+                                    <a href="#">BluePad Inc is the Nickname project for Cambridge Technica 2019 Web Development Competition. This is a dummy website featering a reddit-like community design. It is working with Secure Sign-in and Sign-out.</a>
+                                </div>
+                                <div class="divline"></div>
+                                <div class="blocktxt">
+                                    <a href="#">Read full Documentation at https://github.com/ayushanand18/tachina-2019 .</a>
+                                </div>
+                                <div class="divline"></div>
                             </div>
 
 
@@ -486,8 +490,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-1 col-xs-3 col-sm-2 logo "><a href="#"><img src="images/logo.jpg" alt=""  /></a></div>
-                        <div class="col-lg-8 col-xs-9 col-sm-5 ">© 2025 hopvan.netlify.app</div>
+                        <div class="col-lg-8 col-xs-9 col-sm-5 ">Copyrights 2019, BluePad Inc</div>
                         <div class="col-lg-3 col-xs-12 col-sm-5 sociconcent">
+                            <ul class="socialicons">
+                                <li><a href="#"><i class="fa fa-facebook-square"></i></a></li>
+                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                                <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
+                                <li><a href="#"><i class="fa fa-dribbble"></i></a></li>
+                                <li><a href="#"><i class="fa fa-cloud"></i></a></li>
+                                <li><a href="#"><i class="fa fa-rss"></i></a></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -496,13 +508,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     </body>
 
-<script type="module">
-  // 1. Import các hàm cần thiết từ Firebase SDK phiên bản mới
+    <script type="module">
+  // 1. Import các hàm cần thiết
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
 
-  // 2. Cấu hình Firebase của bạn (copy từ file log.html)
+  // 2. Cấu hình Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
     authDomain: "hopvan-9a648.firebaseapp.com",
@@ -516,60 +528,65 @@ document.addEventListener("DOMContentLoaded", () => {
   // 3. Khởi tạo Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  const db = getFirestore(app); // Khởi tạo Firestore để sẵn sàng cho việc đăng bài
+  // const db = getFirestore(app); 
 
+  // Lấy các phần tử cần cập nhật
+  const userSection = document.querySelector('.headernav .avt');
+  
+  // Lấy các phần tử Avatar trong Form trả lời
+  const replyAvatar = document.getElementById('reply-user-avatar');
+  const replyLink = document.getElementById('reply-profile-link');
+  
   // 4. Lắng nghe sự thay đổi trạng thái đăng nhập
   onAuthStateChanged(auth, user => {
-    const userSection = document.querySelector('.headernav .avt');
-    
     if (user) {
       // --- NẾU NGƯỜI DÙNG ĐÃ ĐĂNG NHẬP ---
-      console.log("User is signed in:", user);
-      
-      // Lấy ảnh đại diện (nếu có trên Google), nếu không thì dùng ảnh mặc định
       const photoURL = user.photoURL || 'images/avatar.jpg'; 
-      // Lấy tên hiển thị
-      const displayName = user.displayName || 'Người dùng mới';
+      const displayName = user.displayName || user.email.split('@')[0];
 
-      // Cập nhật lại HTML của khu vực avatar
-userSection.innerHTML = `
-    <div class="stnt pull-left">                            
-        <form action='03_new_topic.html' class="form">
-            <button class="btn btn-primary">Tạo Topic mới</button>
-        </form>
-    </div>
-    <div class="env pull-left"><i class="fa fa-envelope"></i></div>
+      // Cập nhật HEADER (Thêm link 06_profile.html)
+      userSection.innerHTML = `
+        <div class="stnt pull-left">                            
+            <form action='03_new_topic.html' class="form">
+                <button class="btn btn-primary">Tạo Topic mới</button>
+            </form>
+        </div>
+        <div class="env pull-left"><i class="fa fa-envelope"></i></div>
 
-    <div class="avatar pull-left dropdown">
-        <a data-toggle="dropdown" href="06_profile.html"> 
-            <img src="${photoURL}" alt="${displayName}" />
-        </a> <b class="caret"></b>
-        <div class="status green">&nbsp;</div>
-        <ul class="dropdown-menu" role="menu">
-            <li role="presentation"><a role="menuitem" tabindex="-1" href="06_profile.html">Trang cá nhân của ${displayName}</a></li> 
-            <li role="presentation"><a role="menuitem" tabindex="-2" href="#">Hộp thư</a></li>
-            <li role="presentation"><a role="menuitem" tabindex="-3" href="#" id="logout-button">Đăng xuất</a></li>
-        </ul>
-    </div>
-    <div class="clearfix"></div>
-`;
+        <div class="avatar pull-left dropdown">
+            <a data-toggle="dropdown" href="06_profile.html"> <img src="${photoURL}" alt="${displayName}" />
+            </a> <b class="caret"></b>
+            <div class="status green">&nbsp;</div>
+            <ul class="dropdown-menu" role="menu">
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="06_profile.html">Trang cá nhân của ${displayName}</a></li> <li role="presentation"><a role="menuitem" tabindex="-2" href="#">Hộp thư</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-3" href="#" id="logout-button">Đăng xuất</a></li>
+            </ul>
+        </div>
+        <div class="clearfix"></div>
+      `;
+      
+      // Cập nhật Avatar và Link trong FORM TRẢ LỜI
+      if (replyAvatar) {
+          replyAvatar.src = photoURL;
+          replyAvatar.alt = displayName;
+      }
+      if (replyLink) {
+          replyLink.href = '06_profile.html';
+      }
 
       // Thêm sự kiện click cho nút đăng xuất vừa tạo
       document.getElementById('logout-button').addEventListener('click', (e) => {
         e.preventDefault();
         signOut(auth).then(() => {
-          console.log('User signed out.');
-          window.location.reload(); // Tải lại trang để cập nhật giao diện
+          window.location.reload(); 
         }).catch(error => {
           console.error('Sign out error', error);
         });
       });
 
     } else {
-      // --- NẾU NGƯỜI DÙNG ĐÃ ĐĂNG XUẤT (HOẶC CHƯA ĐĂNG NHẬP) ---
-      console.log("User is signed out.");
-
-      // Trả lại HTML mặc định
+      // --- NẾU NGƯỜI DÙNG CHƯA ĐĂNG NHẬP ---
+      // Cập nhật HEADER (Link về log.html)
       userSection.innerHTML = `
         <div class="stnt pull-left">                            
             <a href="log.html" class="btn btn-primary">Đăng nhập để tạo Topic</a>
@@ -583,8 +600,16 @@ userSection.innerHTML = `
         </div>
         <div class="clearfix"></div>
       `;
+      
+      // Cập nhật Avatar và Link trong FORM TRẢ LỜI về mặc định / log.html
+      if (replyAvatar) {
+          replyAvatar.src = 'images/avatar4.jpg'; // Avatar mặc định
+          replyAvatar.alt = '';
+      }
+      if (replyLink) {
+          replyLink.href = '05_login.html'; // Hoặc log.html nếu bạn dùng file đó
+      }
     }
   });
-
 </script>
 </html>
