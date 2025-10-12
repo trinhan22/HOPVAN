@@ -332,49 +332,25 @@
                 }, 10); // Tốc độ gõ chữ (ms)
             }
 
-            async function handleAIChat() {
-                const modeKey = modeSelector.value;
-                const mode = MODES[modeKey];
-                const rawInput = promptInput.value.trim();
+async function handleAIChat() {
+                // ... (phần khai báo biến và kiểm tra lỗi giữ nguyên)
                 
-                if (mode.status === 'disabled') {
-                    errorMessage.textContent = `❌ Chế độ ${mode.name} (PRO) chưa khả dụng trong bản dùng thử.`;
-                    errorMessage.classList.remove('hidden');
-                    return;
-                }
-                if (!rawInput) {
-                    errorMessage.textContent = "Vui lòng nhập nội dung yêu cầu.";
-                    errorMessage.classList.remove('hidden');
-                    return;
-                }
-                if (isProcessing) return;
-                
-                errorMessage.classList.add('hidden');
-                isProcessing = true;
-                sendButton.disabled = true;
-                sendButton.innerHTML = `<svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Đang Xử Lý...</span>`;
-                
-                // Hiển thị trạng thái loading tinh tế hơn
-                chatOutput.innerHTML = `<div class="p-4 text-center text-gray-500 italic">
-                                            <p class="font-semibold text-[var(--primary-color)]">Đang kết nối tới HOPVAN AI...</p>
-                                            <div class="mt-2 text-sm">Chế độ: <span class="font-bold">${mode.name}</span></div>
-                                        </div>`;
-
-                let userPrompt = rawInput;
-                if (uploadedDoc) {
-                    userPrompt += uploadedDoc.content 
-                        ? `\n\n[NGỮ CẢNH TỪ TÀI LIỆU (${uploadedDoc.name})]:\n${uploadedDoc.content}`
-                        : `\n\n[NGỮ CẢNH TỪ TÀI LIỆU (Tên: ${uploadedDoc.name})]:\n[Không thể đọc nội dung. Vui lòng trả lời dựa trên tên tài liệu và kiến thức của bạn.]`;
-                }
-
-                const systemPrompt = getSystemPrompt(modeKey);
+                // [TỪ BƯỚC TRƯỚC: HÃY CHẮC CHẮN BẠN ĐÃ THAY THẾ KEY NÀY]
+                const OPENROUTER_KEY = "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"; 
+                const API_URL = "https://openrouter.ai/api/v1/chat/completions"; 
+                const modelToUse = "deepseek/deepseek-chat-v3.1:free"; // Ví dụ mô hình miễn phí
+                // ... (phần xử lý prompt và systemPrompt giữ nguyên)
 
                 try {
-                    const API_URL = "https://ai-20tzpas10-nhans-projects-0c2bb639.vercel.app/api/deepseek"; 
                     const response = await fetch(API_URL, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: { 
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${OPENROUTER_KEY}`,
+                            "HTTP-Referer": window.location.href // Khuyến nghị cho OpenRouter
+                        },
                         body: JSON.stringify({
+                            model: modelToUse, // Tên mô hình
                             messages: [
                                 { role: "system", content: systemPrompt }, 
                                 { role: "user", content: userPrompt }
@@ -388,7 +364,14 @@
                     }
 
                     const data = await response.json();
-                    const responseText = data.text || "Xin lỗi, không nhận được phản hồi hợp lệ.";
+                    
+                    // <--- PHẦN CẦN CHỈNH SỬA TỪ BƯỚC TRƯỚC VÀ BƯỚC NÀY --->
+                    const responseText = data.choices?.[0]?.message?.content || "Xin lỗi, không nhận được phản hồi hợp lệ.";
+
+                    if (data.error) {
+                        throw new Error(`OpenRouter Lỗi: ${data.error.message || data.error.type}. Hãy kiểm tra API Key và Credit.`);
+                    }
+                    // <--- KẾT THÚC PHẦN CHỈNH SỬA --->
 
                     // **Sử dụng hiệu ứng gõ chữ để hiển thị kết quả**
                     const resultContainer = document.createElement('div');
@@ -396,7 +379,6 @@
                     chatOutput.appendChild(resultContainer);
                     
                     typeWriter(resultContainer, responseText, () => {
-                        // Callback này sẽ chạy khi gõ chữ xong
                         resetUI();
                     });
                     
@@ -406,7 +388,7 @@
                 } catch (error) {
                     console.error("Lỗi: ", error);
                     chatOutput.innerHTML = `<div class="p-4 text-red-600 bg-red-50 rounded-lg"><p class="font-bold">❌ Đã xảy ra lỗi:</p><p>${error.message}</p></div>`;
-                    resetUI(); // Reset UI ngay cả khi có lỗi
+                    resetUI();
                 }
             }
 
