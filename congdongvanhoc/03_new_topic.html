@@ -1,9 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Forum :: Create Topic</title>
+        <meta name="google-site-verification" content="73dRIdwl0wADm4SOV2_fm4zWOu8ZbaaJQbfiFdVc09g" />
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>HOPVAN - Cộng đồng văn học</title>
+        <meta property="og:title" content="HOPVAN - Học văn thông minh" />
+        <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+        <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+        <meta property="og:url" content="https://hopvan.netlify.app" />
+        <meta property="og:type" content="article" />
+        <!-- Favicon -->
+        <link href="../LOGO.WEBP" rel="icon" type="logo-white.png"/>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
 
         <link href="css/style_index_blocks.min.css" rel="stylesheet">
         <link href="css/style_custom_only.css" rel="stylesheet">
@@ -21,6 +30,100 @@
 
 
     </head>
+
+    <div id="header"></div>
+<script>
+fetch("header.html")
+  .then(res => res.text())
+  .then(data => document.getElementById("header").innerHTML = data);
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  function setupPagination(sectionId, itemsPerPage=6) {
+    const section = document.getElementById(sectionId);
+    const cards = Array.from(section.querySelectorAll(".news-card"));
+    const totalPages = Math.ceil(cards.length / itemsPerPage);
+
+    const paginationContainer = document.createElement("div");
+    paginationContainer.className = "pagination";
+    section.insertAdjacentElement("afterend", paginationContainer);
+
+    let currentPage = 1;
+
+    function renderPagination() {
+      paginationContainer.innerHTML = "";
+
+      // Prev
+      const prev = document.createElement("span");
+      prev.className = "prev";
+      prev.textContent = "«";
+      prev.onclick = () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderCards();
+          renderPagination();
+        }
+      };
+      paginationContainer.appendChild(prev);
+
+      // Page numbers
+      for (let i = 1; i <= totalPages; i++) {
+        const page = document.createElement("span");
+        page.className = "page-number" + (i === currentPage ? " active" : "");
+        page.textContent = i;
+        page.onclick = () => {
+          currentPage = i;
+          renderCards();
+          renderPagination();
+        };
+        paginationContainer.appendChild(page);
+      }
+
+      // Next
+      const next = document.createElement("span");
+      next.className = "next";
+      next.textContent = "»";
+      next.onclick = () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderCards();
+          renderPagination();
+        }
+      };
+      paginationContainer.appendChild(next);
+    }
+
+    function renderCards() {
+      cards.forEach((card, index) => {
+        // reset
+        card.style.display = "none";
+        card.classList.remove("show");
+      });
+
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+
+      cards.slice(start, end).forEach((card, i) => {
+        card.style.display = "block";
+        // delay animation theo vị trí để đẹp hơn
+        setTimeout(() => card.classList.add("show"), i * 100);
+      });
+    }
+
+    renderCards();
+    renderPagination();
+  }
+
+  // chạy cho NEWS (7 card -> 6 + 1)
+  setupPagination("news-section", 6);
+
+  // chạy cho HUMANS (10 card -> 6 + 4)
+  setupPagination("humans-section", 6);
+});
+</script>
+
+        <div class="container-fluid">
     <body class="topic">
 
         <div class="container-fluid">
@@ -29,16 +132,15 @@
             <div class="headernav">
                 <div class="container">
                     <div class="row">
-                        <div class="col-lg-1 col-xs-3 col-sm-2 col-md-2 logo "><a href="01_forum_home.html"><img src="images/logo.jpg" alt=""  /></a></div>
                         <div class="col-lg-3 col-xs-9 col-sm-5 col-md-3 selecttopic">
                             <div class="dropdown">
-                                <a data-toggle="dropdown" href="#">Create New Post</a> 
+                                <a data-toggle="dropdown" href="index.html" >Cộng đồng văn học</a> 
                             </div>
                         </div>
                         <div class="col-lg-4 search hidden-xs hidden-sm col-md-3">
                             <div class="wrap">
                                 <form action="#"  class="form">
-                                    <div class="pull-left txt"><input type="text" class="form-control" placeholder="Search Topics"></div>
+                                    <div class="pull-left txt"><input type="text" class="form-control" placeholder="Tìm kiếm Topics"></div>
                                         <div class="pull-right"><button class="btn btn-default" type="button"><i class="fa fa-search"></i></button></div>
                                     <div class="clearfix"></div>
                                 </form>
@@ -47,7 +149,7 @@
                         <div class="col-lg-4 col-xs-12 col-sm-5 col-md-4 avt">
                             <div class="stnt pull-left">                            
                                 <form action="03_new_topic.html"  class="form">
-                                    <button class="btn btn-primary">Start New Topic</button>
+                                    <button class="btn btn-primary">Tạo Topic mới</button>
                                 </form>
                             </div>
                             <div class="env pull-left"><i class="fa fa-envelope"></i></div>
