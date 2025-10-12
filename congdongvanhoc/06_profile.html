@@ -259,10 +259,8 @@ document.addEventListener("DOMContentLoaded", () => {
                             </div>
                         </div>
                         <div class="col-lg-4 col-xs-12 col-sm-5 col-md-4 avt">
-                            <div class="stnt pull-left"> 
-                                <form action="03_new_topic.html"  class="form">
-                                    <button class="btn btn-primary">Tạo Topic mới</button>
-                                </form>
+                            <div class="stnt pull-left">
+                                <a href="#" class="btn btn-primary btn-sm rounded-pill" id="edit-profile-button" style="padding: 5px 10px; font-size: 12px;">Chỉnh sửa profile</a>
                             </div>
                             <div class="env pull-left"><i class="fa fa-envelope"></i></div>
                             
@@ -341,8 +339,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             
                             <div class="row text-center" style="margin-top: 15px;">
                                 <div class="col-md-12 btn-group-profile"> 
-                                    <button type="button" class="btn btn-primary" id="edit-profile-btn">Chỉnh sửa Profile</button>
-                                    <button type="button" class="btn btn-danger" id="logout-btn-main">Đăng xuất</button>
+                                    <button type="button" class="btn btn-primary btn-sm rounded-pill" id="edit-profile-btn">Chỉnh sửa Profile</button>
+                                    
+                                    <button type="button" class="btn btn-danger btn-sm rounded-pill" id="logout-btn-main">Đăng xuất</button>
                                 </div>
                             </div>
                         </div>
@@ -435,15 +434,19 @@ document.addEventListener("DOMContentLoaded", () => {
               </div>
               <div class="clearfix"></div>
           `;
-          
-          document.getElementById('logout-button').addEventListener('click', (e) => {
-              e.preventDefault();
-              signOut(auth).then(() => {
-                  window.location.href = "index.html"; 
-              }).catch(error => {
-                  console.error('Sign out error', error);
-              });
-          });
+                
+        // ... (trong khối 'if (user)' ở cuối file)
+
+        // Thêm sự kiện đăng xuất cho header
+        document.getElementById('logout-button').addEventListener('click', (e) => {
+            e.preventDefault();
+            signOut(auth).then(() => {
+                // Đảm bảo đường dẫn chuyển hướng là "index.html"
+                window.location.href = "index.html"; 
+            }).catch(error => {
+                console.error('Sign out error', error);
+            });
+        });
       }
 
       // 2. CẬP NHẬT THÔNG TIN PROFILE VỚI CẤU TRÚC MỚI
@@ -458,5 +461,55 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = "log.html";
     }
   });
+
+onAuthStateChanged(auth, user => {
+    if (user) {
+        // ... (phần code cập nhật header ở đây) ...
+        if (userSection) {
+            // ... (HTML content update) ...
+
+            // Thêm sự kiện đăng xuất cho header (ID: logout-button)
+            document.getElementById('logout-button').addEventListener('click', (e) => {
+                e.preventDefault();
+                signOut(auth).then(() => {
+                    // Đảm bảo đường dẫn chuyển hướng là "index.html"
+                    window.location.href = "index.html"; 
+                }).catch(error => {
+                    console.error('Sign out error', error);
+                });
+            });
+        }
+
+        // 2. CẬP NHẬT THÔNG TIN PROFILE VỚI CẤU TRÚC MỚI
+        if (profileAvatar) profileAvatar.src = photoURL;
+        if (profileDisplayName2) profileDisplayName2.textContent = displayName;
+        if (profileEmail) profileEmail.textContent = user.email;
+        if (profileMemberSince) profileMemberSince.textContent = creationDate;
+
+        // BẮT ĐẦU VỊ TRÍ CẦN SỬA: Dán code xử lý nút Đăng xuất chính vào đây!
+        const logoutBtnMain = document.getElementById('logout-btn-main');
+
+        if (logoutBtnMain) {
+            logoutBtnMain.addEventListener('click', (e) => {
+                e.preventDefault();
+                signOut(auth).then(() => {
+                    console.log('User signed out from main profile button.');
+                    // CHUYỂN HƯỚNG VỀ TRANG CHỦ (index.html)
+                    window.location.href = "index.html"; 
+                }).catch(error => {
+                    console.error('Sign out error', error);
+                    alert("Lỗi khi đăng xuất: " + error.message);
+                });
+            });
+        }
+        // KẾT THÚC VỊ TRÍ CẦN SỬA
+
+    } else {
+        // --- NGƯỜI DÙNG CHƯA ĐĂNG NHẬP: CHUYỂN HƯỚNG ---
+        alert("Bạn cần đăng nhập để xem trang cá nhân.");
+        window.location.href = "log.html";
+    }
+});
+// Đảm bảo không có đoạn code xử lý logoutBtnMain nào bên ngoài khối này.
 </script>
 </html>
