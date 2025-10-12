@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "WEB VAN/trial/ai/api/deepseek.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/deepseek",
+      "destination": "WEB VAN/trial/ai/api/deepseek.js"
+    }
+  ]
+}
