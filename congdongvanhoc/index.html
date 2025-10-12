@@ -35,9 +35,6 @@
 <script src="https://www.gstatic.com/firebasejs/6.4.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/6.4.0/firebase-firestore.js"></script>
 
-<script>
-  // Your web app's Firebase configuration
-  var firebaseConfig = {
       apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
       authDomain: "hopvan-9a648.firebaseapp.com",
       projectId: "hopvan-9a648",
@@ -45,9 +42,20 @@
       messagingSenderId: "429347196227",
       appId: "1:429347196227:web:917b8d019f0efd0f7833f6",
       measurementId: "G-1BG8PSRG0R"
-  };
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
+<script>
+// Your web app's Firebase configuration
+var firebaseConfig = {
+  apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
+  authDomain: "hopvan-9a648.firebaseapp.com",
+  // ĐÂY LÀ DÒNG BẠN CẦN THAY THẾ
+  databaseURL: "https://hopvan-9a648-default-rtdb.firebaseio.com", 
+  projectId: "hopvan-9a648",
+  storageBucket: "hopvan-9a648.appspot.com",
+  messagingSenderId: "429347196227",
+  appId: "1:429347196227:web:917b8d019f0efd0f7833f6"
+};
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 </script>
 
 <div id="header"></div>
