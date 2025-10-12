@@ -186,7 +186,7 @@
       try {
         await signInWithEmailAndPassword(auth, email, password);
         // Chuyển hướng sau khi đăng nhập thành công
-        window.location.href = "index.html"; 
+        window.location.href = "student/index.html"; 
       } catch (err) {
         let message = "Sai email hoặc mật khẩu. Vui lòng kiểm tra lại.";
         if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
@@ -204,7 +204,7 @@
       try {
         await signInWithPopup(auth, provider);
         // Chuyển hướng sau khi đăng nhập thành công
-        window.location.href = "index.html"; 
+        window.location.href = "../student/index.html"; 
       } catch (err) {
         console.error("Google login error:", err);
         alert("Đăng nhập bằng Google thất bại: " + err.message);
