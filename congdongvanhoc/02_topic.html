@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="google-site-verification" content="73dRIdwl0wADm4SOV2_fm4zWOu8ZbaaJQbfiFdVc09g" />
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>HOPVAN - Cộng đồng văn học</title>
+        <meta property="og:title" content="HOPVAN - Học văn thông minh" />
+        <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+        <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+        <meta property="og:url" content="https://hopvan.netlify.app" />
+        <meta property="og:type" content="article" />
+        <!-- Favicon -->
+        <link href="../LOGO.WEBP" rel="icon" type="logo-white.png"/>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+
+        <link href="css/style_index_blocks.min.css" rel="stylesheet">
+        <link href="css/style_custom_only.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+          <![endif]-->
+
+        <!-- fonts -->
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="font-awesome-4.0.3/css/font-awesome.min.css">
+
+    </head>
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyCqE7RoY7Vph-Ui3ZaotGnRSOsyxOtAfYs",
+    authDomain: "cambridge-technica-2019.firebaseapp.com",
+    databaseURL: "https://cambridge-technica-2019.firebaseio.com",
+    projectId: "cambridge-technica-2019",
+    storageBucket: "",
+    messagingSenderId: "933613214672",
+    appId: "1:933613214672:web:79989cad334a0113"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+</script>
+
+<div id="header"></div>
+<script>
+fetch("header.html")
+  .then(res => res.text())
+  .then(data => document.getElementById("header").innerHTML = data);
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  function setupPagination(sectionId, itemsPerPage=6) {
+    const section = document.getElementById(sectionId);
+    const cards = Array.from(section.querySelectorAll(".news-card"));
+    const totalPages = Math.ceil(cards.length / itemsPerPage);
+
+    const paginationContainer = document.createElement("div");
+    paginationContainer.className = "pagination";
+    section.insertAdjacentElement("afterend", paginationContainer);
+
+    let currentPage = 1;
+
+    function renderPagination() {
+      paginationContainer.innerHTML = "";
+
+      // Prev
+      const prev = document.createElement("span");
+      prev.className = "prev";
+      prev.textContent = "«";
+      prev.onclick = () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderCards();
+          renderPagination();
+        }
+      };
+      paginationContainer.appendChild(prev);
+
+      // Page numbers
+      for (let i = 1; i <= totalPages; i++) {
+        const page = document.createElement("span");
+        page.className = "page-number" + (i === currentPage ? " active" : "");
+        page.textContent = i;
+        page.onclick = () => {
+          currentPage = i;
+          renderCards();
+          renderPagination();
+        };
+        paginationContainer.appendChild(page);
+      }
+
+      // Next
+      const next = document.createElement("span");
+      next.className = "next";
+      next.textContent = "»";
+      next.onclick = () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderCards();
+          renderPagination();
+        }
+      };
+      paginationContainer.appendChild(next);
+    }
+
+    function renderCards() {
+      cards.forEach((card, index) => {
+        // reset
+        card.style.display = "none";
+        card.classList.remove("show");
+      });
+
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+
+      cards.slice(start, end).forEach((card, i) => {
+        card.style.display = "block";
+        // delay animation theo vị trí để đẹp hơn
+        setTimeout(() => card.classList.add("show"), i * 100);
+      });
+    }
+
+    renderCards();
+    renderPagination();
+  }
+
+  // chạy cho NEWS (7 card -> 6 + 1)
+  setupPagination("news-section", 6);
+
+  // chạy cho HUMANS (10 card -> 6 + 4)
+  setupPagination("humans-section", 6);
+});
+</script>
+
+        <div class="container-fluid">
+
+            <!-- //Slider -->
+
+
+            <div class="headernav">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-3 col-xs-9 col-sm-5 col-md-3 selecttopic">
+                            <div class="dropdown">
+                                <a data-toggle="dropdown" href="index.html" >Cộng đồng văn học</a> 
+                            </div>
+                        </div>
+                        <div class="col-lg-4 search hidden-xs hidden-sm col-md-3">
+                            <div class="wrap">
+                                <form action="#" class="form">
+                                    <div class="pull-left txt"><input type="text" class="form-control" placeholder="Tìm kiếm Topics"></div>
+                                    <div class="pull-right"><button class="btn btn-default" type="button"><i class="fa fa-search"></i></button></div>
+                                    <div class="clearfix"></div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xs-12 col-sm-5 col-md-4 avt">
+                            <div class="stnt pull-left">                            
+                                <form action="03_new_topic.html"  class="form">
+                                    <button class="btn btn-primary">Tạo Topic mới</button>
+                                </form>
+                            </div>
+                            <div class="env pull-left"><i class="fa fa-envelope"></i></div>
+
+                            <div class="avatar pull-left dropdown">
+                                <a data-toggle="dropdown" href="06_profile.html"><img src="images/avatar.jpg" alt="" /></a> <b class="caret"></b>
+                                <div class="status green">&nbsp;</div>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">My Profile</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-2" href="#">Inbox</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-3" href="#">Log Out</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-4" href="04_new_account.html">Create account</a></li>
+                                </ul>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <section class="content">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-8 breadcrumbf">
+                            <a href="#">Home</a> <span class="diviver">&gt;</span> <a href="#">General Discussion</a> <span class="diviver">&gt;</span> <a href="#">Topic Details</a>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-8 col-md-8">
+
+                            <!-- POST -->
+                            <div class="post beforepagination">
+                                <div class="topwrap">
+                                    <div class="userinfo pull-left">
+                                        <div class="avatar">
+                                            <img src="images/avatar.jpg" alt="" />
+                                            <div class="status green">&nbsp;</div>
+                                        </div>
+
+                                        <div class="icons">
+                                            <img src="images/icon1.jpg" alt="" /><img src="images/icon4.jpg" alt="" /><img src="images/icon5.jpg" alt="" /><img src="images/icon6.jpg" alt="" />
+                                        </div>
+                                    </div>
+                                    <div class="posttext pull-left">
+                                        <h2>10 Kids Unaware of Their Halloween Costume</h2>
+                                        <p>Today, we're looking at three particularly interesting stories. Pinterest added a new location-based feature on Wednesday that uses Place Pins as a way to map out vacations and favorite areas. Southwest Airlines is providing Wi-Fi access from gate to gate for $8 per day through an onboard hotspot. And in an effort to ramp up its user base, Google Wallet is offering a debit card that can take out cash from.</p>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>                              
+                                <div class="postinfobot">
+
+                                    <div class="likeblock pull-left">
+                                        <a href="#" class="up"><i class="fa fa-thumbs-o-up"></i>25</a>
+                                        <a href="#" class="down"><i class="fa fa-thumbs-o-down"></i>3</a>
+                                    </div>
+
+                                    <div class="prev pull-left">                                        
+                                        <a href="#"><i class="fa fa-reply"></i></a>
+                                    </div>
+
+                                    <div class="posted pull-left"><i class="fa fa-clock-o"></i> Posted on : 20 Nov @ 9:30am</div>
+
+                                    <div class="next pull-right">                                        
+                                        <a href="#"><i class="fa fa-share"></i></a>
+
+                                        <a href="#"><i class="fa fa-flag"></i></a>
+                                    </div>
+
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div><!-- POST -->
+
+                            <div class="paginationf">
+                                <div class="pull-left"><a href="#" class="prevnext"><i class="fa fa-angle-left"></i></a></div>
+                                <div class="pull-left">
+                                    <ul class="paginationforum">
+                                        <li class="hidden-xs"><a href="#" class="active">1</a></li>
+                                        <li class="hidden-xs"><a href="#">2</a></li>
+                                        <li class="hidden-xs"><a href="#">3</a></li>
+                                        <li class="hidden-xs"><a href="#">4</a></li>
+                                        <li class="hidden-xs"><a href="#">5</a></li>
+                                        <li class="hidden-xs"><a href="#">6</a></li>
+                                        <li class="hidden-xs"><a href="#" >7</a></li>
+                                        <li class="hidden-xs"><a href="#">8</a></li>
+                                        <li class="hidden-xs"><a href="#">9</a></li>
+                                        <li class="hidden-xs"><a href="#">10</a></li>
+                                        <li class="hidden-xs hidden-md"><a href="#">11</a></li>
+                                        <li class="hidden-xs hidden-md"><a href="#">12</a></li>
+                                        <li class="hidden-xs hidden-sm hidden-md"><a href="#">13</a></li>
+                                    </ul>
+                                </div>
+                                <div class="pull-left"><a href="#" class="prevnext last"><i class="fa fa-angle-right"></i></a></div>
+                                <div class="clearfix"></div>
+                            </div>
+
+                            <!-- POST -->
+                            <div class="post">
+                                <div class="topwrap">
+                                    <div class="userinfo pull-left">
+                                        <div class="avatar">
+                                            <img src="images/avatar2.jpg" alt="" />
+                                            <div class="status red">&nbsp;</div>
+                                        </div>
+
+                                        <div class="icons">
+                                            <img src="images/icon3.jpg" alt="" /><img src="images/icon4.jpg" alt="" /><img src="images/icon5.jpg" alt="" /><img src="images/icon6.jpg" alt="" />
+                                        </div>
+                                    </div>
+                                    <div class="posttext pull-left">
+                                        <p>Typography helps you engage your audience and establish a distinct, unique personality on your website. Knowing how to use fonts to build character in your design is a powerful skill, and exploring the history and use of typefaces, as well as typogra...</p>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>                              
+                                <div class="postinfobot">
+
+                                    <div class="likeblock pull-left">
+                                        <a href="#" class="up"><i class="fa fa-thumbs-o-up"></i>10</a>
+                                        <a href="#" class="down"><i class="fa fa-thumbs-o-down"></i>1</a>
+                                    </div>
+
+                                    <div class="prev pull-left">                                        
+                                        <a href="#"><i class="fa fa-reply"></i></a>
+                                    </div>
+
+                                    <div class="posted pull-left"><i class="fa fa-clock-o"></i> Posted on : 20 Nov @ 9:45am</div>
+
+                                    <div class="next pull-right">                                        
+                                        <a href="#"><i class="fa fa-share"></i></a>
+
+                                        <a href="#"><i class="fa fa-flag"></i></a>
+                                    </div>
+
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div><!-- POST -->
+
+
+
+                            <!-- POST -->
+                            <div class="post">
+                                <div class="topwrap">
+                                    <div class="userinfo pull-left">
+                                        <div class="avatar">
+                                            <img src="images/avatar3.jpg" alt="" />
+                                            <div class="status red">&nbsp;</div>
+                                        </div>
+
+                                        <div class="icons">
+                                            <img src="images/icon3.jpg" alt="" /><img src="images/icon4.jpg" alt="" /><img src="images/icon5.jpg" alt="" /><img src="images/icon6.jpg" alt="" />
+                                        </div>
+                                    </div>
+                                    <div class="posttext pull-left">
+
+                                        <blockquote>
+                                            <span class="original">Original Posted by - theguy_21:</span>
+                                            Did you see that Dove ad pop up in your Facebook feed this year? How about the Geico camel one? 
+                                        </blockquote>
+                                        <p>Toronto Mayor Rob Ford does not have a bigger fan than "Anchorman's" Ron Burgundy. In fact, Burgundy wants Ford to be re-elected so much, that he agreed to sing the campaign song Brien. The tune in question ...</p>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>                              
+                                <div class="postinfobot">
+
+                                    <div class="likeblock pull-left">
+                                        <a href="#" class="up"><i class="fa fa-thumbs-o-up"></i>55</a>
+                                        <a href="#" class="down"><i class="fa fa-thumbs-o-down"></i>12</a>
+                                    </div>
+
+                                    <div class="prev pull-left">                                        
+                                        <a href="#"><i class="fa fa-reply"></i></a>
+                                    </div>
+
+                                    <div class="posted pull-left"><i class="fa fa-clock-o"></i> Posted on : 20 Nov @ 9:50am</div>
+
+                                    <div class="next pull-right">                                        
+                                        <a href="#"><i class="fa fa-share"></i></a>
+
+                                        <a href="#"><i class="fa fa-flag"></i></a>
+                                    </div>
+
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div><!-- POST -->
+
+
+
+                            <!-- POST -->
+                            <div class="post">
+                                <form action="#" class="form" >
+                                    <div class="topwrap">
+                                        <div class="userinfo pull-left">
+                                            <div class="avatar">
+                                                <img src="images/avatar4.jpg" alt="" />
+                                                <div class="status red">&nbsp;</div>
+                                            </div>
+
+                                            <div class="icons">
+                                                <img src="images/icon3.jpg" alt="" /><img src="images/icon4.jpg" alt="" /><img src="images/icon5.jpg" alt="" /><img src="images/icon6.jpg" alt="" />
+                                            </div>
+                                        </div>
+                                        <div class="posttext pull-left">
+                                            <div class="textwraper">
+                                                <div class="postreply">Post a Reply</div>
+                                                <textarea name="reply" id="reply" placeholder="Type your message"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>                              
+                                    <div class="postinfobot">
+
+                                        <div class="notechbox pull-left">
+                                            <input type="checkbox" name="note" id="note" class="form-control" />
+                                        </div>
+
+                                        <div class="pull-left">
+                                            <label for="note"> Email me when some one post a reply</label>
+                                        </div>
+
+                                        <div class="pull-right postreply">
+                                            <div class="pull-left smile"><a href="#"><i class="fa fa-smile-o"></i></a></div>
+                                            <div class="pull-left"><button class="btn btn-primary">Post Reply</button></div>
+                                            <div class="clearfix"></div>
+                                        </div>
+
+
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </form>
+                            </div><!-- POST -->
+
+
+                        </div>
+                        <div class="col-lg-4 col-md-4">
+
+                            <!-- -->
+                            <div class="sidebarblock">
+                                <h3>Categories</h3>
+                                <div class="divline"></div>
+                                <div class="blocktxt">
+                                    <ul class="cats">
+                                        <li><a href="#">Technology <span class="badge pull-right">20</span></a></li>
+                                        <li><a href="#">Medecine<span class="badge pull-right">10</span></a></li>
+                                        <li><a href="#">Techinica STEM Fest<span class="badge pull-right">50</span></a></li>
+                                        <li><a href="#">Cambridge School<span class="badge pull-right">36</span></a></li>
+                                        <li><a href="#">Misc &amp; Others <span class="badge pull-right">41</span></a></li>
+                                        <li><a href="#">Unknown<span class="badge pull-right">11</span></a></li>
+                                        <li><a href="#">2K Unofficial Forums <span class="badge pull-right">5</span></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- -->
+                            <div class="sidebarblock">
+                                <h3>Major Links</h3>
+                                <div class="divline"></div>
+                                <div class="blocktxt">
+                                    <a href="index.html">About BluePad INC</a>
+                                </div>
+                                <div class="divline"></div>
+                                <div class="blocktxt">
+                                    <a href="index.html">Contact Us</a>
+                                </div>
+                                <div class="divline"></div>
+                                <div class="blocktxt">
+                                    <a href="05_login.html">Login</a>  |  <a href="04_new_account.html">Register</a>
+                                </div>
+                            </div>
+                            <!-- -->
+                            <div class="sidebarblock">
+                                <h3>Brought to you by BluePad</h3>
+                                <div class="divline"></div>
+                                <div class="blocktxt">
+                                    <a href="#">BluePad Inc is the Nickname project for Cambridge Technica 2019 Web Development Competition. This is a dummy website featering a reddit-like community design. It is working with Secure Sign-in and Sign-out.</a>
+                                </div>
+                                <div class="divline"></div>
+                                <div class="blocktxt">
+                                    <a href="#">Read full Documentation at https://github.com/ayushanand18/tachina-2019 .</a>
+                                </div>
+                                <div class="divline"></div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="pull-left"><a href="#" class="prevnext"><i class="fa fa-angle-left"></i></a></div>
+                            <div class="pull-left">
+                                <ul class="paginationforum">
+                                        <li class="hidden-xs"><a href="#" class="active">1</a></li>
+                                        <li class="hidden-xs"><a href="#">2</a></li>
+                                        <li class="hidden-xs"><a href="#">3</a></li>
+                                        <li class="hidden-xs"><a href="#">4</a></li>
+                                        <li class="hidden-xs"><a href="#">5</a></li>
+                                        <li class="hidden-xs"><a href="#">6</a></li>
+                                        <li class="hidden-xs"><a href="#" >7</a></li>
+                                        <li class="hidden-xs"><a href="#">8</a></li>
+                                        <li class="hidden-xs"><a href="#">9</a></li>
+                                        <li class="hidden-xs"><a href="#">10</a></li>
+                                        <li class="hidden-xs hidden-md"><a href="#">11</a></li>
+                                        <li class="hidden-xs hidden-md"><a href="#">12</a></li>
+                                        <li class="hidden-xs hidden-sm hidden-md"><a href="#">13</a></li>
+                                    </ul>
+                            </div>
+                            <div class="pull-left"><a href="#" class="prevnext last"><i class="fa fa-angle-right"></i></a></div>
+                            <div class="clearfix"></div>                        
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <footer>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-1 col-xs-3 col-sm-2 logo "><a href="#"><img src="images/logo.jpg" alt=""  /></a></div>
+                        <div class="col-lg-8 col-xs-9 col-sm-5 ">Copyrights 2019, BluePad Inc</div>
+                        <div class="col-lg-3 col-xs-12 col-sm-5 sociconcent">
+                            <ul class="socialicons">
+                                <li><a href="#"><i class="fa fa-facebook-square"></i></a></li>
+                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                                <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
+                                <li><a href="#"><i class="fa fa-dribbble"></i></a></li>
+                                <li><a href="#"><i class="fa fa-cloud"></i></a></li>
+                                <li><a href="#"><i class="fa fa-rss"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+    </body>
+</html>
