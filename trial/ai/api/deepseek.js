@@ -1,8 +1,7 @@
 module.exports = async (req, res) => {
-
     // --- BẮT BUỘC ĐOẠN NÀY PHẢI NẰM Ở ĐẦU TIÊN ---
     res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', '*'); // CHO PHÉP MỌI NGUỒN
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Dòng này là chìa khóa
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
     res.setHeader(
         'Access-Control-Allow-Headers',
@@ -10,7 +9,7 @@ module.exports = async (req, res) => {
     );
 
     if (req.method === 'OPTIONS') {
-        // TRẢ VỀ THÀNH CÔNG CHO YÊU CẦU OPTIONS
+        // TRẢ VỀ THÀNH CÔNG CHO YÊU CẦU OPTIONS (CORS Preflight)
         res.status(200).end();
         return;
     }
