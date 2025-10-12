@@ -95,29 +95,49 @@ game.BirdEntity = me.Entity.extend({
         }
     },
 
-    endAnimation: function() {
-        me.game.viewport.fadeOut("#fff", 100);
-        var currentPos = this.pos.y;
-        this.endTween = new me.Tween(this.pos);
-        this.endTween.easing(me.Tween.Easing.Exponential.InOut);
+    endAnimation: function() {
+        me.game.viewport.fadeOut("#fff", 100);
+        var currentPos = this.pos.y;
+        this.endTween = new me.Tween(this.pos);
+        this.endTween.easing(me.Tween.Easing.Exponential.InOut);
 
-        this.flyTween.stop();
-        this.renderable.currentTransform.identity();
-        this.renderable.currentTransform.rotate(Number.prototype.degToRad(90));
-        var finalPos = me.game.viewport.height - this.renderable.width/2 - 96;
-        this.endTween
-            .to({y: currentPos}, 1000)
-            .to({y: finalPos}, 1000)
-            .onComplete(function() {
-                me.state.change(me.state.GAME_OVER);
-            });
-        this.endTween.start();
-    }
+        this.flyTween.stop();
+        this.renderable.currentTransform.identity();
+        this.renderable.currentTransform.rotate(Number.prototype.degToRad(90));
+        var finalPos = me.game.viewport.height - this.renderable.width/2 - 96;
+        
+        // 1. Nếu chim va chạm (chạm đất/ống nước), gọi câu hỏi ngay
+        if (this.collided) {
+            this.showQuestion();
+            return; 
+        }
+        
+        // 2. Animation rơi (Chỉ xảy ra khi chim bay quá cao)
+        this.endTween
+            .to({y: currentPos}, 1000)
+            .to({y: finalPos}, 1000)
+            .onComplete(function() {
+                // GỌI CÂU HỎI SAU KHI CHIM RƠI XONG
+                this.showQuestion();
+            }.bind(this));
+        this.endTween.start();
+    },
+    
+    // HÀM MỚI: Gọi logic Game Over/Câu hỏi từ PlayScreen
+    showQuestion: function() {
+        // me.state.current() là đối tượng PlayScreen
+        if (me.state.current().onGameOver) {
+            me.state.current().onGameOver();
+        } else {
+            // Dự phòng nếu không tìm thấy hàm
+            me.state.change(me.state.GAMEOVER);
+        }
+    }
 
 });
 
-
 game.PipeEntity = me.Entity.extend({
+// ... (GIỮ NGUYÊN CODE TỪ ĐÂY VỀ SAU) ...
     init: function(x, y) {
         var settings = {};
         settings.image = this.image = me.loader.getImage('pipe');

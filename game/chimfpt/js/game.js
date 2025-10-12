@@ -26,7 +26,8 @@ var game = {
         {name: "hit", type: "audio", src: "data/sfx/"},
         {name: "lose", type: "audio", src: "data/sfx/"},
         {name: "wing", type: "audio", src: "data/sfx/"},
-
+        // questions
+        {name: "questions", type: "json", src: "data/questions.json"}         
     ],
 
     "onload": function() {
