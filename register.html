@@ -19,7 +19,30 @@
 
   <style>
     body {
-      font-family: 'Be Vietnam Pro', sans-serif;
+      /* Font được giữ lại */
+      font-family: 'Be Vietnam Pro', sans-serif; 
+      /* Nền Gradient Động: chuyển 4 màu với góc -45 độ */
+      background: linear-gradient(-45deg, #e0f2f1, #e0f2fe, #eef2ff, #f1f5f9);
+      /* Phóng to kích thước nền để có không gian di chuyển */
+      background-size: 400% 400%;
+      /* Áp dụng animation */
+      animation: gradientBG 15s ease infinite;
+    }
+
+    /* Định nghĩa hiệu ứng chuyển động */
+    @keyframes gradientBG {
+      0% { 
+          /* Bắt đầu ở bên trái */
+          background-position: 0% 50% 
+      }
+      50% { 
+          /* Di chuyển sang bên phải */
+          background-position: 100% 50% 
+      }
+      100% { 
+          /* Quay lại bên trái và lặp lại */
+          background-position: 0% 50% 
+      }
     }
     .text-orange-500 {
       color: #fca96a; /* Màu cam chủ đạo của HOPVAN */
