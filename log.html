@@ -161,15 +161,18 @@
 
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { 
+        initializeApp 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { 
         getAuth, 
         signInWithEmailAndPassword, 
         GoogleAuthProvider, 
         signInWithPopup, 
         onAuthStateChanged,
-        setPersistence, // 💡 IMPORT MỚI
-        browserLocalPersistence // 💡 IMPORT MỚI
+        setPersistence, 
+        browserLocalPersistence,
+        browserSessionPersistence // 💡 Thêm session persistence
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
     // Cấu hình Firebase
@@ -186,33 +189,39 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     
-    // --- BỔ SUNG: KIỂM TRA TỰ ĐỘNG ĐĂNG NHẬP ---
-    // Ngay khi trang load, kiểm tra nếu người dùng đã đăng nhập và chuyển hướng ngay
+    const REDIRECT_URL = "../student/index.html"; // URL chuyển hướng khi đăng nhập thành công
+
+    // --- 1. TỰ ĐỘNG CHUYỂN HƯỚNG NẾU ĐÃ ĐĂNG NHẬP ---
+    // Ngay khi trang load, kiểm tra nếu người dùng đã đăng nhập (do persistence) và chuyển hướng ngay
     onAuthStateChanged(auth, (user) => {
         if (user) {
             console.log("User is already signed in. Auto-redirecting...");
-            // Chuyển hướng đến trang học viên nếu đã đăng nhập
-            window.location.href = "../student/index.html"; 
+            window.location.href = REDIRECT_URL; 
         }
     });
 
-    // Xử lý Login bằng Email/Password
+    // --- 2. XỬ LÝ LOGIN BẰNG EMAIL/PASSWORD (CÓ KIỂM TRA "GHI NHỚ TÔI") ---
     document.getElementById("login-form").addEventListener("submit", async (e) => {
         e.preventDefault();
         const email = document.getElementById("login-email").value;
         const password = document.getElementById("login-password").value;
-        const rememberMe = document.getElementById("remember-me").checked; // Lấy trạng thái checkbox
+        // 💡 LẤY TRẠNG THÁI CHECKBOX "Ghi nhớ tôi"
+        const rememberMe = document.getElementById("remember-me").checked; 
 
         try {
-            // 💡 Áp dụng cơ chế ghi nhớ: 
-            // Nếu "Ghi nhớ tôi" được chọn, lưu trữ vĩnh viễn (Local Storage).
-            // Nếu không, chỉ duy trì trong phiên (Session Storage).
-            await setPersistence(auth, rememberMe ? browserLocalPersistence : 'session');
+            // 💡 THIẾT LẬP PERSISTENCE DỰA TRÊN CHECKBOX
+            if (rememberMe) {
+                // Nếu chọn: Lưu vĩnh viễn (Local Storage)
+                await setPersistence(auth, browserLocalPersistence);
+            } else {
+                // Nếu KHÔNG chọn: Chỉ lưu trong phiên hiện tại (Session Storage)
+                await setPersistence(auth, browserSessionPersistence);
+            }
             
             await signInWithEmailAndPassword(auth, email, password);
             
             // Chuyển hướng sau khi đăng nhập thành công
-            window.location.href = "../student/index.html"; 
+            window.location.href = REDIRECT_URL; 
         } catch (err) {
             let message = "Sai email hoặc mật khẩu. Vui lòng kiểm tra lại.";
             if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
@@ -224,17 +233,17 @@
         }
     });
 
-    // Xử lý Login bằng Google
+    // --- 3. XỬ LÝ LOGIN BẰNG GOOGLE (LUÔN GHI NHỚ) ---
     document.getElementById("google-login-btn").addEventListener("click", async () => {
         const provider = new GoogleAuthProvider();
         try {
-            // 💡 Đặt persistence cho Google Login: Luôn ghi nhớ.
+            // Đặt persistence cho Google Login: Luôn ghi nhớ (Local Storage)
             await setPersistence(auth, browserLocalPersistence);
 
             await signInWithPopup(auth, provider);
             
             // Chuyển hướng sau khi đăng nhập thành công
-            window.location.href = "../student/index.html"; 
+            window.location.href = REDIRECT_URL; 
         } catch (err) {
             console.error("Google login error:", err);
             alert("Đăng nhập bằng Google thất bại: " + err.message);
