@@ -189,9 +189,9 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     
-    const REDIRECT_URL = "../student/index.html"; // URL chuyển hướng khi đăng nhập thành công
+    const REDIRECT_URL = "../student/index.html"; 
 
-    // --- 1. TỰ ĐỘNG CHUYỂN HƯỚNG NẾU ĐÃ ĐĂNG NHẬP (DO PERSISTENCE ĐÃ ĐƯỢC THIẾT LẬP) ---
+    // --- 1. TỰ ĐỘNG CHUYỂN HƯỚNG NẾU ĐÃ ĐĂNG NHẬP ---
     onAuthStateChanged(auth, (user) => {
         if (user) {
             console.log("User is already signed in. Auto-redirecting...");
@@ -199,27 +199,24 @@
         }
     });
 
-    // ----------------------------------------------------------------------------------
-    // --- 2. XỬ LÝ LOGIN BẰNG EMAIL/PASSWORD (CÓ KIỂM TRA "GHI NHỚ TÔI") ---
-    // ----------------------------------------------------------------------------------
+    // --- 2. XỬ LÝ LOGIN BẰNG EMAIL/PASSWORD ---
     document.getElementById("login-form").addEventListener("submit", async (e) => {
         e.preventDefault();
         const email = document.getElementById("login-email").value;
         const password = document.getElementById("login-password").value;
-        // LẤY TRẠNG THÁI CHECKBOX "Ghi nhớ tôi"
         const rememberMe = document.getElementById("remember-me").checked; 
 
         try {
-            // THIẾT LẬP PERSISTENCE DỰA TRÊN CHECKBOX
+            // 💡 BƯỚC QUAN TRỌNG: THIẾT LẬP PERSISTENCE TRƯỚC KHI ĐĂNG NHẬP
             if (rememberMe) {
-                // Nếu chọn: Lưu vĩnh viễn (Local Storage) -> Auto-login lần sau
+                // Nếu chọn: Lưu vĩnh viễn (Local Storage)
                 await setPersistence(auth, browserLocalPersistence);
             } else {
-                // Nếu KHÔNG chọn: Chỉ lưu trong phiên hiện tại (Session Storage) -> Cần đăng nhập lại sau khi đóng trình duyệt
+                // Nếu KHÔNG chọn: Chỉ lưu trong phiên hiện tại (Session Storage)
                 await setPersistence(auth, browserSessionPersistence);
             }
             
-            // Tiến hành đăng nhập
+            // Tiến hành đăng nhập (sẽ dùng persistence vừa set ở trên)
             await signInWithEmailAndPassword(auth, email, password);
             
             // Chuyển hướng sau khi đăng nhập thành công
@@ -235,18 +232,12 @@
         }
     });
 
-    // ----------------------------------------------------------------------------------
     // --- 3. XỬ LÝ LOGIN BẰNG GOOGLE (LUÔN GHI NHỚ) ---
-    // ----------------------------------------------------------------------------------
     document.getElementById("google-login-btn").addEventListener("click", async () => {
         const provider = new GoogleAuthProvider();
         try {
-            // Đặt persistence cho Google Login: Luôn ghi nhớ (Local Storage)
-            await setPersistence(auth, browserLocalPersistence);
-
+            await setPersistence(auth, browserLocalPersistence); // Luôn ghi nhớ
             await signInWithPopup(auth, provider);
-            
-            // Chuyển hướng sau khi đăng nhập thành công
             window.location.href = REDIRECT_URL; 
         } catch (err) {
             console.error("Google login error:", err);
