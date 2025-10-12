@@ -132,8 +132,15 @@
 
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { 
+        initializeApp 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { 
+        getAuth, 
+        createUserWithEmailAndPassword, 
+        updateProfile,
+        signOut // 💡 ĐÃ THÊM: Dùng để đăng xuất ngay sau khi đăng ký
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
     // Cấu hình Firebase
     const firebaseConfig = {
@@ -176,14 +183,17 @@
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         
-        // Cập nhật Tên đăng nhập (Display Name) ngay sau khi tạo tài khoản
+        // 1. Cập nhật Tên đăng nhập (Display Name)
         await updateProfile(user, {
             displayName: displayName
         });
         
-        alert("Đăng ký tài khoản thành công! Tên đăng nhập của bạn là: " + displayName);
-        // Chuyển hướng sau khi đăng ký thành công
-        window.location.href = "../log.html"; 
+        // 2. 🚨 KHẮC PHỤC LỖI AUTO-LOGIN: Đăng xuất người dùng ngay lập tức
+        await signOut(auth); 
+        
+        alert("Đăng ký tài khoản thành công! Vui lòng Đăng nhập.");
+        // 3. Chuyển hướng đến trang đăng nhập
+        window.location.href = "log.html"; 
         
       } catch (err) {
         let message = "Đăng ký thất bại. Vui lòng thử lại.";
