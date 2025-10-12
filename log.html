@@ -4,167 +4,144 @@
   <meta name="google-site-verification" content="73dRIdwl0wADm4SOV2_fm4zWOu8ZbaaJQbfiFdVc09g" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HOPVAN - Login</title>
+  <title>HOPVAN - Đăng nhập</title>
   <meta property="og:title" content="HOPVAN - Học văn thông minh" />
   <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
   <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
   <meta property="og:url" content="https://hopvan.netlify.app" />
   <meta property="og:type" content="article" />
-  <!-- Favicon -->
-<link href="../LOGO.WEBP" rel="icon" type="logo-white.png"/>
+  <link href="../LOGO.WEBP" rel="icon" type="logo-white.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/feather-icons"></script>
+
   <style>
     body {
       font-family: 'Be Vietnam Pro', sans-serif;
-      background: linear-gradient(-45deg, #e0f2f1, #e0f2fe, #eef2ff, #f1f5f9);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
     }
-    @keyframes gradientBG {
-      0% { background-position: 0% 50% }
-      50% { background-position: 100% 50% }
-      100% { background-position: 0% 50% }
+    .text-orange-500 {
+      color: #fca96a; /* Màu cam chủ đạo của HOPVAN */
     }
-    .auth-card {
-      background-color: rgba(255,255,255,0.85);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 1.5rem;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.1);
-    }
-    .gradient-text {
-      background: linear-gradient(90deg, #fca96a,#fcd5b5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .input-group { position: relative; margin-bottom: 1.5rem; }
-    .input-field {
-      border: 1px solid #E2E8F0;
-      border-radius: 0.75rem;
-      width: 100%;
-      padding: 1rem 2.75rem;
-      font-size: 1rem;
-      background-color: rgba(255,255,255,0.9);
-      transition: all .25s;
-    }
-    .input-field:focus {
+    .border-orange-500 {
       border-color: #fca96a;
-      box-shadow: 0 0 0 3px rgba(255, 250, 212, 0.15);
-      outline: none;
-      background: #fff;
     }
-    .input-label {
-      position: absolute;
-      top: -0.6rem;
-      left: 0.85rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-      background: white;
-      padding: 0 0.4rem;
-      color: #475569;
-      border-radius: 4px;
+
+    /* Định nghĩa màu Gradient cho nút Đăng nhập */
+    .bg-gradient-hopvan {
+      background: linear-gradient(to right, #fca96a, #fcd5b5);
     }
-    .input-icon {
-      position: absolute; left: 1rem; top: 50%;
-      transform: translateY(-50%);
-      color: #94A3B8;
+    
+    /* Hiệu ứng hover cho nút Đăng nhập: Đổi gradient nhẹ hơn */
+    .bg-gradient-hopvan:hover {
+      background: linear-gradient(to right, #f89852, #fcd0a3);
+      box-shadow: 0 4px 12px rgba(252, 169, 106, 0.4);
     }
-    .password-toggle {
-      position: absolute; right: 1rem; top: 50%;
-      transform: translateY(-50%);
-      color: #94A3B8;
-      cursor: pointer;
+
+    /* Hiệu ứng xuất hiện cho toàn bộ form */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
-    .cta-button {
-      background: linear-gradient(90deg, #fca96a,#fcd5b5);
-      color: #fff;
-      font-weight: 600;
-      border-radius: 0.75rem;
-      padding: 0.9rem;
-      transition: all .3s ease;
-      box-shadow: 0 6px 18px rgba(255, 250, 212, 0.15);
+
+    .login-container {
+        animation: fadeIn 0.6s ease-out forwards;
+        opacity: 0; /* Bắt đầu ẩn */
     }
-    .cta-button:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 10px 28px rgba(255, 250, 212, 0.15);
+    
+    /* Thiết lập chuyển động mượt cho hover trên các nút */
+    .transition-all-smooth {
+        transition: all 0.3s ease-in-out;
+    }
+
+    /* Thêm shadow khi hover cho nút Google */
+    #google-login-btn:hover {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
   </style>
 </head>
-<body class="flex items-center justify-center min-h-screen px-4">
-  
-  <div class="auth-card w-full max-w-md p-8">
-    <div class="text-center mb-8">
-      <a href="/" class="text-3xl font-bold gradient-text">HOPVAN</a>
-      <p class="text-gray-500 text-sm mt-2">Đăng nhập để tiếp tục</p>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+  <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl login-container">
+    <div class="flex flex-col items-center justify-center mb-6">
+      <img src="../LOGO.WEBP" alt="HOPVAN Logo" class="w-20 h-20 mb-4"/>
+      <h2 class="text-3xl font-bold text-gray-800">Đăng nhập vào HOPVAN</h2>
     </div>
 
-    <!-- Form email/password -->
-    <form id="login-form" novalidate>
-      <div class="input-group">
-        <label for="login-email" class="input-label">Email</label>
-        <i data-feather="mail" class="input-icon"></i>
-        <input id="login-email" type="email" required class="input-field" placeholder="yourmail@email.com">
+    <p class="text-center mb-4 text-sm text-gray-600">
+      Chưa có tài khoản? 
+      <a href="register.html" class="text-orange-500 font-semibold hover:text-orange-600 transition-all-smooth">Đăng ký ngay</a>
+    </p>
+
+    <form id="login-form" class="space-y-6">
+      <div>
+        <label for="login-email" class="block text-sm font-medium text-gray-700">Email</label>
+        <input type="email" id="login-email" required placeholder="Nhập email của bạn"
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 transition duration-150 ease-in-out transition-all-smooth">
       </div>
-      <div class="input-group">
-        <label for="login-password" class="input-label">Mật khẩu</label>
-        <i data-feather="lock" class="input-icon"></i>
-        <input id="login-password" type="password" required class="input-field" placeholder="••••••••">
-        <span class="password-toggle" data-for="login-password">
-          <i data-feather="eye-off" class="w-5 h-5"></i>
-        </span>
+
+      <div>
+        <label for="login-password" class="block text-sm font-medium text-gray-700">Mật khẩu</label>
+        <input type="password" id="login-password" required placeholder="Nhập mật khẩu"
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 transition duration-150 ease-in-out transition-all-smooth">
       </div>
-      <button type="submit" class="w-full cta-button">Đăng nhập</button>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <input id="remember-me" name="remember-me" type="checkbox"
+                 class="h-4 w-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500">
+          <label for="remember-me" class="ml-2 block text-sm text-gray-900"> Ghi nhớ tôi </label>
+        </div>
+        <div class="text-sm">
+          <a href="#" class="font-medium text-orange-500 hover:text-orange-600 transition-all-smooth"> Quên mật khẩu? </a>
+        </div>
+      </div>
+
+      <button type="submit"
+              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-hopvan focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all-smooth">
+        Đăng nhập
+      </button>
     </form>
 
-    <!-- Divider -->
-    <div class="flex items-center my-6">
-      <div class="flex-grow border-t border-slate-300"></div>
-      <span class="mx-3 text-xs text-slate-400">HOẶC</span>
-      <div class="flex-grow border-t border-slate-300"></div>
-    </div>
+    <div class="mt-6">
+      <div class="relative">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-300"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-2 bg-white text-gray-500"> hoặc </span>
+        </div>
+      </div>
 
-    <!-- Google Login -->
-    <button id="google-login-btn" type="button" class="w-full flex items-center justify-center px-4 py-3 border border-slate-300 rounded-lg bg-white hover:bg-slate-50 transition">
+      <div class="mt-6">
+        <button id="google-login-btn"
+                class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all-smooth">
       <svg class="w-5 h-5 mr-3" viewBox="0 0 48 48">
         <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path>
         <path fill="#FF3D00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"></path>
         <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path>
         <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C41.383 34.613 44 29.833 44 24c0-1.341-.138-2.65-.389-3.917z"></path>
-      </svg>
-      <span class="font-semibold text-slate-700">Đăng nhập bằng Google</span>
-    </button>
+      </svg>          
+      Đăng nhập bằng Google
+        </button>
+      </div>
+    </div>
   </div>
 
-  <script>
-    feather.replace();
-    document.querySelectorAll('.password-toggle').forEach(toggle => {
-      toggle.addEventListener('click', () => {
-        const inputId = toggle.dataset.for;
-        const input = document.getElementById(inputId);
-        const icon = toggle.querySelector('i');
-        if (input.type === 'password') {
-          input.type = 'text';
-          icon.setAttribute('data-feather', 'eye');
-        } else {
-          input.type = 'password';
-          icon.setAttribute('data-feather', 'eye-off');
-        }
-        feather.replace();
-      });
-    });
-  </script>
 
-  <!-- Firebase -->
-  <script type="module">
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } 
-      from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-    // ⚠️ Dán config của bạn ở đây
+    // Cấu hình Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
       authDomain: "hopvan-9a648.firebaseapp.com",
@@ -178,37 +155,39 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Login Email
+    // Xử lý Login bằng Email/Password
     document.getElementById("login-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = document.getElementById("login-email").value;
       const password = document.getElementById("login-password").value;
       try {
         await signInWithEmailAndPassword(auth, email, password);
-        window.location.href = "/student/index.html";
+        // Chuyển hướng sau khi đăng nhập thành công
+        window.location.href = "index.html"; 
       } catch (err) {
-        alert("Sai email hoặc mật khẩu!");
+        let message = "Sai email hoặc mật khẩu. Vui lòng kiểm tra lại.";
+        if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
+            message = "Sai email hoặc mật khẩu. Vui lòng kiểm tra lại.";
+        } else if (err.code === "auth/too-many-requests") {
+             message = "Tài khoản của bạn đã bị khóa tạm thời do nhập sai mật khẩu quá nhiều lần. Vui lòng thử lại sau.";
+        }
+        alert(message);
       }
     });
 
-    // Login Google
+    // Xử lý Login bằng Google
     document.getElementById("google-login-btn").addEventListener("click", async () => {
       const provider = new GoogleAuthProvider();
       try {
         await signInWithPopup(auth, provider);
-        window.location.href = "../student/index.html";
+        // Chuyển hướng sau khi đăng nhập thành công
+        window.location.href = "index.html"; 
       } catch (err) {
         console.error("Google login error:", err);
-        alert("Lỗi đăng nhập Google: " + err.message);
+        alert("Đăng nhập bằng Google thất bại: " + err.message);
       }
     });
+</script>
 
-    // Tự redirect nếu đã login
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        window.location.href = "../student/index.html";
-      }
-    });
-  </script>
 </body>
 </html>
