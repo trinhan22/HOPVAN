@@ -25,14 +25,6 @@
 
         <div class="container-fluid">
 
-            <!-- Slider -->
-            <div class="tp-banner-container">
-                <div class="tp-banner" >
-                BluePad || Forum
-                </div>
-            </div>
-            <!-- //Slider -->
-
 
             <div class="headernav">
                 <div class="container">
@@ -260,5 +252,127 @@
             </footer>
         </div>
 
+        <script type="module">
+  // 1. Import các hàm cần thiết từ Firebase SDK
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+  // 2. Cấu hình Firebase của bạn
+  const firebaseConfig = {
+    apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
+    authDomain: "hopvan-9a648.firebaseapp.com",
+    databaseURL: "https://hopvan-9a648-default-rtdb.firebaseio.com", 
+    projectId: "hopvan-9a648",
+    storageBucket: "hopvan-9a648.appspot.com",
+    messagingSenderId: "429347196227",
+    appId: "1:429347196227:web:917b8d019f0efd0f7833f6"
+  };
+
+  // 3. Khởi tạo Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app); // Khởi tạo Firestore
+
+  // Lấy các phần tử cần cập nhật
+  const userSection = document.querySelector('.headernav .avt');
+  const postForm = document.querySelector('.post form');
+  const postAvatarImg = document.querySelector('.post form .userinfo .avatar img');
+  const postTitleInput = postForm.querySelector('textarea:nth-child(1)'); // Giả định Title là textarea đầu tiên
+  const postContentInput = postForm.querySelector('textarea:nth-child(2)'); // Giả định Content là textarea thứ hai
+  const postButton = postForm.querySelector('.postreply .btn-primary');
+
+  // 4. Lắng nghe sự thay đổi trạng thái đăng nhập
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      // --- NẾU NGƯỜI DÙNG ĐÃ ĐĂNG NHẬP ---
+      const photoURL = user.photoURL || 'images/avatar.jpg'; 
+      const displayName = user.displayName || user.email.split('@')[0]; // Lấy tên từ email nếu không có displayName
+
+      // Cập nhật HEADER
+      userSection.innerHTML = `
+        <div class="stnt pull-left">                            
+            <form action='03_new_topic.html' class="form">
+                <button class="btn btn-primary">Tạo Topic mới</button>
+            </form>
+        </div>
+        <div class="env pull-left"><i class="fa fa-envelope"></i></div>
+
+        <div class="avatar pull-left dropdown">
+            <a data-toggle="dropdown" href="#">
+                <img src="${photoURL}" alt="${displayName}" />
+            </a> <b class="caret"></b>
+            <div class="status green">&nbsp;</div>
+            <ul class="dropdown-menu" role="menu">
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Trang cá nhân của ${displayName}</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-2" href="#">Hộp thư</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-3" href="#" id="logout-button">Đăng xuất</a></li>
+            </ul>
+        </div>
+        <div class="clearfix"></div>
+      `;
+
+      // Cập nhật AVATAR trong form đăng bài
+      if (postAvatarImg) {
+        postAvatarImg.src = photoURL;
+      }
+      
+      // Thêm sự kiện click cho nút đăng xuất vừa tạo
+      document.getElementById('logout-button').addEventListener('click', (e) => {
+        e.preventDefault();
+        signOut(auth).then(() => {
+          window.location.href = "index.html"; // Chuyển về trang chủ sau khi đăng xuất
+        }).catch(error => {
+          console.error('Sign out error', error);
+        });
+      });
+
+      // Thêm chức năng ĐĂNG BÀI
+      postForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const title = postTitleInput.value.trim();
+        const content = postContentInput.value.trim();
+
+        if (!title || !content) {
+          alert('Vui lòng nhập đầy đủ Tiêu đề và Nội dung bài viết.');
+          return;
+        }
+        
+        // Tắt nút để tránh double-click
+        postButton.disabled = true;
+        postButton.textContent = 'Đang đăng...';
+
+        try {
+          const docRef = await addDoc(collection(db, "topics"), {
+            title: title,
+            content: content,
+            authorUid: user.uid,
+            authorName: displayName,
+            authorPhoto: photoURL,
+            comments: 0,
+            views: 0,
+            createdAt: serverTimestamp() // Sử dụng timestamp của server
+          });
+          console.log("Document written with ID: ", docRef.id);
+          alert("Đăng bài thành công!");
+          window.location.href = "index.html"; // Quay lại trang chủ sau khi đăng bài
+
+        } catch (e) {
+          console.error("Error adding document: ", e);
+          alert("Lỗi khi đăng bài: " + e.message);
+        } finally {
+          postButton.disabled = false;
+          postButton.textContent = 'Post Reply'; // Trả lại text ban đầu
+        }
+      });
+
+    } else {
+      // --- NẾU NGƯỜI DÙNG ĐÃ ĐĂNG XUẤT (HOẶC CHƯA ĐĂNG NHẬP) ---
+      // CHUYỂN HƯỚNG về trang đăng nhập
+      alert("Bạn cần đăng nhập để tạo Topic mới.");
+      window.location.href = "log.html";
+    }
+  });
+</script>
     </body>
 </html>

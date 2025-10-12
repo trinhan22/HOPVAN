@@ -31,32 +31,6 @@
     </head>
     
     <body>
-           <!-- The core Firebase JS SDK is always required and must be listed first -->
-<script src="https://www.gstatic.com/firebasejs/6.4.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/6.4.0/firebase-firestore.js"></script>
-
-      apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
-      authDomain: "hopvan-9a648.firebaseapp.com",
-      projectId: "hopvan-9a648",
-      storageBucket: "hopvan-9a648.appspot.com",
-      messagingSenderId: "429347196227",
-      appId: "1:429347196227:web:917b8d019f0efd0f7833f6",
-      measurementId: "G-1BG8PSRG0R"
-<script>
-// Your web app's Firebase configuration
-var firebaseConfig = {
-  apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
-  authDomain: "hopvan-9a648.firebaseapp.com",
-  // ĐÂY LÀ DÒNG BẠN CẦN THAY THẾ
-  databaseURL: "https://hopvan-9a648-default-rtdb.firebaseio.com", 
-  projectId: "hopvan-9a648",
-  storageBucket: "hopvan-9a648.appspot.com",
-  messagingSenderId: "429347196227",
-  appId: "1:429347196227:web:917b8d019f0efd0f7833f6"
-};
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-</script>
 
 <div id="header"></div>
 <script>
@@ -556,5 +530,96 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
 
     </body>
+    
+<script type="module">
+  // 1. Import các hàm cần thiết từ Firebase SDK phiên bản mới
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+  // 2. Cấu hình Firebase của bạn (copy từ file log.html)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
+    authDomain: "hopvan-9a648.firebaseapp.com",
+    databaseURL: "https://hopvan-9a648-default-rtdb.firebaseio.com", 
+    projectId: "hopvan-9a648",
+    storageBucket: "hopvan-9a648.appspot.com",
+    messagingSenderId: "429347196227",
+    appId: "1:429347196227:web:917b8d019f0efd0f7833f6"
+  };
+
+  // 3. Khởi tạo Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app); // Khởi tạo Firestore để sẵn sàng cho việc đăng bài
+
+  // 4. Lắng nghe sự thay đổi trạng thái đăng nhập
+  onAuthStateChanged(auth, user => {
+    const userSection = document.querySelector('.headernav .avt');
+    
+    if (user) {
+      // --- NẾU NGƯỜI DÙNG ĐÃ ĐĂNG NHẬP ---
+      console.log("User is signed in:", user);
+      
+      // Lấy ảnh đại diện (nếu có trên Google), nếu không thì dùng ảnh mặc định
+      const photoURL = user.photoURL || 'images/avatar.jpg'; 
+      // Lấy tên hiển thị
+      const displayName = user.displayName || 'Người dùng mới';
+
+      // Cập nhật lại HTML của khu vực avatar
+      userSection.innerHTML = `
+        <div class="stnt pull-left">                            
+            <form action='03_new_topic.html' class="form">
+                <button class="btn btn-primary">Tạo Topic mới</button>
+            </form>
+        </div>
+        <div class="env pull-left"><i class="fa fa-envelope"></i></div>
+
+        <div class="avatar pull-left dropdown">
+            <a data-toggle="dropdown" href="#">
+                <img src="${photoURL}" alt="${displayName}" />
+            </a> <b class="caret"></b>
+            <div class="status green">&nbsp;</div>
+            <ul class="dropdown-menu" role="menu">
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Trang cá nhân của ${displayName}</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-2" href="#">Hộp thư</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-3" href="#" id="logout-button">Đăng xuất</a></li>
+            </ul>
+        </div>
+        <div class="clearfix"></div>
+      `;
+
+      // Thêm sự kiện click cho nút đăng xuất vừa tạo
+      document.getElementById('logout-button').addEventListener('click', (e) => {
+        e.preventDefault();
+        signOut(auth).then(() => {
+          console.log('User signed out.');
+          window.location.reload(); // Tải lại trang để cập nhật giao diện
+        }).catch(error => {
+          console.error('Sign out error', error);
+        });
+      });
+
+    } else {
+      // --- NẾU NGƯỜI DÙNG ĐÃ ĐĂNG XUẤT (HOẶC CHƯA ĐĂNG NHẬP) ---
+      console.log("User is signed out.");
+
+      // Trả lại HTML mặc định
+      userSection.innerHTML = `
+        <div class="stnt pull-left">                            
+            <a href="log.html" class="btn btn-primary">Đăng nhập để tạo Topic</a>
+        </div>
+        <div class="avatar pull-left dropdown">
+            <a data-toggle="dropdown" href="log.html"><img src="images/avatar.jpg" alt="" /></a> <b class="caret"></b>
+            <ul class="dropdown-menu" role="menu">
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="log.html">Đăng nhập</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-4" href="04_new_account.html">Tạo tài khoản</a></li>
+            </ul>
+        </div>
+        <div class="clearfix"></div>
+      `;
+    }
+  });
+
+</script>
 </html>
