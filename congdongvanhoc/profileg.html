@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="google-site-verification" content="73dRIdwl0wADm4SOV2_fm4zWOu8ZbaaJQbfiFdVc09g" />
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>HOPVAN - Cộng đồng văn học</title>
+        <meta property="og:title" content="HOPVAN - Học văn thông minh" />
+        <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+        <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+        <meta property="og:url" content="https://hopvan.netlify.app" />
+        <meta property="og:type" content="article" />
+        <!-- Favicon -->
+        <link href="../LOGO.WEBP" rel="icon" type="logo-white.png"/>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+
+        <link href="css/style_index_blocks.min.css" rel="stylesheet">
+        <link href="css/style_custom_only.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+          <![endif]-->
+
+        <!-- fonts -->
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="font-awesome-4.0.3/css/font-awesome.min.css">
+<style>
+
+.emp-profile{
+    padding: 3%;
+    margin-top: 3%;
+    margin-bottom: 3%;
+    border-radius: 0.5rem;
+    background: #fff;
+}
+.profile-img{
+    text-align: center;
+}
+.profile-img img{
+    width: 70%;
+    height: 100%;
+}
+.profile-img .file {
+    position: relative;
+    overflow: hidden;
+    margin-top: -20%;
+    width: 70%;
+    border: none;
+    border-radius: 0;
+    font-size: 15px;
+    background: #212529b8;
+}
+.profile-img .file input {
+    position: absolute;
+    opacity: 0;
+    right: 0;
+    top: 0;
+}
+.profile-head h5{
+    color: #333;
+}
+.profile-head h6{
+    color: #fca96a;
+}
+.profile-edit-btn{
+    border: none;
+    border-radius: 1.5rem;
+    width: 100%;
+    padding: 2%;
+    font-weight: 600;
+    position:relative;
+    right:10px;
+    color: #6c757d;
+    cursor: pointer;
+}
+.proile-rating{
+    font-size: 12px;
+    color: #818182;
+    margin-top: 5%;
+}
+.proile-rating span{
+    color: #495057;
+    font-size: 15px;
+    font-weight: 600;
+}
+.profile-head .nav-tabs{
+    margin-bottom:5%;
+}
+.profile-head .nav-tabs .nav-link{
+    font-weight:600;
+    border: none;
+}
+.profile-head .nav-tabs .nav-link.active{
+    border: none;
+    border-bottom:2px solid #fca96a;
+}
+.profile-work{
+    padding: 14%;
+    margin-top: -15%;
+}
+.profile-work p{
+    font-size: 12px;
+    color: #818182;
+    font-weight: 600;
+    margin-top: 10%;
+}
+.profile-work a{
+    text-decoration: none;
+    color: #495057;
+    font-weight: 600;
+    font-size: 14px;
+}
+.profile-work ul{
+    list-style: none;
+}
+.profile-tab label{
+    font-weight: 600;
+}
+.profile-tab p{
+    font-weight: 600;
+    color: #fca96a;
+} 
+
+/* Thêm CSS cho nhóm nút ở cuối cột profile */
+.btn-group-profile button {
+    margin: 5px; /* Điều chỉnh margin để có khoảng cách tốt hơn */
+    width: 180px; /* Tăng kích thước cố định để nút dài nhất cũng vừa */
+    text-align: center; /* Đảm bảo văn bản được căn giữa */
+}
+
+
+
+</style>
+    </head>
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyCqE7RoY7Vph-Ui3ZaotGnRSOsyxOtAfYs",
+    authDomain: "cambridge-technica-2019.firebaseapp.com",
+    databaseURL: "https://cambridge-technica-2019.firebaseio.com",
+    projectId: "cambridge-technica-2019",
+    storageBucket: "",
+    messagingSenderId: "933613214672",
+    appId: "1:933613214672:web:79989cad334a0113"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+</script>
+
+<div id="header"></div>
+<script>
+fetch("../congdongvanhoc/headerg.html")
+  .then(res => res.text())
+  .then(data => document.getElementById("header").innerHTML = data);
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  function setupPagination(sectionId, itemsPerPage=6) {
+    const section = document.getElementById(sectionId);
+    const cards = Array.from(section.querySelectorAll(".news-card"));
+    const totalPages = Math.ceil(cards.length / itemsPerPage);
+
+    const paginationContainer = document.createElement("div");
+    paginationContainer.className = "pagination";
+    section.insertAdjacentElement("afterend", paginationContainer);
+
+    let currentPage = 1;
+
+    function renderPagination() {
+      paginationContainer.innerHTML = "";
+
+      // Prev
+      const prev = document.createElement("span");
+      prev.className = "prev";
+      prev.textContent = "«";
+      prev.onclick = () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderCards();
+          renderPagination();
+        }
+      };
+      paginationContainer.appendChild(prev);
+
+      // Page numbers
+      for (let i = 1; i <= totalPages; i++) {
+        const page = document.createElement("span");
+        page.className = "page-number" + (i === currentPage ? " active" : "");
+        page.textContent = i;
+        page.onclick = () => {
+          currentPage = i;
+          renderCards();
+          renderPagination();
+        };
+        paginationContainer.appendChild(page);
+      }
+
+      // Next
+      const next = document.createElement("span");
+      next.className = "next";
+      next.textContent = "»";
+      next.onclick = () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderCards();
+          renderPagination();
+        }
+      };
+      paginationContainer.appendChild(next);
+    }
+
+    function renderCards() {
+      cards.forEach((card, index) => {
+        // reset
+        card.style.display = "none";
+        card.classList.remove("show");
+      });
+
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+
+      cards.slice(start, end).forEach((card, i) => {
+        card.style.display = "block";
+        // delay animation theo vị trí để đẹp hơn
+        setTimeout(() => card.classList.add("show"), i * 100);
+      });
+    }
+
+    renderCards();
+    renderPagination();
+  }
+
+  // chạy cho NEWS (7 card -> 6 + 1)
+  setupPagination("news-section", 6);
+
+  // chạy cho HUMANS (10 card -> 6 + 4)
+  setupPagination("humans-section", 6);
+});
+</script>
+
+<section class="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 breadcrumbf">
+                <a href="index.html">Trang chủ</a> <span class="sep">></span> <a href="06_profile.html">Profile></a> 
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            
+            <div class="col-lg-4 col-md-4">
+                <div class="post">
+                    <div class="postinfotop" style="padding: 10px 15px;">
+                        <h4 style="margin: 0;">Thông tin cá nhân</h4>
+                    </div>
+                    
+                    <div class="row" style="padding: 15px;">
+                        <div class="col-md-12 text-center">
+                            <div class="profile-img">
+                                <img id="profile-avatar" src="images/avatar.jpg" alt="Avatar" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;"/> 
+                                <div class="file btn btn-sm btn-primary" style="margin-top: 10px;">
+                                    Đổi ảnh
+                                    <input type="file" name="file" id="change-photo-input"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding: 0 15px 15px 15px;">
+                        <div class="col-md-12">
+                            <hr style="margin-top: 5px; margin-bottom: 10px;">
+                            
+                            <div class="row">
+                                <div class="col-md-5"><label style="font-weight: 600;">Tên:</label></div>
+                                <div class="col-md-7">
+                                    <p id="profile-display-name-2">Loading...</p> 
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-5"><label style="font-weight: 600;">Email:</label></div>
+                                <div class="col-md-7">
+                                    <p id="profile-email" style="word-wrap: break-word;">Loading...</p>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-5"><label style="font-weight: 600;">Tham gia:</label></div>
+                                <div class="col-md-7">
+                                    <p id="profile-member-since">Loading...</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row text-center" style="margin-top: 15px;">
+                                <div class="col-md-12 btn-group-profile"> 
+                                    <button type="button" class="btn btn-primary btn-sm rounded-pill" id="edit-profile-btn">Chỉnh sửa Profile</button>
+                                    <button type="button" class="btn btn-danger btn-sm rounded-pill" id="logout-btn-main">Đăng xuất</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-8 col-md-8">
+                
+                <div class="post" style="margin-bottom: 20px;">
+                    <div class="postinfotop">
+                        <h2>Bài viết đã đăng</h2>
+                    </div>
+                    <div class="wrapper">
+                        <p style="padding: 15px;">Danh sách các bài viết đã đăng sẽ hiển thị ở đây (cần tích hợp Firestore).</p>
+                    </div>
+                </div>
+                
+                <div class="post">
+                    <div class="postinfotop">
+                        <h2>Bình luận đã gửi</h2>
+                    </div>
+                    <div class="wrapper">
+                        <p style="padding: 15px;">Danh sách các bình luận đã gửi sẽ hiển thị ở đây (cần tích hợp Firestore).</p>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+    </body>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+  // Cấu hình Firebase (GIỮ NGUYÊN)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
+    authDomain: "hopvan-9a648.firebaseapp.com",
+    databaseURL: "https://hopvan-9a648-default-rtdb.firebaseio.com", 
+    projectId: "hopvan-9a648",
+    storageBucket: "hopvan-9a648.appspot.com",
+    messagingSenderId: "429347196227",
+    appId: "1:429347196227:web:917b8d019f0efd0f7833f6"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // >>> Khai báo cờ để tránh xung đột chuyển hướng sau khi đăng xuất <<<
+  let isSigningOut = false; 
+
+  // Lấy các phần tử Profile đã đặt ID
+  const profileAvatar = document.getElementById('profile-avatar');
+  const profileDisplayName2 = document.getElementById('profile-display-name-2');
+  const profileEmail = document.getElementById('profile-email');
+  const profileMemberSince = document.getElementById('profile-member-since');
+  const userSection = document.querySelector('.headernav .avt'); 
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      // --- NGƯỜI DÙNG ĐÃ ĐĂNG NHẬP ---
+      const photoURL = user.photoURL || 'images/avatar.jpg';
+      const displayName = user.displayName || user.email.split('@')[0];
+      
+      const creationDate = user.metadata.creationTime 
+                           ? new Date(user.metadata.creationTime).toLocaleDateString('vi-VN') 
+                           : 'Không rõ';
+      
+      // 1. CẬP NHẬT HEADER (Đồng bộ)
+      if (userSection) {
+          userSection.innerHTML = `
+              <div class="stnt pull-left">                            
+                  <form action='03_new_topic.html' class="form">
+                      <button class="btn btn-primary">Tạo Topic mới</button>
+                  </form>
+              </div>
+              <div class="env pull-left"><i class="fa fa-envelope"></i></div>
+
+              <div class="avatar pull-left dropdown">
+                  <a data-toggle="dropdown" href="06_profile.html"> 
+                      <img src="${photoURL}" alt="${displayName}" />
+                  </a> <b class="caret"></b>
+                  <div class="status green">&nbsp;</div>
+                  <ul class="dropdown-menu" role="menu">
+                      <li role="presentation"><a role="menuitem" tabindex="-1" href="06_profile.html">Trang cá nhân của ${displayName}</a></li> 
+                      <li role="presentation"><a role="menuitem" tabindex="-2" href="#">Hộp thư</a></li>
+                      <li role="presentation"><a role="menuitem" tabindex="-3" href="#" id="logout-button">Đăng xuất</a></li>
+                  </ul>
+              </div>
+              <div class="clearfix"></div>
+          `;
+                
+        // Thêm sự kiện đăng xuất cho header
+        document.getElementById('logout-button').addEventListener('click', (e) => {
+            e.preventDefault();
+            isSigningOut = true; // >>> Đặt cờ trước khi đăng xuất
+            signOut(auth).then(() => {
+                // Đảm bảo đường dẫn chuyển hướng là "../index.html"
+                window.location.href = "../index.html"; 
+            }).catch(error => {
+                isSigningOut = false; // Đặt lại cờ nếu lỗi
+                console.error('Sign out error', error);
+            });
+        });
+      }
+
+      // 2. CẬP NHẬT THÔNG TIN PROFILE VỚI CẤU TRÚC MỚI
+      if (profileAvatar) profileAvatar.src = photoURL;
+      if (profileDisplayName2) profileDisplayName2.textContent = displayName;
+      if (profileEmail) profileEmail.textContent = user.email;
+      if (profileMemberSince) profileMemberSince.textContent = creationDate;
+      
+      const logoutBtnMain = document.getElementById('logout-btn-main');
+
+      if (logoutBtnMain) {
+          logoutBtnMain.addEventListener('click', (e) => {
+              e.preventDefault();
+              isSigningOut = true; // >>> Đặt cờ trước khi đăng xuất
+              signOut(auth).then(() => {
+                  console.log('User signed out from main profile button.');
+                  // CHUYỂN HƯỚNG VỀ TRANG CHỦ (index.html)
+                  window.location.href = "../index.html"; 
+              }).catch(error => {
+                  isSigningOut = false; // Đặt lại cờ nếu lỗi
+                  console.error('Sign out error', error);
+                  alert("Lỗi khi đăng xuất: " + error.message);
+              });
+          });
+      }
+
+    } else {
+      // --- NGƯỜI DÙNG CHƯA ĐĂNG NHẬP: CHUYỂN HƯỚNG ---
+      // >>> CHỈ CHUYỂN HƯỚNG NẾU KHÔNG PHẢI VỪA ĐĂNG XUẤT <<<
+      if (!isSigningOut) {
+        alert("Bạn cần đăng nhập để xem trang cá nhân.");
+        window.location.href = "log.html";
+      }
+    }
+  });
+</script>
+</html>
