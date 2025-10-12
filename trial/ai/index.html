@@ -332,25 +332,41 @@
                 }, 10); // Tốc độ gõ chữ (ms)
             }
 
-async function handleAIChat() {
-                // ... (phần khai báo biến và kiểm tra lỗi giữ nguyên)
-                
-                // [TỪ BƯỚC TRƯỚC: HÃY CHẮC CHẮN BẠN ĐÃ THAY THẾ KEY NÀY]
-                const OPENROUTER_KEY = "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"; 
-                const API_URL = "https://openrouter.ai/api/v1/chat/completions"; 
-                const modelToUse = "deepseek/deepseek-chat-v3.1:free"; // Ví dụ mô hình miễn phí
-                // ... (phần xử lý prompt và systemPrompt giữ nguyên)
+            async function handleAIChat() {
+                if (isProcessing) return;
 
+                const userPrompt = promptInput.value.trim(); // <--- CHẮC CHẮN BIẾN userPrompt ĐƯỢC ĐỊNH NGHĨA Ở ĐÂY
+
+                if (!userPrompt) {
+                    alert("Vui lòng nhập nội dung yêu cầu.");
+                    return;
+                }
+
+                isProcessing = true;
+                sendButton.disabled = true;
+                sendButton.innerHTML = `<i data-lucide="loader" class="h-5 w-5 mr-2 animate-spin"></i> <span>Đang xử lý...</span>`;
+                lucide.createIcons();
+
+                // 1. **KHAI BÁO systemPrompt Ở ĐÂY**
+                const systemPrompt = "Bạn là một trợ lý AI chuyên về Ngữ Văn, có kiến thức sâu rộng về văn học Việt Nam và quốc tế, đặc biệt là các tác phẩm trong chương trình giáo dục phổ thông. Nhiệm vụ của bạn là phân tích tác phẩm, hỗ trợ luyện viết, và trả lời các câu hỏi liên quan đến Ngữ Văn bằng giọng văn học thuật, thân thiện và dễ hiểu."; 
+                
+                const OPENROUTER_KEY = "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"; 
+                const API_URL = "https://openrouter.ai/api/v1/chat/completions"; 
+                const modelToUse = "deepseek/deepseek-chat-v3.1:free"; 
+
+                // ... (Các dòng code tiếp theo)
+                
                 try {
                     const response = await fetch(API_URL, {
                         method: "POST",
                         headers: { 
                             "Content-Type": "application/json",
+                            // Dòng BẮT BUỘC để xác thực (Fix lỗi 401)
                             "Authorization": `Bearer ${OPENROUTER_KEY}`,
                             "HTTP-Referer": window.location.href // Khuyến nghị cho OpenRouter
                         },
                         body: JSON.stringify({
-                            model: modelToUse, // Tên mô hình
+                            model: modelToUse, 
                             messages: [
                                 { role: "system", content: systemPrompt }, 
                                 { role: "user", content: userPrompt }
