@@ -289,85 +289,84 @@ document.addEventListener("DOMContentLoaded", () => {
 
     <div class="container">
         <div class="row">
-            <div class="col-lg-12 col-md-12">
+            
+            <div class="col-lg-4 col-md-4">
                 <div class="post">
-                    <form action="#" class="form newtopic" >
-                        <div class="postinfotop">
-                            <h2>Trang cá nhân</h2>
+                    <div class="postinfotop" style="padding: 10px 15px;">
+                        <h4 style="margin: 0;">Thông tin cá nhân</h4>
+                    </div>
+                    
+                    <div class="row" style="padding: 15px;">
+                        <div class="col-md-12 text-center">
+                            <div class="profile-img">
+                                <img id="profile-avatar" src="images/avatar.jpg" alt="Avatar" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;"/> 
+                                <div class="file btn btn-sm btn-primary" style="margin-top: 10px;">
+                                    Đổi ảnh
+                                    <input type="file" name="file" id="change-photo-input"/>
+                                </div>
+                            </div>
                         </div>
+                    </div>
 
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="profile-img">
-                                    <img id="profile-avatar" src="images/avatar.jpg" alt="Avatar"/> 
-                                    <div class="file btn btn-lg btn-primary">
-                                        Change Photo
-                                        <input type="file" name="file" id="change-photo-input"/>
-                                    </div>
+                    <div class="row" style="padding: 0 15px 15px 15px;">
+                        <div class="col-md-12">
+                            <hr style="margin-top: 5px; margin-bottom: 10px;">
+                            
+                            <div class="row">
+                                <div class="col-md-5"><label style="font-weight: 600;">Tên:</label></div>
+                                <div class="col-md-7">
+                                    <p id="profile-display-name-2">Loading...</p> 
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="profile-head">
-                                    <h3>
-                                        <strong><span id="profile-display-name">Loading...</span></strong>
-                                    </h3>
-                                    <p class="proile-rating">Tham gia từ: <span id="profile-member-since">Loading...</span></p>
-                                    
-                                    </div>
-                            </div>
-                            <div class="col-md-2">
-                                <button type="button" class="profile-edit-btn" name="btnAddMore" id="edit-profile-btn">Chỉnh sửa</button>
-                            </div>
-                        </div>
-                        
-                        <div class="row" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
-                            <div class="col-md-12">
-                                <h4 style="margin-bottom: 15px;">Thông tin tài khoản</h4>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label>Tên hiển thị</label>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p id="profile-display-name-2">Loading...</p> 
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label>Email</label>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p id="profile-email">Loading...</p>
-                                    </div>
+                            
+                            <div class="row">
+                                <div class="col-md-5"><label style="font-weight: 600;">Email:</label></div>
+                                <div class="col-md-7">
+                                    <p id="profile-email" style="word-wrap: break-word;">Loading...</p>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="row" style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px;">
-                            <div class="col-md-12">
-                                <ul class="nav nav-tabs" id="myTab" role="tablist">
-                                    <li class="nav-item active">
-                                        <a class="nav-link" id="timeline-tab" data-toggle="tab" href="#timeline" role="tab" aria-controls="timeline" aria-selected="true">Hoạt động</a>
-                                    </li>
-                                </ul>
-                                <div class="tab-content profile-tab" id="myTabContent">
-                                    <div class="tab-pane fade active in" id="timeline" role="tabpanel" aria-labelledby="timeline-tab">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <p>Các bài viết và bình luận của người dùng sẽ hiển thị ở đây (cần tích hợp Firestore).</p>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="row">
+                                <div class="col-md-5"><label style="font-weight: 600;">Tham gia:</label></div>
+                                <div class="col-md-7">
+                                    <p id="profile-member-since">Loading...</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row text-center" style="margin-top: 15px;">
+                                <div class="col-md-12">
+                                    <button type="button" class="btn btn-default" id="edit-profile-btn">Chỉnh sửa Profile</button>
                                 </div>
                             </div>
                         </div>
-                        
-                    </form>
+                    </div>
                 </div>
+            </div>
+            
+            <div class="col-lg-8 col-md-8">
+                
+                <div class="post" style="margin-bottom: 20px;">
+                    <div class="postinfotop">
+                        <h2>Bài viết đã đăng</h2>
+                    </div>
+                    <div class="wrapper">
+                        <p style="padding: 15px;">Danh sách các bài viết đã đăng sẽ hiển thị ở đây (cần tích hợp Firestore).</p>
+                    </div>
+                </div>
+                
+                <div class="post">
+                    <div class="postinfotop">
+                        <h2>Bình luận đã gửi</h2>
+                    </div>
+                    <div class="wrapper">
+                        <p style="padding: 15px;">Danh sách các bình luận đã gửi sẽ hiển thị ở đây (cần tích hợp Firestore).</p>
+                    </div>
+                </div>
+                
             </div>
         </div>
     </div>
-    
-    </section>
+</section>
 
     </body>
 
@@ -375,7 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-  // Cấu hình Firebase
+  // Cấu hình Firebase (GIỮ NGUYÊN)
   const firebaseConfig = {
     apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
     authDomain: "hopvan-9a648.firebaseapp.com",
@@ -389,10 +388,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  // Lấy các phần tử Profile mới đã đặt ID
+  // Lấy các phần tử Profile đã đặt ID (ĐÃ CẬP NHẬT)
   const profileAvatar = document.getElementById('profile-avatar');
-  const profileDisplayName = document.getElementById('profile-display-name');
-  const profileDisplayName2 = document.getElementById('profile-display-name-2'); // Thẻ lặp lại trong Tab About
+  const profileDisplayName2 = document.getElementById('profile-display-name-2');
   const profileEmail = document.getElementById('profile-email');
   const profileMemberSince = document.getElementById('profile-member-since');
   const userSection = document.querySelector('.headernav .avt'); 
@@ -401,15 +399,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (user) {
       // --- NGƯỜI DÙNG ĐÃ ĐĂNG NHẬP ---
       const photoURL = user.photoURL || 'images/avatar.jpg';
-      // Lấy Tên hiển thị (DisplayName) hoặc dùng phần đầu email nếu chưa có
       const displayName = user.displayName || user.email.split('@')[0];
       
-      // Định dạng ngày tham gia
       const creationDate = user.metadata.creationTime 
                            ? new Date(user.metadata.creationTime).toLocaleDateString('vi-VN') 
                            : 'Không rõ';
       
-      // 1. CẬP NHẬT HEADER (Đồng bộ)
+      // 1. CẬP NHẬT HEADER (Đồng bộ - Giữ nguyên logic)
       if (userSection) {
           userSection.innerHTML = `
               <div class="stnt pull-left">                            
@@ -433,7 +429,6 @@ document.addEventListener("DOMContentLoaded", () => {
               <div class="clearfix"></div>
           `;
           
-          // Thêm sự kiện đăng xuất cho header
           document.getElementById('logout-button').addEventListener('click', (e) => {
               e.preventDefault();
               signOut(auth).then(() => {
@@ -444,10 +439,9 @@ document.addEventListener("DOMContentLoaded", () => {
           });
       }
 
-      // 2. CẬP NHẬT THÔNG TIN PROFILE TẠI TRANG NÀY
+      // 2. CẬP NHẬT THÔNG TIN PROFILE VỚI CẤU TRÚC MỚI
       if (profileAvatar) profileAvatar.src = photoURL;
-      if (profileDisplayName) profileDisplayName.textContent = displayName;
-      if (profileDisplayName2) profileDisplayName2.textContent = displayName; // Cập nhật thẻ lặp lại
+      if (profileDisplayName2) profileDisplayName2.textContent = displayName;
       if (profileEmail) profileEmail.textContent = user.email;
       if (profileMemberSince) profileMemberSince.textContent = creationDate;
 
