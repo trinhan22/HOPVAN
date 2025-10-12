@@ -561,7 +561,7 @@ td.chbox {
 }
 
 .up {
-    color: #1abc9c;
+    color: #fca96a;
     font-size: 12px;
 }
 
@@ -579,7 +579,7 @@ td.chbox {
 
 a.up:hover {
     text-decoration: none;
-    color: #1de4bd;
+    color: #fca96a;
 }
 
 a.down:hover {
@@ -655,7 +655,7 @@ a.down:hover {
 
 
 .btn-primary {
-    background-color: #1abc9c;
+    background-color: #fca96a;
     box-shadow: none;
     border-radius: 2px;
     padding: 10px 15px;
@@ -670,7 +670,7 @@ a.down:hover {
 .btn-primary:active,
 .btn-primary:focus {
     border: none;
-    background-color: #20e1bb;
+    background-color: #fca96a;
     box-shadow: none;
 }
 
@@ -853,7 +853,7 @@ a.down:hover {
 }
 
 .accsection.networks h3 {
-    background-color: #80d3ab;
+    background-color: #fca96a;
 
 }
 
@@ -1176,4 +1176,3 @@ a.down:hover {
     right: 0px; /* Điều chỉnh vị trí */
     top: 2px;
 }
-
