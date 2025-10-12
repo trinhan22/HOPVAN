@@ -1148,3 +1148,31 @@ a.down:hover {
         padding: 0;
     }
 }
+
+
+/* Ghi đè CSS cho kích thước Avatar trong Header */
+.headernav .avt .avatar {
+    width: 32px; /* Kích thước khung avatar (thường là 32px, 40px hoặc 50px) */
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden; /* Cần thiết để ảnh không tràn ra ngoài khung */
+    padding: 0; /* Đảm bảo không có padding làm to khung */
+    margin: 0 0 0 10px; /* Điều chỉnh khoảng cách với nút/icon khác */
+}
+
+.headernav .avt .avatar img {
+    width: 100%; /* Đảm bảo ảnh chiếm hết khung */
+    height: 100%;
+    object-fit: cover; /* Cắt ảnh để vừa với khung (tránh méo) */
+    border-radius: 50%; /* Tròn */
+    box-shadow: none; /* Bỏ các shadow không cần thiết */
+    display: block;
+}
+
+/* Kích thước icon trạng thái (chấm xanh/đỏ) */
+.headernav .avt .avatar .status {
+    width: 8px; /* Giảm kích thước chấm tròn trạng thái */
+    height: 8px;
+    right: 0px; /* Điều chỉnh vị trí */
+    top: 2px;
+}
