@@ -349,8 +349,11 @@
 
                 // 1. **KHAI BÁO systemPrompt Ở ĐÂY**
                 const systemPrompt = "Bạn là một trợ lý AI chuyên về Ngữ Văn, có kiến thức sâu rộng về văn học Việt Nam và quốc tế, đặc biệt là các tác phẩm trong chương trình giáo dục phổ thông. Nhiệm vụ của bạn là phân tích tác phẩm, hỗ trợ luyện viết, và trả lời các câu hỏi liên quan đến Ngữ Văn bằng giọng văn học thuật, thân thiện và dễ hiểu."; 
-                
-                const OPENROUTER_KEY = "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"; 
+                                
+                // ---------------------------------------------------------------------------------
+                // Đã XÓA Key OPENROUTER_KEY khỏi frontend để đảm bảo bảo mật tuyệt đối.
+                // Key sẽ được chèn an toàn bởi API Proxy trên Vercel.
+                // ---------------------------------------------------------------------------------
                 const API_URL = "https://ai-20tzpas10-nhans-projects-0c2bb639.vercel.app/api/deepseek";
                 const modelToUse = "deepseek/deepseek-chat-v3.1:free"; 
 
@@ -361,9 +364,8 @@
                         method: "POST",
                         headers: { 
                             "Content-Type": "application/json",
-                            // Dòng BẮT BUỘC để xác thực (Fix lỗi 401)
-                            "Authorization": `Bearer ${OPENROUTER_KEY}`,
-                            "HTTP-Referer": window.location.href // Khuyến nghị cho OpenRouter
+                            // Đã XÓA header "Authorization"
+                            "HTTP-Referer": window.location.href // Giữ lại Referer
                         },
                         body: JSON.stringify({
                             model: modelToUse, 
