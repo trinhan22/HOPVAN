@@ -124,6 +124,12 @@
     font-weight: 600;
     color: #fca96a;
 } 
+
+/* Thêm CSS cho nhóm nút ở cuối cột profile */
+.btn-group-profile button {
+    margin: 0 5px; /* Khoảng cách ngang giữa các nút */
+}
+
 </style>
     </head>
 <script>
@@ -282,7 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <div class="container">
         <div class="row">
             <div class="col-lg-12 breadcrumbf">
-                <a href="index.html">Trang chủ</a> <span class="sep">></span> <a href="06_profile.html">Profile ></a> 
+                <a href="index.html">Trang chủ</a> <span class="sep">></span> <a href="06_profile.html">Profile></a> 
             </div>
         </div>
     </div>
@@ -334,8 +340,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             </div>
                             
                             <div class="row text-center" style="margin-top: 15px;">
-                                <div class="col-md-12">
-                                    <button type="button" class="btn btn-default" id="edit-profile-btn">Chỉnh sửa Profile</button>
+                                <div class="col-md-12 btn-group-profile"> 
+                                    <button type="button" class="btn btn-primary" id="edit-profile-btn">Chỉnh sửa Profile</button>
+                                    <button type="button" class="btn btn-danger" id="logout-btn-main">Đăng xuất</button>
                                 </div>
                             </div>
                         </div>
