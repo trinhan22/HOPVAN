@@ -127,8 +127,13 @@
 
 /* Thêm CSS cho nhóm nút ở cuối cột profile */
 .btn-group-profile button {
-    margin: 0 5px; /* Khoảng cách ngang giữa các nút */
+    margin: 5px; /* Điều chỉnh margin để có khoảng cách tốt hơn */
+    /* SỬA: Tăng kích thước cố định để nút dài nhất cũng vừa */
+    width: 180px; 
+    text-align: center; 
 }
+
+
 
 </style>
     </head>
@@ -340,7 +345,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div class="row text-center" style="margin-top: 15px;">
                                 <div class="col-md-12 btn-group-profile"> 
                                     <button type="button" class="btn btn-primary btn-sm rounded-pill" id="edit-profile-btn">Chỉnh sửa Profile</button>
-                                    
                                     <button type="button" class="btn btn-danger btn-sm rounded-pill" id="logout-btn-main">Đăng xuất</button>
                                 </div>
                             </div>
@@ -487,21 +491,21 @@ onAuthStateChanged(auth, user => {
         if (profileMemberSince) profileMemberSince.textContent = creationDate;
 
         // BẮT ĐẦU VỊ TRÍ CẦN SỬA: Dán code xử lý nút Đăng xuất chính vào đây!
-        const logoutBtnMain = document.getElementById('logout-btn-main');
+            const logoutBtnMain = document.getElementById('logout-btn-main');
 
-        if (logoutBtnMain) {
-            logoutBtnMain.addEventListener('click', (e) => {
-                e.preventDefault();
-                signOut(auth).then(() => {
-                    console.log('User signed out from main profile button.');
-                    // CHUYỂN HƯỚNG VỀ TRANG CHỦ (index.html)
-                    window.location.href = "index.html"; 
-                }).catch(error => {
-                    console.error('Sign out error', error);
-                    alert("Lỗi khi đăng xuất: " + error.message);
+            if (logoutBtnMain) {
+                logoutBtnMain.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    signOut(auth).then(() => {
+                        console.log('User signed out from main profile button.');
+                        // ĐÃ SỬA: CHUYỂN HƯỚNG VỀ TRANG CHỦ (index.html) ở cấp thư mục cha
+                        window.location.href = "../index.html"; 
+                    }).catch(error => {
+                        console.error('Sign out error', error);
+                        alert("Lỗi khi đăng xuất: " + error.message);
+                    });
                 });
-            });
-        }
+            }
         // KẾT THÚC VỊ TRÍ CẦN SỬA
 
     } else {
