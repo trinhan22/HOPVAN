@@ -530,7 +530,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
 
     </body>
-    
+
 <script type="module">
   // 1. Import các hàm cần thiết từ Firebase SDK phiên bản mới
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -567,27 +567,27 @@ document.addEventListener("DOMContentLoaded", () => {
       const displayName = user.displayName || 'Người dùng mới';
 
       // Cập nhật lại HTML của khu vực avatar
-      userSection.innerHTML = `
-        <div class="stnt pull-left">                            
-            <form action='03_new_topic.html' class="form">
-                <button class="btn btn-primary">Tạo Topic mới</button>
-            </form>
-        </div>
-        <div class="env pull-left"><i class="fa fa-envelope"></i></div>
+userSection.innerHTML = `
+    <div class="stnt pull-left">                            
+        <form action='03_new_topic.html' class="form">
+            <button class="btn btn-primary">Tạo Topic mới</button>
+        </form>
+    </div>
+    <div class="env pull-left"><i class="fa fa-envelope"></i></div>
 
-        <div class="avatar pull-left dropdown">
-            <a data-toggle="dropdown" href="#">
-                <img src="${photoURL}" alt="${displayName}" />
-            </a> <b class="caret"></b>
-            <div class="status green">&nbsp;</div>
-            <ul class="dropdown-menu" role="menu">
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Trang cá nhân của ${displayName}</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-2" href="#">Hộp thư</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-3" href="#" id="logout-button">Đăng xuất</a></li>
-            </ul>
-        </div>
-        <div class="clearfix"></div>
-      `;
+    <div class="avatar pull-left dropdown">
+        <a data-toggle="dropdown" href="06_profile.html"> 
+            <img src="${photoURL}" alt="${displayName}" />
+        </a> <b class="caret"></b>
+        <div class="status green">&nbsp;</div>
+        <ul class="dropdown-menu" role="menu">
+            <li role="presentation"><a role="menuitem" tabindex="-1" href="06_profile.html">Trang cá nhân của ${displayName}</a></li> 
+            <li role="presentation"><a role="menuitem" tabindex="-2" href="#">Hộp thư</a></li>
+            <li role="presentation"><a role="menuitem" tabindex="-3" href="#" id="logout-button">Đăng xuất</a></li>
+        </ul>
+    </div>
+    <div class="clearfix"></div>
+`;
 
       // Thêm sự kiện click cho nút đăng xuất vừa tạo
       document.getElementById('logout-button').addEventListener('click', (e) => {

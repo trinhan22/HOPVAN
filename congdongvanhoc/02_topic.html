@@ -29,20 +29,45 @@
         <link rel="stylesheet" href="font-awesome-4.0.3/css/font-awesome.min.css">
 
     </head>
-<script>
-  // Your web app's Firebase configuration
-  var firebaseConfig = {
-    apiKey: "AIzaSyCqE7RoY7Vph-Ui3ZaotGnRSOsyxOtAfYs",
-    authDomain: "cambridge-technica-2019.firebaseapp.com",
-    databaseURL: "https://cambridge-technica-2019.firebaseio.com",
-    projectId: "cambridge-technica-2019",
-    storageBucket: "",
-    messagingSenderId: "933613214672",
-    appId: "1:933613214672:web:79989cad334a0113"
-  };
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-</script>
+
+    <style>
+/* 1. CSS Ghi đè cho Avatar trong Header (.headernav .avt) */
+.headernav .avt .avatar {
+    width: 32px; /* Kích thước khung avatar nhỏ gọn trong header */
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden; 
+    padding: 0; 
+    margin: 0 0 0 10px; 
+}
+
+.headernav .avt .avatar img {
+    width: 100%; 
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: none;
+    display: block;
+}
+
+/* 2. CSS Ghi đè cho Avatar trong Form Trả lời (.post .userinfo) */
+.post .userinfo .avatar {
+    width: 70px; /* Kích thước trong form trả lời/đăng bài */
+    height: 70px;
+    border-radius: 50%;
+    overflow: hidden;
+    padding: 0;
+}
+
+.post .userinfo .avatar img {
+    width: 100%; 
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: none;
+    display: block;
+}
+</style>
 
 <div id="header"></div>
 <script>
@@ -506,4 +531,110 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
 
     </body>
+
+    <script type="module">
+  // 1. Import các hàm cần thiết
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; // Giữ lại Firestore nếu bạn dùng cho Comments/Topic
+
+  // 2. Cấu hình Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
+    authDomain: "hopvan-9a648.firebaseapp.com",
+    databaseURL: "https://hopvan-9a648-default-rtdb.firebaseio.com", 
+    projectId: "hopvan-9a648",
+    storageBucket: "hopvan-9a648.appspot.com",
+    messagingSenderId: "429347196227",
+    appId: "1:429347196227:web:917b8d019f0efd0f7833f6"
+  };
+
+  // 3. Khởi tạo Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  // const db = getFirestore(app); // Có thể dùng sau này cho việc lấy/đăng Comments
+
+  // Lấy các phần tử cần cập nhật
+  const userSection = document.querySelector('.headernav .avt');
+  const replyBox = document.querySelector('.post .reply'); // Form trả lời
+  const replyAvatarImg = document.querySelector('.post .reply .userinfo .avatar img'); // Avatar trong form trả lời
+
+  // 4. Lắng nghe sự thay đổi trạng thái đăng nhập
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      // --- NẾU NGƯỜI DÙNG ĐÃ ĐĂNG NHẬP ---
+      const photoURL = user.photoURL || 'images/avatar.jpg'; 
+      const displayName = user.displayName || user.email.split('@')[0];
+
+      // Cập nhật HEADER (Giống index.html/03_new_topic.html)
+      userSection.innerHTML = `
+        <div class="stnt pull-left">                            
+            <form action='03_new_topic.html' class="form">
+                <button class="btn btn-primary">Tạo Topic mới</button>
+            </form>
+        </div>
+        <div class="env pull-left"><i class="fa fa-envelope"></i></div>
+
+        <div class="avatar pull-left dropdown">
+            <a data-toggle="dropdown" href="#">
+                <img src="${photoURL}" alt="${displayName}" />
+            </a> <b class="caret"></b>
+            <div class="status green">&nbsp;</div>
+            <ul class="dropdown-menu" role="menu">
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Trang cá nhân của ${displayName}</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-2" href="#">Hộp thư</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-3" href="#" id="logout-button">Đăng xuất</a></li>
+            </ul>
+        </div>
+        <div class="clearfix"></div>
+      `;
+
+      // Cập nhật AVATAR trong form TRẢ LỜI
+      if (replyAvatarImg) {
+        replyAvatarImg.src = photoURL;
+      }
+
+      // ẨN thông báo "You must login to reply" và HIỆN form trả lời (Nếu có logic ẩn/hiện)
+      // *Nếu bạn có logic ẩn/hiện form trả lời khi chưa đăng nhập, hãy thêm vào đây*
+
+      // Thêm sự kiện click cho nút đăng xuất
+      document.getElementById('logout-button').addEventListener('click', (e) => {
+        e.preventDefault();
+        signOut(auth).then(() => {
+          // Tải lại trang để cập nhật giao diện thành trạng thái chưa đăng nhập
+          window.location.reload(); 
+        }).catch(error => {
+          console.error('Sign out error', error);
+        });
+      });
+
+    } else {
+      // --- NẾU NGƯỜI DÙNG CHƯA ĐĂNG NHẬP ---
+      // Cập nhật HEADER (Giống index.html)
+userSection.innerHTML = `
+    <div class="stnt pull-left">                            
+        <form action='03_new_topic.html' class="form">
+            <button class="btn btn-primary">Tạo Topic mới</button>
+        </form>
+    </div>
+    <div class="env pull-left"><i class="fa fa-envelope"></i></div>
+
+    <div class="avatar pull-left dropdown">
+        <a data-toggle="dropdown" href="06_profile.html"> 
+            <img src="${photoURL}" alt="${displayName}" />
+        </a> <b class="caret"></b>
+        <div class="status green">&nbsp;</div>
+        <ul class="dropdown-menu" role="menu">
+            <li role="presentation"><a role="menuitem" tabindex="-1" href="06_profile.html">Trang cá nhân của ${displayName}</a></li> 
+            <li role="presentation"><a role="menuitem" tabindex="-2" href="#">Hộp thư</a></li>
+            <li role="presentation"><a role="menuitem" tabindex="-3" href="#" id="logout-button">Đăng xuất</a></li>
+        </ul>
+    </div>
+    <div class="clearfix"></div>
+`;
+      
+      // *Nếu bạn có logic ẩn form trả lời khi chưa đăng nhập, hãy thêm vào đây*
+    }
+  });
+</script>
 </html>
