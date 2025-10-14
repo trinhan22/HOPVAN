@@ -1,6 +1,17 @@
 [build]
-  functions = "netlify/functions" 
-  publish = "phongluyenviet"  # <-- Đảm bảo có dòng này
+  functions = "netlify/functions"
+  # Vẫn để publish = "phongluyenviet" để Netlify Function hoạt động đúng
+  publish = "phongluyenviet" 
 
 [functions]
   node_bundler = "esbuild"
+
+# THÊM PHẦN NÀY VÀO CUỐI FILE NETLIFY.TOML
+# Tạo một quy tắc Redirects (Chuyển hướng)
+[[redirects]]
+  # Khi người dùng truy cập trang gốc (/)
+  from = "/"
+  # Chuyển hướng họ đến file index.html mong muốn
+  to = "/index.html"
+  # Loại chuyển hướng: 200 (Rewrite/giữ nguyên URL)
+  status = 200
