@@ -249,176 +249,183 @@
     </main>
     
     
-    <script type="module">
-        const MODES = {
-            co_ban: { name: "Cơ bản", status: "available", info: "Cung cấp kiến thức cốt lõi, dễ hiểu. Phù hợp cho ôn tập cơ bản.", prompt: "Bạn là gia sư Văn học Tiếng Việt tập trung vào cung cấp các kiến thức cốt lõi, cơ bản và dễ hiểu nhất. Phản hồi phải có bố cục rõ ràng, sử dụng Markdown để định dạng (tiêu đề, danh sách, in đậm)."},
-            thong_thao: { name: "Thông Thạo", status: "available", info: "Cung cấp phân tích chuyên sâu, phức tạp.", prompt: "Bạn là chuyên gia Văn học Việt Nam và Thế giới, tập trung vào phân tích chuyên sâu các yếu tố nghệ thuật, tư tưởng và phong cách sáng tác. Hãy trình bày logic, có dẫn chứng và phân tầng ý rõ ràng. Phản hồi cần có bố cục 3 phần (Mở – Thân – Kết), kết hợp lập luận, so sánh, và nhận định cá nhân thuyết phục. Sử dụng Markdown để làm nổi bật luận điểm và trích dẫn."},
-            sang_tao: { name: "Sáng Tạo", status: "available", info: "Hỗ trợ luyện viết, tạo ý tưởng, chỉnh sửa bài viết.", prompt: "Bạn là người cố vấn sáng tạo trong lĩnh vực Văn học, chuyên giúp học sinh phát triển khả năng viết và tư duy hình tượng. Hãy đưa ra gợi ý ý tưởng, cảm hứng, hoặc chỉnh sửa bài viết theo hướng tự nhiên, giàu cảm xúc và cá tính. Có thể đề xuất cách mở bài – kết bài ấn tượng, hình ảnh ẩn dụ, hoặc giọng văn phù hợp với mục tiêu. Trình bày bằng Markdown, có thể chèn ví dụ minh họa."},
-            hoc_thuat: { name: "Học thuật", status: "available", info: "Đánh giá, trích dẫn học thuật chuyên ngành.", prompt: "Bạn là nhà nghiên cứu Văn học với phong cách học thuật nghiêm túc. Hãy phân tích và đánh giá tác phẩm dựa trên lý thuyết văn học (ví dụ: chủ nghĩa hiện thực, biểu tượng, cấu trúc luận, phân tâm học, hậu hiện đại,...). Trích dẫn nguồn (nếu có) hoặc ghi chú theo dạng [Tên tác giả, Năm]. Viết theo phong cách học thuật, mạch lạc, có hệ thống luận điểm – luận cứ – dẫn chứng. Sử dụng Markdown cho định dạng khoa học."}
-        };
+<script type="module">
+    const MODES = {
+        co_ban: { name: "Cơ bản", status: "available", info: "Cung cấp kiến thức cốt lõi, dễ hiểu. Phù hợp cho ôn tập cơ bản.", prompt: "Bạn là gia sư Văn học Tiếng Việt tập trung vào cung cấp các kiến thức cốt lõi, cơ bản và dễ hiểu nhất. Phản hồi phải có bố cục rõ ràng, sử dụng Markdown để định dạng (tiêu đề, danh sách, in đậm)."},
+        thong_thao: { name: "Thông Thạo", status: "available", info: "Cung cấp phân tích chuyên sâu, phức tạp.", prompt: "Bạn là chuyên gia Văn học Việt Nam và Thế giới, tập trung vào phân tích chuyên sâu các yếu tố nghệ thuật, tư tưởng và phong cách sáng tác. Hãy trình bày logic, có dẫn chứng và phân tầng ý rõ ràng. Phản hồi cần có bố cục 3 phần (Mở – Thân – Kết), kết hợp lập luận, so sánh, và nhận định cá nhân thuyết phục. Sử dụng Markdown để làm nổi bật luận điểm và trích dẫn."},
+        sang_tao: { name: "Sáng Tạo", status: "available", info: "Hỗ trợ luyện viết, tạo ý tưởng, chỉnh sửa bài viết.", prompt: "Bạn là người cố vấn sáng tạo trong lĩnh vực Văn học, chuyên giúp học sinh phát triển khả năng viết và tư duy hình tượng. Hãy đưa ra gợi ý ý tưởng, cảm hứng, hoặc chỉnh sửa bài viết theo hướng tự nhiên, giàu cảm xúc và cá tính. Có thể đề xuất cách mở bài – kết bài ấn tượng, hình ảnh ẩn dụ, hoặc giọng văn phù hợp với mục tiêu. Trình bày bằng Markdown, có thể chèn ví dụ minh họa."},
+        hoc_thuat: { name: "Học thuật", status: "available", info: "Đánh giá, trích dẫn học thuật chuyên ngành.", prompt: "Bạn là nhà nghiên cứu Văn học với phong cách học thuật nghiêm túc. Hãy phân tích và đánh giá tác phẩm dựa trên lý thuyết văn học (ví dụ: chủ nghĩa hiện thực, biểu tượng, cấu trúc luận, phân tâm học, hậu hiện đại,...). Trích dẫn nguồn (nếu có) hoặc ghi chú theo dạng [Tên tác giả, Năm]. Viết theo phong cách học thuật, mạch lạc, có hệ thống luận điểm – luận cứ – dẫn chứng. Sử dụng Markdown cho định dạng khoa học."}
+    };
 
-        let isProcessing = false;
-        let uploadedDoc = null; 
-        let typingInterval = null; // Biến để kiểm soát hiệu ứng gõ chữ
+    let isProcessing = false;
+    let uploadedDoc = null; 
+    let typingInterval = null; // Biến để kiểm soát hiệu ứng gõ chữ
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const promptInput = document.getElementById('prompt-input');
-            const sendButton = document.getElementById('send-button');
-            const chatOutput = document.getElementById('chat-output');
-            const errorMessage = document.getElementById('error-message');
-            const modeSelector = document.getElementById('ai-mode');
-            const modeInfo = document.getElementById('mode-info');
-            const docUpload = document.getElementById('doc-upload');
-            const docStatus = document.getElementById('doc-status');
-            
-            lucide.createIcons();
+    document.addEventListener('DOMContentLoaded', () => {
+        const promptInput = document.getElementById('prompt-input');
+        const sendButton = document.getElementById('send-button');
+        const chatOutput = document.getElementById('chat-output');
+        const errorMessage = document.getElementById('error-message');
+        const modeSelector = document.getElementById('ai-mode');
+        const modeInfo = document.getElementById('mode-info');
+        const docUpload = document.getElementById('doc-upload');
+        const docStatus = document.getElementById('doc-status');
+        
+        lucide.createIcons();
 
+        modeInfo.textContent = MODES[modeSelector.value].info;
+        modeSelector.addEventListener('change', () => {
             modeInfo.textContent = MODES[modeSelector.value].info;
-            modeSelector.addEventListener('change', () => {
-                modeInfo.textContent = MODES[modeSelector.value].info;
-            });
-            
-            docUpload.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    if (file.size > 5 * 1024 * 1024) { // Limit to 5MB
-                        docStatus.innerHTML = `<span class="text-red-500 font-bold">Lỗi:</span> File quá lớn (Max 5MB).`;
-                        uploadedDoc = null;
-                        e.target.value = null;
-                        return;
-                    }
-                    uploadedDoc = { name: file.name, size: (file.size / 1024 / 1024).toFixed(2) };
-                    docStatus.innerHTML = `<span class="font-bold text-green-600">File đã tải:</span> ${uploadedDoc.name} (${uploadedDoc.size} MB).`;
-                    if (file.type === 'text/plain') {
-                        const reader = new FileReader();
-                        reader.onload = (e) => { uploadedDoc.content = e.target.result; };
-                        reader.readAsText(file);
-                    } else {
-                        docStatus.innerHTML += `<br><span class="text-yellow-600">Lưu ý: AI chỉ dùng tên file PDF/DOCX.</span>`;
-                    }
-                } else {
+        });
+        
+        docUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) { // Limit to 5MB
+                    docStatus.innerHTML = `<span class="text-red-500 font-bold">Lỗi:</span> File quá lớn (Max 5MB).`;
                     uploadedDoc = null;
-                    docStatus.innerHTML = `Chưa có tài liệu.`;
-                }
-            });
-
-            sendButton.addEventListener('click', handleAIChat);
-            promptInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-                    e.preventDefault();
-                    handleAIChat();
-                }
-            });
-
-            function getSystemPrompt(modeKey) {
-                return MODES[modeKey]?.prompt || MODES.co_ban.prompt;
-            }
-            
-            // **Hàm mới: Tạo hiệu ứng gõ chữ**
-            function typeWriter(element, text, onComplete) {
-                let i = 0;
-                element.innerHTML = ""; // Xóa nội dung cũ
-                if (typingInterval) clearInterval(typingInterval);
-
-                typingInterval = setInterval(() => {
-                    if (i < text.length) {
-                        element.innerHTML = marked.parse(text.substring(0, i + 1) + '<span class="typing-cursor"></span>');
-                        i++;
-                        element.scrollTop = element.scrollHeight; // Tự động cuộn xuống
-                    } else {
-                        clearInterval(typingInterval);
-                        element.innerHTML = marked.parse(text); // Hiển thị đầy đủ khi hoàn tất
-                        if (onComplete) onComplete();
-                    }
-                }, 10); // Tốc độ gõ chữ (ms)
-            }
-
-            async function handleAIChat() {
-                const modeKey = modeSelector.value;
-                const mode = MODES[modeKey];
-                const rawInput = promptInput.value.trim();
-                
-                if (mode.status === 'disabled') {
-                    errorMessage.textContent = `❌ Chế độ ${mode.name} (PRO) chưa khả dụng trong bản dùng thử.`;
-                    errorMessage.classList.remove('hidden');
+                    e.target.value = null;
                     return;
                 }
-                if (!rawInput) {
-                    errorMessage.textContent = "Vui lòng nhập nội dung yêu cầu.";
-                    errorMessage.classList.remove('hidden');
-                    return;
+                uploadedDoc = { name: file.name, size: (file.size / 1024 / 1024).toFixed(2) };
+                docStatus.innerHTML = `<span class="font-bold text-green-600">File đã tải:</span> ${uploadedDoc.name} (${uploadedDoc.size} MB).`;
+                if (file.type === 'text/plain') {
+                    const reader = new FileReader();
+                    reader.onload = (e) => { uploadedDoc.content = e.target.result; };
+                    reader.readAsText(file);
+                } else {
+                    docStatus.innerHTML += `<br><span class="text-yellow-600">Lưu ý: AI chỉ dùng tên file PDF/DOCX.</span>`;
                 }
-                if (isProcessing) return;
-                
-                errorMessage.classList.add('hidden');
-                isProcessing = true;
-                sendButton.disabled = true;
-                sendButton.innerHTML = `<svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Đang Xử Lý...</span>`;
-                
-                // Hiển thị trạng thái loading tinh tế hơn
-                chatOutput.innerHTML = `<div class="p-4 text-center text-gray-500 italic">
-                                            <p class="font-semibold text-[var(--primary-color)]">Đang kết nối tới HOPVAN AI...</p>
-                                            <div class="mt-2 text-sm">Chế độ: <span class="font-bold">${mode.name}</span></div>
-                                        </div>`;
-
-                let userPrompt = rawInput;
-                if (uploadedDoc) {
-                    userPrompt += uploadedDoc.content 
-                        ? `\n\n[NGỮ CẢNH TỪ TÀI LIỆU (${uploadedDoc.name})]:\n${uploadedDoc.content}`
-                        : `\n\n[NGỮ CẢNH TỪ TÀI LIỆU (Tên: ${uploadedDoc.name})]:\n[Không thể đọc nội dung. Vui lòng trả lời dựa trên tên tài liệu và kiến thức của bạn.]`;
-                }
-
-                const systemPrompt = getSystemPrompt(modeKey);
-
-                try {
-                    const API_URL = "https://ai-20tzpas10-nhans-projects-0c2bb639.vercel.app/api/deepseek"; 
-                    const response = await fetch(API_URL, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            messages: [
-                                { role: "system", content: systemPrompt }, 
-                                { role: "user", content: userPrompt }
-                            ]
-                        })
-                    });
-
-                    if (!response.ok) {
-                        const errorDetails = await response.json().catch(() => ({}));
-                        throw new Error(`API Lỗi ${response.status}: ${errorDetails.error || response.statusText}`);
-                    }
-
-                    const data = await response.json();
-                    const responseText = data.text || "Xin lỗi, không nhận được phản hồi hợp lệ.";
-
-                    // **Sử dụng hiệu ứng gõ chữ để hiển thị kết quả**
-                    const resultContainer = document.createElement('div');
-                    chatOutput.innerHTML = '';
-                    chatOutput.appendChild(resultContainer);
-                    
-                    typeWriter(resultContainer, responseText, () => {
-                        // Callback này sẽ chạy khi gõ chữ xong
-                        resetUI();
-                    });
-                    
-                    promptInput.value = "";
-                    promptInput.style.height = 'auto';
-
-                } catch (error) {
-                    console.error("Lỗi: ", error);
-                    chatOutput.innerHTML = `<div class="p-4 text-red-600 bg-red-50 rounded-lg"><p class="font-bold">❌ Đã xảy ra lỗi:</p><p>${error.message}</p></div>`;
-                    resetUI(); // Reset UI ngay cả khi có lỗi
-                }
-            }
-
-            // Hàm riêng để reset UI
-            function resetUI() {
-                isProcessing = false;
-                sendButton.disabled = false;
-                sendButton.innerHTML = `<i data-lucide="send" class="h-5 w-5 mr-2"></i> <span>Gửi Yêu Cầu</span>`;
-                lucide.createIcons();
+            } else {
+                uploadedDoc = null;
+                docStatus.innerHTML = `Chưa có tài liệu.`;
             }
         });
-    </script>
+
+        sendButton.addEventListener('click', handleAIChat);
+        promptInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                handleAIChat();
+            }
+        });
+
+        function getSystemPrompt(modeKey) {
+            return MODES[modeKey]?.prompt || MODES.co_ban.prompt;
+        }
+        
+        // **Hàm mới: Tạo hiệu ứng gõ chữ**
+        function typeWriter(element, text, onComplete) {
+            let i = 0;
+            element.innerHTML = ""; // Xóa nội dung cũ
+            if (typingInterval) clearInterval(typingInterval);
+
+            typingInterval = setInterval(() => {
+                if (i < text.length) {
+                    // Cập nhật nội dung (tự động cuộn chỉ khi nội dung lớn)
+                    element.innerHTML = marked.parse(text.substring(0, i + 1) + '<span class="typing-cursor"></span>');
+                    i++;
+                    element.parentElement.scrollTop = element.parentElement.scrollHeight; // Tự động cuộn xuống (áp dụng cho right-panel)
+                } else {
+                    clearInterval(typingInterval);
+                    element.innerHTML = marked.parse(text); // Hiển thị đầy đủ khi hoàn tất
+                    if (onComplete) onComplete();
+                }
+            }, 10); // Tốc độ gõ chữ (ms)
+        }
+
+        async function handleAIChat() {
+            const modeKey = modeSelector.value;
+            const mode = MODES[modeKey];
+            const rawInput = promptInput.value.trim();
+            
+            if (mode.status === 'disabled') {
+                errorMessage.textContent = `❌ Chế độ ${mode.name} (PRO) chưa khả dụng trong bản dùng thử.`;
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+            if (!rawInput) {
+                errorMessage.textContent = "Vui lòng nhập nội dung yêu cầu.";
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+            if (isProcessing) return;
+            
+            errorMessage.classList.add('hidden');
+            isProcessing = true;
+            sendButton.disabled = true;
+            sendButton.innerHTML = `<svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Đang Xử Lý...</span>`;
+            
+            chatOutput.innerHTML = `<div class="p-4 text-center text-gray-500 italic">
+                                        <p class="font-semibold text-[var(--primary-color)]">Đang kết nối tới HOPVAN AI...</p>
+                                        <div class="mt-2 text-sm">Chế độ: <span class="font-bold">${mode.name}</span></div>
+                                    </div>`;
+
+            let userPrompt = rawInput;
+            if (uploadedDoc) {
+                userPrompt += uploadedDoc.content 
+                    ? `\n\n[NGỮ CẢNH TỪ TÀI LIỆU (${uploadedDoc.name})]:\n${uploadedDoc.content}`
+                    : `\n\n[NGỮ CẢNH TỪ TÀI LIỆU (Tên: ${uploadedDoc.name})]:\n[Không thể đọc nội dung. Vui lòng trả lời dựa trên tên tài liệu và kiến thức của bạn.]`;
+            }
+
+            const systemPrompt = getSystemPrompt(modeKey);
+
+            try {
+                // Sử dụng đường dẫn tương đối, sẽ hoạt động tốt trên Netlify
+                const API_URL = "/.netlify/functions/deepseek"; 
+                
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        messages: [
+                            { role: "system", content: systemPrompt }, 
+                            { role: "user", content: userPrompt }
+                        ],
+                        model: "deepseek/deepseek-chat-v3.1:free" 
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    // Xử lý lỗi từ Netlify Function (ví dụ: Lỗi Key API 500)
+                    const errorMsg = data.error 
+                        ? (typeof data.error === 'string' ? data.error : JSON.stringify(data.error)) 
+                        : `Lỗi không xác định (${response.status} ${response.statusText}). Kiểm tra logs Netlify.`;
+                    
+                    chatOutput.innerHTML = `<div class="p-4 text-red-600 bg-red-50 rounded-lg">
+                                                <p class="font-bold">❌ Lỗi Phản Hồi (${response.status}):</p>
+                                                <p>${errorMsg}</p>
+                                            </div>`;
+                    resetUI();
+                    return;
+                }
+                
+                // === LOGIC THÀNH CÔNG ĐÃ SỬA ===
+                const aiResponseContent = data.choices[0]?.message?.content || "Không nhận được phản hồi từ AI.";
+                
+                // Bắt đầu hiệu ứng gõ chữ
+                typeWriter(chatOutput, aiResponseContent, () => {
+                    // Gọi resetUI sau khi hiệu ứng gõ chữ hoàn tất
+                    resetUI();
+                });
+                
+            } catch (error) {
+                console.error("Lỗi Fetch/Code: ", error);
+                chatOutput.innerHTML = `<div class="p-4 text-red-600 bg-red-50 rounded-lg"><p class="font-bold">❌ Lỗi kết nối (Frontend):</p><p>${error.message}</p></div>`;
+                resetUI(); 
+            }
+        }
+
+        // Hàm riêng để reset UI
+        function resetUI() {
+            isProcessing = false;
+            sendButton.disabled = false;
+            sendButton.innerHTML = `<i data-lucide="send" class="h-5 w-5 mr-2"></i> <span>Gửi Yêu Cầu</span>`;
+            lucide.createIcons();
+        }
+    });
+</script>
 </body>
 </html>

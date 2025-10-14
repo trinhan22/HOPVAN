@@ -1,0 +1,6 @@
+[build]
+  functions = "netlify/functions" 
+  publish = "phongluyenviet"  # <-- Đảm bảo có dòng này
+
+[functions]
+  node_bundler = "esbuild"
