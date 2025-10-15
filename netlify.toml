@@ -5,8 +5,8 @@
 [functions]
   node_bundler = "esbuild"
 
-# Quy tắc chuyển hướng mới: Trỏ URL gốc đến file chat.html
+# Quy tắc chuyển hướng để trang chủ (/) trỏ đến trang chat.html
 [[redirects]]
   from = "/"
-  to = "/chat.html"  # <-- Đã đổi tên index.html thành chat.html
+  to = "/chat.html"
   status = 200
