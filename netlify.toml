@@ -1,11 +1,14 @@
 [build]
-  functions = "netlify/functions"
+  # 1. BẮT BUỘC PHẢI CÓ: Chỉ định thư mục chứa các file giao diện (HTML)
   publish = "phongluyenviet" 
+  # 2. Chỉ định thư mục chứa Netlify Functions
+  functions = "netlify/functions" 
 
 [functions]
   node_bundler = "esbuild"
 
-# Quy tắc chuyển hướng để trang chủ (/) trỏ đến trang chat.html
+# 3. QUY TẮC CHUYỂN HƯỚNG:
+# Yêu cầu Netlify khi người dùng truy cập URL gốc (/) thì phục vụ nội dung của file chat.html
 [[redirects]]
   from = "/"
   to = "/chat.html"
