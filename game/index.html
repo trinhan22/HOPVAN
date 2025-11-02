@@ -4,7 +4,7 @@
   <meta name="google-site-verification" content="73dRIdwl0wADm4SOV2_fm4zWOu8ZbaaJQbfiFdVc09g" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HOPVAN - Game hoá và hành trình học tập</title>
+  <title>HOPVAN - Chim FPT</title>
   <meta property="og:title" content="HOPVAN - Học văn thông minh" />
   <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
   <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
@@ -952,6 +952,76 @@ margin: 66px auto 30px auto;
   transform: translateY(0);
 }
 
+
+/* Container của Slideshow */
+.slideshow-container {
+  max-width: 100%;
+  position: relative;
+  margin: auto;
+  border-radius: 8px; /* Bo góc nhẹ */
+  overflow: hidden; /* Quan trọng để ảnh không tràn ra ngoài */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Ẩn các slide theo mặc định */
+.mySlides {
+  display: none;
+}
+
+/* Nút Trước (Previous) và Sau (Next) */
+.prev, .next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  padding: 16px;
+  margin-top: -22px;
+  color: white;
+  font-weight: bold;
+  font-size: 24px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  user-select: none;
+  background-color: rgba(0,0,0,0.5); /* Nền hơi tối */
+}
+
+/* Vị trí nút "Next" ở bên phải */
+.next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+/* Hiệu ứng hover cho nút điều khiển */
+.prev:hover, .next:hover {
+  background-color: rgba(252, 169, 106, 0.8); /* Màu cam khi hover */
+}
+
+/* Hiệu ứng chuyển mờ dần (Fade) */
+.fade {
+  animation-name: fade;
+  animation-duration: 1.5s;
+}
+
+@keyframes fade {
+  from {opacity: .4} 
+  to {opacity: 1}
+}
+
+/* Các chấm tròn (Dots) */
+.dot {
+  cursor: pointer;
+  height: 12px;
+  width: 12px;
+  margin: 0 4px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.6s ease;
+}
+
+.active-dot, .dot:hover {
+  background-color: #fca96a; /* Màu cam thương hiệu */
+}
   </style>
 </head>
 <body>
@@ -1045,94 +1115,50 @@ document.addEventListener("DOMContentLoaded", () => {
   // chạy cho HUMANS (10 card -> 6 + 4)
   setupPagination("humans-section", 6);
 });
+
+
 </script>
-
+<section>
   <main class="container"> 
-<h1 class="page-title" style="margin-top:20px;">GAME</h1>
-    <section class="news-grid" id="news-section">
-      
-      <!-- Bài viết 6 -->
-      <article class="news-card">
-        <a href="../game/chimfpt/index.html" style="text-decoration: none; color: inherit;">
-          <img src="../IMG/GAME/CHIMFPT.png" alt="Bài viết 6" />
-          <div class="news-info">
-            <h2>Chim FPT</h2>
-            <p>Y chang game Flappy Bird</p>
-            <span class="date">Khả dụng</span>
-          </div>
-        </a>
-      </article>
+<h1 class="page-title" style="margin-top:20px;">COMING SOON</h1>
 
-      <!-- Bài viết 5 -->
-      <article class="news-card">
-        <a href="../game/supermario/index.html" style="text-decoration: none; color: inherit;">
-          <img src="../IMG/GAME/mario.png" alt="Bài viết 5" />
-          <div class="news-info">
-            <h2>Super Mario</h2>
-            <p>Y chang game Super Mario</p>
-            <span class="date">Khả dụng</span>
-          </div>
-        </a>
-      </article>
+<div class="slideshow-container">
+    <div class="mySlides fade">
+        <img src="data/1.webp" style="width:100%">
+    </div>
 
-      <!-- Bài viết 4 -->
-      <article class="news-card">
-        <a href="https://edulive.net/util/content/4rvkn1doysvkbrpi7qxo?share_code=TC68EA5811B07C8" style="text-decoration: none; color: inherit;">
-          <img src="../IMG/GAME/daovang.png" alt="Bài viết 4" />
-          <div class="news-info">
-            <h2>Đào vàng</h2>
-            <p>Y chang game Đào vàng</p>
-            <span class="date">Khả dụng</span>
-          </div>
-        </a>
-      </article>
+    <div class="mySlides fade">
+        <img src="data/2.webp" style="width:100%">
+    </div>
 
-      <!-- Bài viết 3 -->
-      <article class="news-card">
-        <a href="https://edulive.net/util/content/9b9uh77zrusoqkxtevjz?share_code=TC68EA5811B07C8" style="text-decoration: none; color: inherit;">
-          <img src="../IMG/GAME/ailatrieuphu.png" alt="Bài viết 3" />
-          <div class="news-info">
-            <h2>Ai là triệu phú</h2>
-            <p>Y chang game Ai là triệu phú</p>
-            <span class="date">Khả dụng</span>
-          </div>
-        </a>
-      </article>
+    <div class="mySlides fade">
+        <img src="data/3.webp" style="width:100%">
+    </div>
 
-      <!-- Bài viết 2 -->
-      <article class="news-card">
-        <a href="https://edulive.net/util/content/1nnjirybyhvvxq56o2k2?share_code=TC68EA5811B07C8" style="text-decoration: none; color: inherit;">
-          <img src="../IMG/GAME/nhanhnhuchop.png" alt="Bài viết 2" />
-          <div class="news-info">
-            <h2>Nhanh như chóp</h2>
-            <p>Y chang game Nhanh như chóp</p>
-            <span class="date">khả dụng</span>
-          </div>
-        </a>
-      </article>
+    <div class="mySlides fade">
+        <img src="data/4.webp" style="width:100%">
+    </div>
 
-      <!-- Bài viết 1 -->
-      <article class="news-card">
-        <a href="https://edulive.net/util/content/blg5x2mzvh6481ammtbe?share_code=TC68EA5811B07C8" style="text-decoration: none; color: inherit;">
-          <img src="../IMG/GAME/duaxecungthotrang.png" alt="Bài viết 1" />
-          <div class="news-info">
-            <h2>Đua xe cùng thỏ trắng</h2>
-            <p>Y chang game đua xe</p>
-            <span class="date">Khả dụng</span>
-          </div>
-        </a>
-      </article>
+    <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+    <a class="next" onclick="plusSlides(1)">&#10095;</a>
+</div>
 
-    </section>
-  </main>
+<div style="text-align:center; margin-top: 10px;">
+    <span class="dot" onclick="currentSlide(1)"></span> 
+    <span class="dot" onclick="currentSlide(2)"></span> 
+    <span class="dot" onclick="currentSlide(3)"></span> 
+    <span class="dot" onclick="currentSlide(4)"></span> 
+</div>
+
 </body>
+</section>
 </section>
 <div id="footer"></div>
 
 
 
 <script>
-  fetch("../footer.html")
+  fetch("../../footer.html")
     .then(res => res.text())
     .then(data => document.getElementById("footer").innerHTML = data);
 </script>
@@ -1140,69 +1166,54 @@ document.addEventListener("DOMContentLoaded", () => {
 <script src="backtotop.js"></script>
 
 <script>
-function setupPagination(sectionId, paginationId, itemsPerPage=6) {
-  const section = document.getElementById(sectionId);
-  const cards = section.querySelectorAll(".news-card");
-  const pagination = document.getElementById(paginationId);
+var slideIndex = 1;
+var slideTimeout; // Biến để lưu trữ timer
 
-  const totalPages = Math.ceil(cards.length / itemsPerPage);
+showSlides(slideIndex);
 
-  function renderPagination() {
-    pagination.innerHTML = "";
-
-    // Nút prev
-    const prev = document.createElement("button");
-    prev.textContent = "<";
-    prev.classList.add("prev");
-    prev.addEventListener("click", () => {
-      const current = parseInt(pagination.querySelector(".active").textContent);
-      if (current > 1) showPage(current - 1);
-    });
-    pagination.appendChild(prev);
-
-    // Số trang
-    for (let i = 1; i <= totalPages; i++) {
-      const span = document.createElement("span");
-      span.classList.add("page-number");
-      if (i === 1) span.classList.add("active");
-      span.textContent = i;
-      span.addEventListener("click", () => showPage(i));
-      pagination.appendChild(span);
-    }
-
-    // Nút next
-    const next = document.createElement("button");
-    next.textContent = ">";
-    next.classList.add("next");
-    next.addEventListener("click", () => {
-      const current = parseInt(pagination.querySelector(".active").textContent);
-      if (current < totalPages) showPage(current + 1);
-    });
-    pagination.appendChild(next);
-  }
-
-  function showPage(page) {
-    const start = (page - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-
-    cards.forEach((card, i) => {
-      card.style.display = (i >= start && i < end) ? "block" : "none";
-    });
-
-    // đổi active
-    pagination.querySelectorAll(".page-number").forEach(el => el.classList.remove("active"));
-    pagination.querySelectorAll(".page-number")[page - 1].classList.add("active");
-  }
-
-  renderPagination();
-  showPage(1);
+// Hàm điều khiển tiến/lùi
+function plusSlides(n) {
+    clearTimeout(slideTimeout); // Xóa timer cũ
+    showSlides(slideIndex += n);
 }
 
-// chạy cho FPC NEWS (7 card → 2 trang)
-setupPagination("news-section", "pagination-news", 6);
+// Hàm chuyển đến slide cụ thể
+function currentSlide(n) {
+    clearTimeout(slideTimeout); // Xóa timer cũ
+    showSlides(slideIndex = n);
+}
 
-// chạy cho HUMANS OF FPC (10 card → 2 trang)
-setupPagination("humans-section", "pagination-humans", 6);
+// Hàm hiển thị Slides
+function showSlides(n) {
+    var i;
+    var slides = document.getElementsByClassName("mySlides");
+    var dots = document.getElementsByClassName("dot");
+    
+    // Xử lý khi vượt quá giới hạn
+    if (n > slides.length) {slideIndex = 1}    
+    if (n < 1) {slideIndex = slides.length}
+    
+    // Ẩn tất cả slides
+    for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";  
+    }
+    
+    // Bỏ trạng thái active của dots
+    for (i = 0; i < dots.length; i++) {
+        dots[i].className = dots[i].className.replace(" active-dot", "");
+    }
+    
+    // Hiển thị slide hiện tại và đánh dấu dot
+    if (slides.length > 0) {
+        slides[slideIndex-1].style.display = "block";  
+        dots[slideIndex-1].className += " active-dot";
+    }
+
+    // Tự động chuyển slide sau 3 giây (3000ms)
+    slideTimeout = setTimeout(() => {
+        plusSlides(1); // Chuyển sang slide tiếp theo
+    }, 3000); 
+}
 </script>
 
 
