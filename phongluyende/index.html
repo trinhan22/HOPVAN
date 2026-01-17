@@ -241,10 +241,10 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- 1. CẤU HÌNH API KEY GEMINI (QUAN TRỌNG: DÁN KEY CỦA BẠN VÀO ĐÂY) ---
-        const API_KEY = "AIzaSyCReCun-vMIHZdHdCw8FW9QID2cSgdhk60"; 
+        // --- CẤU HÌNH API KEY (DÁN KEY CỦA BẠN VÀO ĐÂY) ---
+        const API_KEY = "AIzaSyCReCun-vMIHZdHdCw8FW9QID2cSgdhk60"; // Key của bạn
         
-        // --- 2. CẤU HÌNH FIREBASE ---
+        // --- CẤU HÌNH FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
             authDomain: "hopvan-9a648.firebaseapp.com",
@@ -259,11 +259,11 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Bảo vệ trang
+        // Auth Protection
         onAuthStateChanged(auth, (user) => {
             if (!user) {
-                // alert("Vui lòng đăng nhập!");
-                // window.location.href = "../log.html";
+                alert("Vui lòng đăng nhập!");
+                window.location.href = "../log.html";
             }
         });
 
@@ -271,7 +271,7 @@
             if(confirm("Đăng xuất?")) signOut(auth).then(() => window.location.href = "../index.html");
         });
 
-        // Mobile Sidebar
+        // UI Logic
         window.toggleSidebar = function() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.querySelector('.sidebar-overlay');
@@ -284,7 +284,6 @@
             }
         }
 
-        // Đếm từ
         const essayInput = document.getElementById('student-essay');
         essayInput.addEventListener('input', () => {
             const text = essayInput.value.trim();
@@ -292,23 +291,24 @@
             document.getElementById('word-count').innerText = `${count} từ`;
         });
 
-        // Load Đề bài
+        // Load Question Logic
         let allQuestions = {}; 
         async function loadQuestions() {
             try {
                 const res = await fetch('questions.json');
-                if (!res.ok) throw new Error("Không tìm thấy file questions.json");
+                if (!res.ok) throw new Error("Không thể tải file questions.json");
                 allQuestions = await res.json();
                 
+                // Check localStorage from Dashboard
                 const selectedTopic = localStorage.getItem('selectedTopic');
-                if(selectedTopic && document.getElementById('topic-select').querySelector(`option[value="${selectedTopic}"]`)) {
+                if(selectedTopic) {
                     document.getElementById('topic-select').value = selectedTopic;
                     localStorage.removeItem('selectedTopic');
                 }
                 randomizeQuestion();
             } catch (error) {
-                console.error("Lỗi tải đề:", error);
-                document.getElementById('prompt-text').innerHTML = "Lỗi: Không tìm thấy file 'questions.json'. Hãy tạo file này cùng thư mục.";
+                console.error("Lỗi:", error);
+                document.getElementById('prompt-text').innerHTML = "Lỗi: Không tìm thấy bộ đề. Hãy đảm bảo file 'questions.json' nằm cùng thư mục.";
             }
         }
 
@@ -318,13 +318,11 @@
             if (list && list.length > 0) {
                 const q = list[Math.floor(Math.random() * list.length)];
                 document.getElementById('prompt-content-box').innerHTML = `
-                    <div class="prompt-content font-bold text-gray-800 mb-2">Đề bài: ${q.topic}</div>
-                    <div class="prompt-hint text-sm text-gray-500 italic border-l-4 border-gray-300 pl-3">
-                        <i class="fas fa-info-circle mr-1"></i> Gợi ý: ${q.hint}
-                    </div>
+                    <div class="prompt-content"><b>Đề bài:</b> ${q.topic}</div>
+                    <div class="prompt-hint"><i class="fas fa-info-circle mr-1"></i> <b>Gợi ý:</b> ${q.hint}</div>
                 `;
             } else {
-                document.getElementById('prompt-content-box').innerHTML = "<p class='text-gray-500'>Chưa có đề cho mục này trong questions.json</p>";
+                document.getElementById('prompt-content-box').innerHTML = "<p>Chưa có đề cho mục này.</p>";
             }
         }
 
@@ -342,54 +340,37 @@
             }
         }, 1000);
 
-        // --- GEMINI AI LOGIC (FIXED) ---
+        // --- AI LOGIC (ĐÃ FIX URL MODEL) ---
         document.getElementById('submit-btn').addEventListener('click', async () => {
             const content = essayInput.value.trim();
-            
-            // 1. Kiểm tra Key
-            if (API_KEY === "DÁN_KEY_MỚI_CỦA_BẠN_VÀO_ĐÂY" || API_KEY.length < 20) {
-                alert("Lỗi: Bạn chưa nhập API Key vào trong code! Hãy sửa file index.html");
-                return;
-            }
-
             if (content.length < 20) return alert("Bài làm quá ngắn! Hãy viết thêm.");
 
             const loading = document.getElementById('loading-overlay');
             const btn = document.getElementById('submit-btn');
-            
-            // Hiện loading
             loading.style.display = 'flex';
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang gửi...';
 
-            // 2. Chuẩn bị Prompt
-            const systemPrompt = `Bạn là một giáo viên Ngữ Văn xuất sắc. Nhiệm vụ: Chấm bài làm của học sinh.
-            Yêu cầu bắt buộc:
-            1. Tìm lỗi chính tả, dùng từ, ngữ pháp.
-            2. Nhận xét ưu điểm và khuyết điểm về nội dung.
-            3. Trả về kết quả dưới dạng JSON thuần (Raw JSON), KHÔNG dùng markdown code block.
-            Mẫu JSON:
+            const systemPrompt = `Bạn là một giáo viên Ngữ Văn xuất sắc. Nhiệm vụ: Chấm bài và sửa lỗi.
+            QUAN TRỌNG: Chỉ trả về chuỗi JSON thô (Raw JSON), KHÔNG dùng markdown code block (không dùng \`\`\`json).
+            Cấu trúc JSON bắt buộc:
             {
-                "correction_html": "Bài làm gốc của học sinh nhưng chèn thêm: <span class='diff-del'>từ sai</span> <span class='diff-add'>từ sửa lại</span>. Giữ nguyên các câu đúng.",
-                "idea_feedback": ["Nhận xét tốt 1", "Nhận xét tốt 2"],
+                "correction_html": "Bài làm đã sửa lỗi. Dùng thẻ <span class='diff-del'>từ sai</span> và <span class='diff-add'>từ đúng</span>. Giữ nguyên các câu đúng.",
+                "idea_feedback": ["Nhận xét ưu điểm 1", "Nhận xét ưu điểm 2"],
                 "missing_points": ["Điểm cần cải thiện 1", "Điểm cần cải thiện 2"]
             }`;
 
-            // Lấy đề bài an toàn
             const promptBox = document.getElementById('prompt-content-box');
-            const promptText = promptBox.innerText || "Chấm bài viết tự do"; 
-            const userMessage = `Đề bài: ${promptText}\n\nBài làm của học sinh:\n${content}`;
+            const promptText = promptBox.textContent || promptBox.innerText; 
+            const userMessage = `Đề bài: ${promptText}\n\nBài làm học sinh:\n${content}`;
 
             try {
-                // 3. Gọi API (Dùng model gemini-1.5-flash ổn định nhất)
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+                // SỬA Ở ĐÂY: Đổi tên model thành 'gemini-1.5-flash-latest' để tránh lỗi not found
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ 
-                            parts: [{ text: systemPrompt + "\n\n---\n\n" + userMessage }] 
-                        }],
-                        // Tắt bộ lọc an toàn để tránh bị chặn nhầm khi chấm văn
+                        contents: [{ parts: [{ text: systemPrompt + "\n---\n" + userMessage }] }],
+                        // Safety Settings để tránh AI từ chối trả lời oan
                         safetySettings: [
                             { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
                             { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
@@ -401,52 +382,44 @@
                 });
 
                 if (!response.ok) {
-                    const errData = await response.json();
-                    throw new Error(errData.error?.message || `Lỗi HTTP ${response.status}`);
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || "Lỗi kết nối API Google.");
                 }
 
                 const data = await response.json();
                 
                 if (data.candidates && data.candidates.length > 0) {
                     let rawText = data.candidates[0].content.parts[0].text;
-                    // Làm sạch JSON nếu AI lỡ thêm markdown
                     rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
                     
                     const result = JSON.parse(rawText);
                     
-                    // Render kết quả
                     document.getElementById('ai-correction-box').innerHTML = result.correction_html.replace(/\n/g, '<br>');
                     document.getElementById('idea-feedback-list').innerHTML = result.idea_feedback.map(i => `<li>${i}</li>`).join('');
                     document.getElementById('missing-points-list').innerHTML = result.missing_points.map(i => `<li>${i}</li>`).join('');
 
-                    // Hiện bảng kết quả
-                    const fbSection = document.getElementById('overall-feedback-box');
-                    fbSection.style.display = 'block';
-                    fbSection.scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById('overall-feedback-box').style.display = 'block';
+                    document.getElementById('overall-feedback-box').scrollIntoView({ behavior: 'smooth' });
 
-                    // Lưu lịch sử (Chỉ khi có user)
-                    if (auth.currentUser) {
-                        try {
-                            const topicName = document.getElementById('topic-select').options[document.getElementById('topic-select').selectedIndex].text;
-                            await addDoc(collection(db, "activities"), {
-                                uid: auth.currentUser.uid,
-                                action: "Luyện đề: " + topicName,
-                                timestamp: serverTimestamp()
-                            });
-                        } catch(err) { console.error("Lỗi lưu history:", err); }
-                    }
+                    try {
+                        const topicName = document.getElementById('topic-select').options[document.getElementById('topic-select').selectedIndex].text;
+                        await addDoc(collection(db, "activities"), {
+                            uid: auth.currentUser.uid,
+                            action: "Luyện đề: " + topicName,
+                            timestamp: serverTimestamp()
+                        });
+                    } catch(err) { console.error("Lỗi lưu history:", err); }
 
                 } else {
-                    throw new Error("AI trả về kết quả rỗng (Safety Block hoặc Lỗi Model).");
+                    throw new Error("AI không trả về kết quả.");
                 }
 
             } catch (e) {
-                console.error("Chi tiết lỗi:", e);
-                alert("Có lỗi xảy ra: " + e.message + "\n\nHãy kiểm tra lại API Key hoặc kết nối mạng.");
+                console.error(e);
+                alert("Lỗi: " + e.message);
             } finally {
                 loading.style.display = 'none';
                 btn.disabled = false;
-                btn.innerHTML = 'Nộp bài <i class="fas fa-paper-plane"></i>';
             }
         });
     </script>
