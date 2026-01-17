@@ -1,250 +1,385 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta name="google-site-verification" content="73dRIdwl0wADm4SOV2_fm4zWOu8ZbaaJQbfiFdVc09g" />
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HOPVAN - Đăng nhập</title>
-  <meta property="og:title" content="HOPVAN - Học văn thông minh" />
-  <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
-  <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
-  <meta property="og:url" content="https://hopvan.netlify.app" />
-  <meta property="og:type" content="article" />
-  <link href="../LOGO.WEBP" rel="icon" type="logo-white.png"/>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/feather-icons"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hopvan - Đăng nhập</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <style>
-    body {
-      /* Font được giữ lại */
-      font-family: 'Be Vietnam Pro', sans-serif; 
-      /* Nền Gradient Động: chuyển 4 màu với góc -45 độ */
-      background: linear-gradient(-45deg, #e0f2f1, #e0f2fe, #eef2ff, #f1f5f9);
-      /* Phóng to kích thước nền để có không gian di chuyển */
-      background-size: 400% 400%;
-      /* Áp dụng animation */
-      animation: gradientBG 15s ease infinite;
-    }
-
-    /* Định nghĩa hiệu ứng chuyển động */
-    @keyframes gradientBG {
-      0% { 
-          /* Bắt đầu ở bên trái */
-          background-position: 0% 50% 
-      }
-      50% { 
-          /* Di chuyển sang bên phải */
-          background-position: 100% 50% 
-      }
-      100% { 
-          /* Quay lại bên trái và lặp lại */
-          background-position: 0% 50% 
-      }
-    }
-    .text-orange-500 {
-      color: #fca96a; /* Màu cam chủ đạo của HOPVAN */
-    }
-    .border-orange-500 {
-      border-color: #fca96a;
-    }
-
-    /* Định nghĩa màu Gradient cho nút Đăng nhập */
-    .bg-gradient-hopvan {
-      background: linear-gradient(to right, #fca96a, #fcd5b5);
-    }
-    
-    /* Hiệu ứng hover cho nút Đăng nhập: Đổi gradient nhẹ hơn */
-    .bg-gradient-hopvan:hover {
-      background: linear-gradient(to right, #f89852, #fcd0a3);
-      box-shadow: 0 4px 12px rgba(252, 169, 106, 0.4);
-    }
-
-    /* Hiệu ứng xuất hiện cho toàn bộ form */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --primary-light: #FFB085;
+            --text-main: #2D3436;
+            --text-light: #636E72;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --blur: 20px;
+            --white: #ffffff;
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
-    }
 
-    .login-container {
-        animation: fadeIn 0.6s ease-out forwards;
-        opacity: 0; /* Bắt đầu ẩn */
-    }
-    
-    /* Thiết lập chuyển động mượt cho hover trên các nút */
-    .transition-all-smooth {
-        transition: all 0.3s ease-in-out;
-    }
+        body {
+            background-color: #FFF5EC;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
 
-    /* Thêm shadow khi hover cho nút Google */
-    #google-login-btn:hover {
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-  </style>
+        /* --- BACKGROUND BLOBS (Đồng bộ với Index) --- */
+        .background-blobs {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: floatBlob 10s infinite alternate;
+        }
+
+        .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
+        .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
+        .blob-3 { width: 300px; height: 300px; background: #FFD1D1; top: 40%; left: 40%; animation-delay: -2s; }
+
+        @keyframes floatBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 50px) scale(1.1); }
+        }
+
+        /* --- LOGIN CARD (Glassmorphism) --- */
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur));
+            -webkit-backdrop-filter: blur(var(--blur));
+            border: 1px solid var(--glass-border);
+            padding: 40px;
+            border-radius: 30px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.8s ease-out;
+            margin: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            color: var(--text-main);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .subtitle a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        /* --- FORM STYLES --- */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 50px; /* Bo tròn kiểu pill */
+            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.8);
+            font-size: 1rem;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 143, 80, 0.2);
+            background: white;
+        }
+
+        /* Checkbox & Forgot Password */
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .remember-me input {
+            accent-color: var(--primary);
+            width: 16px;
+            height: 16px;
+        }
+
+        .forgot-pass {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), #FF758C);
+            color: white;
+            padding: 14px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(255, 143, 80, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px rgba(255, 143, 80, 0.4);
+        }
+
+        .divider {
+            margin: 25px 0;
+            display: flex;
+            align-items: center;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: rgba(0,0,0,0.1);
+        }
+
+        .divider span {
+            padding: 0 10px;
+        }
+
+        .btn-google {
+            width: 100%;
+            background: white;
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(0,0,0,0.1);
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-google:hover {
+            background: #f9f9f9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .back-home {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        .back-home:hover { opacity: 1; }
+
+    </style>
 </head>
+<body>
 
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
-
-  <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl login-container">
-    <div class="flex flex-col items-center justify-center mb-6">
-      <img src="../LOGO.WEBP" alt="HOPVAN Logo" class="w-20 h-20 mb-4"/>
-      <h2 class="text-3xl font-bold text-gray-800">Đăng nhập vào HOPVAN</h2>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
     </div>
 
-    <p class="text-center mb-4 text-sm text-gray-600">
-      Chưa có tài khoản? 
-      <a href="register.html" class="text-orange-500 font-semibold hover:text-orange-600 transition-all-smooth">Đăng ký ngay</a>
-    </p>
+    <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Trang chủ</a>
 
-    <form id="login-form" class="space-y-6">
-      <div>
-        <label for="login-email" class="block text-sm font-medium text-gray-700">Email</label>
-        <input type="email" id="login-email" required placeholder="Nhập email của bạn"
-               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 transition duration-150 ease-in-out transition-all-smooth">
-      </div>
-
-      <div>
-        <label for="login-password" class="block text-sm font-medium text-gray-700">Mật khẩu</label>
-        <input type="password" id="login-password" required placeholder="Nhập mật khẩu"
-               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 transition duration-150 ease-in-out transition-all-smooth">
-      </div>
-
-      <div class="flex items-center justify-between">
-        <div class="flex items-center">
-          <input id="remember-me" name="remember-me" type="checkbox"
-                 class="h-4 w-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500">
-          <label for="remember-me" class="ml-2 block text-sm text-gray-900"> Ghi nhớ tôi </label>
+    <div class="login-card">
+        <div class="header-section">
+            <img src="../LOGO.WEBP" alt="Logo" class="logo-img">
+            <h2>Chào mừng trở lại</h2>
+            <p class="subtitle">Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a></p>
         </div>
-        <div class="text-sm">
-          <a href="#" class="font-medium text-orange-500 hover:text-orange-600 transition-all-smooth"> Quên mật khẩu? </a>
-        </div>
-      </div>
 
-      <button type="submit"
-              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-hopvan focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all-smooth">
-        Đăng nhập
-      </button>
-    </form>
+        <form id="login-form">
+            <div class="input-group">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" class="input-field" placeholder="name@example.com" required>
+            </div>
 
-    <div class="mt-6">
-      <div class="relative">
-        <div class="absolute inset-0 flex items-center">
-          <div class="w-full border-t border-gray-300"></div>
-        </div>
-        <div class="relative flex justify-center text-sm">
-          <span class="px-2 bg-white text-gray-500"> hoặc </span>
-        </div>
-      </div>
+            <div class="input-group">
+                <label for="login-password">Mật khẩu</label>
+                <input type="password" id="login-password" class="input-field" placeholder="••••••••" required>
+            </div>
 
-      <div class="mt-6">
-        <button id="google-login-btn"
-                class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all-smooth">
-      <svg class="w-5 h-5 mr-3" viewBox="0 0 48 48">
-        <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path>
-        <path fill="#FF3D00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"></path>
-        <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path>
-        <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C41.383 34.613 44 29.833 44 24c0-1.341-.138-2.65-.389-3.917z"></path>
-      </svg>          
-      Đăng nhập bằng Google
+            <div class="actions">
+                <label class="remember-me">
+                    <input type="checkbox" id="remember-me">
+                    <span>Ghi nhớ tôi</span>
+                </label>
+                <a href="#" class="forgot-pass">Quên mật khẩu?</a>
+            </div>
+
+            <button type="submit" class="btn-submit">Đăng nhập</button>
+        </form>
+
+        <div class="divider">
+            <span>hoặc đăng nhập với</span>
+        </div>
+
+        <button id="google-login-btn" class="btn-google">
+            <svg width="20" height="20" viewBox="0 0 48 48">
+                <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path>
+                <path fill="#FF3D00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"></path>
+                <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path>
+                <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C41.383 34.613 44 29.833 44 24c0-1.341-.138-2.65-.389-3.917z"></path>
+            </svg>
+            Google
         </button>
-      </div>
     </div>
-  </div>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            GoogleAuthProvider, 
+            signInWithPopup, 
+            onAuthStateChanged,
+            setPersistence, 
+            browserLocalPersistence,
+            browserSessionPersistence 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-<script type="module">
-    import { 
-        initializeApp 
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { 
-        getAuth, 
-        signInWithEmailAndPassword, 
-        GoogleAuthProvider, 
-        signInWithPopup, 
-        onAuthStateChanged,
-        setPersistence, 
-        browserLocalPersistence,
-        browserSessionPersistence // Dùng cho trường hợp KHÔNG chọn 'Ghi nhớ tôi'
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
+            authDomain: "hopvan-9a648.firebaseapp.com",
+            projectId: "hopvan-9a648",
+            storageBucket: "hopvan-9a648.appspot.com",
+            messagingSenderId: "429347196227",
+            appId: "1:429347196227:web:917b8d019f0efd0f7833f6",
+            measurementId: "G-1BG8PSRG0R"
+        };
 
-    // Cấu hình Firebase của bạn
-    const firebaseConfig = {
-      apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
-      authDomain: "hopvan-9a648.firebaseapp.com",
-      projectId: "hopvan-9a648",
-      storageBucket: "hopvan-9a648.appspot.com",
-      messagingSenderId: "429347196227",
-      appId: "1:429347196227:web:917b8d019f0efd0f7833f6",
-      measurementId: "G-1BG8PSRG0R"
-    };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        
+        // --- QUAN TRỌNG: Sửa đường dẫn về index.html để test ---
+        const REDIRECT_URL = "index.html"; 
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    
-    const REDIRECT_URL = "../student/index.html"; 
+        // 1. Tự động chuyển hướng nếu đã đăng nhập
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("Đã đăng nhập, chuyển hướng...");
+                window.location.href = REDIRECT_URL; 
+            }
+        });
 
-    // --- 1. TỰ ĐỘNG CHUYỂN HƯỚNG NẾU ĐÃ ĐĂNG NHẬP ---
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            console.log("User is already signed in. Auto-redirecting...");
-            window.location.href = REDIRECT_URL; 
-        }
-    });
+        // 2. Login Email/Pass
+        document.getElementById("login-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("login-email").value;
+            const password = document.getElementById("login-password").value;
+            const rememberMe = document.getElementById("remember-me").checked; 
+            const submitBtn = document.querySelector(".btn-submit");
 
-    // --- 2. XỬ LÝ LOGIN BẰNG EMAIL/PASSWORD ---
-    document.getElementById("login-form").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const email = document.getElementById("login-email").value;
-        const password = document.getElementById("login-password").value;
-        const rememberMe = document.getElementById("remember-me").checked; 
+            submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Đang xử lý...';
 
-        try {
-            // 💡 BƯỚC QUAN TRỌNG: THIẾT LẬP PERSISTENCE TRƯỚC KHI ĐĂNG NHẬP
-            if (rememberMe) {
-                // Nếu chọn: Lưu vĩnh viễn (Local Storage)
+            try {
+                if (rememberMe) {
+                    await setPersistence(auth, browserLocalPersistence);
+                } else {
+                    await setPersistence(auth, browserSessionPersistence);
+                }
+                
+                await signInWithEmailAndPassword(auth, email, password);
+                // AuthStateChanged sẽ tự bắt sự kiện và chuyển hướng
+            } catch (err) {
+                submitBtn.innerText = 'Đăng nhập';
+                let message = "Lỗi đăng nhập.";
+                if (err.code === "auth/invalid-credential" || err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
+                    message = "Sai email hoặc mật khẩu.";
+                } else if (err.code === "auth/too-many-requests") {
+                    message = "Bạn thử lại quá nhiều lần. Vui lòng đợi chút nhé.";
+                }
+                alert(message);
+                console.error(err);
+            }
+        });
+
+        // 3. Login Google
+        document.getElementById("google-login-btn").addEventListener("click", async () => {
+            const provider = new GoogleAuthProvider();
+            try {
                 await setPersistence(auth, browserLocalPersistence);
-            } else {
-                // Nếu KHÔNG chọn: Chỉ lưu trong phiên hiện tại (Session Storage)
-                await setPersistence(auth, browserSessionPersistence);
+                await signInWithPopup(auth, provider);
+            } catch (err) {
+                console.error("Lỗi Google Login:", err);
+                alert("Đăng nhập Google thất bại.");
             }
-            
-            // Tiến hành đăng nhập (sẽ dùng persistence vừa set ở trên)
-            await signInWithEmailAndPassword(auth, email, password);
-            
-            // Chuyển hướng sau khi đăng nhập thành công
-            window.location.href = REDIRECT_URL; 
-        } catch (err) {
-            let message = "Sai email hoặc mật khẩu. Vui lòng kiểm tra lại.";
-            if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
-                message = "Sai email hoặc mật khẩu. Vui lòng kiểm tra lại.";
-            } else if (err.code === "auth/too-many-requests") {
-                message = "Tài khoản của bạn đã bị khóa tạm thời do nhập sai mật khẩu quá nhiều lần. Vui lòng thử lại sau.";
-            }
-            alert(message);
-        }
-    });
-
-    // --- 3. XỬ LÝ LOGIN BẰNG GOOGLE (LUÔN GHI NHỚ) ---
-    document.getElementById("google-login-btn").addEventListener("click", async () => {
-        const provider = new GoogleAuthProvider();
-        try {
-            await setPersistence(auth, browserLocalPersistence); // Luôn ghi nhớ
-            await signInWithPopup(auth, provider);
-            window.location.href = REDIRECT_URL; 
-        } catch (err) {
-            console.error("Google login error:", err);
-            alert("Đăng nhập bằng Google thất bại: " + err.message);
-        }
-    });
-</script>
+        });
+    </script>
 
 </body>
 </html>
