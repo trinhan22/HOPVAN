@@ -41,8 +41,8 @@
 
         /* --- SIDEBAR --- */
         .sidebar {
-            width: var(--sidebar-width);
-            background: var(--glass-bg);
+            width: var(--sidebar-width); /* Rộng 260px */
+            background: var(--glass-bg); /* Nền kính mờ */
             backdrop-filter: blur(var(--blur));
             border: 1px solid var(--glass-border);
             border-radius: 24px;
@@ -74,7 +74,7 @@
             background: rgba(255, 255, 255, 0.5); border-radius: 14px; transition: all 0.3s;
         }
         .logout-btn:hover { background: #FF5E62; color: white; border-color: transparent; }
-
+        
         /* Overlay cho Mobile Sidebar */
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -342,7 +342,7 @@
             <ul class="menu-list">
                 <li class="menu-item active" onclick="switchTab('overview', this)"><i class="fas fa-home"></i> Tổng quan</li>
                 <li class="menu-item" onclick="switchTab('news', this)"><i class="fas fa-newspaper"></i> Bản tin Văn học</li>
-                <li class="menu-item" onclick="switchTab('community', this)"><i class="fas fa-users"></i> Cộng đồng Văn học</li>
+                <li class="menu-item" onclick="switchTab('community', this)"><i class="fas fa-users"></i> Cộng đồng</li>
                 <li class="menu-item" onclick="switchTab('practice', this)"><i class="fas fa-pen-nib"></i> Phòng luyện đề</li>
                 <li class="menu-item" onclick="switchTab('journal', this)"><i class="fas fa-book-journal-whills"></i> Nhật ký học tập</li>
             </ul>
@@ -426,7 +426,7 @@
             </div>
 
             <div id="community" class="content-section">
-                <h2 style="margin-bottom: 20px; font-weight: 800; color: var(--text-main);">Cộng đồng Văn</h2>
+                <h2 style="margin-bottom: 20px; font-weight: 800; color: var(--text-main);">Cộng đồng Văn học</h2>
                 <div class="community-banner">
                     <i class="fas fa-heart com-float-icon cf-1"></i>
                     <i class="fas fa-comment-dots com-float-icon cf-2"></i>
