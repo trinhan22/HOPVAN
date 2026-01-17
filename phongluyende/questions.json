@@ -1,0 +1,36 @@
+{
+  "nlxh": [
+    {
+      "topic": "Anh/chị hãy viết một đoạn văn (khoảng 200 chữ) trình bày suy nghĩ về ý nghĩa của việc sống có đam mê.",
+      "hint": "Giải thích đam mê là gì? Biểu hiện của người sống có đam mê? Ý nghĩa (động lực, thành công, hạnh phúc...)? Phê phán lối sống hời hợt. Bài học liên hệ bản thân."
+    },
+    {
+      "topic": "Viết đoạn văn (200 chữ) về sự cần thiết của tinh thần tự học trong thời đại số.",
+      "hint": "Tự học là gì? Tại sao thời đại số cần tự học (kiến thức thay đổi nhanh)? Lợi ích của tự học? Dẫn chứng thực tế (Bác Hồ, Bill Gates...). Liên hệ bản thân."
+    },
+    {
+      "topic": "Suy nghĩ của anh/chị về sức mạnh của lòng nhân ái trong cuộc sống.",
+      "hint": "Nhân ái là yêu thương, sẻ chia. Biểu hiện: giúp đỡ người khó khăn, ủng hộ đồng bào bão lụt. Ý nghĩa: gắn kết cộng đồng, lan tỏa yêu thương. Phê phán sự vô cảm."
+    }
+  ],
+  "nlvh": [
+    {
+      "topic": "Phân tích diễn biến tâm trạng Mị trong đêm tình mùa xuân (Vợ chồng A Phủ - Tô Hoài).",
+      "hint": "Hoàn cảnh: Mùa xuân về, tiếng sáo gọi bạn tình. Tâm trạng: Uống rượu -> Nhớ về quá khứ hạnh phúc -> Muốn đi chơi -> Bị A Sử trói -> Vẫn nghe tiếng sáo -> Vùng bước đi. Ý nghĩa sức sống tiềm tàng."
+    },
+    {
+      "topic": "Cảm nhận về vẻ đẹp hào hùng và hào hoa của người lính Tây Tiến qua đoạn thơ thứ 3 (Tây Tiến - Quang Dũng).",
+      "hint": "Hình ảnh đoàn binh không mọc tóc, quân xanh màu lá. Giấc mơ gửi về dáng kiều thơm. Sự hy sinh bi tráng: rải rác biên cương mồ viễn xứ. Lời thề độc hành."
+    }
+  ],
+  "doc-hieu": [
+    {
+      "topic": "Đọc đoạn trích sau (Trích 'Thư gửi thanh niên' - Hồ Chí Minh) và thực hiện yêu cầu: Xác định phương thức biểu đạt chính? Thông điệp tác giả muốn gửi gắm là gì?",
+      "hint": "Phương thức: Nghị luận. Thông điệp: Vai trò quan trọng của thanh niên là người chủ tương lai nước nhà, cần rèn luyện đạo đức và tài năng."
+    },
+    {
+      "topic": "Đọc bài thơ 'Mẹ và Quả' (Nguyễn Khoa Điềm) và trả lời: Hình ảnh 'quả' có ý nghĩa ẩn dụ gì? Tình cảm của người con dành cho mẹ?",
+      "hint": "Quả: thành quả lao động, sự hi sinh của mẹ, sự trưởng thành của con. Tình cảm: Biết ơn, trân trọng, lo sợ sự trôi chảy của thời gian."
+    }
+  ]
+}
