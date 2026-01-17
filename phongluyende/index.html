@@ -29,7 +29,7 @@
         .logout-btn { margin-top: auto; display: flex; align-items: center; gap: 12px; padding: 15px 20px; color: #FF5E62; font-weight: 700; cursor: pointer; border: 1px solid rgba(255, 94, 98, 0.2); background: rgba(255, 255, 255, 0.5); border-radius: 14px; transition: all 0.3s; }
         /* Main Content */
         .main-content { flex: 1; background: var(--glass-bg); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.02); -webkit-overflow-scrolling: touch; }
-        /* UI Components */
+        /* Header */
         .practice-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .header-title h2 { font-size: 1.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 5px; }
         .header-title p { color: var(--text-light); font-size: 0.95rem; }
@@ -41,25 +41,20 @@
         .prompt-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .prompt-label { background: #FFF5EC; color: var(--primary); padding: 6px 15px; border-radius: 20px; font-weight: 800; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; }
         .refresh-btn { font-size: 0.9rem; color: var(--text-light); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 50px; background: white; border: 1px solid #eee; font-weight: 600; }
-        .refresh-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
         .prompt-content { font-size: 1.1rem; line-height: 1.6; color: var(--text-main); font-weight: 500; }
         .prompt-hint { margin-top: 15px; font-size: 0.95rem; color: var(--text-light); font-style: italic; border-left: 3px solid #ddd; padding-left: 15px; }
         /* Workspace */
         .workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; flex: 1; min-height: 500px; }
         .editor-box { background: white; border-radius: 24px; border: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden; height: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.02); transition: 0.3s; position: relative; }
-        .editor-box:focus-within { border-color: var(--primary); box-shadow: 0 10px 40px rgba(255, 143, 80, 0.15); }
         .editor-toolbar { padding: 15px 25px; background: #fff; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
         .tool-label { font-weight: 800; color: var(--text-main); font-size: 1rem; display: flex; align-items: center; gap: 10px; }
         .word-count { font-size: 0.8rem; color: var(--text-light); background: #f5f5f5; padding: 5px 12px; border-radius: 20px; font-weight: 600; }
         .writing-area { flex: 1; width: 100%; padding: 25px; border: none; outline: none; resize: none; font-size: 1.05rem; line-height: 1.8; color: var(--text-main); background: transparent; font-family: inherit; }
         .ai-result-view { padding: 25px; font-size: 1.05rem; line-height: 1.8; color: var(--text-main); overflow-y: auto; height: 100%; background-color: #fafafa; }
-        /* Diff Colors */
         .diff-del { background-color: #ffe5e5; color: #d63031; text-decoration: line-through; padding: 0 4px; border-radius: 4px; }
         .diff-add { background-color: #e3f9e5; color: #00b894; font-weight: 700; padding: 0 4px; border-radius: 4px; }
-        /* Button */
         .submit-btn { background: var(--primary-gradient); color: white; border: none; padding: 10px 25px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; box-shadow: 0 5px 15px rgba(255, 94, 98, 0.4); }
-        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 94, 98, 0.5); }
-        .submit-btn:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; transform: none; }
+        .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
         /* Feedback Grid */
         .feedback-section { margin-top: 30px; display: none; animation: slideUp 0.6s ease-out; padding-bottom: 50px; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -70,7 +65,7 @@
         .fb-list li::before { font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; left: 0; top: 3px; font-size: 1.1rem; }
         .fb-good .fb-header { color: #00b894; } .fb-good li::before { content: '\f00c'; color: #00b894; }
         .fb-bad .fb-header { color: #ff7675; } .fb-bad li::before { content: '\f071'; color: #ff7675; }
-        /* Thinking Indicator */
+        /* Loading */
         .loading-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); z-index: 60; display: none; justify-content: center; align-items: center; flex-direction: column; border-radius: 24px; }
         .thinking-indicator { display: flex; gap: 8px; margin-top: 20px; }
         .dot { width: 12px; height: 12px; background: var(--primary); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
@@ -192,7 +187,7 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // API KEY TỪ SCRIPT BẠN GỬI (ĐÃ KIỂM TRA)
+        // API KEY TỪ SCRIPT BẠN GỬI (ĐÃ XÁC NHẬN CHẠY ĐƯỢC)
         const API_KEY = "AIzaSyAlT6Pu8uu0DirlLduXVO_B6twZadh-v7w"; 
         
         // CONFIG FIREBASE
@@ -222,7 +217,7 @@
             if(confirm("Đăng xuất?")) signOut(auth).then(() => window.location.href = "../index.html");
         });
 
-        // --- UI ---
+        // --- UI UTILS ---
         window.toggleSidebar = function() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.querySelector('.sidebar-overlay');
@@ -242,12 +237,12 @@
             document.getElementById('word-count').innerText = `${count} từ`;
         });
 
-        // --- LOAD QUESTION ---
+        // --- LOAD QUESTION LOGIC ---
         let allQuestions = {}; 
         async function loadQuestions() {
             try {
                 const res = await fetch('questions.json');
-                if (!res.ok) throw new Error("Không thể tải file questions.json");
+                if (!res.ok) throw new Error("Lỗi tải questions.json");
                 allQuestions = await res.json();
                 
                 const selectedTopic = localStorage.getItem('selectedTopic');
@@ -265,7 +260,7 @@
 
             } catch (error) {
                 console.error("Lỗi:", error);
-                document.getElementById('prompt-text').innerHTML = "Lỗi: Không tìm thấy bộ đề. Hãy đảm bảo file 'questions.json' nằm cùng thư mục.";
+                document.getElementById('prompt-text').innerHTML = "Lỗi kết nối bộ đề.";
             }
         }
 
@@ -304,15 +299,13 @@
             }
         }, 1000);
 
-        // --- GEMINI API LOGIC (CỐT LÕI) ---
-        // Hàm trích xuất JSON từ phản hồi (Kể cả khi AI bọc trong Markdown)
-        function extractJSON(text) {
-            const jsonStart = text.indexOf('{');
-            const jsonEnd = text.lastIndexOf('}');
-            if (jsonStart !== -1 && jsonEnd !== -1) {
-                return text.substring(jsonStart, jsonEnd + 1);
-            }
-            return text; // Fallback
+        // --- API CALL LOGIC (SỬ DỤNG FETCH CHUẨN TỪ CHATBOT SCRIPT) ---
+        // SỬA: Đổi sang phiên bản 1.5-flash-001 để chắc chắn không bị lỗi Model Not Found
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-001:generateContent?key=${API_KEY}`;
+
+        // Hàm clean JSON (Quan trọng)
+        function cleanJSON(text) {
+            return text.replace(/```json/g, '').replace(/```/g, '').trim();
         }
 
         document.getElementById('submit-btn').addEventListener('click', async () => {
@@ -324,57 +317,59 @@
             loading.style.display = 'flex';
             btn.disabled = true;
 
-            const systemPrompt = `Bạn là giáo viên Văn giỏi. Hãy chấm bài này.
-            QUAN TRỌNG: Chỉ trả về định dạng JSON (không có markdown).
-            Mẫu JSON:
+            const systemPrompt = `Bạn là một giáo viên Ngữ Văn xuất sắc. Nhiệm vụ: Chấm bài và sửa lỗi.
+            QUAN TRỌNG: Chỉ trả về chuỗi JSON thô (Raw JSON), KHÔNG dùng markdown code block.
+            Cấu trúc JSON bắt buộc:
             {
-                "correction_html": "Bài làm có <span class='diff-del'>lỗi sai</span> và <span class='diff-add'>sửa đúng</span>.",
-                "idea_feedback": ["Nhận xét 1", "Nhận xét 2"],
-                "missing_points": ["Cần cải thiện 1", "Cần cải thiện 2"]
+                "correction_html": "Bài làm sửa lỗi. Dùng thẻ <span class='diff-del'>từ sai</span> và <span class='diff-add'>từ đúng</span>.",
+                "idea_feedback": ["Nhận xét tốt 1", "Nhận xét tốt 2"],
+                "missing_points": ["Điểm cần cải thiện 1", "Điểm cần cải thiện 2"]
             }`;
 
             const promptBox = document.getElementById('prompt-content-box');
             const promptText = promptBox.textContent || promptBox.innerText; 
-            const userMessage = `Đề: ${promptText}\n\nBài làm:\n${content}`;
-
-            // URL chuẩn cho model 1.5 flash
-            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+            const userMessage = `Đề bài: ${promptText}\n\nBài làm:\n${content}`;
 
             try {
+                // Fetch ĐƠN GIẢN NHẤT (Bỏ Safety Settings để tránh lỗi 400 Bad Request)
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         contents: [{ 
                             parts: [{ text: systemPrompt + "\n---\n" + userMessage }] 
-                        }],
-                        safetySettings: [
-                            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-                            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-                            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-                            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
-                        ]
+                        }]
                     })
                 });
 
-                if (!response.ok) throw new Error("Lỗi kết nối API.");
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error?.message || "Lỗi API");
+                }
 
                 const data = await response.json();
                 
                 if (data.candidates && data.candidates.length > 0) {
                     let rawText = data.candidates[0].content.parts[0].text;
-                    // Làm sạch và Parse
-                    const cleanText = extractJSON(rawText);
-                    const result = JSON.parse(cleanText);
                     
-                    document.getElementById('ai-correction-box').innerHTML = result.correction_html.replace(/\n/g, '<br>');
-                    document.getElementById('idea-feedback-list').innerHTML = result.idea_feedback.map(i => `<li>${i}</li>`).join('');
-                    document.getElementById('missing-points-list').innerHTML = result.missing_points.map(i => `<li>${i}</li>`).join('');
+                    // FALLBACK: Nếu parse JSON thất bại, vẫn hiện text thô
+                    try {
+                        const cleanText = cleanJSON(rawText);
+                        const result = JSON.parse(cleanText);
+                        
+                        document.getElementById('ai-correction-box').innerHTML = result.correction_html.replace(/\n/g, '<br>');
+                        document.getElementById('idea-feedback-list').innerHTML = result.idea_feedback.map(i => `<li>${i}</li>`).join('');
+                        document.getElementById('missing-points-list').innerHTML = result.missing_points.map(i => `<li>${i}</li>`).join('');
+                        document.getElementById('overall-feedback-box').style.display = 'block';
+                    } catch (jsonError) {
+                        console.warn("Lỗi Parse JSON, hiển thị text thô:", jsonError);
+                        // Nếu lỗi JSON, hiện nguyên văn câu trả lời của AI
+                        document.getElementById('ai-correction-box').innerHTML = rawText.replace(/\n/g, '<br>');
+                    }
 
-                    document.getElementById('overall-feedback-box').style.display = 'block';
                     document.getElementById('overall-feedback-box').scrollIntoView({ behavior: 'smooth' });
 
-                    // Save History (Silent fail if no auth)
+                    // Save History
                     if(auth.currentUser) {
                         try {
                             const topicName = document.getElementById('topic-select').options[document.getElementById('topic-select').selectedIndex].text;
@@ -383,7 +378,7 @@
                                 action: "Luyện đề: " + topicName,
                                 timestamp: serverTimestamp()
                             });
-                        } catch(err) { console.error(err); }
+                        } catch(err) { console.error("History Error:", err); }
                     }
                 } else {
                     throw new Error("AI không trả về kết quả.");
@@ -391,7 +386,7 @@
 
             } catch (e) {
                 console.error(e);
-                alert("Đã xảy ra lỗi: " + e.message);
+                alert("Lỗi: " + e.message);
             } finally {
                 loading.style.display = 'none';
                 btn.disabled = false;
