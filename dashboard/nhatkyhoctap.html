@@ -4,74 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hopvan - Nhật Ký Học Tập</title>
-    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
-    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
-    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
-    <meta property="og:url" content="https://hopvan.netlify.app" />
-    <meta property="og:type" content="article" />
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
-    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        /* Giữ nguyên root primary color */
         :root { --primary: #FF8F50; --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62); --sidebar-width: 280px; }
-        * { font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.3s ease; }
+        * { font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         body { background-color: #FFF5EC; min-height: 100vh; display: flex; overflow-x: hidden; }
 
         #menu-placeholder { width: var(--sidebar-width); flex-shrink: 0; z-index: 100; }
         .main-content { flex-grow: 1; padding: 40px; position: relative; min-height: 100vh; }
 
-        /* --- GREETING CARD (MÀU CAM ĐỘC QUYỀN MỚI) --- */
+        /* --- GREETING CARD --- */
         .welcome-card {
-            /* Sử dụng gradient cam đậm, đồng bộ với màu thương hiệu */
             background: linear-gradient(135deg, #FF9F68 0%, #FF5E62 100%);
-            border-radius: 35px; padding: 40px; 
-            color: #ffffff; /* Chữ màu trắng nổi bật */
-            /* Bóng đổ màu cam đỏ */
+            border-radius: 35px; padding: 40px; color: #ffffff;
             box-shadow: 0 20px 40px rgba(255, 94, 98, 0.3); 
             position: relative; overflow: hidden; margin-bottom: 60px;
             border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideDown 0.8s ease;
         }
-        .welcome-card::after {
-            content: '\f5da'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
-            position: absolute; right: -20px; bottom: -20px; font-size: 12rem; opacity: 0.1; transform: rotate(-15deg);
-        }
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* --- ZIGZAG PATH --- */
-        .path-wrapper { position: relative; width: 100%; max-width: 450px; margin: 0 auto; padding-top: 20px; min-height: 1000px; }
-        .path-container { position: relative; display: flex; flex-direction: column; align-items: center; gap: 110px; z-index: 10; }
+        /* --- STRAIGHT PATH SYSTEM --- */
+        .path-wrapper { 
+            position: relative; 
+            width: 100%; 
+            max-width: 500px; 
+            margin: 0 auto; 
+            padding-top: 20px; 
+            min-height: 1200px; 
+            display: flex;
+            justify-content: center;
+        }
+        
+        .path-container { 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 160px; /* Tăng gap để nhãn không đè lên node dưới */
+            z-index: 10; 
+            width: 100%;
+        }
         
         .level-node {
-            width: 95px; height: 95px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 1.8rem; cursor: pointer; position: relative;
-            border-bottom: 8px solid rgba(0,0,0,0.1); background: white; z-index: 20;
+            width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 2.2rem; cursor: pointer; position: relative;
+            background: white; z-index: 20;
+            box-shadow: 0 10px 0 #eee, 0 15px 30px rgba(0,0,0,0.05);
+            opacity: 0; transform: scale(0.3) translateY(50px);
         }
         
-        .node-pos-0 { transform: translateX(0); }
-        .node-pos-1 { transform: translateX(100px); }
-        .node-pos-2 { transform: translateX(0); }
-        .node-pos-3 { transform: translateX(-100px); }
+        .level-node.node-appear { opacity: 1; transform: scale(1) translateY(0); }
+        .level-node:hover { transform: translateY(-12px) scale(1.1); box-shadow: 0 15px 0 #eee, 0 25px 40px rgba(255, 143, 80, 0.2); }
 
-        .level-passed { background: #58cc02; color: white; border-bottom-color: #46a302; box-shadow: 0 8px 0 #46a302; }
-        .level-current { background: white; color: var(--primary); border: 4px solid var(--primary); animation: bounce 2s infinite; box-shadow: 0 10px 25px rgba(255, 143, 80, 0.3); }
-        .level-locked { background: #e5e5e5; color: #afafaf; cursor: not-allowed; border-bottom-color: #ccc; pointer-events: none; }
+        /* Trạng thái Level */
+        .level-passed { background: linear-gradient(135deg, #58cc02, #46a302); color: white; border-bottom: 8px solid #3b8a02; box-shadow: 0 10px 20px rgba(88, 204, 2, 0.3); }
+        .level-current { 
+            background: white; color: var(--primary); border: 6px solid var(--primary); 
+            animation: bounce 2s infinite; 
+            box-shadow: 0 0 30px rgba(255, 143, 80, 0.5);
+        }
+        .level-locked { background: #e5e5e5; color: #afafaf; cursor: not-allowed; pointer-events: none; border-bottom: 8px solid #ccc; }
         
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
+        .completed-medal { font-size: 1.8rem; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2)); animation: medalPop 0.5s ease; }
+        @keyframes medalPop { from { transform: scale(0) rotate(-45deg); } to { transform: scale(1) rotate(0); } }
+
+        /* --- SỬA NHÃN TIÊU ĐỀ NẰM DƯỚI VÀ CENTER --- */
         .node-label {
-            position: absolute; bottom: -45px; background: white; padding: 6px 14px; border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); font-size: 11px; font-weight: 800; color: #8d6e63;
-            white-space: nowrap; border: 1px solid #f3e5f5; text-transform: uppercase;
+            position: absolute; 
+            top: 115px; /* Nằm dưới ô tròn 100px */
+            left: 50%;
+            transform: translateX(-50%); /* Căn giữa */
+            background: white; padding: 8px 18px; border-radius: 14px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.06); font-size: 13px; font-weight: 800; color: #5d4037;
+            white-space: nowrap; border: 2px solid #fff; pointer-events: none;
         }
+        .level-node:hover .node-label { background: var(--primary); color: white; transform: translate(-50%, 8px); }
 
+        /* --- SVG PATH ANIMATIONS --- */
         #path-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
+        
+        .path-line {
+            stroke: #FF8F50;
+            stroke-width: 10;
+            stroke-linecap: round;
+            fill: none;
+            stroke-dasharray: 15, 20;
+            animation: flowLine 8s linear infinite;
+            opacity: 0.3;
+        }
+        @keyframes flowLine { from { stroke-dashoffset: 350; } to { stroke-dashoffset: 0; } }
 
-        @media (max-width: 1024px) { 
+        .path-draw-anim {
+            stroke-dasharray: 3000;
+            stroke-dashoffset: 3000;
+            animation: drawLine 2.5s ease-out forwards;
+            opacity: 0.6;
+        }
+        @keyframes drawLine { to { stroke-dashoffset: 0; } }
+
+        @media (max-width: 768px) { 
             #menu-placeholder { width: 0; display: none; }
-            .node-pos-1, .node-pos-3 { transform: translateX(0); } 
+            .node-label { font-size: 11px; padding: 6px 12px; }
+            .path-wrapper { max-width: 100%; }
         }
     </style>
 </head>
@@ -83,19 +124,19 @@
         <div class="welcome-card">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div class="z-10">
-                    <h1 class="text-3xl font-black mb-1 text-white">Xin chào, <span id="user-display-name"></span></h1>
-                    <p class="font-bold text-white/90">Sẵn sàng bứt phá giới hạn bản thân hôm nay chưa?</p>
+                    <h1 class="text-4xl font-black mb-2 tracking-tight">Xin chào, <span id="user-display-name"></span></h1>
+                    <p class="font-bold text-white/90 text-lg">Sẵn sàng bứt phá giới hạn bản thân hôm nay chưa?</p>
                     
-                    <div class="flex gap-3 mt-5">
-                        <div class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-2xl flex items-center gap-2 font-black text-white border border-white/30">
-                            <i class="fas fa-fire"></i> Streak: <span id="streak-val">0</span>
+                    <div class="flex gap-4 mt-6">
+                        <div class="bg-white/20 backdrop-blur-md px-5 py-3 rounded-[22px] flex items-center gap-3 font-black text-white border border-white/30 shadow-lg">
+                            <i class="fas fa-fire text-yellow-300"></i> Streak: <span id="streak-val">0</span>
                         </div>
-                        <div class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-2xl flex items-center gap-2 font-black text-white border border-white/30">
-                            <i class="fas fa-trophy"></i> Level: <span id="level-val">0</span>
+                        <div class="bg-white/20 backdrop-blur-md px-5 py-3 rounded-[22px] flex items-center gap-3 font-black text-white border border-white/30 shadow-lg">
+                            <i class="fas fa-crown text-yellow-400"></i> Level: <span id="level-val">0</span>
                         </div>
                     </div>
                 </div>
-                <div id="avatar-initial" class="w-20 h-20 bg-white text-orange-500 rounded-[25px] flex items-center justify-center font-black text-3xl shadow-xl transform rotate-6 border-4 border-white/50 z-10"></div>
+                <div id="avatar-initial" class="w-24 h-24 bg-white text-orange-500 rounded-[30px] flex items-center justify-center font-black text-4xl shadow-2xl transform rotate-6 border-4 border-white/50 z-10"></div>
             </div>
         </div>
 
@@ -108,7 +149,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
@@ -116,23 +157,11 @@
     const db = getFirestore(app);
 
     const courseMap = [
-        { id: 1, title: 'Nghị lực sống', type: 'nlxh' },
-        { id: 2, title: 'Giá trị thời gian', type: 'nlxh' },
-        { id: 3, title: 'Lòng thấu cảm', type: 'dochieu' },
-        { id: 4, title: 'Vợ chồng A Phủ', type: 'nlvn' },
-        { id: 5, title: 'Sự tử tế', type: 'nlxh' },
-        { id: 6, title: 'Sóng Xuân Quỳnh', type: 'nlvn' },
-        { id: 7, title: 'Ý chí bền bỉ', type: 'nlxh' }
+        { id: 1, title: 'Nghị lực sống' }, { id: 2, title: 'Giá trị thời gian' },
+        { id: 3, title: 'Lòng thấu cảm' }, { id: 4, title: 'Vợ chồng A Phủ' },
+        { id: 5, title: 'Sự tử tế' }, { id: 6, title: 'Sóng Xuân Quỳnh' },
+        { id: 7, title: 'Ý chí bền bỉ' }
     ];
-
-    fetch('menu.html').then(r => r.text()).then(html => {
-        document.getElementById('menu-placeholder').innerHTML = html;
-        setTimeout(() => {
-            document.querySelectorAll('.sb-link').forEach(l => {
-                if(l.href.includes('nhatkyhoctap')) l.classList.add('active');
-            });
-        }, 300);
-    });
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -141,31 +170,37 @@
             document.getElementById('avatar-initial').innerText = name[0].toUpperCase();
 
             try {
-                const userDocRef = doc(db, "users_progress", user.uid);
-                const userSnap = await getDoc(userDocRef);
-                
-                let currentLevel = 1;
+                // --- ĐỒNG BỘ STREAK TỪ COLLECTION "users" (GIỐNG DASHBOARD) ---
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+                const todayStr = new Date().toLocaleDateString('en-CA');
+                const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toLocaleDateString('en-CA');
+
                 let streakValue = 0;
-
                 if (userSnap.exists()) {
-                    const data = userSnap.data();
-                    currentLevel = data.currentLevel || 1; 
-                    streakValue = data.streak || 0; 
+                    const userData = userSnap.data();
+                    streakValue = userData.streak || 1;
+                    if (userData.lastLoginDate !== todayStr) {
+                        streakValue = (userData.lastLoginDate === yesterdayStr) ? streakValue + 1 : 1;
+                        await updateDoc(userRef, { lastLoginDate: todayStr, streak: streakValue });
+                    }
                 } else {
-                    await setDoc(userDocRef, { currentLevel: 1, streak: 0 });
+                    streakValue = 1;
+                    await setDoc(userRef, { lastLoginDate: todayStr, streak: 1, email: user.email });
                 }
-
                 document.getElementById('streak-val').innerText = streakValue;
+
+                // --- LẤY LEVEL TỪ COLLECTION "users_progress" ---
+                const progressRef = doc(db, "users_progress", user.uid);
+                const progressSnap = await getDoc(progressRef);
+                let currentLevel = progressSnap.exists() ? progressSnap.data().currentLevel : 1;
+                
                 document.getElementById('level-val').innerText = currentLevel;
                 renderJourney(currentLevel);
 
-            } catch (error) {
-                console.error("Firebase Sync Error:", error);
-                renderJourney(1);
-            }
-        } else {
-            window.location.href = "../log.html";
-        }
+            } catch (error) { renderJourney(1); }
+        } else { window.location.href = "../log.html"; }
     });
 
     function renderJourney(userLevel) {
@@ -174,17 +209,19 @@
 
         courseMap.forEach((lvl, index) => {
             const node = document.createElement('div');
-            const posClass = `node-pos-${index % 4}`;
-
             let status = 'level-locked';
             if (lvl.id < userLevel) status = 'level-passed';
             else if (lvl.id === userLevel) status = 'level-current';
 
-            node.className = `level-node ${posClass} ${status}`;
+            node.className = `level-node ${status}`;
             
-            if (lvl.id < userLevel) node.innerHTML = '<i class="fas fa-check"></i>';
-            else if (lvl.id === userLevel) node.innerHTML = '<i class="fas fa-feather-pointed"></i>';
-            else node.innerHTML = '<i class="fas fa-lock text-sm opacity-40"></i>';
+            if (lvl.id < userLevel) {
+                node.innerHTML = '<i class="fas fa-medal completed-medal"></i>';
+            } else if (lvl.id === userLevel) {
+                node.innerHTML = '<i class="fas fa-feather-pointed fa-shake"></i>';
+            } else {
+                node.innerHTML = '<i class="fas fa-lock text-sm opacity-30"></i>';
+            }
 
             const label = document.createElement('div');
             label.className = "node-label";
@@ -192,27 +229,19 @@
             node.appendChild(label);
 
             if (lvl.id <= userLevel) {
-                node.onclick = () => {
-                    if (lvl.id === 1) window.location.href = '../nhatkyhoctap/1.html';
-                    else if (lvl.id === 2) window.location.href = '../nhatkyhoctap/2.html';
-                    else if (lvl.id === 3) window.location.href = '../nhatkyhoctap/3.html';
-                    else if (lvl.id === 4) window.location.href = '../nhatkyhoctap/4.html';
-                    else if (lvl.id === 5) window.location.href = '../nhatkyhoctap/5.html';
-                    else if (lvl.id === 6) window.location.href = '../nhatkyhoctap/6.html';
-                    else if (lvl.id === 7) window.location.href = '../nhatkyhoctap/7.html';
-                };
+                node.onclick = () => { window.location.href = `../nhatkyhoctap/${lvl.id}.html`; };
             }
             container.appendChild(node);
+            setTimeout(() => node.classList.add('node-appear'), index * 150);
         });
         
-        setTimeout(drawBeautifulPath, 600);
+        setTimeout(drawBeautifulPath, 800);
     }
 
     function drawBeautifulPath() {
         const nodes = document.querySelectorAll('.level-node');
         const svg = document.getElementById('path-svg');
         const wrapper = document.querySelector('.path-wrapper');
-        
         if (!svg || nodes.length < 2) return;
 
         svg.setAttribute('height', wrapper.scrollHeight);
@@ -225,28 +254,34 @@
             const wrapperRect = wrapper.getBoundingClientRect();
             const x = rect.left + rect.width / 2 - wrapperRect.left;
             const y = rect.top + rect.height / 2 - wrapperRect.top;
-
-            if (i === 0) { pathData += `M ${x} ${y}`; } 
-            else {
-                const prevRect = nodes[i-1].getBoundingClientRect();
-                const px = prevRect.left + prevRect.width / 2 - wrapperRect.left;
-                const py = prevRect.top + prevRect.height / 2 - wrapperRect.top;
-                const controlY = (y + py) / 2;
-                pathData += ` C ${px} ${controlY}, ${x} ${controlY}, ${x} ${y}`;
-            }
+            if (i === 0) pathData += `M ${x} ${y}`;
+            else pathData += ` L ${x} ${y}`; // Đường thẳng đứng xuyên qua tâm các ô
         });
 
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", pathData);
-        path.setAttribute("fill", "none");
-        // Đổi màu đường dẫn sang cam để đồng bộ
-        path.setAttribute("stroke", "#FF8F50"); 
-        path.setAttribute("stroke-width", "10");
-        path.setAttribute("stroke-linecap", "round");
-        path.setAttribute("stroke-dasharray", "1, 20"); 
-        path.setAttribute("opacity", "0.4");
-        svg.appendChild(path);
+        const pathLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        pathLine.setAttribute("d", pathData);
+        pathLine.classList.add('path-line');
+        svg.appendChild(pathLine);
+
+        const pathDraw = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        pathDraw.setAttribute("d", pathData);
+        pathDraw.setAttribute("fill", "none");
+        pathDraw.setAttribute("stroke", "#FF8F50");
+        pathDraw.setAttribute("stroke-width", "10");
+        pathDraw.setAttribute("stroke-linecap", "round");
+        pathDraw.classList.add('path-draw-anim');
+        svg.appendChild(pathDraw);
     }
+
+    // Nạp Menu & Highlight
+    fetch('menu.html').then(r => r.text()).then(html => {
+        document.getElementById('menu-placeholder').innerHTML = html;
+        setTimeout(() => {
+            document.querySelectorAll('.sb-link').forEach(l => {
+                if(l.href.includes('nhatkyhoctap')) l.classList.add('active');
+            });
+        }, 150);
+    });
 
     window.addEventListener('resize', drawBeautifulPath);
 </script>
