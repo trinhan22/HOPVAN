@@ -131,6 +131,34 @@
             .practice-grid, .topics-grid { grid-template-columns: 1fr; }
             .modal-box { padding: 30px 20px; }
         }
+
+
+        /* Hiệu ứng cho các chủ đề bị khóa */
+.topic-item.locked {
+    filter: grayscale(1); /* Làm xám màu */
+    opacity: 0.6; /* Làm mờ */
+    cursor: not-allowed; /* Đổi icon chuột thành dấu cấm */
+    position: relative;
+}
+
+/* Thêm icon ổ khóa nhỏ ở góc */
+.topic-item.locked::after {
+    content: "\f023"; /* Mã icon ổ khóa của FontAwesome */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: #999;
+    font-size: 1.1rem;
+}
+
+.topic-item.locked:hover {
+    transform: none; /* Bỏ hiệu ứng bay lên khi hover */
+    border-color: #eee;
+    background: #fff;
+    box-shadow: none;
+}
     </style>
 </head>
 <body>
@@ -184,26 +212,31 @@
             </div>
 
             <div class="topics-grid">
-                <div class="topic-item" onclick="goToExam('tho')">
+                <div class="topic-item locked" onclick="alertLocked()">
                     <div class="topic-icon-circle"><i class="fas fa-wind"></i></div>
                     <span>Thơ</span>
                 </div>
-                <div class="topic-item" onclick="goToExam('truyen')">
+                
+                <div class="topic-item locked" onclick="alertLocked()">
                     <div class="topic-icon-circle"><i class="fas fa-book-open"></i></div>
                     <span>Truyện</span>
                 </div>
-                <div class="topic-item" onclick="goToExam('ky')">
+                
+                <div class="topic-item locked" onclick="alertLocked()">
                     <div class="topic-icon-circle"><i class="fas fa-pen-nib"></i></div>
                     <span>Ký & Tùy Bút</span>
                 </div>
-                <div class="topic-item" onclick="goToExam('kich')">
+                
+                <div class="topic-item locked" onclick="alertLocked()">
                     <div class="topic-icon-circle"><i class="fas fa-theater-masks"></i></div>
                     <span>Kịch</span>
                 </div>
+
                 <div class="topic-item" onclick="goToExam('nlxh')">
                     <div class="topic-icon-circle"><i class="fas fa-globe-asia"></i></div>
                     <span>Nghị Luận Xã Hội</span>
                 </div>
+                
                 <div class="topic-item" onclick="goToExam('doc-hieu')">
                     <div class="topic-icon-circle"><i class="fas fa-search"></i></div>
                     <span>Đọc Hiểu</span>
@@ -255,12 +288,12 @@ window.goToExam = async (type) => {
     
     const topicMap = {
         'random':    { name: 'Đề ngẫu nhiên',    path: '../phongluyende/index.html' },
-        'tho':       { name: 'Thơ',             path: 'tho.html' },
-        'truyen':    { name: 'Truyện',          path: 'truyen.html' },
-        'ky':        { name: 'Ký & Tùy Bút',    path: 'ky.html' },
-        'kich':      { name: 'Kịch',            path: 'kich.html' },
+        'tho':       { name: 'Thơ',             path: '../phongluyende/tho.html' },
+        'truyen':    { name: 'Truyện',          path: '../phongluyende/truyen.html' },
+        'ky':        { name: 'Ký & Tùy Bút',    path: '../phongluyende/ky.html' },
+        'kich':      { name: 'Kịch',            path: '../phongluyende/kich.html' },
         'nlxh':      { name: 'Nghị Luận Xã Hội', path: '../phongluyende/nghiluanxahoi.html' },
-        'doc-hieu':  { name: 'Đọc Hiểu',        path: 'dochieu.html' }
+        'doc-hieu':  { name: 'Đọc Hiểu',        path: '../phongluyende/dochieu.html' }
     };
 
     const selected = topicMap[type] || topicMap['random'];
@@ -319,6 +352,10 @@ window.goToExam = async (type) => {
             window.location.href = "../index.html";
         } catch (error) { alert("Lỗi: " + error.message); }
     });
+    
+    window.alertLocked = () => {
+    alert("Chủ đề này đang được biên soạn. Bạn vui lòng quay lại sau nhé!");
+};
 </script>
 </body>
 </html>

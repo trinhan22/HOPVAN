@@ -1,45 +1,4 @@
 {
-  "nlxh": [
-    {
-      "topic": "Anh/chị hãy viết một đoạn văn (khoảng 200 chữ) trình bày suy nghĩ về ý nghĩa của việc sống có đam mê.",
-      "hint": "Giải thích đam mê là gì? Biểu hiện của người sống có đam mê? Ý nghĩa (động lực, thành công, hạnh phúc...)? Phê phán lối sống hời hợt. Bài học liên hệ bản thân."
-    },
-    {
-      "topic": "Viết đoạn văn (200 chữ) về sự cần thiết của tinh thần tự học trong thời đại số.",
-      "hint": "Tự học là gì? Tại sao thời đại số cần tự học (kiến thức thay đổi nhanh)? Lợi ích của tự học? Dẫn chứng thực tế (Bác Hồ, Bill Gates...). Liên hệ bản thân."
-    },
-    {
-      "topic": "Suy nghĩ của anh/chị về sức mạnh của lòng nhân ái trong cuộc sống.",
-      "hint": "Nhân ái là yêu thương, sẻ chia. Biểu hiện: giúp đỡ người khó khăn, ủng hộ đồng bào bão lụt. Ý nghĩa: gắn kết cộng đồng, lan tỏa yêu thương. Phê phán sự vô cảm."
-    }
-  ],
-
-
-  "nlvh": [
-      {
-        "id": 1,
-        "title": "Vợ chồng A Phủ - Tô Hoài",
-        "text": "Trong bóng tối, Mỵ đứng dậy, lặng lẽ đến gạt nứa, lấy ống mỡ, xắn một miếng bỏ thêm vào đĩa đèn cho sáng. Trong đầu Mỵ đang rập rờn tiếng sáo. Mỵ muốn đi chơi. Mỵ cũng sắp đi chơi. Mỵ quấn lại tóc, Mỵ với tay lấy cái váy hoa vắt ở phía trong vách... A Sử bước vào, bước lại nắm Mỵ, lấy thắt lưng lưng trói tay Mỵ. Nó xách cả một thúng sợi đay ra trói đứng Mỵ vào cột nhà. Tóc Mỵ xõa xuống, A Sử quấn luôn tóc Mỵ lên cột, làm cho Mỵ không cúi, không nghiêng được đầu nữa... Trong lúc mê sảng, Mỵ vẫn nghe tiếng sáo đưa Mỵ đi theo những cuộc chơi, những đám chơi... Mỵ lúc mê lúc tỉnh. Cho tới khi trời sẩm tối, Mỵ mới bàng hoàng tỉnh. Mỵ nghe tiếng chân ngựa đạp vào vách. Ngựa vẫn đứng yên, gãi chân, nhai cỏ. Mỵ thổn thức nghĩ mình không bằng con ngựa.",
-        "topic": "Anh/chị hãy phân tích diễn biến tâm lý và sức sống tiềm tàng của nhân vật Mỵ trong đoạn trích trên. Từ đó, nhận xét về cái nhìn nhân đạo của nhà văn Tô Hoài.",
-        "hint": "Phân tích hành động thắp đèn, chuẩn bị đi chơi (sự hồi sinh). Phân tích trạng thái khi bị trói (tâm hồn vẫn đi theo tiếng sáo). So sánh hình ảnh con ngựa. Nhận xét về niềm tin vào khát vọng sống của con người."
-      },
-      {
-        "id": 2,
-        "title": "Người lái đò Sông Đà - Nguyễn Tuân",
-        "text": "Còn xa lắm mới đến cái thác dưới. Nhưng đã thấy tiếng nước réo gần mãi lại, réo to mãi lên. Tiếng nước thác nghe như là oán trách gì, rồi lại như là van xin, rồi lại như là khiêu khích, giọng gằn mà chế nhạo. Thế rồi nó rống lên như tiếng một ngàn con trâu mộng đang lồng lộn giữa rừng vầu rừng tre nứa nổ lửa, đang phá tuông rừng lửa, rừng lửa cùng gầm thét với đàn trâu da cháy bùng bùng. Tới cái thác rồi. Ngoặt khúc sông lượn, thấy sóng bọt đã trắng xóa cả một chân trời đá. Đá ở đây từ ngàn năm vẫn mai phục hết trong lòng sông, hình như mỗi lần có chiếc thuyền nào xuất hiện ở quãng ầm ầm mà quạnh hiu này, mỗi lần có chiếc nào nhô vào đường ngoặt sông là một số hòn bèn nhổm cả dậy để vồ lấy thuyền.",
-        "topic": "Phân tích vẻ đẹp hung bạo của con sông Đà qua đoạn trích trên. Từ đó, làm nổi bật phong cách nghệ thuật độc đáo của nhà văn Nguyễn Tuân.",
-        "hint": "Phân tích âm thanh thác nước (so sánh với trâu mộng, rừng lửa). Phân tích diện mạo đá sông Đà (mai phục, nhổm dậy). Nhấn mạnh sự uyên bác, vốn từ vựng phong phú và trí tưởng tượng kỳ ảo của Nguyễn Tuân."
-      },
-      {
-        "id": 3,
-        "title": "Chiếc thuyền ngoài xa - Nguyễn Minh Châu",
-        "text": "Lập tức chiếc xe bọc thép hay một con quái vật sắt thép vừa chồm chia ra khỏi mặt nước, tiếng gầm rú của động cơ làm rung chuyển cả bầu không khí. Người đàn bà đứng lại, ngước mắt nhìn lên cái gọng vó đang từ từ hạ xuống... Một gã đàn ông hung dữ, tấm lưng rộng như lưng một con gấu, mái tóc tổ quạ, đôi mắt độc dữ... Gã rút trong người ra một chiếc thắt lưng của lính ngụy ngày xưa, chẳng nói chẳng rằng gã trút cơn giận như lửa cháy bằng cách dùng chiếc thắt lưng quật tới tấp vào lưng người đàn bà, gã vừa đánh vừa thở hồng hộc, hai hàm răng nghiến ken két... Người đàn bà với một vẻ cam chịu đầy nhẫn nhục, không hề kêu một tiếng, không chống trả, cũng không tìm cách trốn chạy.",
-        "topic": "Phân tích hình ảnh người đàn bà hàng chài và gã đàn ông độc ác trong cảnh bạo lực gia đình ở đoạn trích trên. Từ đó, trình bày suy nghĩ về mối quan hệ giữa nghệ thuật và cuộc sống.",
-        "hint": "Sự đối lập giữa cái đẹp 'ngoài xa' và cái xấu xí, bạo lực 'gần lại'. Thái độ nhẫn nhục của người đàn bà (vì con, vì cuộc sống). Nhấn mạnh thông điệp: Nghệ thuật không thể tách rời hiện thực cuộc đời đa đoan, cay đắng."
-      }
-    ],
-
-    
   "dochieu": [
     {
       "id": 1,
