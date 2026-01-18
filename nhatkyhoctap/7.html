@@ -147,15 +147,21 @@
     });
 
     // Menu Fetch & Highlight
-    fetch('menu.html').then(r => r.text()).then(html => {
-        document.getElementById('menu-placeholder').innerHTML = html;
-        setTimeout(() => {
-            document.querySelectorAll('.sb-link').forEach(link => {
-                if(link.getAttribute('href').includes('nhatkyhoctap')) link.classList.add('active');
-            });
-        }, 150);
-    });
-
+fetch('menu.html')
+    .then(res => res.text())
+    .then(html => {
+        const placeholder = document.getElementById('menu-placeholder');
+        placeholder.innerHTML = html;
+        
+        // --- QUAN TRỌNG NHẤT: Ép trình duyệt chạy lại Script bên trong menu ---
+        const scripts = placeholder.querySelectorAll('script');
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement('script');
+            newScript.text = oldScript.text; // Copy nội dung script
+            document.body.appendChild(newScript); // Chèn vào body để thực thi
+        });
+    })
+    .catch(err => console.error("Lỗi tải menu:", err));
     document.getElementById('submit-btn').onclick = async () => {
         const content = document.getElementById('student-essay').value.trim();
         if (content.split(/\s+/).length < 50) return alert("Bài viết cuối cùng cần được đầu tư hơn, hãy viết thêm nhé!");

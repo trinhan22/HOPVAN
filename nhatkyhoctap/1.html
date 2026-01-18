@@ -154,22 +154,21 @@
     });
 
     // 2. Fetch Menu
-    fetch('menu.html').then(r => r.text()).then(html => {
+fetch('menu.html')
+    .then(res => res.text())
+    .then(html => {
         const placeholder = document.getElementById('menu-placeholder');
         placeholder.innerHTML = html;
-
-        // HIGHLIGHT LOGIC: Ép link Nhật ký học tập sáng lên
-        setTimeout(() => {
-            document.querySelectorAll('.sb-link').forEach(link => {
-                // Kiểm tra nếu href của link chứa "nhatkyhoctap"
-                if(link.getAttribute('href').includes('nhatkyhoctap')) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            });
-        }, 100); // Đợi 100ms để menu kịp render xong
-    });
+        
+        // --- QUAN TRỌNG NHẤT: Ép trình duyệt chạy lại Script bên trong menu ---
+        const scripts = placeholder.querySelectorAll('script');
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement('script');
+            newScript.text = oldScript.text; // Copy nội dung script
+            document.body.appendChild(newScript); // Chèn vào body để thực thi
+        });
+    })
+    .catch(err => console.error("Lỗi tải menu:", err));
 
     // 3. Logic Chấm bài AI
 // Tìm đoạn xử lý AI trong <script> và thay bằng đoạn này:
