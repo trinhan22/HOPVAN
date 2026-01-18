@@ -209,11 +209,11 @@
                 const userSnap = await getDoc(userRef);
                 let currentDbLevel = (userSnap.exists()) ? userSnap.data().currentLevel : 1;
 
-                // CHỈ CẬP NHẬT NẾU LEVEL HIỆN TẠI ĐANG LÀ 2 HOẶC THẤP HƠN
+                // NẾU XONG BÀI 2 THÌ MỞ BÀI 3
                 if (currentDbLevel <= 2) {
                     await setDoc(userRef, { currentLevel: 3 }, { merge: true });
                 }
-                alert("Chúc mừng! Bạn đã vượt qua thử thách và mở khóa Level 3.");
+                alert("Tuyệt vời! Lộ trình chặng 3 đã sẵn sàng.");
             }
 
             await addDoc(collection(db, "activities"), {
