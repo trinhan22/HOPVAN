@@ -121,56 +121,54 @@
 
 <script>
     (function() {
-        // 1. Lấy đường dẫn hiện tại và làm sạch nó
-        // Loại bỏ dấu "/" ở cuối và bỏ đuôi ".html" nếu có
-        const currentPath = window.location.pathname.toLowerCase().replace(/\/$/, "").replace(".html", "");
+        // 1. Lấy đường dẫn hiện tại và làm sạch
+        const path = window.location.pathname.toLowerCase();
         const links = document.querySelectorAll('.sb-link');
 
         links.forEach(link => {
             link.classList.remove('active');
             
-            // Lấy href của link và làm sạch để so sánh
-            let href = link.getAttribute('href').toLowerCase().replace(".html", "");
-            
-            // Xử lý đường dẫn tương đối (bỏ dấu ../ hoặc ./)
-            href = href.replace(/^(\.\.\/|\.\/)/, "");
+            const id = link.getAttribute('data-id');
+            const href = link.getAttribute('href').toLowerCase();
 
-            // LOGIC HIGHLIGHT THÔNG MINH
-            // Nếu là trang chủ/tổng quan
-            if (link.getAttribute('data-id') === 'overview') {
-                if (currentPath === "" || currentPath.endsWith("dashboard") || currentPath.endsWith("index")) {
+            // LOGIC HIGHLIGHT RIÊNG CHO PHÒNG LUYỆN ĐỀ
+            // Kiểm tra nếu URL hiện tại có chứa chữ "phongluyende"
+            if (id === 'practice' && path.includes('phongluyende')) {
+                link.classList.add('active');
+            }
+            
+            // Logic cho các trang khác (so khớp chính xác tên file)
+            else {
+                const fileName = href.split('/').pop().replace('.html', '');
+                if (path.includes(fileName) && fileName !== "" && id !== 'practice') {
                     link.classList.add('active');
                 }
-            } 
-            // Nếu là các trang khác (so khớp từ cuối đường dẫn)
-            else if (currentPath.endsWith(href) && href !== "") {
-                link.classList.add('active');
+            }
+
+            // Fix trang chủ (Dashboard)
+            if (id === 'overview' && (path === "/" || path.endsWith("dashboard") || path.endsWith("index"))) {
+                if (!path.includes('phongluyende')) { // Chỉ sáng khi không ở phòng luyện đề
+                    link.classList.add('active');
+                }
             }
         });
 
-        // 2. Các sự kiện Nút bấm (Giữ nguyên logic cũ của bạn)
-        document.getElementById('open-fb-modal').onclick = () => document.getElementById('menu-fb-modal').style.display = 'flex';
+        // 2. LOGIC ĐĂNG XUẤT (Dis-account & Out)
+        const logoutBtn = document.getElementById('btn-logout-global') || document.getElementById('btn-logout-trigger');
+        if(logoutBtn) {
+            logoutBtn.onclick = () => {
+                if(confirm("Bạn muốn đăng xuất và ngắt kết nối tài khoản?")) {
+                    window.dispatchEvent(new Event('perform-logout'));
+                }
+            };
+        }
 
-        document.getElementById('logout-trigger').onclick = () => {
-            if(confirm("Bạn muốn đăng xuất và ngắt kết nối tài khoản?")) {
-                window.dispatchEvent(new Event('trigger-firebase-signout'));
-            }
-        };
-
-        // Formspree logic giữ nguyên...
-        const form = document.getElementById('ajax-fb-form');
-        if(form) {
-            form.onsubmit = async (e) => {
-                e.preventDefault();
-                const btn = form.querySelector('button');
-                btn.innerText = "Đang gửi..."; btn.disabled = true;
-                try {
-                    await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } });
-                    alert("Cảm ơn bạn đã góp ý! ❤️");
-                    form.reset();
-                    document.getElementById('menu-fb-modal').style.display = 'none';
-                } catch (e) { alert("Lỗi gửi thư!"); }
-                finally { btn.innerText = "Gửi ngay"; btn.disabled = false; }
+        // 3. MODAL GÓP Ý (Giữ nguyên của bạn)
+        const fbBtn = document.getElementById('btn-feedback');
+        if(fbBtn) {
+            fbBtn.onclick = () => {
+                const modal = document.getElementById('modal-feedback');
+                if(modal) modal.style.display = 'flex';
             };
         }
     })();
