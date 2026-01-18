@@ -171,7 +171,7 @@
         <div class="user-header">
             <div class="welcome-text">
                 <h2 id="welcome-name">Xin chào...</h2>
-                <p style="color: var(--text-light); margin-top: 5px;">Hôm nay bạn muốn chinh phục tác phẩm nào?</p>
+                <p style="color: var(--text-light); margin-top: 5px;">Hãy cùng bắt đầu học tập cùng với Hopvan nhé.</p>
             </div>
             <div class="user-avatar" id="avatar-initial">P</div>
         </div>
@@ -179,7 +179,7 @@
         <div class="section-title">
             <i class="fas fa-feather-alt" style="color: var(--primary);"></i> Phòng Luyện Đề AI
         </div>
-        <p class="section-desc">Hệ thống chấm điểm và sửa lỗi tự động 24/7.</p>
+        <p class="section-desc">Hệ thống chấm điểm và sửa lỗi tự động.</p>
 
         <div class="practice-grid">
             <div class="card card-orange" onclick="goToExam('random')">
@@ -349,7 +349,7 @@ fetch('menu.html')
         });
     })
     .catch(err => console.error("Lỗi tải menu:", err));
-    
+
     window.addEventListener('trigger-firebase-signout', async () => {
         try {
             await signOut(auth);

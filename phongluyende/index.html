@@ -109,7 +109,7 @@
                 <div class="flex items-center gap-5">
                     <button class="md:hidden text-2xl" onclick="toggleSidebarGlobal()"><i class="fas fa-bars"></i></button>
                     <div>
-                        <h2 class="text-3xl font-black text-gray-800 tracking-tight">Phòng Luyện Đề AI</h2>
+                        <h2 class="text-3xl font-black text-gray-800 tracking-tight">Phòng Luyện Đề - Ngẫu Nhiên</h2>
                         <div class="flex items-center gap-2 mt-1">
                             <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                             <p class="text-sm text-gray-500 font-bold uppercase tracking-widest">Trạng thái: Sẵn sàng</p>
@@ -261,7 +261,7 @@ window.randomizeQuestion = () => {
         titleUI.innerText = "";
 
         if (type === 'dochieu') {
-            labelUI.innerText = "Phần I: Đọc hiểu";
+            labelUI.innerText = "Đọc hiểu";
             titleUI.innerText = q.title || "";
             textUI.innerText = "Dựa vào văn bản sau để trả lời các câu hỏi:";
             
@@ -276,7 +276,7 @@ window.randomizeQuestion = () => {
             `).join('');
 
         } else if (type === 'nlvh') {
-            labelUI.innerText = "Phần II: Nghị luận văn học";
+            labelUI.innerText = "Nghị luận văn học";
             titleUI.innerText = q.title || "Tác phẩm trọng tâm";
             textUI.innerText = q.topic; // Yêu cầu đề bài (Ví dụ: Phân tích nhân vật Mỵ...)
             
@@ -286,7 +286,7 @@ window.randomizeQuestion = () => {
             hintBox.querySelector('span').innerText = q.hint;
 
         } else if (type === 'nlxh') {
-            labelUI.innerText = "Phần II: Nghị luận xã hội";
+            labelUI.innerText = "Nghị luận xã hội";
             textUI.innerText = q.topic;
             hintBox.classList.remove('hidden');
             hintBox.querySelector('span').innerText = q.hint;
