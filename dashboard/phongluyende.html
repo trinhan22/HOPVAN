@@ -251,6 +251,31 @@
                 document.getElementById('avatar-initial').innerText = name.charAt(0).toUpperCase();
             }
         });
+
+// 1. FETCH MENU VÀ ÉP CHẠY SCRIPT
+    fetch('menu.html')
+        .then(res => res.text())
+        .then(html => {
+            const placeholder = document.getElementById('menu-placeholder');
+            placeholder.innerHTML = html;
+            const scripts = placeholder.querySelectorAll('script');
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                newScript.text = oldScript.text;
+                document.body.appendChild(newScript);
+            });
+        });
+
+    // 2. LẮNG NGHE TÍN HIỆU ĐĂNG XUẤT THẬT (TẠM QUÊN TÀI KHOẢN)
+    window.addEventListener('trigger-firebase-signout', async () => {
+        try {
+            await signOut(auth); // Dis-account hoàn toàn
+            console.log("Account disconnected.");
+            window.location.href = "../index.html"; // Out ra trang khách
+        } catch (error) {
+            alert("Lỗi khi thoát: " + error.message);
+        }
+    });
     </script>
 </body>
 </html>
