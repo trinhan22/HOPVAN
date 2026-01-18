@@ -278,6 +278,8 @@
         .then(html => {
             const placeholder = document.getElementById('menu-placeholder');
             placeholder.innerHTML = html;
+            
+            // CỰC KỲ QUAN TRỌNG: Kích hoạt JS của menu sau khi fetch
             const scripts = placeholder.querySelectorAll('script');
             scripts.forEach(oldScript => {
                 const newScript = document.createElement('script');
