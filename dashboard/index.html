@@ -254,13 +254,11 @@
                     </div>
                     <div class="stat-card">
                         <h3><i class="fas fa-file-alt" style="color: #FF9966;"></i> Đã làm</h3>
-                        <div class="value">0</div>
-                        <div class="unit">đề thi</div>
+                        <div class="value" id="total-exams">0</div> <div class="unit">đề thi</div>
                     </div>
                     <div class="stat-card">
                         <h3><i class="fas fa-fire" style="color: #e74c3c;"></i> Chuỗi</h3>
-                        <div class="value">1</div>
-                        <div class="unit">ngày liên tiếp</div>
+                        <div class="value" id="streak-value">1</div> <div class="unit">ngày liên tiếp</div>
                     </div>
                 </div>
                 
@@ -344,172 +342,173 @@
         </div>
     </div>
 
-    <script>
-        // Fetch và chèn menu.html vào div #menu-placeholder
-        fetch('menu.html')
-            .then(res => res.text())
-            .then(html => {
-                const placeholder = document.getElementById('menu-placeholder');
-                placeholder.innerHTML = html;
-                
-                // Kích hoạt các thẻ script trong menu.html (nếu có)
-                const scripts = placeholder.querySelectorAll('script');
-                scripts.forEach(script => eval(script.innerText));
-                
-                // Thêm sự kiện cho nút logout trong menu (vì nó mới được chèn vào DOM)
-                document.addEventListener('request-logout', () => {
-                    if(confirm("Bạn muốn đăng xuất?")) {
-                        // Gọi hàm signOut từ module bên dưới bằng cách reload hoặc dùng biến global
-                        // Ở đây ta dùng cơ chế dispatch event ngược lại
-                        window.dispatchEvent(new Event('perform-logout'));
-                    }
-                });
-            })
-            .catch(err => console.error("Lỗi tải menu:", err));
-    </script>
-
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    // Thêm doc, getDoc, setDoc vào danh sách import
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Cấu hình Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
-            authDomain: "hopvan-9a648.firebaseapp.com",
-            projectId: "hopvan-9a648",
-            storageBucket: "hopvan-9a648.appspot.com",
-            messagingSenderId: "429347196227",
-            appId: "1:429347196227:web:917b8d019f0efd0f7833f6",
-            measurementId: "G-1BG8PSRG0R"
-        };
+    // 1. CẤU HÌNH FIREBASE
+    const firebaseConfig = {
+        apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
+        authDomain: "hopvan-9a648.firebaseapp.com",
+        projectId: "hopvan-9a648",
+        storageBucket: "hopvan-9a648.appspot.com",
+        messagingSenderId: "429347196227",
+        appId: "1:429347196227:web:917b8d019f0efd0f7833f6",
+        measurementId: "G-1BG8PSRG0R"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        // --- 1. AUTH & LOAD INFO ---
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const name = user.displayName || user.email;
-                document.getElementById('welcome-name').textContent = `Xin chào, ${name}`;
-                document.getElementById('avatar-initial').textContent = name.charAt(0).toUpperCase();
-                loadRecentActivity(user);
-            } else {
-                window.location.href = "log.html";
-            }
-        });
-
-        // --- 2. XỬ LÝ LOGOUT TỪ SỰ KIỆN MENU ---
-        window.addEventListener('perform-logout', () => {
-            signOut(auth).then(() => window.location.href = "index.html");
-        });
-
-        // --- 3. LOAD HISTORY ---
-        async function loadRecentActivity(user) {
-            const listEl = document.getElementById('activity-list');
-            try {
-                const q = query(
-                    collection(db, "activities"), 
-                    where("uid", "==", user.uid), 
-                    orderBy("timestamp", "desc"), 
-                    limit(3)
-                );
-                
-                const querySnapshot = await getDocs(q);
-                
-                if (querySnapshot.empty) {
-                    listEl.innerHTML = `<li style="text-align: center; color: #999; padding: 20px;">Chưa có hoạt động nào.</li>`;
-                } else {
-                    listEl.innerHTML = '';
-                    querySnapshot.forEach((doc) => {
-                        const data = doc.data();
-                        const date = data.timestamp ? new Date(data.timestamp.seconds * 1000) : new Date();
-                        const timeString = date.toLocaleDateString('vi-VN');
-
-                        const itemHTML = `
-                            <li class="activity-item">
-                                <div class="act-icon orange"><i class="fas fa-pen-nib"></i></div>
-                                <div class="act-info">
-                                    <h4>${data.action || 'Làm bài tập'}</h4>
-                                    <p>${timeString}</p>
-                                </div>
-                                <div class="act-status text-green-500">Xong</div>
-                            </li>
-                        `;
-                        listEl.innerHTML += itemHTML;
-                    });
-                }
-            } catch (error) {
-                console.error("Lỗi tải lịch sử:", error);
-                listEl.innerHTML = `<li style="text-align: center; color: #999; padding: 20px;">Vui lòng làm bài tập để thấy lịch sử.</li>`;
-            }
-        }
-
-        // --- 4. HÀM CHUYỂN TAB & MODAL ---
-        window.switchTab = function(tabId, element) {
-            // Lưu ý: Hàm này dành cho menu nội bộ (nếu có). 
-            // Với menu.html tải từ ngoài, logic active nằm trong menu.html
-            // Nhưng để tương thích cũ, ta giữ lại để ẩn hiện các section
+    // --- 1. THEO DÕI ĐĂNG NHẬP & KÍCH HOẠT ĐỒNG BỘ ---
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const name = user.displayName || user.email.split('@')[0];
+            document.getElementById('welcome-name').textContent = `Xin chào, ${name}`;
+            document.getElementById('avatar-initial').textContent = name.charAt(0).toUpperCase();
             
-            // Ẩn tất cả section
-            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
-            // Hiện section được chọn
-            const target = document.getElementById(tabId);
-            if(target) target.classList.add('active');
+            // Chạy logic Chuỗi ngày
+            updateUserStreak(user);
+            // Chạy logic đồng bộ bài làm và lịch sử (hàm cũ của bạn)
+            setupRealtimeStats(user);
+        } else {
+            window.location.href = "log.html";
         }
+    });
 
-        // Xử lý hash trên URL để chuyển tab khi reload
-        // VD: dashboard.html#practice sẽ mở tab Luyện đề
-        function checkHash() {
-            const hash = window.location.hash.substring(1); // bỏ dấu #
-            if(hash) {
-                const target = document.getElementById(hash);
-                if(target) {
-                    document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
-                    target.classList.add('active');
-                }
+// --- HÀM LOGIC CHUỖI NGÀY (STREAK) ---
+    async function updateUserStreak(user) {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        
+        // Lấy ngày hiện tại theo định dạng YYYY-MM-DD (Giờ Việt Nam)
+        const now = new Date();
+        const todayStr = now.toLocaleDateString('en-CA'); // Trả về dạng 2026-01-18
+        
+        // Tính ngày hôm qua
+        const yesterday = new Date();
+        yesterday.setDate(now.getDate() - 1);
+        const yesterdayStr = yesterday.toLocaleDateString('en-CA');
+
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            const lastDate = userData.lastLoginDate;
+            let currentStreak = userData.streak || 1;
+
+            if (lastDate === todayStr) {
+                // Đăng nhập lần thứ n trong ngày -> Không tăng chuỗi
+                console.log("Hôm nay đã điểm danh.");
+            } else if (lastDate === yesterdayStr) {
+                // Đăng nhập vào ngày hôm sau -> Tăng chuỗi thêm 1
+                currentStreak += 1;
+                await updateDoc(userRef, {
+                    lastLoginDate: todayStr,
+                    streak: currentStreak
+                });
+            } else {
+                // Bỏ lỡ 1 ngày trở lên -> Reset chuỗi về 1
+                currentStreak = 1;
+                await updateDoc(userRef, {
+                    lastLoginDate: todayStr,
+                    streak: currentStreak
+                });
             }
+            document.getElementById('streak-value').textContent = currentStreak;
+        } else {
+            // Người dùng mới hoàn toàn -> Tạo mới dữ liệu streak
+            await setDoc(userRef, {
+                lastLoginDate: todayStr,
+                streak: 1,
+                email: user.email
+            });
+            document.getElementById('streak-value').textContent = 1;
         }
-        window.addEventListener('load', checkHash);
-        window.addEventListener('hashchange', checkHash);
+    }
 
-        // Modal Logic
-        window.openTopicModal = () => document.getElementById('topicModal').style.display = "flex";
-        window.closeTopicModal = () => document.getElementById('topicModal').style.display = "none";
-        window.onclick = (e) => { if(e.target == document.getElementById('topicModal')) window.closeTopicModal(); }
+    // --- 2. HÀM ĐỒNG BỘ REAL-TIME (STATS & HISTORY) ---
+    function setupRealtimeStats(user) {
+        const q = query(
+            collection(db, "activities"), 
+            where("uid", "==", user.uid),
+            orderBy("timestamp", "desc")
+        );
 
-        window.goToExam = (type) => {
-            localStorage.setItem('selectedTopic', type); 
-            window.location.href = "phongluyende/index.html"; 
-        }
+        // Lắng nghe mọi thay đổi trên Database
+        onSnapshot(q, (snapshot) => {
+            // A. Cập nhật con số "Đã làm"
+            const total = snapshot.size;
+            document.getElementById('total-exams').textContent = total;
 
-// 1. FETCH MENU VÀ ÉP CHẠY SCRIPT
-    fetch('menu.html')
-    .then(res => res.text())
-    .then(html => {
+            // B. Cập nhật Level & Trình độ
+            let levelName = "Sơ cấp";
+            const levelNum = Math.floor(total / 5) + 1;
+            if (levelNum > 3) levelName = "Trung cấp";
+            if (levelNum > 7) levelName = "Cao cấp";
+            if (levelNum > 12) levelName = "Bậc thầy";
+
+            const levelCard = document.querySelector('.stat-card:nth-child(1)');
+            if (levelCard) {
+                levelCard.querySelector('.value').textContent = `Level ${levelNum}`;
+                levelCard.querySelector('.unit').textContent = levelName;
+            }
+
+            // C. Cập nhật danh sách Hoạt động gần đây (3 cái mới nhất)
+            const listEl = document.getElementById('activity-list');
+            if (snapshot.empty) {
+                listEl.innerHTML = `<li style="text-align: center; color: #999; padding: 20px;">Hãy bắt đầu luyện bài đầu tiên!</li>`;
+                return;
+            }
+
+            let html = '';
+            const recentDocs = snapshot.docs.slice(0, 3); // Lấy 3 bản ghi đầu tiên
+            
+            recentDocs.forEach(doc => {
+                const data = doc.data();
+                const time = data.timestamp ? data.timestamp.toDate().toLocaleDateString('vi-VN') : 'Vừa xong';
+                
+                html += `
+                    <li class="activity-item">
+                        <div class="act-icon orange"><i class="fas fa-pen-nib"></i></div>
+                        <div class="act-info">
+                            <h4>${data.action || 'Luyện đề Ngữ Văn'}</h4>
+                            <p>${time}</p>
+                        </div>
+                        <div class="act-status" style="color: #4caf50;">Xong</div>
+                    </li>
+                `;
+            });
+            listEl.innerHTML = html;
+        });
+    }
+
+    // --- 3. CÁC LOGIC HỆ THỐNG (MENU, LOGOUT...) ---
+    fetch('menu.html').then(res => res.text()).then(html => {
         const placeholder = document.getElementById('menu-placeholder');
         placeholder.innerHTML = html;
-        
-        // --- QUAN TRỌNG: Kích hoạt Javascript bên trong menu ---
-        const scripts = placeholder.querySelectorAll('script');
-        scripts.forEach(oldScript => {
+        placeholder.querySelectorAll('script').forEach(oldScript => {
             const newScript = document.createElement('script');
             newScript.text = oldScript.text;
             document.body.appendChild(newScript);
         });
     });
 
-    // 2. LẮNG NGHE TÍN HIỆU ĐĂNG XUẤT THẬT (TẠM QUÊN TÀI KHOẢN)
     window.addEventListener('trigger-firebase-signout', async () => {
         try {
-            await signOut(auth); // Dis-account hoàn toàn
-            console.log("Account disconnected.");
-            window.location.href = "../index.html"; // Out ra trang khách
-        } catch (error) {
-            alert("Lỗi khi thoát: " + error.message);
-        }
+            await signOut(auth);
+            window.location.href = "../index.html";
+        } catch (error) { alert("Lỗi thoát: " + error.message); }
     });
-    </script>
+
+    // --- 4. HÀM TOÀN CỤC CHO UI ---
+    window.openTopicModal = () => document.getElementById('topicModal').style.display = "flex";
+    window.closeTopicModal = () => document.getElementById('topicModal').style.display = "none";
+    window.goToExam = (type) => {
+        localStorage.setItem('selectedTopic', type); 
+        window.location.href = "../phongluyende/index.html"; 
+    };
+</script>
 </body>
 </html>

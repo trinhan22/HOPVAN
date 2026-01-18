@@ -212,72 +212,113 @@
         </div>
     </div>
 
-    <script>
-        // Fetch Menu
-        fetch('menu.html').then(res => res.text()).then(html => {
-            const ph = document.getElementById('menu-placeholder');
-            ph.innerHTML = html;
-            ph.querySelectorAll('script').forEach(s => eval(s.innerText));
-        });
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Modal Logic
-        window.openTopicModal = () => document.getElementById('topicModal').style.display = 'flex';
-        window.closeTopicModal = () => document.getElementById('topicModal').style.display = 'none';
-        
-        // Đóng khi click ra ngoài
-        window.onclick = (e) => {
-            if(e.target == document.getElementById('topicModal')) closeTopicModal();
+    // 1. CẤU HÌNH FIREBASE (Giữ nguyên của bạn)
+    const firebaseConfig = { 
+        apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", 
+        authDomain: "hopvan-9a648.firebaseapp.com", 
+        projectId: "hopvan-9a648", 
+        storageBucket: "hopvan-9a648.appspot.com", 
+        messagingSenderId: "429347196227", 
+        appId: "1:429347196227:web:917b8d019f0efd0f7833f6", 
+        measurementId: "G-1BG8PSRG0R" 
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // --- A. LOGIC MODAL (PHẢI GÁN VÀO WINDOW) ---
+    window.openTopicModal = () => {
+        const modal = document.getElementById('topicModal');
+        if(modal) modal.style.display = 'flex';
+    };
+
+    window.closeTopicModal = () => {
+        const modal = document.getElementById('topicModal');
+        if(modal) modal.style.display = 'none';
+    };
+
+    // Đóng khi click ra ngoài vùng trắng
+    window.addEventListener('click', (e) => {
+        const modal = document.getElementById('topicModal');
+        if (e.target === modal) window.closeTopicModal();
+    });
+
+    // --- B. HÀM CHUYỂN TRANG & LƯU DATABASE ---
+// Thêm await vào trước addDoc
+window.goToExam = async (type) => {
+    const user = auth.currentUser;
+    
+    const topicMap = {
+        'random':    { name: 'Đề ngẫu nhiên',    path: '../phongluyende/index.html' },
+        'tho':       { name: 'Thơ',             path: 'tho.html' },
+        'truyen':    { name: 'Truyện',          path: 'truyen.html' },
+        'ky':        { name: 'Ký & Tùy Bút',    path: 'ky.html' },
+        'kich':      { name: 'Kịch',            path: 'kich.html' },
+        'nlxh':      { name: 'Nghị Luận Xã Hội', path: '../phongluyende/nghiluanxahoi.html' },
+        'doc-hieu':  { name: 'Đọc Hiểu',        path: 'dochieu.html' }
+    };
+
+    const selected = topicMap[type] || topicMap['random'];
+
+    // 1. Lưu trạng thái vào LocalStorage (luôn chạy nhanh)
+    localStorage.setItem('selectedTopic', type);
+
+    // 2. Ghi nhận vào Database (PHẢI ĐỢI)
+    if (user) {
+        try {
+            console.log("Đang lưu hoạt động...");
+            // ÉP TRÌNH DUYỆT ĐỢI LƯU XONG
+            await addDoc(collection(db, "activities"), {
+                uid: user.uid,
+                action: "Bắt đầu luyện đề: " + selected.name,
+                topic: type,
+                timestamp: serverTimestamp()
+            });
+            console.log("Lưu database thành công!");
+        } catch (e) { 
+            console.error("Lưu DB lỗi:", e); 
         }
+    }
 
-        // Chuyển trang
-        window.goToExam = (type) => {
-            localStorage.setItem('selectedTopic', type);
-            window.location.href = "../phongluyende";
-        };
-    </script>
+    // 3. Sau khi lưu xong (hoặc lỗi) mới chuyển trang
+    window.location.href = selected.path;
+};
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    // --- C. ĐỒNG BỘ THÔNG TIN USER ---
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const name = user.displayName || user.email.split('@')[0];
+            document.getElementById('welcome-name').innerText = `Xin chào, ${name}`;
+            document.getElementById('avatar-initial').innerText = name.charAt(0).toUpperCase();
+        } else {
+            window.location.href = "log.html";
+        }
+    });
 
-        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const name = user.displayName || user.email.split('@')[0];
-                document.getElementById('welcome-name').innerText = `Xin chào, ${name}`;
-                document.getElementById('avatar-initial').innerText = name.charAt(0).toUpperCase();
-            }
-        });
-
-// 1. FETCH MENU VÀ ÉP CHẠY SCRIPT
+    // --- D. FETCH MENU & LOGOUT ---
     fetch('menu.html')
     .then(res => res.text())
     .then(html => {
-        const placeholder = document.getElementById('menu-placeholder');
-        placeholder.innerHTML = html;
-        
-        // --- QUAN TRỌNG: Kích hoạt Javascript bên trong menu ---
-        const scripts = placeholder.querySelectorAll('script');
-        scripts.forEach(oldScript => {
+        const ph = document.getElementById('menu-placeholder');
+        ph.innerHTML = html;
+        ph.querySelectorAll('script').forEach(oldScript => {
             const newScript = document.createElement('script');
             newScript.text = oldScript.text;
             document.body.appendChild(newScript);
         });
     });
 
-    // 2. LẮNG NGHE TÍN HIỆU ĐĂNG XUẤT THẬT (TẠM QUÊN TÀI KHOẢN)
     window.addEventListener('trigger-firebase-signout', async () => {
         try {
-            await signOut(auth); // Dis-account hoàn toàn
-            console.log("Account disconnected.");
-            window.location.href = "../index.html"; // Out ra trang khách
-        } catch (error) {
-            alert("Lỗi khi thoát: " + error.message);
-        }
+            await signOut(auth);
+            window.location.href = "../index.html";
+        } catch (error) { alert("Lỗi: " + error.message); }
     });
-    </script>
+</script>
 </body>
 </html>
