@@ -344,7 +344,18 @@
                 body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\nĐỀ BÀI:\n" + context + "\n\nBÀI LÀM:\n" + content }] }] })
             });
 
-            const data = await response.json();
+const data = await response.json();
+
+// Nếu Proxy báo lỗi từ Google
+if (data.error_message_from_google) {
+    loading.style.display = 'none';
+    alert("Lỗi từ Google AI: " + data.error_message_from_google);
+    console.error("Chi tiết lỗi:", data);
+    return;
+}
+
+// Nếu ok thì mới chạy tiếp
+if (!data.candidates || data.candidates.length === 0) throw new Error("AI không phản hồi dữ liệu");
             let rawText = data.candidates[0].content.parts[0].text;
             
             // Trích xuất JSON an toàn

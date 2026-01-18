@@ -358,10 +358,18 @@ window.randomizeQuestion = () => {
                 })
             });
 
-            const data = await response.json();
-            
-            // Trích xuất dữ liệu từ cấu trúc phản hồi của Gemini
-            if (!data.candidates || data.candidates.length === 0) throw new Error("AI không phản hồi dữ liệu");
+const data = await response.json();
+
+// Nếu Proxy báo lỗi từ Google
+if (data.error_message_from_google) {
+    loading.style.display = 'none';
+    alert("Lỗi từ Google AI: " + data.error_message_from_google);
+    console.error("Chi tiết lỗi:", data);
+    return;
+}
+
+// Nếu ok thì mới chạy tiếp
+if (!data.candidates || data.candidates.length === 0) throw new Error("AI không phản hồi dữ liệu");
             
             let rawText = data.candidates[0].content.parts[0].text;
             
