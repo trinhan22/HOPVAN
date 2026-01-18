@@ -370,15 +370,21 @@
             document.body.style.overflow = "auto";
         };
 
-        fetch('menu.html').then(res => res.text()).then(html => {
-            const placeholder = document.getElementById('menu-placeholder');
-            placeholder.innerHTML = html;
-            placeholder.querySelectorAll('script').forEach(oldScript => {
-                const newScript = document.createElement('script');
-                newScript.text = oldScript.text;
-                document.body.appendChild(newScript);
-            });
+fetch('menu.html')
+    .then(res => res.text())
+    .then(html => {
+        const placeholder = document.getElementById('menu-placeholder');
+        placeholder.innerHTML = html;
+        
+        // --- QUAN TRỌNG NHẤT: Ép trình duyệt chạy lại Script bên trong menu ---
+        const scripts = placeholder.querySelectorAll('script');
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement('script');
+            newScript.text = oldScript.text; // Copy nội dung script
+            document.body.appendChild(newScript); // Chèn vào body để thực thi
         });
+    })
+    .catch(err => console.error("Lỗi tải menu:", err));
     </script>
 </body>
 </html>

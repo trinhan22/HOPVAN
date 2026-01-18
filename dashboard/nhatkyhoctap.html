@@ -274,14 +274,21 @@
     }
 
     // Nạp Menu & Highlight
-    fetch('menu.html').then(r => r.text()).then(html => {
-        document.getElementById('menu-placeholder').innerHTML = html;
-        setTimeout(() => {
-            document.querySelectorAll('.sb-link').forEach(l => {
-                if(l.href.includes('nhatkyhoctap')) l.classList.add('active');
-            });
-        }, 150);
-    });
+fetch('menu.html')
+    .then(res => res.text())
+    .then(html => {
+        const placeholder = document.getElementById('menu-placeholder');
+        placeholder.innerHTML = html;
+        
+        // --- QUAN TRỌNG NHẤT: Ép trình duyệt chạy lại Script bên trong menu ---
+        const scripts = placeholder.querySelectorAll('script');
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement('script');
+            newScript.text = oldScript.text; // Copy nội dung script
+            document.body.appendChild(newScript); // Chèn vào body để thực thi
+        });
+    })
+    .catch(err => console.error("Lỗi tải menu:", err));
 
     window.addEventListener('resize', drawBeautifulPath);
 </script>
