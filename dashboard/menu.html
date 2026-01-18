@@ -1,5 +1,5 @@
 <style>
-    /* --- GIỮ NGUYÊN CSS PREMIUM CỦA BẠN --- */
+    /* --- CSS PREMIUM REMASTERED (CÔ LẬP) --- */
     :root {
         --sb-w: 260px;
         --sb-primary: #FF8F50;
@@ -7,30 +7,73 @@
         --sb-glass: rgba(255, 255, 255, 0.7);
         --sb-border: rgba(255, 255, 255, 0.8);
     }
+
     .sidebar-comp {
-        width: var(--sb-w); height: 100vh; background: var(--sb-glass); backdrop-filter: blur(35px);
-        border-right: 1px solid var(--sb-border); display: flex; flex-direction: column; padding: 40px 20px;
-        position: fixed; top: 0; left: 0; z-index: 1000; font-family: 'Plus Jakarta Sans', sans-serif;
+        width: var(--sb-w); height: 100vh;
+        background: var(--sb-glass); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
+        border-right: 1px solid var(--sb-border);
+        display: flex; flex-direction: column; padding: 40px 20px;
+        position: fixed; top: 0; left: 0; z-index: 1000;
+        transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        box-shadow: 10px 0 30px rgba(0,0,0,0.03);
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
-    .sb-logo { display: flex; align-items: center; gap: 14px; margin-bottom: 50px; text-decoration: none; }
-    .sb-logo span { font-size: 1.6rem; font-weight: 900; background: var(--sb-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    /* Logo */
+    .sb-logo { display: flex; align-items: center; gap: 14px; margin-bottom: 50px; text-decoration: none; padding-left: 10px; }
+    .sb-logo img { width: 40px; transition: 0.4s; }
+    .sb-logo span { font-size: 1.6rem; font-weight: 900; background: var(--sb-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; }
+
+    /* Menu Items */
     .sb-list { list-style: none; padding: 0; margin: 0; flex: 1; display: flex; flex-direction: column; gap: 10px; }
-    .sb-link { display: flex; align-items: center; gap: 15px; padding: 14px 20px; border-radius: 20px; color: #636E72; font-weight: 700; font-size: 0.95rem; text-decoration: none; transition: 0.3s; }
+    .sb-link {
+        display: flex; align-items: center; gap: 15px; padding: 14px 20px;
+        border-radius: 20px; color: #636E72; font-weight: 700; font-size: 0.95rem;
+        text-decoration: none; transition: 0.3s; position: relative;
+    }
     .sb-link:hover { background: rgba(255, 143, 80, 0.08); color: var(--sb-primary); transform: translateX(8px); }
     .sb-link.active { background: var(--sb-gradient); color: white !important; box-shadow: 0 10px 25px rgba(255, 94, 98, 0.3); }
+
     .sb-footer { display: flex; flex-direction: column; gap: 12px; margin-top: auto; }
-    .btn-fb-new { background: #fff5ec; border: 1.5px solid var(--sb-primary); color: var(--sb-primary); font-size: 0.85rem; font-weight: 700; padding: 12px; border-radius: 16px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .btn-logout-new { background: rgba(255, 94, 98, 0.05); color: #FF5E62; font-size: 1.1rem; font-weight: 800; padding: 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; border: none; }
+    
+    /* Nút Góp ý - VIỀN LIỀN (SOLID) */
+    .btn-fb-new {
+        background: #fff5ec; border: 1.5px solid var(--sb-primary);
+        color: var(--sb-primary); font-size: 0.85rem; font-weight: 700;
+        padding: 12px; border-radius: 16px; cursor: pointer; transition: 0.3s;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-fb-new:hover { background: var(--sb-primary); color: white; transform: translateY(-3px); }
+
+    /* Nút Đăng xuất */
+    .btn-logout-new {
+        background: rgba(255, 94, 98, 0.05); border: 1px solid transparent;
+        color: #FF5E62; font-size: 1.1rem; font-weight: 800;
+        padding: 16px; border-radius: 20px; cursor: pointer; transition: 0.3s;
+        display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-logout-new:hover { background: #FF5E62; color: white; box-shadow: 0 10px 25px rgba(255, 94, 98, 0.25); }
+
+    /* Overlay Mobile */
+    #sb-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.2); backdrop-filter: blur(4px); z-index: 999; display: none; }
+
+    /* Modal Góp Ý */
     .modal-fb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 20001; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
     .modal-fb-box { background: white; padding: 40px; border-radius: 35px; width: 90%; max-width: 480px; position: relative; animation: modalPop 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes modalPop { from { transform: scale(0.9) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
     .modal-fb-close { position: absolute; top: 25px; right: 30px; font-size: 1.5rem; cursor: pointer; color: #ccc; }
+
+    @media (max-width: 768px) {
+        .sidebar-comp { left: -100%; width: 85%; }
+        .sidebar-comp.open { transform: translateX(100%); }
+    }
 </style>
 
-<div id="sb-overlay" style="position: fixed; inset: 0; background: rgba(0,0,0,0.2); backdrop-filter: blur(4px); z-index: 999; display: none;"></div>
+<div id="sb-overlay"></div>
 
 <aside class="sidebar-comp" id="main-sidebar">
     <a href="index.html" class="sb-logo">
-        <img src="../LOGO.WEBP" alt="Logo" style="width:40px">
+        <img src="../LOGO.WEBP" alt="Logo" style="width: 40px;">
         <span>HOPVAN</span>
     </a>
 
@@ -43,50 +86,52 @@
     </nav>
 
     <div class="sb-footer">
-        <button id="btn-fb-trigger" class="btn-fb-new"><i class="fas fa-comment-dots"></i> Góp ý</button>
-        <button id="btn-logout-trigger" class="btn-logout-new"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+        <button id="btn-fb-trigger" class="btn-fb-new">
+            <i class="fas fa-comment-dots"></i> Góp ý
+        </button>
+        <button id="btn-logout-trigger" class="btn-logout-new">
+            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+        </button>
     </div>
 </aside>
 
 <div id="modal-feedback-menu" class="modal-fb-overlay">
     <div class="modal-fb-box">
         <span id="close-fb-menu" class="modal-fb-close">&times;</span>
-        <h3 style="margin-bottom: 10px; color: #2D3436; font-weight: 800; font-size: 1.5rem;">Góp ý cho Hopvan</h3>
+        <h3 style="margin-bottom: 10px; color: #2D3436; font-weight: 800; font-size: 1.5rem;">💌 Góp ý cho Hopvan</h3>
+        <p style="color: #636E72; margin-bottom: 25px; font-size: 0.95rem;">Ý kiến của bạn là động lực để chúng mình hoàn thiện hơn mỗi ngày.</p>
+        
         <form id="formspree-menu" action="https://formspree.io/f/mqeepqew" method="POST">
-            <textarea name="message" rows="4" required style="width: 100%; padding: 18px; border: 1.5px solid #eee; border-radius: 20px; margin-bottom: 20px; outline: none; resize: none;" placeholder="Bạn muốn chia sẻ điều gì..."></textarea>
-            <button type="submit" id="btn-submit-fb" style="width: 100%; padding: 16px; background: var(--sb-gradient); color: white; border: none; border-radius: 18px; font-weight: 800;">Gửi ý kiến ngay</button>
+            <textarea name="message" rows="4" required style="width: 100%; padding: 18px; border: 1.5px solid #eee; border-radius: 20px; margin-bottom: 20px; outline: none; resize: none; font-family: inherit;" placeholder="Bạn muốn chia sẻ điều gì..."></textarea>
+            <button type="submit" id="btn-submit-fb" style="width: 100%; padding: 16px; background: var(--sb-gradient); color: white; border: none; border-radius: 18px; font-weight: 800; cursor: pointer; width: 100%;">Gửi ý kiến ngay</button>
         </form>
     </div>
 </div>
 
 <script>
     (function() {
-        // 1. Lấy địa chỉ URL hiện tại
+        // --- 1. LOGIC HIGHLIGHT ƯU TIÊN CAO (CHỐNG LỖI NETLIFY & ĐÚP) ---
         const path = window.location.pathname.toLowerCase();
         const links = document.querySelectorAll('.sb-link');
         
         let matchedId = null;
 
-        // 2. LOGIC ƯU TIÊN: Kiểm tra các trang chuyên biệt trước
-        // Chỉ cần URL chứa từ khóa này thì gán ID tương ứng
+        // Ưu tiên tìm các từ khóa đặc thù trong URL trước
         if (path.includes('congdong')) {
             matchedId = 'community';
-        } 
-        else if (path.includes('phongluyende')) {
+        } else if (path.includes('phongluyende')) {
             matchedId = 'practice';
-        } 
-        else if (path.includes('bantinvanhoc')) {
+        } else if (path.includes('bantinvanhoc')) {
             matchedId = 'news';
-        } 
-        else if (path.includes('nhatkyhoctap')) {
+        } else if (path.includes('nhatkyhoctap')) {
             matchedId = 'journal';
         } 
-        // Cuối cùng mới xét đến trang chủ/tổng quan
+        // Nếu không khớp các trang trên, mới xét đến trang chủ/dashboard
         else if (path.includes('index') || path.includes('dashboard') || path === '/' || path.endsWith('/')) {
             matchedId = 'overview';
         }
 
-        // 3. Áp dụng class Active (Xóa hết rồi mới thêm cái đúng)
+        // Thực hiện sáng đèn duy nhất một mục
         links.forEach(link => {
             link.classList.remove('active');
             if (link.getAttribute('data-id') === matchedId) {
@@ -94,34 +139,49 @@
             }
         });
 
-        // --- GIỮ NGUYÊN CÁC SỰ KIỆN NÚT BẤM CỦA BẠN ---
+        // --- 2. CÁC SỰ KIỆN NÚT BẤM ---
         const modal = document.getElementById('modal-feedback-menu');
         const btnFb = document.getElementById('btn-fb-trigger');
-        if(btnFb) btnFb.onclick = () => modal.style.display = 'flex';
-        
-        const closeFb = document.getElementById('close-fb-menu');
-        if(closeFb) closeFb.onclick = () => modal.style.display = 'none';
+        const btnClose = document.getElementById('close-fb-menu');
 
+        if(btnFb) btnFb.onclick = () => modal.style.display = 'flex';
+        if(btnClose) btnClose.onclick = () => modal.style.display = 'none';
+
+        // Formspree AJAX (Gửi thật)
         const form = document.getElementById('formspree-menu');
         if(form) {
             form.onsubmit = async (e) => {
                 e.preventDefault();
                 const btn = document.getElementById('btn-submit-fb');
-                btn.innerText = "Đang gửi...";
-                await fetch(e.target.action, { method: 'POST', body: new FormData(e.target), headers: { 'Accept': 'application/json' } });
-                alert("Cảm ơn bạn! ❤️");
-                e.target.reset(); modal.style.display = 'none'; btn.innerText = "Gửi ngay";
+                btn.innerText = "Đang gửi..."; btn.disabled = true;
+                try {
+                    const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } });
+                    if (res.ok) { alert("Cảm ơn bạn! ❤️"); form.reset(); modal.style.display = 'none'; }
+                } catch (err) { alert("Lỗi gửi thư!"); }
+                finally { btn.innerText = "Gửi ngay"; btn.disabled = false; }
             };
         }
 
+        // Đăng xuất và điều hướng ra trang chủ khách
         const btnLogout = document.getElementById('btn-logout-trigger');
         if(btnLogout) {
             btnLogout.onclick = () => {
                 if(confirm("Bạn muốn đăng xuất khỏi Hopvan?")) {
+                    // Tín hiệu cho Firebase xử lý SignOut
                     window.dispatchEvent(new Event('trigger-firebase-signout'));
+                    // Chuyển vùng về trang chủ khách (../index.html)
                     setTimeout(() => { window.location.href = "../index.html"; }, 500);
                 }
             };
         }
+
+        // Mobile Toggle Global
+        window.toggleSidebarGlobal = function() {
+            const sidebar = document.getElementById('main-sidebar');
+            const overlay = document.getElementById('sb-overlay');
+            sidebar.classList.toggle('open');
+            overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+        };
+        document.getElementById('sb-overlay').onclick = window.toggleSidebarGlobal;
     })();
 </script>

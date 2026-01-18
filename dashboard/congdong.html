@@ -222,11 +222,12 @@
             .catch(err => console.error("Lỗi Menu:", err));
     </script>
 
-    <script type="module">
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // 1. CẤU HÌNH FIREBASE
         const firebaseConfig = { 
             apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", 
             authDomain: "hopvan-9a648.firebaseapp.com", 
@@ -241,6 +242,24 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // 2. FETCH MENU (CHỈ GỌI 1 LẦN DUY NHẤT)
+        fetch('menu.html')
+        .then(res => res.text())
+        .then(html => {
+            const placeholder = document.getElementById('menu-placeholder');
+            placeholder.innerHTML = html;
+            
+            // --- QUAN TRỌNG: Kích hoạt Javascript bên trong menu ---
+            const scripts = placeholder.querySelectorAll('script');
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                newScript.text = oldScript.text;
+                document.body.appendChild(newScript);
+            });
+            })
+            .catch(err => console.error("Lỗi tải menu:", err));
+
+        // 3. KIỂM TRA ĐĂNG NHẬP
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const name = user.displayName || user.email.split('@')[0];
@@ -251,51 +270,34 @@
             }
         });
 
-        const discordBtn = document.getElementById('btn-discord-action');
-        discordBtn.addEventListener('click', async () => {
-            const user = auth.currentUser;
-            if (user) {
-                try {
-                    await addDoc(collection(db, "activities"), {
-                        uid: user.uid,
-                        action: "Gia nhập Cộng đồng Discord",
-                        timestamp: serverTimestamp()
-                    });
-                    window.open("https://discord.gg/EhsQyEAk2k", "_blank");
-                } catch (error) {
-                    window.open("https://discord.gg/EhsQyEAk2k", "_blank");
-                }
+        // 4. XỬ LÝ LỆNH ĐĂNG XUẤT (KHỚP VỚI MENU.HTML)
+        window.addEventListener('trigger-firebase-signout', async () => {
+            try {
+                await signOut(auth);
+                console.log("Đã ngắt kết nối tài khoản.");
+                window.location.href = "../index.html"; 
+            } catch (error) {
+                alert("Lỗi khi thoát: " + error.message);
             }
         });
 
-        window.addEventListener('perform-logout', () => {
-            signOut(auth).then(() => window.location.href = "index.html");
-        });
-
-// 1. FETCH MENU VÀ ÉP CHẠY SCRIPT
-    fetch('menu.html')
-    .then(res => res.text())
-    .then(html => {
-        const ph = document.getElementById('menu-placeholder');
-        ph.innerHTML = html;
-        // Chạy lại Script để logic Highlight hoạt động
-        ph.querySelectorAll('script').forEach(s => {
-            const ns = document.createElement('script');
-            ns.text = s.text;
-            document.body.appendChild(ns);
-        });
-    });
-
-    // 2. LẮNG NGHE TÍN HIỆU ĐĂNG XUẤT THẬT (TẠM QUÊN TÀI KHOẢN)
-    window.addEventListener('trigger-firebase-signout', async () => {
-        try {
-            await signOut(auth); // Dis-account hoàn toàn
-            console.log("Account disconnected.");
-            window.location.href = "../index.html"; // Out ra trang khách
-        } catch (error) {
-            alert("Lỗi khi thoát: " + error.message);
+        // 5. GIA NHẬP DISCORD (LƯU DATABASE)
+        const discordBtn = document.getElementById('btn-discord-action');
+        if(discordBtn) {
+            discordBtn.addEventListener('click', async () => {
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        await addDoc(collection(db, "activities"), {
+                            uid: user.uid,
+                            action: "Gia nhập Cộng đồng Discord",
+                            timestamp: serverTimestamp()
+                        });
+                    } catch (e) { console.error("Lưu DB lỗi nhưng vẫn mở link:", e); }
+                }
+                window.open("https://discord.gg/EhsQyEAk2k", "_blank");
+            });
         }
-    });
     </script>
 </body>
 </html>
