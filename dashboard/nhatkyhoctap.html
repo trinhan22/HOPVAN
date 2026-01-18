@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hopvan - Nhật Ký Học Tập</title>
+    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
+    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+    <meta property="og:url" content="https://hopvan.netlify.app" />
+    <meta property="og:type" content="article" />
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root { --primary: #FF8F50; --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62); --sidebar-width: 280px; }
+        * { font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.3s ease; }
+        body { background-color: #FFF5EC; min-height: 100vh; display: flex; overflow-x: hidden; }
+
+        #menu-placeholder { width: var(--sidebar-width); flex-shrink: 0; z-index: 100; }
+        .main-content { flex-grow: 1; padding: 40px; position: relative; min-height: 100vh; }
+
+        .welcome-card {
+            background: linear-gradient(135deg, #fceabb 0%, #f8b500 100%);
+            border-radius: 35px; padding: 40px; color: #5d4037;
+            box-shadow: 0 15px 35px rgba(248, 181, 0, 0.15); position: relative; overflow: hidden; margin-bottom: 60px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .welcome-card::after {
+            content: '\f5da'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+            position: absolute; right: -20px; bottom: -20px; font-size: 12rem; opacity: 0.07; transform: rotate(-15deg);
+        }
+
+        .path-wrapper { position: relative; width: 100%; max-width: 450px; margin: 0 auto; padding-top: 20px; min-height: 1000px; }
+        .path-container { position: relative; display: flex; flex-direction: column; align-items: center; gap: 110px; z-index: 10; }
+        
+        .level-node {
+            width: 95px; height: 95px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 1.8rem; cursor: pointer; position: relative;
+            border-bottom: 8px solid rgba(0,0,0,0.1); background: white; z-index: 20;
+        }
+        
+        .node-pos-0 { transform: translateX(0); }
+        .node-pos-1 { transform: translateX(100px); }
+        .node-pos-2 { transform: translateX(0); }
+        .node-pos-3 { transform: translateX(-100px); }
+
+        .level-passed { background: #58cc02; color: white; border-bottom-color: #46a302; box-shadow: 0 8px 0 #46a302; }
+        .level-current { background: white; color: var(--primary); border: 4px solid var(--primary); animation: bounce 2s infinite; box-shadow: 0 10px 25px rgba(255, 143, 80, 0.3); }
+        .level-locked { background: #e5e5e5; color: #afafaf; cursor: not-allowed; border-bottom-color: #ccc; pointer-events: none; }
+        
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        .node-label {
+            position: absolute; bottom: -45px; background: white; padding: 6px 14px; border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); font-size: 11px; font-weight: 800; color: #8d6e63;
+            white-space: nowrap; border: 1px solid #f3e5f5; text-transform: uppercase;
+        }
+
+        #path-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
+
+        @media (max-width: 1024px) { 
+            #menu-placeholder { width: 0; display: none; }
+            .node-pos-1, .node-pos-3 { transform: translateX(0); } 
+        }
+    </style>
+</head>
+<body>
+
+    <div id="menu-placeholder"></div>
+
+    <main class="main-content">
+        <div class="welcome-card">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                    <h1 class="text-3xl font-black mb-1 text-[#5d4037]">Xin chào, <span id="user-display-name"></span>!</h1>
+                    <p class="text-[#8d6e63] font-bold opacity-80">Chào mừng bạn quay lại với lộ trình học tập.</p>
+                    <div class="flex gap-3 mt-5">
+                        <div class="bg-white/50 backdrop-blur-md px-4 py-2 rounded-2xl flex items-center gap-2 font-black text-[#5d4037]">
+                            <i class="fas fa-fire text-orange-600"></i> Streak: <span id="streak-val"></span>
+                        </div>
+                        <div class="bg-white/50 backdrop-blur-md px-4 py-2 rounded-2xl flex items-center gap-2 font-black text-[#5d4037]">
+                            <i class="fas fa-trophy text-yellow-700"></i> Level: <span id="level-val"></span>
+                        </div>
+                    </div>
+                </div>
+                <div id="avatar-initial" class="w-20 h-20 bg-white text-[#f8b500] rounded-[25px] flex items-center justify-center font-black text-3xl shadow-xl transform rotate-6 border-4 border-white/50"></div>
+            </div>
+        </div>
+
+        <div class="path-wrapper">
+            <svg id="path-svg"></svg>
+            <div id="path-render" class="path-container"></div>
+        </div>
+    </main>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const courseMap = [
+        { id: 1, title: 'Nghị lực sống', type: 'nlxh' },
+        { id: 2, title: 'Giá trị thời gian', type: 'nlxh' },
+        { id: 3, title: 'Lòng thấu cảm', type: 'dochieu' },
+        { id: 4, title: 'Vợ chồng A Phủ', type: 'nlvn' },
+        { id: 5, title: 'Sự tử tế', type: 'nlxh' },
+        { id: 6, title: 'Sóng Xuân Quỳnh', type: 'nlvn' },
+        { id: 7, title: 'Ý chí bền bỉ', type: 'nlxh' }
+    ];
+
+    fetch('menu.html').then(r => r.text()).then(html => {
+        document.getElementById('menu-placeholder').innerHTML = html;
+        setTimeout(() => {
+            document.querySelectorAll('.sb-link').forEach(l => {
+                if(l.href.includes('nhatkyhoctap')) l.classList.add('active');
+            });
+        }, 300);
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const name = user.displayName || user.email.split('@')[0];
+            document.getElementById('user-display-name').innerText = name;
+            document.getElementById('avatar-initial').innerText = name[0].toUpperCase();
+
+            try {
+                const userDocRef = doc(db, "users_progress", user.uid);
+                const userSnap = await getDoc(userDocRef);
+                
+                let currentLevel = 1;
+                let streakValue = 0;
+
+                if (userSnap.exists()) {
+                    const data = userSnap.data();
+                    currentLevel = data.currentLevel || 1; 
+                    streakValue = data.streak || 0; 
+                } else {
+                    await setDoc(userDocRef, { currentLevel: 1, streak: 0 });
+                }
+
+                document.getElementById('streak-val').innerText = streakValue;
+                document.getElementById('level-val').innerText = currentLevel;
+                renderJourney(currentLevel);
+
+            } catch (error) {
+                console.error("Firebase Sync Error:", error);
+                renderJourney(1);
+            }
+        } else {
+            window.location.href = "../log.html";
+        }
+    });
+
+    function renderJourney(userLevel) {
+        const container = document.getElementById('path-render');
+        container.innerHTML = "";
+
+        courseMap.forEach((lvl, index) => {
+            const node = document.createElement('div');
+            const posClass = `node-pos-${index % 4}`;
+
+            let status = 'level-locked';
+            if (lvl.id < userLevel) status = 'level-passed';
+            else if (lvl.id === userLevel) status = 'level-current';
+
+            node.className = `level-node ${posClass} ${status}`;
+            
+            if (lvl.id < userLevel) node.innerHTML = '<i class="fas fa-check"></i>';
+            else if (lvl.id === userLevel) node.innerHTML = '<i class="fas fa-feather-pointed"></i>';
+            else node.innerHTML = '<i class="fas fa-lock text-sm opacity-40"></i>';
+
+            const label = document.createElement('div');
+            label.className = "node-label";
+            label.innerText = lvl.title;
+            node.appendChild(label);
+
+            if (lvl.id <= userLevel) {
+                node.onclick = () => {
+                    // ĐIỀU HƯỚNG RIÊNG CHO LEVEL 1 VÀ 2
+                    if (lvl.id === 1) {
+                        window.location.href = '../nhatkyhoctap/1.html';
+                    } else if (lvl.id === 2) {
+                        window.location.href = '../nhatkyhoctap/2.html';
+                    } else {
+                        // Fallback cho các level chưa làm file riêng
+                        window.location.href = `lambai.html?id=${lvl.id}&type=${lvl.type}`;
+                    }
+                };
+            }
+            container.appendChild(node);
+        });
+        
+        setTimeout(drawBeautifulPath, 600);
+    }
+
+    function drawBeautifulPath() {
+        const nodes = document.querySelectorAll('.level-node');
+        const svg = document.getElementById('path-svg');
+        const wrapper = document.querySelector('.path-wrapper');
+        
+        if (!svg || nodes.length < 2) return;
+
+        svg.setAttribute('height', wrapper.scrollHeight);
+        svg.setAttribute('width', wrapper.clientWidth);
+        svg.innerHTML = "";
+
+        let pathData = "";
+        nodes.forEach((node, i) => {
+            const rect = node.getBoundingClientRect();
+            const wrapperRect = wrapper.getBoundingClientRect();
+
+            const x = rect.left + rect.width / 2 - wrapperRect.left;
+            const y = rect.top + rect.height / 2 - wrapperRect.top;
+
+            if (i === 0) {
+                pathData += `M ${x} ${y}`;
+            } else {
+                const prevRect = nodes[i-1].getBoundingClientRect();
+                const px = prevRect.left + prevRect.width / 2 - wrapperRect.left;
+                const py = prevRect.top + prevRect.height / 2 - wrapperRect.top;
+                
+                const controlY = (y + py) / 2;
+                pathData += ` C ${px} ${controlY}, ${x} ${controlY}, ${x} ${y}`;
+            }
+        });
+
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", pathData);
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke", "#f8b500");
+        path.setAttribute("stroke-width", "10");
+        path.setAttribute("stroke-linecap", "round");
+        path.setAttribute("stroke-dasharray", "1, 20"); 
+        path.setAttribute("opacity", "0.35");
+        
+        svg.appendChild(path);
+    }
+
+    window.addEventListener('resize', drawBeautifulPath);
+</script>
+
+</body>
+</html>

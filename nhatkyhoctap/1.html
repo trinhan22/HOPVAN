@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Level 1: Nghị lực sống</title>
+    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
+    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+    <meta property="og:url" content="https://hopvan.netlify.app" />
+    <meta property="og:type" content="article" />
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root { --primary: #FF8F50; --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62); --sidebar-width: 280px; }
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: #FFF5EC; min-height: 100vh; display: flex; }
+
+        #menu-placeholder { width: var(--sidebar-width); flex-shrink: 0; }
+        .main-content { flex-grow: 1; padding: 40px; overflow-y: auto; }
+
+        .exam-card { background: white; border-radius: 35px; padding: 40px; border: 1px solid rgba(255, 143, 80, 0.2); box-shadow: 0 15px 35px rgba(255, 143, 80, 0.05); }
+        .editor-container { background: white; border-radius: 30px; border: 2px solid #f0f0f0; overflow: hidden; transition: 0.3s; }
+        .editor-container:focus-within { border-color: var(--primary); box-shadow: 0 10px 30px rgba(255, 143, 80, 0.1); }
+        
+        .writing-area { width: 100%; height: 450px; padding: 30px; border: none; outline: none; resize: none; font-size: 1.15rem; line-height: 2; color: #2d3436; background: #fafafa; }
+
+        /* AI Feedback Styles */
+        .text-good { color: #10B981; background: #ECFDF5; font-weight: 600; padding: 2px 4px; border-radius: 6px; }
+        .text-bad { color: #EF4444; background: #FEF2F2; text-decoration: line-through; padding: 2px 4px; border-radius: 6px; }
+        .text-fix { color: #3B82F6; font-weight: 700; font-style: italic; }
+
+        .score-circle { width: 100px; height: 100px; border-radius: 50%; border: 8px solid #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 900; }
+
+        @media (max-width: 1024px) { #menu-placeholder { display: none; } .main-content { padding: 20px; } }
+    </style>
+</head>
+<body>
+
+    <div id="menu-placeholder"></div>
+
+    <main class="main-content">
+        <div class="flex justify-between items-center mb-8">
+            <a href="../dashboard/nhatkyhoctap.html" class="bg-white px-5 py-2.5 rounded-2xl font-bold text-gray-500 hover:text-orange-500 shadow-sm transition-all flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i> Quay lại lộ trình
+            </a>
+            <div class="flex items-center gap-4">
+                <div class="bg-black text-white px-6 py-2.5 rounded-2xl font-black flex items-center gap-3">
+                    <i class="fas fa-clock text-orange-400"></i> <span id="timer">45:00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            <div class="space-y-6">
+                <div class="exam-card">
+                    <span class="bg-orange-500 text-white px-4 py-1.5 rounded-xl font-black text-xs uppercase tracking-widest">Level 1: Nghị luận xã hội</span>
+                    <h2 class="text-3xl font-black text-gray-800 mt-4 mb-6 leading-tight">Chủ đề: Sức mạnh của nghị lực sống</h2>
+                    
+                    <div class="p-6 bg-orange-50 rounded-3xl border-2 border-orange-100 italic text-gray-700 leading-relaxed mb-6">
+                        "Đừng để nỗi sợ thất bại ngăn cản bạn thực hiện những ước mơ của mình. Mỗi lần vấp ngã là một lần bạn học được cách đứng dậy vững vàng hơn."
+                    </div>
+
+                    <div class="space-y-4 text-gray-800">
+                        <p class="font-bold text-lg"><i class="fas fa-pen-nib text-orange-500 mr-2"></i> Yêu cầu đề bài:</p>
+                        <p class="text-lg leading-relaxed">Hãy viết một đoạn văn (khoảng 200 chữ) trình bày suy nghĩ của anh/chị về <strong>sức mạnh của nghị lực</strong> giúp con người vượt qua những thử thách trong cuộc sống.</p>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-dashed border-gray-200">
+                        <p class="text-sm font-bold text-gray-400 uppercase tracking-tighter mb-3">Gợi ý từ giáo viên AI:</p>
+                        <ul class="text-gray-500 text-sm space-y-2">
+                            <li>• Giải thích nghị lực là gì? (Sự kiên trì, bản lĩnh).</li>
+                            <li>• Nêu sức mạnh: Giúp vượt qua nghịch cảnh, tạo niềm tin.</li>
+                            <li>• Dẫn chứng thực tế (Nick Vujicic, thầy Nguyễn Ngọc Ký...).</li>
+                            <li>• Bài học nhận thức và hành động.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="editor-container" id="editor-box">
+                    <div class="px-8 py-4 bg-gray-50 border-b flex justify-between items-center">
+                        <span class="font-black text-xs text-gray-400 uppercase">Bài làm của bạn</span>
+                        <span id="word-count" class="text-xs font-black bg-gray-200 text-gray-600 px-3 py-1 rounded-lg text-uppercase">0 TỪ</span>
+                    </div>
+                    <textarea id="student-essay" class="writing-area" placeholder="Hãy bắt đầu viết tại đây..."></textarea>
+                    <div class="p-4 bg-white border-t">
+                        <button id="submit-btn" class="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white py-4 rounded-2xl font-black text-lg shadow-lg hover:scale-[1.02] active:scale-95 transition-all">
+                            NỘP BÀI & CHẤM ĐIỂM
+                        </button>
+                    </div>
+                </div>
+
+                <div id="result-box" class="hidden exam-card animate-render-in">
+                    <div class="flex items-center gap-6 mb-8">
+                        <div id="score-display" class="score-circle">0</div>
+                        <div>
+                            <h3 id="grade-title" class="text-2xl font-black">Đang tính toán...</h3>
+                            <p id="grade-desc" class="text-gray-500">Giáo viên AI đang xem xét bài làm của bạn.</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <p class="font-black text-gray-800 mb-3 uppercase text-xs tracking-widest">Sửa lỗi chi tiết:</p>
+                            <div id="ai-correction" class="p-6 bg-gray-50 rounded-3xl leading-relaxed text-lg"></div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-5 bg-green-50 rounded-2xl border border-green-100">
+                                <p class="font-bold text-green-700 text-sm mb-2">Điểm tốt:</p>
+                                <ul id="pros-list" class="text-green-800 text-xs space-y-1"></ul>
+                            </div>
+                            <div class="p-5 bg-red-50 rounded-2xl border border-red-100">
+                                <p class="font-bold text-red-700 text-sm mb-2">Cần cải thiện:</p>
+                                <ul id="cons-list" class="text-red-800 text-xs space-y-1"></ul>
+                            </div>
+                        </div>
+
+                        <button onclick="location.reload()" class="w-full py-3 rounded-xl font-bold text-gray-400 hover:bg-gray-100 transition-all">LÀM LẠI BÀI</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="loading-overlay" class="fixed inset-0 bg-white/90 backdrop-blur-md z-[2000] hidden flex-col items-center justify-center">
+        <div class="text-6xl animate-bounce text-orange-500"><i class="fas fa-robot"></i></div>
+        <h3 class="font-black text-2xl mt-4">GIÁO VIÊN AI ĐANG CHẤM BÀI...</h3>
+        <p class="text-gray-400 mt-2">Vui lòng đợi trong giây lát</p>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const API_URL = `../.netlify/functions/gemini-proxy`;
+    let userUid = null;
+
+    // 1. Kiểm tra đăng nhập
+    onAuthStateChanged(auth, (u) => {
+        if (u) { userUid = u.uid; } else { window.location.href = "../log.html"; }
+    });
+
+    // 2. Fetch Menu
+    fetch('menu.html').then(r => r.text()).then(html => {
+        const placeholder = document.getElementById('menu-placeholder');
+        placeholder.innerHTML = html;
+
+        // HIGHLIGHT LOGIC: Ép link Nhật ký học tập sáng lên
+        setTimeout(() => {
+            document.querySelectorAll('.sb-link').forEach(link => {
+                // Kiểm tra nếu href của link chứa "nhatkyhoctap"
+                if(link.getAttribute('href').includes('nhatkyhoctap')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }, 100); // Đợi 100ms để menu kịp render xong
+    });
+
+    // 3. Logic Chấm bài AI
+    document.getElementById('submit-btn').onclick = async () => {
+        const content = document.getElementById('student-essay').value.trim();
+        const wordCount = content.split(/\s+/).length;
+
+        if (wordCount < 50) return alert("Bài viết của bạn quá ngắn để AI có thể phân tích chính xác!");
+
+        const loading = document.getElementById('loading-overlay');
+        loading.style.display = 'flex';
+
+        const systemPrompt = `Bạn là chuyên gia Ngữ Văn chấm bài Nghị luận xã hội. 
+        Đề bài: Suy nghĩ về sức mạnh của nghị lực sống. 
+        Hãy chấm điểm trên thang 100 và nhận xét chi tiết.
+        YÊU CẦU TRẢ VỀ JSON:
+        {
+            "score": 85,
+            "grade_title": "Rất tốt / Khá / Cần cố gắng",
+            "grade_desc": "Lời nhắn tổng quan",
+            "correction_html": "Bài làm bọc trong <span class='text-good'>, <span class='text-bad'> kèm <span class='text-fix'>(gợi ý)</span>",
+            "pros": ["Điểm mạnh 1", "Điểm mạnh 2"],
+            "cons": ["Lỗi 1", "Lỗi 2"]
+        }`;
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\n\nBÀI LÀM:\n" + content }] }] })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server báo lỗi ${response.status}. Bạn cần chạy bằng 'netlify dev' thay vì Live Server!`);
+            }
+
+            const data = await response.json();
+            const rawText = data.candidates[0].content.parts[0].text;
+            const result = JSON.parse(rawText.substring(rawText.indexOf('{'), rawText.lastIndexOf('}') + 1));
+
+            // Hiển thị kết quả UI
+            document.getElementById('result-box').classList.remove('hidden');
+            document.getElementById('score-display').innerText = result.score;
+            document.getElementById('score-display').style.borderColor = result.score >= 60 ? '#58cc02' : '#ff4b4b';
+            document.getElementById('grade-title').innerText = result.grade_title;
+            document.getElementById('grade-desc').innerText = result.grade_desc;
+            document.getElementById('ai-correction').innerHTML = result.correction_html;
+            document.getElementById('pros-list').innerHTML = result.pros.map(i => `<li>• ${i}</li>`).join('');
+            document.getElementById('cons-list').innerHTML = result.cons.map(i => `<li>• ${i}</li>`).join('');
+            
+            document.getElementById('editor-box').style.display = 'none';
+
+            // --- CẬP NHẬT DATABASE ---
+            if (result.score >= 60) {
+                // Mở khóa Level 2
+                const userRef = doc(db, "users_progress", userUid);
+                const userSnap = await getDoc(userRef);
+                
+                let currentLevelOnDb = 1;
+                if (userSnap.exists()) {
+                    currentLevelOnDb = userSnap.data().currentLevel || 1;
+                }
+
+                // Chỉ tăng level nếu level hiện tại đang là 1
+                if (currentLevelOnDb === 1) {
+                    await setDoc(userRef, { currentLevel: 2 }, { merge: true });
+                }
+
+                alert("Chúc mừng! Bạn đã đạt trên 60 điểm và mở khóa Level 2.");
+            } else {
+                alert("Bạn cần đạt ít nhất 60 điểm để vượt qua thử thách này. Hãy thử lại nhé!");
+            }
+
+            // Lưu hoạt động vào Firebase
+            await addDoc(collection(db, "activities"), {
+                uid: userUid,
+                action: "Hoàn thành Level 1: Nghị lực sống (" + result.score + "đ)",
+                timestamp: serverTimestamp()
+            });
+
+        } catch (e) {
+            console.error(e);
+            alert("Đã xảy ra lỗi khi chấm bài. Vui lòng kiểm tra kết nối!");
+        } finally {
+            loading.style.display = 'none';
+        }
+    };
+
+    // Đếm từ & Đồng hồ
+    document.getElementById('student-essay').oninput = function() {
+        const words = this.value.trim().split(/\s+/).filter(x => x).length;
+        document.getElementById('word-count').innerText = words + " TỪ";
+    };
+
+    let timeLeft = 2700; 
+    setInterval(() => {
+        if(timeLeft > 0) {
+            timeLeft--;
+            const m = Math.floor(timeLeft/60);
+            const s = timeLeft%60;
+            document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`;
+        }
+    }, 1000);
+</script>
+
+</body>
+</html>
