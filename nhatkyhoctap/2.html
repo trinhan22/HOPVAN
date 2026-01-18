@@ -145,11 +145,16 @@
     let userUid = null;
 
 onAuthStateChanged(auth, (u) => {
-        if (u) { userUid = u.uid; } else { window.location.href = "../../log.html"; }
-    });
+    if (u) { 
+        userUid = u.uid; 
+        console.log("Đã xác thực user:", userUid);
+    } else { 
+        window.location.href = "../log.html"; 
+    }
+});
 
     // --- SỬA LẠI ĐƯỜNG DẪN FETCH MENU ---
-    fetch('../menu.html').then(r => r.text()).then(html => {
+    fetch('menu.html').then(r => r.text()).then(html => {
         document.getElementById('menu-placeholder').innerHTML = html;
         setTimeout(() => {
             document.querySelectorAll('.sb-link').forEach(link => {
