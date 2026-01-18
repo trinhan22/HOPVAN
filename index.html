@@ -239,6 +239,7 @@
             .cta-section h2 { font-size: 2rem; }
             .mobile-menu-btn { display: block; margin-right: 10px; }
         }
+
     </style>
 </head>
 <body>
@@ -263,7 +264,7 @@
             <a href="">Trang chủ</a>
             <a href="dashboard/phongluyende.html">Phòng luyện đề</a>
             <a href="dashboard/bantinvanhoc.html">Bản tin Văn học</a>
-            <a href="dashboard/congdong.html">Cộng đồng Văn học</a>
+            <a href="dashboard/congdong.html">Cộng đồng</a>
             <a href="dashboard/nhatkyhoctap.html">Nhật ký học tập</a>
         </nav>
 
@@ -426,21 +427,57 @@
         });
 
         // 3. Menu Mobile Responsive
-        const menuBtn = document.querySelector('.mobile-menu-btn');
-        function checkMobile() {
-            if (window.innerWidth <= 768) {
-                menuBtn.style.display = 'block';
-            } else {
-                menuBtn.style.display = 'none';
-            }
-        }
-        window.addEventListener('resize', checkMobile);
-        checkMobile();
+// --- LOGIC MENU MOBILE HOÀN THIỆN ---
+    const menuBtn = document.getElementById('mobile-toggle');
+    const navMenu = document.getElementById('nav-menu');
+    const body = document.body;
 
-        menuBtn.addEventListener('click', () => {
-            // Sau này bạn có thể code thêm menu sổ xuống ở đây
-            alert("Menu mobile đang phát triển ^^");
+    menuBtn.addEventListener('click', () => {
+        const isOpen = navMenu.classList.toggle('active');
+        body.classList.toggle('menu-open');
+        
+        // Đổi icon từ Bars sang X
+        const icon = menuBtn.querySelector('i');
+        if (isOpen) {
+            icon.classList.remove('fa-bars');
+            icon.classList.add('fa-times');
+            menuBtn.style.transform = 'rotate(90deg)';
+        } else {
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+            menuBtn.style.transform = 'rotate(0deg)';
+        }
+    });
+
+    // Tự động đóng menu khi nhấn vào một link
+    const navLinks = document.querySelectorAll('.nav-links a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            navMenu.classList.remove('active');
+            body.classList.remove('menu-open');
+            const icon = menuBtn.querySelector('i');
+            icon.classList.replace('fa-times', 'fa-bars');
         });
+    });
+
+    // Cập nhật trạng thái Auth vào menu Mobile
+    onAuthStateChanged(auth, (user) => {
+        const mobileActions = document.getElementById('mobile-only-actions');
+        if (user) {
+            btnHocNgay.style.display = 'none';
+            userProfile.style.display = 'flex';
+            displayName.textContent = user.displayName || "Bạn mình";
+            
+            // Trên Mobile, chúng ta có thể hiện lời chào trong menu
+            mobileActions.innerHTML = `<p class="font-bold text-orange-500">Chào, ${user.displayName || "Bạn"}</p>`;
+        } else {
+            btnHocNgay.style.display = 'inline-block';
+            userProfile.style.display = 'none';
+            
+            // Trên Mobile hiện nút Học ngay to rõ
+            mobileActions.innerHTML = `<a href="log.html" class="btn-primary">Bắt đầu ngay</a>`;
+        }
+    });
     </script>
 </body>
 </html>

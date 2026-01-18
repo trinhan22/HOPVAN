@@ -485,15 +485,21 @@
     }
 
     // --- 3. CÁC LOGIC HỆ THỐNG (MENU, LOGOUT...) ---
-    fetch('menu.html').then(res => res.text()).then(html => {
+fetch('menu.html')
+    .then(res => res.text())
+    .then(html => {
         const placeholder = document.getElementById('menu-placeholder');
         placeholder.innerHTML = html;
-        placeholder.querySelectorAll('script').forEach(oldScript => {
+        
+        // --- QUAN TRỌNG NHẤT: Ép trình duyệt chạy lại Script bên trong menu ---
+        const scripts = placeholder.querySelectorAll('script');
+        scripts.forEach(oldScript => {
             const newScript = document.createElement('script');
-            newScript.text = oldScript.text;
-            document.body.appendChild(newScript);
+            newScript.text = oldScript.text; // Copy nội dung script
+            document.body.appendChild(newScript); // Chèn vào body để thực thi
         });
-    });
+    })
+    .catch(err => console.error("Lỗi tải menu:", err));
 
     window.addEventListener('trigger-firebase-signout', async () => {
         try {

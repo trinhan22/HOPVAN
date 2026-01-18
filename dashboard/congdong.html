@@ -242,23 +242,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // 2. FETCH MENU (CHỈ GỌI 1 LẦN DUY NHẤT)
-        fetch('menu.html')
-        .then(res => res.text())
-        .then(html => {
-            const placeholder = document.getElementById('menu-placeholder');
-            placeholder.innerHTML = html;
-            
-            // --- QUAN TRỌNG: Kích hoạt Javascript bên trong menu ---
-            const scripts = placeholder.querySelectorAll('script');
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement('script');
-                newScript.text = oldScript.text;
-                document.body.appendChild(newScript);
-            });
-            })
-            .catch(err => console.error("Lỗi tải menu:", err));
-
         // 3. KIỂM TRA ĐĂNG NHẬP
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -298,6 +281,28 @@
                 window.open("https://discord.gg/EhsQyEAk2k", "_blank");
             });
         }
+
+    fetch('menu.html')
+    .then(res => res.text())
+    .then(html => {
+        const placeholder = document.getElementById('menu-placeholder');
+        placeholder.innerHTML = html;
+        
+        // --- QUAN TRỌNG: Ép chạy lại script của menu ---
+        const scripts = placeholder.querySelectorAll('script');
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement('script');
+            newScript.text = oldScript.text;
+            document.body.appendChild(newScript);
+        });
+
+        // --- BƯỚC QUYẾT ĐỊNH: Ra lệnh highlight mục Cộng đồng ---
+        setTimeout(() => {
+            if (typeof window.forceActiveMenu === 'function') {
+                window.forceActiveMenu('community');
+            }
+        }, 100); // Đợi 100ms để đảm bảo DOM đã render xong
+    });
     </script>
 </body>
 </html>

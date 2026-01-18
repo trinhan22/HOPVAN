@@ -334,18 +334,22 @@ window.goToExam = async (type) => {
     });
 
     // --- D. FETCH MENU & LOGOUT ---
-    fetch('menu.html')
+fetch('menu.html')
     .then(res => res.text())
     .then(html => {
-        const ph = document.getElementById('menu-placeholder');
-        ph.innerHTML = html;
-        ph.querySelectorAll('script').forEach(oldScript => {
+        const placeholder = document.getElementById('menu-placeholder');
+        placeholder.innerHTML = html;
+        
+        // --- QUAN TRỌNG NHẤT: Ép trình duyệt chạy lại Script bên trong menu ---
+        const scripts = placeholder.querySelectorAll('script');
+        scripts.forEach(oldScript => {
             const newScript = document.createElement('script');
-            newScript.text = oldScript.text;
-            document.body.appendChild(newScript);
+            newScript.text = oldScript.text; // Copy nội dung script
+            document.body.appendChild(newScript); // Chèn vào body để thực thi
         });
-    });
-
+    })
+    .catch(err => console.error("Lỗi tải menu:", err));
+    
     window.addEventListener('trigger-firebase-signout', async () => {
         try {
             await signOut(auth);

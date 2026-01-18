@@ -200,166 +200,174 @@
         });
     </script>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    // --- CẤU HÌNH HỆ THỐNG ---
+    const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        // API Gemini
-        const API_KEY = "AIzaSyDJ_v-wCOWQRMgPNMLH8WHQjg5vZxFG14I"; 
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+    // Sử dụng Netlify Proxy để bảo mật tuyệt đối API Key
+    const API_URL = `/.netlify/functions/gemini-proxy`;
 
-        // 1. Auth & Data Sync
-        onAuthStateChanged(auth, (u) => {
-            if (u) {
-                const n = u.displayName || u.email;
-                document.getElementById('avatar-initial').innerText = n.charAt(0).toUpperCase();
-            } else {
-                window.location.href = "../log.html";
-            }
-        });
+    let questionsData = [];
+    window.currentExamData = null;
 
-        // 2. Questions Manager
-        let questions = {};
-        async function loadQ() {
-            try {
-                const r = await fetch('questions-nlxh.json');
-                questions = await r.json();
-                randomizeQuestion();
-            } catch (e) { document.getElementById('prompt-text').innerText = "Vui lòng thêm file questions.json"; }
+    // 1. Kiểm tra trạng thái người dùng
+    onAuthStateChanged(auth, (u) => {
+        if (u) {
+            const n = u.displayName || u.email.split('@')[0];
+            document.getElementById('avatar-initial').innerText = n.charAt(0).toUpperCase();
+        } else {
+            window.location.href = "../log.html";
         }
+    });
 
-        window.randomizeQuestion = () => {
-            const t = document.getElementById('topic-select').value;
-            const l = questions[t];
-            if (l && l.length > 0) {
-                const q = l[Math.floor(Math.random() * l.length)];
-                document.getElementById('prompt-text').innerText = q.topic;
-                document.getElementById('prompt-hint').innerHTML = `<i class="fas fa-lightbulb text-orange-400"></i> Gợi ý: ${q.hint}`;
-            }
-        }
-        document.getElementById('topic-select').onchange = randomizeQuestion;
-        loadQ();
-
-        // 3. Word Count
-        const essayInput = document.getElementById('student-essay');
-        essayInput.oninput = () => {
-            const c = essayInput.value.trim().split(/\s+/).filter(x => x).length;
-            document.getElementById('word-count').innerText = `${c} TỪ`;
-        };
-
-        // 4. AI GRADING LOGIC (The Core)
-    document.getElementById('submit-btn').onclick = async () => {
-    const content = essayInput.value.trim();
-    if (content.split(/\s+/).filter(x => x).length < 50) return alert("Bài viết quá ngắn!");
-
-    const loading = document.getElementById('loading-overlay');
-    loading.style.display = 'flex';
-
-    const promptText = document.getElementById('prompt-text').innerText;
-    
-    const systemPrompt = `Bạn là giáo viên Văn chuyên nghiệp. Hãy chấm bài văn sau và trả về DUY NHẤT một khối JSON.
-    Quy tắc correction_html:
-    - Đoạn văn hay: bọc trong <span class="text-good">...</span>
-    - Đoạn lỗi, sai từ: bọc trong <span class="text-bad">...</span>
-    - Gợi ý sửa: đặt trong thẻ <span class="text-fix">(Sửa là: ...)</span> ngay sau đoạn sai.
-    
-    JSON: {"correction_html": "...", "idea_feedback": [...], "missing_points": [...]}`;
-
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\nĐề: " + promptText + "\nBài làm: " + content }] }] })
-        });
-
-        const data = await response.json();
-        if (!data.candidates) throw new Error("AI không phản hồi");
-
-        let rawResponse = data.candidates[0].content.parts[0].text;
-
-        // --- BƯỚC 1: TRÍCH XUẤT JSON AN TOÀN ---
-        const jsonStart = rawResponse.indexOf('{');
-        const jsonEnd = rawResponse.lastIndexOf('}') + 1;
-        if (jsonStart === -1 || jsonEnd === -1) throw new Error("Định dạng dữ liệu sai");
-        
-        const result = JSON.parse(rawResponse.substring(jsonStart, jsonEnd));
-
-        // --- BƯỚC 2: HIỂN THỊ KẾT QUẢ LÊN UI (Ưu tiên số 1) ---
-        const box = document.getElementById('ai-correction-box');
-        box.innerHTML = result.correction_html;
-        box.classList.remove('flex', 'items-center', 'justify-center', 'text-gray-300', 'italic');
-        box.style.textAlign = 'left';
-
-        document.getElementById('idea-list').innerHTML = result.idea_feedback.map(i => `<li>• ${i}</li>`).join('');
-        document.getElementById('missing-list').innerHTML = result.missing_points.map(i => `<li>• ${i}</li>`).join('');
-        document.getElementById('overall-feedback-box').style.display = 'block';
-
-        // --- BƯỚC 3: LƯU DATABASE (Chạy ngầm, lỗi cũng không báo cho user) ---
+    // 2. Tải danh sách đề NLXH
+    async function loadQuestions() {
         try {
+            const response = await fetch('questions-nlxh.json');
+            const data = await response.json();
+            questionsData = data.nlxh;
+            randomizeQuestion();
+        } catch (e) {
+            document.getElementById('prompt-text').innerText = "Vui lòng kiểm tra file questions-nlxh.json";
+        }
+    }
+
+    // 3. Hàm chọn đề ngẫu nhiên
+    window.randomizeQuestion = () => {
+        if (!questionsData.length) return;
+        const q = questionsData[Math.floor(Math.random() * questionsData.length)];
+        window.currentExamData = q;
+
+        document.getElementById('prompt-text').innerText = q.topic;
+        document.getElementById('prompt-hint').innerHTML = `<i class="fas fa-lightbulb text-orange-400"></i> Gợi ý: ${q.hint}`;
+        
+        // Reset UI làm bài
+        document.getElementById('student-essay').value = "";
+        document.getElementById('overall-feedback-box').style.display = 'none';
+        document.getElementById('ai-correction-box').innerHTML = `
+            <div>
+                <i class="fas fa-magic text-5xl mb-4 opacity-20"></i>
+                <p class="font-bold text-gray-400">Bắt đầu viết bài và nhấn "Nộp bài" để AI chấm điểm.</p>
+            </div>`;
+    };
+
+    loadQuestions();
+
+    // 4. Logic Chấm bài AI (Tối ưu cho Nghị luận xã hội)
+    document.getElementById('submit-btn').onclick = async () => {
+        const content = document.getElementById('student-essay').value.trim();
+        const wordCount = content.split(/\s+/).filter(x => x).length;
+
+        if (wordCount < 50) return alert("Bài viết của bạn quá ngắn (hiện có " + wordCount + " từ). Hãy viết ít nhất 150-200 chữ để đạt kết quả tốt nhất!");
+
+        const loading = document.getElementById('loading-overlay');
+        loading.style.display = 'flex';
+
+        const promptText = document.getElementById('prompt-text').innerText;
+
+        const systemPrompt = `Bạn là chuyên gia chấm thi Ngữ Văn cấp quốc gia. Hãy chấm đoạn văn Nghị luận xã hội sau.
+        TIÊU CHÍ CHẤM:
+        - Đúng cấu trúc đoạn văn 200 chữ.
+        - Lập luận sắc bén, dẫn chứng thực tế thuyết phục.
+        - Văn phong giàu cảm xúc, không mắc lỗi chính tả.
+
+        YÊU CẦU TRẢ VỀ JSON DUY NHẤT:
+        {
+          "correction_html": "Bài làm học sinh được highlight (<span class='text-good'> cho câu văn hay, <span class='text-bad'> cho lỗi dùng từ/sai ý, <span class='text-fix'>(Sửa là: ...)</span> cho gợi ý thay thế)",
+          "idea_feedback": ["Nhận xét về tư duy lập luận", "Nhận xét về dẫn chứng"],
+          "missing_points": ["Các ý còn thiếu", "Lỗi logic cần sửa"]
+        }`;
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: systemPrompt + "\nĐề bài: " + promptText + "\nBài làm: " + content }]
+                    }]
+                })
+            });
+
+            const data = await response.json();
+            if (!data.candidates) throw new Error("AI không phản hồi");
+
+            let rawText = data.candidates[0].content.parts[0].text;
+            
+            // Trích xuất JSON an toàn khỏi Markdown
+            const jsonStart = rawText.indexOf('{');
+            const jsonEnd = rawText.lastIndexOf('}') + 1;
+            const result = JSON.parse(rawText.substring(jsonStart, jsonEnd));
+
+            // Hiển thị kết quả lên UI
+            const box = document.getElementById('ai-correction-box');
+            box.innerHTML = result.correction_html;
+            box.style.textAlign = 'left';
+            box.classList.remove('flex', 'items-center', 'justify-center', 'text-gray-400');
+
+            document.getElementById('idea-list').innerHTML = result.idea_feedback.map(i => `<li>• ${i}</li>`).join('');
+            document.getElementById('missing-list').innerHTML = result.missing_points.map(i => `<li>• ${i}</li>`).join('');
+            document.getElementById('overall-feedback-box').style.display = 'block';
+
+            // Lưu vào Firebase Activities (Dashboard)
             if (auth.currentUser) {
                 await addDoc(collection(db, "activities"), {
                     uid: auth.currentUser.uid,
-                    action: "Luyện đề: " + promptText.substring(0, 30) + "...",
+                    action: "Luyện NLXH: " + promptText.substring(0, 35) + "...",
                     timestamp: serverTimestamp()
                 });
             }
-        } catch (dbErr) {
-            console.warn("Lỗi lưu lịch sử nhưng không sao:", dbErr);
+
+        } catch (error) {
+            console.error(error);
+            alert("AI đang bận, bạn đợi chút rồi nhấn nộp lại nhé!");
+        } finally {
+            loading.style.display = 'none';
         }
+    };
 
-    } catch (error) {
-        console.error("Lỗi xử lý:", error);
-        // Chỉ hiện thông báo này nếu THỰC SỰ không lấy được kết quả
-        if (!document.getElementById('overall-feedback-box').style.display || document.getElementById('overall-feedback-box').style.display === 'none') {
-            alert("AI đang bận một chút, bạn thử nhấn 'Nộp bài' lại nhé!");
+    // --- TIỆN ÍCH ---
+    // Word Count
+    document.getElementById('student-essay').oninput = function() {
+        const count = this.value.trim().split(/\s+/).filter(x => x).length;
+        document.getElementById('word-count').innerText = `${count} TỪ`;
+    };
+
+    // Timer Logic (30 phút)
+    let s = 1800;
+    setInterval(() => {
+        if (s > 0) {
+            s--;
+            const m = Math.floor(s / 60), sec = s % 60;
+            document.getElementById('timer').innerText = `${m}:${sec < 10 ? '0' + sec : sec}`;
         }
-    } finally {
-        loading.style.display = 'none';
-    }
-};
+    }, 1000);
 
-        // Timer Logic
-        let s = 1800;
-        setInterval(() => {
-            if(s > 0) {
-                s--;
-                const m = Math.floor(s/60), sec = s%60;
-                document.getElementById('timer').innerText = `${m}:${sec<10?'0'+sec:sec}`;
-            }
-        }, 1000);
-
-// 1. FETCH MENU VÀ ÉP CHẠY SCRIPT
-    fetch('menu.html')
-    .then(res => res.text())
-    .then(html => {
-        const placeholder = document.getElementById('menu-placeholder');
-        placeholder.innerHTML = html;
-        
-        // --- QUAN TRỌNG: Kích hoạt Javascript bên trong menu ---
-        const scripts = placeholder.querySelectorAll('script');
-        scripts.forEach(oldScript => {
-            const newScript = document.createElement('script');
-            newScript.text = oldScript.text;
-            document.body.appendChild(newScript);
+    // Load Menu Component
+    fetch('menu.html').then(res => res.text()).then(html => {
+        const ph = document.getElementById('menu-placeholder');
+        ph.innerHTML = html;
+        const scripts = ph.querySelectorAll('script');
+        scripts.forEach(old => {
+            const ns = document.createElement('script');
+            ns.text = old.text;
+            document.body.appendChild(ns);
         });
     });
 
-    // 2. LẮNG NGHE TÍN HIỆU ĐĂNG XUẤT THẬT (TẠM QUÊN TÀI KHOẢN)
     window.addEventListener('trigger-firebase-signout', async () => {
         try {
-            await signOut(auth); // Dis-account hoàn toàn
-            console.log("Account disconnected.");
-            window.location.href = "../index.html"; // Out ra trang khách
-        } catch (error) {
-            alert("Lỗi khi thoát: " + error.message);
-        }
+            await signOut(auth);
+            window.location.href = "../index.html";
+        } catch (error) { alert(error.message); }
     });
-    </script>
+</script>
 </body>
 </html>
