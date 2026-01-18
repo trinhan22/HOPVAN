@@ -1,0 +1,182 @@
+<style>
+    /* --- CSS PREMIUM REMASTERED (CÔ LẬP) --- */
+    :root {
+        --sb-w: 260px;
+        --sb-primary: #FF8F50;
+        --sb-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
+        --sb-glass: rgba(255, 255, 255, 0.7);
+        --sb-border: rgba(255, 255, 255, 0.8);
+    }
+
+    .sidebar-comp {
+        width: var(--sb-w); height: 100vh;
+        background: var(--sb-glass); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
+        border-right: 1px solid var(--sb-border);
+        display: flex; flex-direction: column; padding: 40px 20px;
+        position: fixed; top: 0; left: 0; z-index: 1000;
+        transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        box-shadow: 10px 0 30px rgba(0,0,0,0.03);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Logo */
+    .sb-logo { display: flex; align-items: center; gap: 14px; margin-bottom: 50px; text-decoration: none; padding-left: 10px; }
+    .sb-logo img { width: 40px; transition: 0.4s; }
+    .sb-logo:hover img { transform: rotate(-10deg) scale(1.1); }
+    .sb-logo span { font-size: 1.6rem; font-weight: 900; background: var(--sb-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; }
+
+    /* Menu Items */
+    .sb-list { list-style: none; padding: 0; margin: 0; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .sb-link {
+        display: flex; align-items: center; gap: 15px; padding: 14px 20px;
+        border-radius: 20px; color: #636E72; font-weight: 700; font-size: 0.95rem;
+        text-decoration: none; transition: 0.3s; position: relative;
+    }
+    .sb-link:hover { background: rgba(255, 143, 80, 0.08); color: var(--sb-primary); transform: translateX(8px); }
+    
+    /* Highlight Active mượt mà */
+    .sb-link.active { background: var(--sb-gradient); color: white !important; box-shadow: 0 10px 25px rgba(255, 94, 98, 0.3); }
+
+    /* Footer Buttons */
+    .sb-footer { display: flex; flex-direction: column; gap: 12px; margin-top: auto; }
+    
+    /* Góp ý - Chữ nhỏ gọn, tinh tế */
+    .btn-fb-new {
+        background: #fff5ec; border: 1px dashed var(--sb-primary);
+        color: var(--sb-primary); font-size: 0.85rem; font-weight: 700;
+        padding: 12px; border-radius: 16px; cursor: pointer; transition: 0.3s;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-fb-new:hover { background: var(--sb-primary); color: white; border-style: solid; transform: translateY(-3px); }
+
+    /* Đăng xuất - To rõ, đậm màu */
+    .btn-logout-new {
+        background: rgba(255, 94, 98, 0.05); border: 1px solid transparent;
+        color: #FF5E62; font-size: 1.1rem; font-weight: 800;
+        padding: 16px; border-radius: 20px; cursor: pointer; transition: 0.3s;
+        display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-logout-new:hover { background: #FF5E62; color: white; box-shadow: 0 10px 25px rgba(255, 94, 98, 0.25); }
+
+    /* Overlay Mobile */
+    .sb-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.2); backdrop-filter: blur(4px); z-index: 999; display: none; opacity: 0; transition: 0.3s; }
+    .sb-overlay.show { display: block; opacity: 1; }
+
+    /* Modal Góp Ý */
+    .modal-fb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 20001; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
+    .modal-fb-box { background: white; padding: 40px; border-radius: 35px; width: 90%; max-width: 480px; position: relative; animation: modalPop 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 40px 100px rgba(0,0,0,0.15); }
+    @keyframes modalPop { from { transform: scale(0.9) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+    .modal-fb-close { position: absolute; top: 25px; right: 30px; font-size: 1.5rem; cursor: pointer; color: #ccc; transition: 0.3s; }
+    .modal-fb-close:hover { color: var(--sb-primary); }
+
+    @media (max-width: 768px) {
+        .sidebar-comp { left: -100%; width: 85%; }
+        .sidebar-comp.open { transform: translateX(100%); }
+    }
+</style>
+
+<div id="sb-overlay" class="sb-overlay"></div>
+
+<aside class="sidebar-comp" id="main-sidebar">
+    <a href="index.html" class="sb-logo">
+        <img src="../LOGO.WEBP" alt="Logo">
+        <span>HOPVAN</span>
+    </a>
+
+    <nav class="sb-list">
+        <a href="../dashboard/index.html" class="sb-link" data-id="overview"><i class="fas fa-home"></i> Tổng quan</a>
+        <a href="../dashboard/bantinvanhoc.html" class="sb-link" data-id="news"><i class="fas fa-newspaper"></i> Bản tin Văn học</a>
+        <a href="../dashboard/congdong.html" class="sb-link" data-id="community"><i class="fas fa-users"></i> Cộng đồng</a>
+        <a href="../dashboard/phongluyende.html" class="sb-link" data-id="practice"><i class="fas fa-pen-nib"></i> Phòng luyện đề</a>
+        <a href="../dashboard/nhatkyhoctap.html" class="sb-link" data-id="journal"><i class="fas fa-book-journal-whills"></i> Nhật ký học tập</a>
+    </nav>
+
+    <div class="sb-footer">
+        <button id="btn-fb-trigger" class="btn-fb-new">
+            <i class="fas fa-comment-dots"></i> Góp ý
+        </button>
+        <button id="btn-logout-trigger" class="btn-logout-new">
+            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+        </button>
+    </div>
+</aside>
+
+<div id="modal-feedback-remaster" class="modal-fb-overlay">
+    <div class="modal-fb-box">
+        <span id="close-fb-remaster" class="modal-fb-close">&times;</span>
+        <h3 style="margin-bottom: 10px; color: #2D3436; font-weight: 800; font-size: 1.5rem;">Góp ý cho Hopvan</h3>
+        <p style="color: #636E72; margin-bottom: 25px; font-size: 0.95rem;">Ý kiến của bạn là động lực để chúng mình hoàn thiện hơn mỗi ngày.</p>
+        
+        <form id="formspree-feedback" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST">
+            <textarea name="message" id="fb-content-text" rows="4" required
+                style="width: 100%; padding: 18px; border: 1.5px solid #eee; border-radius: 20px; margin-bottom: 20px; outline: none; font-family: inherit; transition: 0.3s; resize: none;" 
+                placeholder="Bạn muốn chia sẻ điều gì với chúng mình..."></textarea>
+            <button type="submit" id="fb-submit-btn-remaster"
+                style="width: 100%; padding: 16px; background: var(--sb-gradient); color: white; border: none; border-radius: 18px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 10px 25px rgba(255, 94, 98, 0.2);">
+                Gửi ý kiến ngay
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // --- 1. LOGIC HIGHLIGHT (SỬA LỖI LOẠN) ---
+        const path = window.location.pathname.split('/').pop() || 'index.html';
+        const links = document.querySelectorAll('.sb-link');
+        
+        links.forEach(link => {
+            link.classList.remove('active');
+            const href = link.getAttribute('href');
+            if (path === href) {
+                link.classList.add('active');
+            }
+        });
+
+        // --- 2. MOBILE TOGGLE ---
+        window.toggleSidebarGlobal = function() {
+            document.getElementById('main-sidebar').classList.toggle('open');
+            document.getElementById('sb-overlay').classList.toggle('show');
+        }
+        document.getElementById('sb-overlay').onclick = window.toggleSidebarGlobal;
+
+        // --- 3. ĐĂNG XUẤT (KÍCH HOẠT FIREBASE SIGNOUT) ---
+        document.getElementById('btn-logout-trigger').onclick = function() {
+            if(confirm("Bạn muốn đăng xuất và thoát tài khoản?")) {
+                // Phát tín hiệu cho trang chính (Script Firebase) thực hiện signOut
+                window.dispatchEvent(new Event('firebase-logout-request'));
+            }
+        };
+
+        // --- 4. GÓP Ý FORMSPREE AJAX ---
+        const fbModal = document.getElementById('modal-feedback-remaster');
+        document.getElementById('btn-fb-trigger').onclick = () => fbModal.style.display = 'flex';
+        document.getElementById('close-fb-remaster').onclick = () => fbModal.style.display = 'none';
+        
+        const form = document.getElementById("formspree-feedback");
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("fb-submit-btn-remaster");
+            btn.disabled = true; btn.innerText = "Đang gửi...";
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (response.ok) {
+                    alert("Cảm ơn bạn! ❤️ Chúng mình đã nhận được thư.");
+                    form.reset();
+                    fbModal.style.display = 'none';
+                } else {
+                    alert("Có lỗi xảy ra, bạn thử lại sau nhé.");
+                }
+            } catch (error) {
+                alert("Lỗi kết nối mạng.");
+            } finally {
+                btn.disabled = false; btn.innerText = "Gửi ý kiến ngay";
+            }
+        };
+    })();
+</script>

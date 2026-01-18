@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hopvan - Phòng luyện đề</title>
+    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
+    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+    <meta property="og:url" content="https://hopvan.netlify.app" />
+    <meta property="og:type" content="article" />
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
+            --text-main: #2D3436;
+            --text-light: #636E72;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --sidebar-width: 260px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: #FFF5EC; height: 100vh; overflow: hidden; display: flex; }
+
+        /* --- BACKGROUND BLOBS --- */
+        .background-blobs { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: floatBlob 10s infinite alternate; }
+        .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
+        .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; }
+        @keyframes floatBlob { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 50px); } }
+
+        /* --- MAIN LAYOUT --- */
+        .dashboard-container { width: 100%; height: 100%; display: flex; position: relative; }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            height: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            border-left: 1px solid rgba(255, 255, 255, 0.8);
+            padding: 40px 60px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Header */
+        .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .welcome-text h2 { font-size: 2.2rem; font-weight: 800; color: var(--text-main); }
+        .user-avatar { width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.4rem; transform: rotate(-5deg); box-shadow: 0 8px 20px rgba(255, 143, 80, 0.3); }
+
+        /* --- PHÒNG LUYỆN ĐỀ AREA --- */
+        .section-title { display: flex; align-items: center; gap: 12px; font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
+        .section-desc { color: var(--text-light); margin-bottom: 30px; font-size: 1rem; }
+
+        .practice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1000px; }
+        
+        /* Hiệu ứng Hover xịn từ Dashboard cũ */
+        .card {
+            border-radius: 35px; padding: 40px; position: relative; overflow: hidden; cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); height: 260px;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .card:hover { 
+            transform: translateY(-12px) scale(1.02); 
+            box-shadow: 0 30px 60px rgba(255, 143, 80, 0.2); 
+        }
+
+        .card-orange { background: var(--primary-gradient); color: white; }
+        .card-white { background: white; color: var(--text-main); border: 1px solid rgba(0,0,0,0.03); }
+
+        .card-title { font-size: 1.8rem; font-weight: 800; line-height: 1.2; z-index: 2; }
+        .card-desc { font-size: 1rem; opacity: 0.9; max-width: 85%; z-index: 2; margin-top: 10px; }
+        
+        .card-btn {
+            display: inline-flex; align-items: center; gap: 10px; padding: 12px 25px; border-radius: 50px;
+            font-weight: 700; font-size: 0.95rem; transition: 0.3s; z-index: 2; width: fit-content;
+        }
+        .card-orange .card-btn { background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(10px); }
+        .card-white .card-btn { background: #FFF5EC; color: var(--primary); }
+        
+        .card-icon-bg { position: absolute; right: -20px; bottom: -20px; font-size: 10rem; opacity: 0.1; transform: rotate(-15deg); transition: 0.5s; }
+        .card:hover .card-icon-bg { transform: rotate(0deg) scale(1.1); opacity: 0.2; }
+
+        /* --- MODAL CHỌN CHỦ ĐỀ (GIỐNG ẢNH 2) --- */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+            z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s;
+        }
+        .modal-box {
+            background: white; width: 90%; max-width: 850px; padding: 50px; border-radius: 40px;
+            position: relative; animation: popUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.15);
+        }
+        .close-modal { position: absolute; top: 25px; right: 30px; font-size: 1.8rem; cursor: pointer; color: #ccc; transition: 0.2s; }
+        .close-modal:hover { color: var(--primary); }
+
+        .modal-header { text-align: center; margin-bottom: 40px; }
+        .modal-header h3 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+        .modal-header p { color: var(--text-light); }
+
+        .topics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .topic-item {
+            background: #fff; border: 1px solid #f0f0f0; border-radius: 25px; padding: 30px 15px;
+            text-align: center; transition: 0.3s; cursor: pointer;
+        }
+        .topic-item:hover { 
+            border-color: var(--primary); background: #FFF5EC; transform: translateY(-5px); 
+            box-shadow: 0 15px 30px rgba(255, 143, 80, 0.1);
+        }
+        .topic-icon-circle {
+            width: 70px; height: 70px; background: #FFF5EC; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            margin: 0 auto 15px; font-size: 1.5rem; color: var(--primary);
+            transition: 0.3s;
+        }
+        .topic-item:hover .topic-icon-circle { background: var(--primary-gradient); color: white; }
+        .topic-item span { font-weight: 700; color: var(--text-main); font-size: 1rem; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popUp { from { transform: scale(0.9) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+
+        @media (max-width: 768px) {
+            .main-content { margin-left: 0; width: 100%; padding: 25px 20px; }
+            .practice-grid, .topics-grid { grid-template-columns: 1fr; }
+            .modal-box { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+    
+    <div id="menu-placeholder"></div>
+
+    <main class="main-content">
+        <div class="user-header">
+            <div class="welcome-text">
+                <h2 id="welcome-name">Xin chào...</h2>
+                <p style="color: var(--text-light); margin-top: 5px;">Hôm nay bạn muốn chinh phục tác phẩm nào?</p>
+            </div>
+            <div class="user-avatar" id="avatar-initial">P</div>
+        </div>
+
+        <div class="section-title">
+            <i class="fas fa-feather-alt" style="color: var(--primary);"></i> Phòng Luyện Đề AI
+        </div>
+        <p class="section-desc">Hệ thống chấm điểm và sửa lỗi tự động 24/7.</p>
+
+        <div class="practice-grid">
+            <div class="card card-orange" onclick="goToExam('random')">
+                <div class="card-content">
+                    <div class="card-title">Luyện đề<br>Ngẫu nhiên</div>
+                    <p class="card-desc">Thử thách bản thân với đề bài bất kỳ từ kho dữ liệu.</p>
+                </div>
+                <div class="card-btn">Bắt đầu ngay <i class="fas fa-arrow-right"></i></div>
+                <i class="fas fa-dice card-icon-bg"></i>
+            </div>
+
+            <div class="card card-white" onclick="openTopicModal()">
+                <div class="card-content">
+                    <div class="card-title">Chọn theo<br>Chủ đề</div>
+                    <p class="card-desc">Ôn tập chuyên sâu: Thơ Mới, Truyện Ngắn, Kịch...</p>
+                </div>
+                <div class="card-btn">Xem danh sách <i class="fas fa-list-ul"></i></div>
+                <i class="fas fa-layer-group card-icon-bg"></i>
+            </div>
+        </div>
+    </main>
+
+    <div id="topicModal" class="modal-overlay">
+        <div class="modal-box">
+            <span class="close-modal" onclick="closeTopicModal()">&times;</span>
+            
+            <div class="modal-header">
+                <h3>Chọn chủ đề ôn luyện</h3>
+                <p>Bạn muốn ôn kỹ phần nào hôm nay?</p>
+            </div>
+
+            <div class="topics-grid">
+                <div class="topic-item" onclick="goToExam('tho')">
+                    <div class="topic-icon-circle"><i class="fas fa-wind"></i></div>
+                    <span>Thơ & Thơ Mới</span>
+                </div>
+                <div class="topic-item" onclick="goToExam('truyen')">
+                    <div class="topic-icon-circle"><i class="fas fa-book-open"></i></div>
+                    <span>Truyện Ngắn</span>
+                </div>
+                <div class="topic-item" onclick="goToExam('ky')">
+                    <div class="topic-icon-circle"><i class="fas fa-pen-nib"></i></div>
+                    <span>Ký & Tùy Bút</span>
+                </div>
+                <div class="topic-item" onclick="goToExam('kich')">
+                    <div class="topic-icon-circle"><i class="fas fa-theater-masks"></i></div>
+                    <span>Vở Kịch</span>
+                </div>
+                <div class="topic-item" onclick="goToExam('nlxh')">
+                    <div class="topic-icon-circle"><i class="fas fa-globe-asia"></i></div>
+                    <span>Nghị Luận Xã Hội</span>
+                </div>
+                <div class="topic-item" onclick="goToExam('doc-hieu')">
+                    <div class="topic-icon-circle"><i class="fas fa-search"></i></div>
+                    <span>Đọc Hiểu</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fetch Menu
+        fetch('menu.html').then(res => res.text()).then(html => {
+            const ph = document.getElementById('menu-placeholder');
+            ph.innerHTML = html;
+            ph.querySelectorAll('script').forEach(s => eval(s.innerText));
+        });
+
+        // Modal Logic
+        window.openTopicModal = () => document.getElementById('topicModal').style.display = 'flex';
+        window.closeTopicModal = () => document.getElementById('topicModal').style.display = 'none';
+        
+        // Đóng khi click ra ngoài
+        window.onclick = (e) => {
+            if(e.target == document.getElementById('topicModal')) closeTopicModal();
+        }
+
+        // Chuyển trang
+        window.goToExam = (type) => {
+            localStorage.setItem('selectedTopic', type);
+            window.location.href = "../phongluyende";
+        };
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const name = user.displayName || user.email.split('@')[0];
+                document.getElementById('welcome-name').innerText = `Xin chào, ${name}`;
+                document.getElementById('avatar-initial').innerText = name.charAt(0).toUpperCase();
+            }
+        });
+    </script>
+</body>
+</html>
