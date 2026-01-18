@@ -4,18 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hopvan - Nhật Ký Học Tập</title>
-    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
-    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
-    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
-    <meta property="og:url" content="https://hopvan.netlify.app" />
-    <meta property="og:type" content="article" />
+    
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
-
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
+        /* Giữ nguyên root primary color */
         :root { --primary: #FF8F50; --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62); --sidebar-width: 280px; }
         * { font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.3s ease; }
         body { background-color: #FFF5EC; min-height: 100vh; display: flex; overflow-x: hidden; }
@@ -23,17 +19,23 @@
         #menu-placeholder { width: var(--sidebar-width); flex-shrink: 0; z-index: 100; }
         .main-content { flex-grow: 1; padding: 40px; position: relative; min-height: 100vh; }
 
+        /* --- GREETING CARD (MÀU CAM ĐỘC QUYỀN MỚI) --- */
         .welcome-card {
-            background: linear-gradient(135deg, #fceabb 0%, #f8b500 100%);
-            border-radius: 35px; padding: 40px; color: #5d4037;
-            box-shadow: 0 15px 35px rgba(248, 181, 0, 0.15); position: relative; overflow: hidden; margin-bottom: 60px;
-            border: 1px solid rgba(255,255,255,0.3);
+            /* Sử dụng gradient cam đậm, đồng bộ với màu thương hiệu */
+            background: linear-gradient(135deg, #FF9F68 0%, #FF5E62 100%);
+            border-radius: 35px; padding: 40px; 
+            color: #ffffff; /* Chữ màu trắng nổi bật */
+            /* Bóng đổ màu cam đỏ */
+            box-shadow: 0 20px 40px rgba(255, 94, 98, 0.3); 
+            position: relative; overflow: hidden; margin-bottom: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .welcome-card::after {
             content: '\f5da'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
-            position: absolute; right: -20px; bottom: -20px; font-size: 12rem; opacity: 0.07; transform: rotate(-15deg);
+            position: absolute; right: -20px; bottom: -20px; font-size: 12rem; opacity: 0.1; transform: rotate(-15deg);
         }
 
+        /* --- ZIGZAG PATH --- */
         .path-wrapper { position: relative; width: 100%; max-width: 450px; margin: 0 auto; padding-top: 20px; min-height: 1000px; }
         .path-container { position: relative; display: flex; flex-direction: column; align-items: center; gap: 110px; z-index: 10; }
         
@@ -75,19 +77,20 @@
     <main class="main-content">
         <div class="welcome-card">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                <div>
-                    <h1 class="text-3xl font-black mb-1 text-[#5d4037]">Xin chào, <span id="user-display-name"></span>!</h1>
-                    <p class="text-[#8d6e63] font-bold opacity-80">Chào mừng bạn quay lại với lộ trình học tập.</p>
+                <div class="z-10">
+                    <h1 class="text-3xl font-black mb-1 text-white">Xin chào, <span id="user-display-name"></span></h1>
+                    <p class="font-bold text-white/90">Sẵn sàng bứt phá giới hạn bản thân hôm nay chưa?</p>
+                    
                     <div class="flex gap-3 mt-5">
-                        <div class="bg-white/50 backdrop-blur-md px-4 py-2 rounded-2xl flex items-center gap-2 font-black text-[#5d4037]">
-                            <i class="fas fa-fire text-orange-600"></i> Streak: <span id="streak-val"></span>
+                        <div class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-2xl flex items-center gap-2 font-black text-white border border-white/30">
+                            <i class="fas fa-fire"></i> Streak: <span id="streak-val">0</span>
                         </div>
-                        <div class="bg-white/50 backdrop-blur-md px-4 py-2 rounded-2xl flex items-center gap-2 font-black text-[#5d4037]">
-                            <i class="fas fa-trophy text-yellow-700"></i> Level: <span id="level-val"></span>
+                        <div class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-2xl flex items-center gap-2 font-black text-white border border-white/30">
+                            <i class="fas fa-trophy"></i> Level: <span id="level-val">0</span>
                         </div>
                     </div>
                 </div>
-                <div id="avatar-initial" class="w-20 h-20 bg-white text-[#f8b500] rounded-[25px] flex items-center justify-center font-black text-3xl shadow-xl transform rotate-6 border-4 border-white/50"></div>
+                <div id="avatar-initial" class="w-20 h-20 bg-white text-orange-500 rounded-[25px] flex items-center justify-center font-black text-3xl shadow-xl transform rotate-6 border-4 border-white/50 z-10"></div>
             </div>
         </div>
 
@@ -185,14 +188,13 @@
 
             if (lvl.id <= userLevel) {
                 node.onclick = () => {
-                    // ĐIỀU HƯỚNG RIÊNG CHO LEVEL 1 VÀ 2
-                if (lvl.id === 1) {
-                    window.location.href = '../nhatkyhoctap/1.html';
-                } else if (lvl.id === 2) {
-                    window.location.href = '../nhatkyhoctap/2.html';
-                } else if (lvl.id === 3) {
-                    window.location.href = '../nhatkyhoctap/3.html'; // Thêm dòng này cho bài 3
-                }
+                    if (lvl.id === 1) window.location.href = '../nhatkyhoctap/1.html';
+                    else if (lvl.id === 2) window.location.href = '../nhatkyhoctap/2.html';
+                    else if (lvl.id === 3) window.location.href = '../nhatkyhoctap/3.html';
+                    else if (lvl.id === 4) window.location.href = '../nhatkyhoctap/4.html';
+                    else if (lvl.id === 5) window.location.href = '../nhatkyhoctap/5.html';
+                    else if (lvl.id === 6) window.location.href = '../nhatkyhoctap/6.html';
+                    else if (lvl.id === 7) window.location.href = '../nhatkyhoctap/7.html';
                 };
             }
             container.appendChild(node);
@@ -216,17 +218,14 @@
         nodes.forEach((node, i) => {
             const rect = node.getBoundingClientRect();
             const wrapperRect = wrapper.getBoundingClientRect();
-
             const x = rect.left + rect.width / 2 - wrapperRect.left;
             const y = rect.top + rect.height / 2 - wrapperRect.top;
 
-            if (i === 0) {
-                pathData += `M ${x} ${y}`;
-            } else {
+            if (i === 0) { pathData += `M ${x} ${y}`; } 
+            else {
                 const prevRect = nodes[i-1].getBoundingClientRect();
                 const px = prevRect.left + prevRect.width / 2 - wrapperRect.left;
                 const py = prevRect.top + prevRect.height / 2 - wrapperRect.top;
-                
                 const controlY = (y + py) / 2;
                 pathData += ` C ${px} ${controlY}, ${x} ${controlY}, ${x} ${y}`;
             }
@@ -235,12 +234,12 @@
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         path.setAttribute("d", pathData);
         path.setAttribute("fill", "none");
-        path.setAttribute("stroke", "#f8b500");
+        // Đổi màu đường dẫn sang cam để đồng bộ
+        path.setAttribute("stroke", "#FF8F50"); 
         path.setAttribute("stroke-width", "10");
         path.setAttribute("stroke-linecap", "round");
         path.setAttribute("stroke-dasharray", "1, 20"); 
-        path.setAttribute("opacity", "0.35");
-        
+        path.setAttribute("opacity", "0.4");
         svg.appendChild(path);
     }
 
