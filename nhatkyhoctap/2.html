@@ -144,16 +144,15 @@
     const API_URL = `../.netlify/functions/gemini-proxy`;
     let userUid = null;
 
-    onAuthStateChanged(auth, (u) => {
+onAuthStateChanged(auth, (u) => {
         if (u) { userUid = u.uid; } else { window.location.href = "../../log.html"; }
     });
 
-    // SỬA ĐƯỜNG DẪN FETCH MENU & HIGHLIGHT
-    fetch('menu.html').then(r => r.text()).then(html => {
+    // --- SỬA LẠI ĐƯỜNG DẪN FETCH MENU ---
+    fetch('../menu.html').then(r => r.text()).then(html => {
         document.getElementById('menu-placeholder').innerHTML = html;
         setTimeout(() => {
             document.querySelectorAll('.sb-link').forEach(link => {
-                // TÌM VÀ BÔI ĐẬM MENU NHẬT KÝ
                 if(link.getAttribute('href').includes('nhatkyhoctap')) link.classList.add('active');
             });
         }, 200);
@@ -165,15 +164,16 @@
 
         document.getElementById('loading-overlay').style.display = 'flex';
 
+        // Prompt đã oke, AI sẽ trả về nhận xét cho grade_title và grade_desc
         const systemPrompt = `Bạn là chuyên gia Ngữ Văn chấm bài Nghị luận xã hội. 
         Đề bài: Suy nghĩ về giá trị và tầm quan trọng của thời gian. 
         Chấm điểm thang 100. TRẢ VỀ JSON:
         {
             "score": 80,
             "grade_title": "Hoàn thành xuất sắc / Đạt / Cần cố gắng",
-            "grade_desc": "Nhận xét ngắn",
+            "grade_desc": "Lời nhắn tổng quan cho học sinh",
             "correction_html": "Bài làm bọc trong các thẻ span text-good, text-bad, text-fix",
-            "pros": [], "cons": []
+            "pros": ["Điểm tốt 1"], "cons": ["Điểm cần sửa 1"]
         }`;
 
         try {
@@ -183,19 +183,18 @@
                 body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\n\nBÀI LÀM:\n" + content }] }] })
             });
 
-            if (!response.ok) throw new Error("Server AI lỗi");
+            if (!response.ok) throw new Error("Server AI lỗi. Hãy kiểm tra lại Netlify Function!");
 
             const data = await response.json();
             const rawText = data.candidates[0].content.parts[0].text;
             
-            // Trích xuất JSON an toàn
             const jsonStart = rawText.indexOf('{');
             const jsonEnd = rawText.lastIndexOf('}') + 1;
             const result = JSON.parse(rawText.substring(jsonStart, jsonEnd));
 
+            // Hiển thị kết quả (Bao gồm title và desc không còn bị missing)
             document.getElementById('result-box').classList.remove('hidden');
             document.getElementById('score-display').innerText = result.score;
-            document.getElementById('score-display').style.borderColor = result.score >= 60 ? '#58cc02' : '#ff4b4b';
             document.getElementById('grade-title').innerText = result.grade_title;
             document.getElementById('grade-desc').innerText = result.grade_desc;
             document.getElementById('ai-correction').innerHTML = result.correction_html;
@@ -203,17 +202,16 @@
             document.getElementById('cons-list').innerHTML = result.cons.map(i => `<li>• ${i}</li>`).join('');
             document.getElementById('editor-box').style.display = 'none';
 
-            // LOGIC MỞ LEVEL 3 TRÊN FIREBASE
+            // LOGIC MỞ LEVEL 3 TRÊN FIREBASE - CHUẨN OKE
             if (result.score >= 60) {
                 const userRef = doc(db, "users_progress", userUid);
                 const userSnap = await getDoc(userRef);
                 let currentDbLevel = (userSnap.exists()) ? userSnap.data().currentLevel : 1;
 
-                // NẾU XONG BÀI 2 THÌ MỞ BÀI 3
                 if (currentDbLevel <= 2) {
                     await setDoc(userRef, { currentLevel: 3 }, { merge: true });
                 }
-                alert("Tuyệt vời! Lộ trình chặng 3 đã sẵn sàng.");
+                alert("Chúc mừng! Lộ trình bài 3 đã được mở khóa.");
             }
 
             await addDoc(collection(db, "activities"), {
@@ -224,7 +222,7 @@
 
         } catch (e) {
             console.error(e);
-            alert("Lỗi chấm bài. Có thể do lỗi mạng hoặc AI đang bận. Bạn hãy thử lại nhé!");
+            alert("Lỗi kết nối. Hãy đảm bảo bạn đã deploy Netlify Function thành công!");
         } finally {
             document.getElementById('loading-overlay').style.display = 'none';
         }

@@ -175,57 +175,85 @@
 // Tìm đoạn xử lý AI trong <script> và thay bằng đoạn này:
 document.getElementById('submit-btn').onclick = async () => {
     const content = document.getElementById('student-essay').value.trim();
-    if (content.split(/\s+/).length < 50) return alert("Bài viết quá ngắn!");
+    if (content.split(/\s+/).length < 50) return alert("Bài viết của bạn quá ngắn!");
 
     document.getElementById('loading-overlay').style.display = 'flex';
 
+    // SỬA PROMPT: Yêu cầu AI nhận xét cụ thể thay vì để "..."
     const systemPrompt = `Bạn là chuyên gia Ngữ Văn chấm bài Nghị luận xã hội. 
-    Đề bài: Sức mạnh của nghị lực sống. Chấm điểm thang 100. 
-    TRẢ VỀ JSON: {"score": 85, "grade_title": "...", "grade_desc": "...", "correction_html": "...", "pros": [], "cons": []}`;
+    Đề bài: Sức mạnh của nghị lực sống. Hãy chấm điểm trên thang 100.
+    YÊU CẦU TRẢ VỀ JSON CHÍNH XÁC: 
+    {
+        "score": 85, 
+        "grade_title": "Nhận xét ngắn (VD: Rất tốt, Khá, Trung bình)", 
+        "grade_desc": "Lời khuyên tổng quan về bài làm trong 1 câu", 
+        "correction_html": "Bài làm bọc trong các thẻ span text-good (đúng), text-bad (sai), text-fix (sửa lại)", 
+        "pros": ["ưu điểm 1", "ưu điểm 2"], 
+        "cons": ["lỗi 1", "lỗi 2"]
+    }`;
 
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\n\nBÀI LÀM:\n" + content }] }] })
+            body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\n\nBÀI LÀM CỦA HỌC SINH:\n" + content }] }] })
         });
 
-        // Kiểm tra nếu response không thành công
         if (!response.ok) throw new Error("Server AI đang bận hoặc đường dẫn sai.");
 
         const data = await response.json();
         
-        // KIỂM TRA DỮ LIỆU TRƯỚC KHI ĐỌC '0'
-        if (!data.candidates || !data.candidates[0]) {
-            throw new Error("AI không trả về kết quả hợp lệ.");
-        }
+        if (!data.candidates || !data.candidates[0]) throw new Error("AI không trả về kết quả.");
 
         const rawText = data.candidates[0].content.parts[0].text;
         const result = JSON.parse(rawText.substring(rawText.indexOf('{'), rawText.lastIndexOf('}') + 1));
 
-        // Hiển thị UI kết quả
+        // HIỂN THỊ KẾT QUẢ: Gán các thông tin bị "missing" vào UI
         document.getElementById('result-box').classList.remove('hidden');
         document.getElementById('score-display').innerText = result.score;
+        document.getElementById('score-display').style.borderColor = result.score >= 60 ? '#58cc02' : '#ff4b4b';
+        
+        // Cập nhật Tiêu đề và Mô tả từ AI
+        document.getElementById('grade-title').innerText = result.grade_title;
+        document.getElementById('grade-desc').innerText = result.grade_desc;
+        
         document.getElementById('ai-correction').innerHTML = result.correction_html;
         document.getElementById('pros-list').innerHTML = result.pros.map(i => `<li>• ${i}</li>`).join('');
         document.getElementById('cons-list').innerHTML = result.cons.map(i => `<li>• ${i}</li>`).join('');
         document.getElementById('editor-box').style.display = 'none';
 
-        // LƯU DATABASE & MỞ LEVEL 2
-        if (result.score >= 60) {
+        // LƯU DATABASE: Đồng bộ với nhatkyhoctap.html
+        if (result.score >= 60 && userUid) {
             const userRef = doc(db, "users_progress", userUid);
             const userSnap = await getDoc(userRef);
-            let currentDbLevel = (userSnap.exists()) ? userSnap.data().currentLevel : 1;
-
-            if (currentDbLevel <= 1) {
-                await setDoc(userRef, { currentLevel: 2 }, { merge: true });
+            
+            let currentDbLevel = 1;
+            if (userSnap.exists()) {
+                currentDbLevel = userSnap.data().currentLevel || 1;
             }
-            alert("Chúc mừng! Bạn đã mở khóa Level 2.");
+
+            // Chỉ cập nhật nếu người dùng đang ở Level 1
+            if (currentDbLevel <= 1) {
+                await setDoc(userRef, { 
+                    currentLevel: 2,
+                    lastPassed: serverTimestamp() 
+                }, { merge: true });
+                alert("Chúc mừng! Bạn đã mở khóa Level 2 thành công.");
+            }
+        } else if (result.score < 60) {
+            alert("Bạn cần đạt trên 60 điểm để mở khóa bài tiếp theo.");
         }
+
+        // Lưu hoạt động lịch sử
+        await addDoc(collection(db, "activities"), {
+            uid: userUid,
+            action: "Đã vượt qua Level 1 với " + result.score + " điểm",
+            timestamp: serverTimestamp()
+        });
 
     } catch (e) {
         console.error(e);
-        alert("Lỗi: " + e.message + "\n(Gợi ý: Hãy kiểm tra xem bạn đã đẩy lên Netlify chưa?)");
+        alert("Lỗi: " + e.message);
     } finally {
         document.getElementById('loading-overlay').style.display = 'none';
     }

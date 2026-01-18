@@ -10,7 +10,7 @@
     <meta property="og:url" content="https://hopvan.netlify.app" />
     <meta property="og:type" content="article" />
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -186,14 +186,13 @@
             if (lvl.id <= userLevel) {
                 node.onclick = () => {
                     // ĐIỀU HƯỚNG RIÊNG CHO LEVEL 1 VÀ 2
-                    if (lvl.id === 1) {
-                        window.location.href = '../nhatkyhoctap/1.html';
-                    } else if (lvl.id === 2) {
-                        window.location.href = '../nhatkyhoctap/2.html';
-                    } else {
-                        // Fallback cho các level chưa làm file riêng
-                        window.location.href = `lambai.html?id=${lvl.id}&type=${lvl.type}`;
-                    }
+                if (lvl.id === 1) {
+                    window.location.href = '../nhatkyhoctap/1.html';
+                } else if (lvl.id === 2) {
+                    window.location.href = '../nhatkyhoctap/2.html';
+                } else if (lvl.id === 3) {
+                    window.location.href = '../nhatkyhoctap/3.html'; // Thêm dòng này cho bài 3
+                }
                 };
             }
             container.appendChild(node);
