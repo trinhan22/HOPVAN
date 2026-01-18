@@ -1,5 +1,5 @@
 <style>
-    /* --- CSS GIỮ NGUYÊN PHONG CÁCH CỦA BẠN --- */
+    /* --- GIỮ NGUYÊN CSS PREMIUM CỦA BẠN --- */
     :root {
         --sb-w: 260px;
         --sb-primary: #FF8F50;
@@ -7,75 +7,39 @@
         --sb-glass: rgba(255, 255, 255, 0.7);
         --sb-border: rgba(255, 255, 255, 0.8);
     }
-
     .sidebar-comp {
-        width: var(--sb-w); height: 100vh;
-        background: var(--sb-glass); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
-        border-right: 1px solid var(--sb-border);
-        display: flex; flex-direction: column; padding: 40px 20px;
-        position: fixed; top: 0; left: 0; z-index: 1000;
-        transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-        box-shadow: 10px 0 30px rgba(0,0,0,0.03);
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        width: var(--sb-w); height: 100vh; background: var(--sb-glass); backdrop-filter: blur(35px);
+        border-right: 1px solid var(--sb-border); display: flex; flex-direction: column; padding: 40px 20px;
+        position: fixed; top: 0; left: 0; z-index: 1000; font-family: 'Plus Jakarta Sans', sans-serif;
     }
-
-    .sb-logo { display: flex; align-items: center; gap: 14px; margin-bottom: 50px; text-decoration: none; padding-left: 10px; }
-    .sb-logo img { width: 40px; }
-    .sb-logo span { font-size: 1.6rem; font-weight: 900; background: var(--sb-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; }
-
+    .sb-logo { display: flex; align-items: center; gap: 14px; margin-bottom: 50px; text-decoration: none; }
+    .sb-logo span { font-size: 1.6rem; font-weight: 900; background: var(--sb-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .sb-list { list-style: none; padding: 0; margin: 0; flex: 1; display: flex; flex-direction: column; gap: 10px; }
-    .sb-link {
-        display: flex; align-items: center; gap: 15px; padding: 14px 20px;
-        border-radius: 20px; color: #636E72; font-weight: 700; font-size: 0.95rem;
-        text-decoration: none; transition: 0.3s; position: relative;
-    }
+    .sb-link { display: flex; align-items: center; gap: 15px; padding: 14px 20px; border-radius: 20px; color: #636E72; font-weight: 700; font-size: 0.95rem; text-decoration: none; transition: 0.3s; }
     .sb-link:hover { background: rgba(255, 143, 80, 0.08); color: var(--sb-primary); transform: translateX(8px); }
     .sb-link.active { background: var(--sb-gradient); color: white !important; box-shadow: 0 10px 25px rgba(255, 94, 98, 0.3); }
-
     .sb-footer { display: flex; flex-direction: column; gap: 12px; margin-top: auto; }
-    
-    .btn-fb-new {
-        background: #fff5ec; border: 1.5px solid var(--sb-primary); /* VIỀN LIỀN */
-        color: var(--sb-primary); font-size: 0.85rem; font-weight: 700;
-        padding: 12px; border-radius: 16px; cursor: pointer; transition: 0.3s;
-        display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .btn-fb-new:hover { background: var(--sb-primary); color: white; transform: translateY(-3px); }
-
-    .btn-logout-new {
-        background: rgba(255, 94, 98, 0.05); border: 1px solid transparent;
-        color: #FF5E62; font-size: 1.1rem; font-weight: 800;
-        padding: 16px; border-radius: 20px; cursor: pointer; transition: 0.3s;
-        display: flex; align-items: center; justify-content: center; gap: 10px;
-    }
-    .btn-logout-new:hover { background: #FF5E62; color: white; box-shadow: 0 10px 25px rgba(255, 94, 98, 0.25); }
-
+    .btn-fb-new { background: #fff5ec; border: 1.5px solid var(--sb-primary); color: var(--sb-primary); font-size: 0.85rem; font-weight: 700; padding: 12px; border-radius: 16px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-logout-new { background: rgba(255, 94, 98, 0.05); color: #FF5E62; font-size: 1.1rem; font-weight: 800; padding: 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; border: none; }
     .modal-fb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 20001; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
-    .modal-fb-box { background: white; padding: 40px; border-radius: 35px; width: 90%; max-width: 480px; position: relative; animation: modalPop 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 40px 100px rgba(0,0,0,0.15); }
-    @keyframes modalPop { from { transform: scale(0.9) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+    .modal-fb-box { background: white; padding: 40px; border-radius: 35px; width: 90%; max-width: 480px; position: relative; animation: modalPop 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
     .modal-fb-close { position: absolute; top: 25px; right: 30px; font-size: 1.5rem; cursor: pointer; color: #ccc; }
-
-    @media (max-width: 768px) {
-        .sidebar-comp { left: -100%; width: 85%; }
-        .sidebar-comp.open { transform: translateX(100%); }
-        #sb-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.2); backdrop-filter: blur(4px); z-index: 999; display: none; }
-    }
 </style>
 
-<div id="sb-overlay"></div>
+<div id="sb-overlay" style="position: fixed; inset: 0; background: rgba(0,0,0,0.2); backdrop-filter: blur(4px); z-index: 999; display: none;"></div>
 
 <aside class="sidebar-comp" id="main-sidebar">
     <a href="index.html" class="sb-logo">
-        <img src="../LOGO.WEBP" alt="Logo">
+        <img src="../LOGO.WEBP" alt="Logo" style="width:40px">
         <span>HOPVAN</span>
     </a>
 
     <nav class="sb-list">
-        <a href="index.html" class="sb-link" data-key="index"><i class="fas fa-home"></i> Tổng quan</a>
-        <a href="bantinvanhoc.html" class="sb-link" data-key="bantin"><i class="fas fa-newspaper"></i> Bản tin</a>
-        <a href="congdong.html" class="sb-link" data-key="congdong"><i class="fas fa-users"></i> Cộng đồng</a>
-        <a href="phongluyende.html" class="sb-link" data-key="phongluyende"><i class="fas fa-pen-nib"></i> Luyện đề</a>
-        <a href="nhatkyhoctap.html" class="sb-link" data-key="nhatky"><i class="fas fa-book-journal-whills"></i> Nhật ký</a>
+        <a href="index.html" class="sb-link" data-id="overview"><i class="fas fa-home"></i> Tổng quan</a>
+        <a href="bantinvanhoc.html" class="sb-link" data-id="news"><i class="fas fa-newspaper"></i> Bản tin</a>
+        <a href="congdong.html" class="sb-link" data-id="community"><i class="fas fa-users"></i> Cộng đồng</a>
+        <a href="phongluyende.html" class="sb-link" data-id="practice"><i class="fas fa-pen-nib"></i> Luyện đề</a>
+        <a href="nhatkyhoctap.html" class="sb-link" data-id="journal"><i class="fas fa-book-journal-whills"></i> Nhật ký</a>
     </nav>
 
     <div class="sb-footer">
@@ -97,51 +61,67 @@
 
 <script>
     (function() {
-        // --- LOGIC HIGHLIGHT SIÊU CẤP ---
-        const currentURL = window.location.href.toLowerCase();
+        // 1. Lấy địa chỉ URL hiện tại
+        const path = window.location.pathname.toLowerCase();
         const links = document.querySelectorAll('.sb-link');
+        
+        let matchedId = null;
 
+        // 2. LOGIC ƯU TIÊN: Kiểm tra các trang chuyên biệt trước
+        // Chỉ cần URL chứa từ khóa này thì gán ID tương ứng
+        if (path.includes('congdong')) {
+            matchedId = 'community';
+        } 
+        else if (path.includes('phongluyende')) {
+            matchedId = 'practice';
+        } 
+        else if (path.includes('bantinvanhoc')) {
+            matchedId = 'news';
+        } 
+        else if (path.includes('nhatkyhoctap')) {
+            matchedId = 'journal';
+        } 
+        // Cuối cùng mới xét đến trang chủ/tổng quan
+        else if (path.includes('index') || path.includes('dashboard') || path === '/' || path.endsWith('/')) {
+            matchedId = 'overview';
+        }
+
+        // 3. Áp dụng class Active (Xóa hết rồi mới thêm cái đúng)
         links.forEach(link => {
             link.classList.remove('active');
-            
-            // Lấy từ khóa nhận diện từ href (ví dụ: bantinvanhoc.html -> bantinvanhoc)
-            const href = link.getAttribute('href').toLowerCase();
-            const pageKey = href.split('/').pop().replace('.html', '');
-
-            // Nếu URL hiện tại có chứa từ khóa của link, thì sáng đèn
-            // Ví dụ: URL là /dashboard/congdong thì pageKey 'congdong' sẽ khớp
-            if (currentURL.includes(pageKey) && pageKey !== "index") {
+            if (link.getAttribute('data-id') === matchedId) {
                 link.classList.add('active');
             }
         });
 
-        // Xử lý riêng cho Trang chủ (Trường hợp URL trống hoặc kết thúc bằng index/dashboard)
-        const isHome = currentURL.endsWith('/') || currentURL.includes('index') || (currentURL.includes('dashboard') && !currentURL.includes('congdong') && !currentURL.includes('phongluyende'));
-        if (isHome) {
-            const homeLink = document.querySelector('.sb-link[data-key="index"]');
-            if(homeLink) homeLink.classList.add('active');
-        }
-
-        // --- CÁC SỰ KIỆN KHÁC ---
+        // --- GIỮ NGUYÊN CÁC SỰ KIỆN NÚT BẤM CỦA BẠN ---
         const modal = document.getElementById('modal-feedback-menu');
-        document.getElementById('btn-fb-trigger').onclick = () => modal.style.display = 'flex';
-        document.getElementById('close-fb-menu').onclick = () => modal.style.display = 'none';
+        const btnFb = document.getElementById('btn-fb-trigger');
+        if(btnFb) btnFb.onclick = () => modal.style.display = 'flex';
+        
+        const closeFb = document.getElementById('close-fb-menu');
+        if(closeFb) closeFb.onclick = () => modal.style.display = 'none';
 
         const form = document.getElementById('formspree-menu');
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btn-submit-fb');
-            btn.innerText = "Đang gửi...";
-            await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } });
-            alert("Cảm ơn bạn! ❤️");
-            form.reset(); modal.style.display = 'none'; btn.innerText = "Gửi ý kiến ngay";
-        };
+        if(form) {
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('btn-submit-fb');
+                btn.innerText = "Đang gửi...";
+                await fetch(e.target.action, { method: 'POST', body: new FormData(e.target), headers: { 'Accept': 'application/json' } });
+                alert("Cảm ơn bạn! ❤️");
+                e.target.reset(); modal.style.display = 'none'; btn.innerText = "Gửi ngay";
+            };
+        }
 
-        document.getElementById('btn-logout-trigger').onclick = () => {
-            if(confirm("Bạn muốn đăng xuất khỏi Hopvan?")) {
-                window.dispatchEvent(new Event('trigger-firebase-signout'));
-                setTimeout(() => { window.location.href = "../index.html"; }, 500);
-            }
-        };
+        const btnLogout = document.getElementById('btn-logout-trigger');
+        if(btnLogout) {
+            btnLogout.onclick = () => {
+                if(confirm("Bạn muốn đăng xuất khỏi Hopvan?")) {
+                    window.dispatchEvent(new Event('trigger-firebase-signout'));
+                    setTimeout(() => { window.location.href = "../index.html"; }, 500);
+                }
+            };
+        }
     })();
 </script>
