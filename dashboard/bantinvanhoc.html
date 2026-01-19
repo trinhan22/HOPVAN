@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hopvan - Bản Tin Văn Học</title>
+    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
+    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+    <meta property="og:url" content="https://hopvan.netlify.app" />
+    <meta property="og:type" content="article" />
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --primary-dark: #FF5E62;
+            --sidebar-width: 280px;
+            --glass-border: rgba(255, 255, 255, 0.5);
+        }
+
+        * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+        
+        /* --- SCROLLBAR ĐẸP --- */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #ffd1b3; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* --- LAYOUT FIX --- */
+        body { 
+            background: #FFF5EC; 
+            height: 100vh; display: flex; overflow: hidden; 
+        }
+        #menu-placeholder { 
+            width: var(--sidebar-width); flex-shrink: 0; height: 100vh; z-index: 50; 
+        }
+        .main-content {
+            flex: 1; height: 100vh; overflow-y: auto; overflow-x: hidden;
+            padding: 40px 60px; position: relative; scroll-behavior: smooth;
+        }
+
+        /* --- ANIMATED BACKGROUND --- */
+        .bg-orb { position: fixed; border-radius: 50%; filter: blur(90px); z-index: -1; opacity: 0.6; pointer-events: none; }
+        .orb-1 { width: 600px; height: 600px; background: #ffdec7; top: -150px; left: 100px; animation: orbFloat 8s infinite alternate; }
+        .orb-2 { width: 500px; height: 500px; background: #ffcfcf; bottom: -100px; right: -50px; animation: orbFloat 10s infinite alternate-reverse; }
+        @keyframes orbFloat { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 40px); } }
+
+        /* --- TITLE WOW EFFECT --- */
+        .text-gradient-anim {
+            background: linear-gradient(to right, #FF8F50, #FF5E62, #FF8F50);
+            background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: gradientMove 3s linear infinite;
+        }
+        @keyframes gradientMove { to { background-position: 200% center; } }
+
+        /* --- SEARCH BAR NEON GLOW --- */
+        .search-container { position: sticky; top: 0; z-index: 40; margin-bottom: 40px; }
+        .search-box {
+            background: rgba(255,255,255,0.7); backdrop-filter: blur(25px);
+            border-radius: 25px; padding: 12px 30px;
+            display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(255,255,255,0.8);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 700px; margin: 0 auto;
+        }
+        .search-box:focus-within {
+            transform: scale(1.02);
+            background: rgba(255,255,255,0.95);
+            box-shadow: 0 20px 50px rgba(255, 143, 80, 0.25), 0 0 0 2px var(--primary);
+        }
+        .search-input {
+            width: 100%; border: none; outline: none; background: transparent;
+            font-size: 1.1rem; font-weight: 600; color: #444;
+        }
+
+        /* --- FILTER TABS --- */
+        .tabs-wrap { display: flex; justify-content: center; gap: 12px; margin-bottom: 50px; flex-wrap: wrap; }
+        .f-btn {
+            padding: 10px 24px; border-radius: 50px; font-weight: 700; font-size: 0.9rem;
+            background: rgba(255,255,255,0.6); color: #666; cursor: pointer; transition: 0.3s;
+            border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(5px);
+        }
+        .f-btn:hover { background: white; transform: translateY(-3px); color: var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .f-btn.active {
+            background: linear-gradient(135deg, #FF8F50, #FF5E62); color: white;
+            box-shadow: 0 10px 25px rgba(255, 94, 98, 0.3); border-color: transparent;
+        }
+
+        /* --- GRID LAYOUT (3x3) --- */
+        .grid-layout { 
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        
+        /* --- CARD STYLING --- */
+        .article-card {
+            background: rgba(255,255,255,0.9); border-radius: 20px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer; transform-style: preserve-3d;
+            position: relative;
+            /* Hiệu ứng xuất hiện */
+            opacity: 0; animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Modern Academic Hover Effect */
+        .article-card:hover { 
+            transform: translateY(-8px) scale(1.02); 
+            box-shadow: 0 20px 40px rgba(255, 143, 80, 0.15); 
+            border-color: var(--primary);
+            z-index: 10; 
+        }
+
+        .article-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(to right, #FF8F50, #FF5E62);
+            transition: width 0.4s ease;
+        }
+
+        .article-card:hover::after {
+            width: 100%;
+        }
+
+        .card-img-wrap { position: relative; height: 200px; overflow: hidden; }
+        .card-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .article-card:hover .card-img { transform: scale(1.1); }
+        
+        .card-badge {
+            position: absolute; top: 15px; left: 15px;
+            background: rgba(255,255,255,0.95); padding: 6px 14px; border-radius: 8px;
+            font-size: 0.75rem; font-weight: 900; color: var(--primary); text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); backdrop-filter: blur(4px);
+        }
+
+        .card-body { padding: 25px; position: relative; }
+        .card-topic { color: #888; font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 8px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .card-title { font-size: 1.25rem; font-weight: 800; color: #2D3436; line-height: 1.4; margin-bottom: 12px; transition: color 0.3s; font-family: 'Plus Jakarta Sans', serif; }
+        .article-card:hover .card-title { color: var(--primary); }
+        .card-summary { font-size: 0.95rem; color: #666; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .highlight { background: #fff3cd; color: #d97706; padding: 0 3px; border-radius: 4px; }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(255, 245, 236, 0.9);
+            z-index: 200; backdrop-filter: blur(20px);
+            justify-content: center; align-items: center; padding: 20px;
+            animation: fadeIn 0.3s;
+        }
+        .modal-content {
+            background: white; width: 100%; max-width: 900px; max-height: 85vh;
+            border-radius: 30px; overflow: hidden; display: flex; flex-direction: column;
+            box-shadow: 0 50px 100px rgba(255, 143, 80, 0.25);
+            border: 1px solid white; position: relative;
+            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalPop { from { transform: scale(0.9) translateY(50px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+        
+        .modal-header { height: 350px; position: relative; overflow: hidden; }
+        .modal-img { width: 100%; height: 100%; object-fit: cover; }
+        .close-modal {
+            position: absolute; top: 25px; right: 25px; width: 45px; height: 45px; 
+            background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transition: 0.3s; color: var(--primary); z-index: 10;
+        }
+        .close-modal:hover { transform: rotate(90deg) scale(1.1); background: var(--primary); color: white; }
+        
+        .modal-body { padding: 50px; overflow-y: auto; }
+        .dt-tag { display: inline-block; background: #FFF5EC; color: var(--primary); padding: 8px 18px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; margin-bottom: 20px; }
+        .dt-title { font-size: 2.5rem; font-weight: 900; color: #2D3436; margin-bottom: 30px; line-height: 1.2; letter-spacing: -0.5px; }
+        .dt-content { font-size: 1.15rem; line-height: 1.9; color: #444; }
+        .quote-box {
+            border-left: 5px solid var(--primary); background: linear-gradient(to right, #fffbf7, #ffffff);
+            padding: 30px; border-radius: 0 20px 20px 0; margin: 30px 0;
+            font-size: 1.25rem; font-style: italic; color: #555; font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            #menu-placeholder { display: none; width: 0; }
+            .main-content { padding: 25px; }
+            .grid-layout { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .grid-layout { grid-template-columns: 1fr; }
+            .dt-title { font-size: 1.8rem; }
+            .modal-content { max-height: 90vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    
+    <div id="menu-placeholder"></div>
+
+    <main class="main-content">
+        <div class="text-center mb-12 mt-10"> <h1 class="text-5xl md:text-6xl font-black text-gray-800 mb-4 tracking-tighter">
+                Bản Tin <span class="text-gradient-anim">Văn Học</span>
+            </h1>
+            <p class="text-gray-500 text-xl font-medium">Kho tàng tư liệu "đắt giá" cho bài văn điểm 9+</p>
+        </div>
+
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search text-orange-500 text-xl"></i>
+                <input type="text" id="search-input" class="search-input" placeholder="Tìm chủ đề, dẫn chứng, tác giả...">
+            </div>
+        </div>
+
+        <div class="tabs-wrap">
+            <button class="f-btn active" onclick="filterData('all')"><i class="fas fa-layer-group"></i> Tất cả</button>
+            <button class="f-btn" onclick="filterData('NLXH')"><i class="fas fa-fire"></i> Dẫn chứng NLXH</button>
+            <button class="f-btn" onclick="filterData('LyLuan')"><i class="fas fa-book-open"></i> Lý luận văn học</button>
+            <button class="f-btn" onclick="filterData('KyNang')"><i class="fas fa-pen-nib"></i> Văn hay chữ tốt</button>
+        </div>
+
+        <div class="grid-layout" id="news-grid">
+            <div class="text-center w-full col-span-3 py-10 font-bold text-gray-400">Đang tải dữ liệu...</div>
+        </div>
+    </main>
+
+    <div id="detail-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <img id="m-img" class="modal-img" src="" alt="">
+                <div class="close-modal" onclick="closeModal()"><i class="fas fa-times text-xl"></i></div>
+            </div>
+            <div class="modal-body">
+                <span id="m-topic" class="dt-tag">CHỦ ĐỀ</span>
+                <h2 id="m-title" class="dt-title">Tiêu đề bài viết</h2>
+                <div id="m-body" class="dt-content"></div>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    let allNews = [];
+    let currentFilter = 'all';
+
+    // 1. TẢI DỮ LIỆU JSON
+    async function loadData() {
+        try {
+            const [nlxh, lyluan, kynang] = await Promise.all([
+                fetch('../bantinvanhoc/data-nlxh.json').then(r => r.ok ? r.json() : []).catch(() => []),
+                fetch('../bantinvanhoc/data-lyluan.json').then(r => r.ok ? r.json() : []).catch(() => []),
+                fetch('../bantinvanhoc/data-kynang.json').then(r => r.ok ? r.json() : []).catch(() => [])
+            ]);
+            
+            allNews = [...nlxh, ...lyluan, ...kynang];
+            
+            // DỮ LIỆU FALLBACK (Phòng khi chưa có file JSON)
+            if(allNews.length === 0) {
+                allNews = [
+                    {id: 1, category: "Đang tải...", topic: "Đang tải...", title: "Đang tải...", img: "../panel.webp", summary: "Đang tải...", content: "<p>Đang tải...</p>"},
+                    {id: 2, category: "Đang tải...", topic: "Đang tải...", title: "Đang tải...", img: "../panel.webp", summary: "Đang tải...", content: "<p>Đang tải...</p>"},
+                    {id: 3, category: "Đang tải...", topic: "Đang tải...", title: "Đang tải...", img: "../panel.webp", summary: "Đang tải...", content: "<p>Đang tải...</p>"},
+                    {id: 4, category: "Đang tải...", topic: "Đang tải...", title: "Đang tải...", img: "../panel.webp", summary: "Đang tải...", content: "<p>Đang tải...</p>"}
+                ];
+            }
+            allNews.sort(() => Math.random() - 0.5);
+            renderGrid(allNews);
+        } catch (e) {
+            document.getElementById('news-grid').innerHTML = '<p class="text-center font-bold text-gray-400">Đang cập nhật...</p>';
+        }
+    }
+
+    // 2. RENDER GRID (ANIMATION STAGGERED)
+    function renderGrid(data, keyword = "") {
+        const grid = document.getElementById('news-grid');
+        if(data.length === 0) {
+            grid.innerHTML = '<div class="text-center py-20 text-gray-400 font-bold w-full col-span-full">Không tìm thấy bài viết nào.</div>';
+            return;
+        }
+
+        grid.innerHTML = data.map((item, index) => {
+            let titleHtml = item.title;
+            if(keyword) {
+                const regex = new RegExp(`(${keyword})`, 'gi');
+                titleHtml = item.title.replace(regex, '<span class="highlight">$1</span>');
+            }
+
+            // Thêm animation-delay để thẻ bay lên lần lượt
+            return `
+            <div class="article-card" style="animation-delay: ${index * 0.1}s" onclick="window.openDetail('${item.id}')">
+                <div class="card-img-wrap">
+                    <img src="${item.img}" class="card-img" loading="lazy">
+                    <span class="card-badge">${getCatName(item.category)}</span>
+                </div>
+                <div class="card-body">
+                    <span class="card-topic"><i class="fas fa-hashtag text-orange-400"></i> ${item.topic}</span>
+                    <h3 class="card-title">${titleHtml}</h3>
+                    <p class="card-summary">${item.summary}</p>
+                </div>
+            </div>
+            `;
+        }).join('');
+    }
+
+    function getCatName(cat) {
+        if(cat === 'NLXH') return 'Dẫn chứng';
+        if(cat === 'LyLuan') return 'Lý luận';
+        return 'Văn hay chữ tốt';
+    }
+
+    // 3. SEARCH & FILTER
+    function removeAccents(str) { return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
+
+    document.getElementById('search-input').addEventListener('input', (e) => {
+        const rawKeyword = e.target.value;
+        const keyword = removeAccents(rawKeyword);
+        const filtered = allNews.filter(item => {
+            const matchCat = currentFilter === 'all' || item.category === currentFilter;
+            const matchSearch = removeAccents(item.title).includes(keyword) || removeAccents(item.topic).includes(keyword);
+            return matchCat && matchSearch;
+        });
+        renderGrid(filtered, rawKeyword);
+    });
+
+    window.filterData = (cat) => {
+        currentFilter = cat;
+        document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('search-input').value = "";
+        renderGrid(cat === 'all' ? allNews : allNews.filter(i => i.category === cat));
+    };
+
+    // 4. MODAL
+    window.openDetail = (id) => {
+        const item = allNews.find(i => i.id == id);
+        if(!item) return;
+        document.getElementById('m-img').src = item.img;
+        document.getElementById('m-topic').innerText = item.topic;
+        document.getElementById('m-title').innerText = item.title;
+        document.getElementById('m-body').innerHTML = item.content;
+        document.getElementById('detail-modal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeModal = () => {
+        document.getElementById('detail-modal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    };
+
+    window.addEventListener('click', (e) => {
+        if(e.target === document.getElementById('detail-modal')) window.closeModal();
+    });
+
+    // INIT
+    loadData();
+    onAuthStateChanged(auth, (u) => { if(!u) window.location.href="../log.html"; });
+    
+    // FETCH MENU & RESTORE ICONS
+    fetch('menu.html').then(r => r.text()).then(html => {
+        const ph = document.getElementById('menu-placeholder');
+        ph.innerHTML = html;
+        ph.querySelectorAll('script').forEach(s => {
+            const n = document.createElement('script'); n.text = s.text; document.body.appendChild(n);
+        });
+        setTimeout(() => document.querySelectorAll('.sb-link').forEach(l => l.href.includes('bantinvanhoc') && l.classList.add('active')), 100);
+    });
+
+    window.addEventListener('trigger-firebase-signout', async () => { await signOut(auth); window.location.href = "../index.html"; });
+</script>
+</body>
+</html>
