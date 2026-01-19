@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hopvan - Phòng luyện đề</title>
+    <title>Hopvan - Phòng Luyện Đề</title>
     <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
     <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
     <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
@@ -13,6 +13,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         :root {
@@ -27,14 +28,12 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background-color: #FFF5EC; height: 100vh; overflow: hidden; display: flex; }
 
-        /* --- BACKGROUND BLOBS --- */
         .background-blobs { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
         .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: floatBlob 10s infinite alternate; }
         .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
         .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; }
         @keyframes floatBlob { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 50px); } }
 
-        /* --- MAIN LAYOUT --- */
         .dashboard-container { width: 100%; height: 100%; display: flex; position: relative; }
 
         .main-content {
@@ -49,116 +48,56 @@
             position: relative;
         }
 
-        /* Header */
         .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
         .welcome-text h2 { font-size: 2.2rem; font-weight: 800; color: var(--text-main); }
         .user-avatar { width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.4rem; transform: rotate(-5deg); box-shadow: 0 8px 20px rgba(255, 143, 80, 0.3); }
 
-        /* --- PHÒNG LUYỆN ĐỀ AREA --- */
         .section-title { display: flex; align-items: center; gap: 12px; font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
         .section-desc { color: var(--text-light); margin-bottom: 30px; font-size: 1rem; }
 
         .practice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1000px; }
         
-        /* Hiệu ứng Hover xịn từ Dashboard cũ */
         .card {
             border-radius: 35px; padding: 40px; position: relative; overflow: hidden; cursor: pointer;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); height: 260px;
             display: flex; flex-direction: column; justify-content: space-between;
         }
-        .card:hover { 
-            transform: translateY(-12px) scale(1.02); 
-            box-shadow: 0 30px 60px rgba(255, 143, 80, 0.2); 
-        }
-
+        .card:hover { transform: translateY(-12px) scale(1.02); box-shadow: 0 30px 60px rgba(255, 143, 80, 0.2); }
         .card-orange { background: var(--primary-gradient); color: white; }
         .card-white { background: white; color: var(--text-main); border: 1px solid rgba(0,0,0,0.03); }
-
         .card-title { font-size: 1.8rem; font-weight: 800; line-height: 1.2; z-index: 2; }
         .card-desc { font-size: 1rem; opacity: 0.9; max-width: 85%; z-index: 2; margin-top: 10px; }
-        
-        .card-btn {
-            display: inline-flex; align-items: center; gap: 10px; padding: 12px 25px; border-radius: 50px;
-            font-weight: 700; font-size: 0.95rem; transition: 0.3s; z-index: 2; width: fit-content;
-        }
+        .card-btn { display: inline-flex; align-items: center; gap: 10px; padding: 12px 25px; border-radius: 50px; font-weight: 700; font-size: 0.95rem; transition: 0.3s; z-index: 2; width: fit-content; }
         .card-orange .card-btn { background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(10px); }
         .card-white .card-btn { background: #FFF5EC; color: var(--primary); }
-        
         .card-icon-bg { position: absolute; right: -20px; bottom: -20px; font-size: 10rem; opacity: 0.1; transform: rotate(-15deg); transition: 0.5s; }
         .card:hover .card-icon-bg { transform: rotate(0deg) scale(1.1); opacity: 0.2; }
 
-        /* --- MODAL CHỌN CHỦ ĐỀ (GIỐNG ẢNH 2) --- */
-        .modal-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-            z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(8px);
-            animation: fadeIn 0.3s;
-        }
-        .modal-box {
-            background: white; width: 90%; max-width: 850px; padding: 50px; border-radius: 40px;
-            position: relative; animation: popUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 40px 100px rgba(0,0,0,0.15);
-        }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(8px); animation: fadeIn 0.3s; }
+        .modal-box { background: white; width: 90%; max-width: 850px; padding: 50px; border-radius: 40px; position: relative; animation: popUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 40px 100px rgba(0,0,0,0.15); }
         .close-modal { position: absolute; top: 25px; right: 30px; font-size: 1.8rem; cursor: pointer; color: #ccc; transition: 0.2s; }
         .close-modal:hover { color: var(--primary); }
-
         .modal-header { text-align: center; margin-bottom: 40px; }
         .modal-header h3 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
-        .modal-header p { color: var(--text-light); }
-
         .topics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .topic-item {
-            background: #fff; border: 1px solid #f0f0f0; border-radius: 25px; padding: 30px 15px;
-            text-align: center; transition: 0.3s; cursor: pointer;
-        }
-        .topic-item:hover { 
-            border-color: var(--primary); background: #FFF5EC; transform: translateY(-5px); 
-            box-shadow: 0 15px 30px rgba(255, 143, 80, 0.1);
-        }
-        .topic-icon-circle {
-            width: 70px; height: 70px; background: #FFF5EC; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            margin: 0 auto 15px; font-size: 1.5rem; color: var(--primary);
-            transition: 0.3s;
-        }
+        .topic-item { background: #fff; border: 1px solid #f0f0f0; border-radius: 25px; padding: 30px 15px; text-align: center; transition: 0.3s; cursor: pointer; }
+        .topic-item:hover { border-color: var(--primary); background: #FFF5EC; transform: translateY(-5px); box-shadow: 0 15px 30px rgba(255, 143, 80, 0.1); }
+        .topic-icon-circle { width: 70px; height: 70px; background: #FFF5EC; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px; font-size: 1.5rem; color: var(--primary); transition: 0.3s; }
         .topic-item:hover .topic-icon-circle { background: var(--primary-gradient); color: white; }
         .topic-item span { font-weight: 700; color: var(--text-main); font-size: 1rem; }
 
+        .topic-item.locked { filter: grayscale(1); opacity: 0.6; cursor: not-allowed; position: relative; }
+        .topic-item.locked::after { content: "\f023"; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; top: 15px; right: 20px; color: #999; font-size: 1.1rem; }
+        .topic-item.locked:hover { transform: none; border-color: #eee; background: #fff; box-shadow: none; }
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes popUp { from { transform: scale(0.9) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+        @keyframes popUp { from { transform: scale(0.9) translateY(20px); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         @media (max-width: 768px) {
             .main-content { margin-left: 0; width: 100%; padding: 25px 20px; }
             .practice-grid, .topics-grid { grid-template-columns: 1fr; }
             .modal-box { padding: 30px 20px; }
         }
-
-
-        /* Hiệu ứng cho các chủ đề bị khóa */
-.topic-item.locked {
-    filter: grayscale(1); /* Làm xám màu */
-    opacity: 0.6; /* Làm mờ */
-    cursor: not-allowed; /* Đổi icon chuột thành dấu cấm */
-    position: relative;
-}
-
-/* Thêm icon ổ khóa nhỏ ở góc */
-.topic-item.locked::after {
-    content: "\f023"; /* Mã icon ổ khóa của FontAwesome */
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    color: #999;
-    font-size: 1.1rem;
-}
-
-.topic-item.locked:hover {
-    transform: none; /* Bỏ hiệu ứng bay lên khi hover */
-    border-color: #eee;
-    background: #fff;
-    box-shadow: none;
-}
     </style>
 </head>
 <body>
@@ -205,38 +144,31 @@
     <div id="topicModal" class="modal-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="closeTopicModal()">&times;</span>
-            
             <div class="modal-header">
                 <h3>Chọn chủ đề ôn luyện</h3>
                 <p>Bạn muốn ôn kỹ phần nào hôm nay?</p>
             </div>
-
             <div class="topics-grid">
                 <div class="topic-item locked" onclick="alertLocked()">
                     <div class="topic-icon-circle"><i class="fas fa-wind"></i></div>
                     <span>Thơ</span>
                 </div>
-                
                 <div class="topic-item locked" onclick="alertLocked()">
                     <div class="topic-icon-circle"><i class="fas fa-book-open"></i></div>
                     <span>Truyện</span>
                 </div>
-                
                 <div class="topic-item locked" onclick="alertLocked()">
                     <div class="topic-icon-circle"><i class="fas fa-pen-nib"></i></div>
                     <span>Ký & Tùy Bút</span>
                 </div>
-                
                 <div class="topic-item locked" onclick="alertLocked()">
                     <div class="topic-icon-circle"><i class="fas fa-theater-masks"></i></div>
                     <span>Kịch</span>
                 </div>
-
                 <div class="topic-item" onclick="goToExam('nlxh')">
                     <div class="topic-icon-circle"><i class="fas fa-globe-asia"></i></div>
                     <span>Nghị Luận Xã Hội</span>
                 </div>
-                
                 <div class="topic-item" onclick="goToExam('doc-hieu')">
                     <div class="topic-icon-circle"><i class="fas fa-search"></i></div>
                     <span>Đọc Hiểu</span>
@@ -248,9 +180,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // 1. CẤU HÌNH FIREBASE (Giữ nguyên của bạn)
     const firebaseConfig = { 
         apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", 
         authDomain: "hopvan-9a648.firebaseapp.com", 
@@ -262,7 +192,6 @@
     };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app);
 
     // --- A. LOGIC MODAL (PHẢI GÁN VÀO WINDOW) ---
     window.openTopicModal = () => {
@@ -275,52 +204,27 @@
         if(modal) modal.style.display = 'none';
     };
 
-    // Đóng khi click ra ngoài vùng trắng
     window.addEventListener('click', (e) => {
         const modal = document.getElementById('topicModal');
         if (e.target === modal) window.closeTopicModal();
     });
 
-    // --- B. HÀM CHUYỂN TRANG & LƯU DATABASE ---
-// Thêm await vào trước addDoc
-window.goToExam = async (type) => {
-    const user = auth.currentUser;
-    
-    const topicMap = {
-        'random':    { name: 'Đề ngẫu nhiên',    path: '../phongluyende/index.html' },
-        'tho':       { name: 'Thơ',             path: '../phongluyende/tho.html' },
-        'truyen':    { name: 'Truyện',          path: '../phongluyende/truyen.html' },
-        'ky':        { name: 'Ký & Tùy Bút',    path: '../phongluyende/ky.html' },
-        'kich':      { name: 'Kịch',            path: '../phongluyende/kich.html' },
-        'nlxh':      { name: 'Nghị Luận Xã Hội', path: '../phongluyende/nghiluanxahoi.html' },
-        'doc-hieu':  { name: 'Đọc Hiểu',        path: '../phongluyende/dochieu.html' }
+    // --- B. HÀM CHUYỂN TRANG (ĐÃ XOÁ LƯU DATABASE) ---
+    window.goToExam = (type) => {
+        const topicMap = {
+            'random':    { path: '../phongluyende/index.html' },
+            'nlxh':      { path: '../phongluyende/nghiluanxahoi.html' },
+            'doc-hieu':  { path: '../phongluyende/dochieu.html' }
+        };
+
+        const selected = topicMap[type] || topicMap['random'];
+
+        // Lưu trạng thái vào LocalStorage để trang sau biết đang làm chủ đề gì
+        localStorage.setItem('selectedTopic', type);
+
+        // Chuyển hướng trực tiếp không cần đợi Database
+        window.location.href = selected.path;
     };
-
-    const selected = topicMap[type] || topicMap['random'];
-
-    // 1. Lưu trạng thái vào LocalStorage (luôn chạy nhanh)
-    localStorage.setItem('selectedTopic', type);
-
-    // 2. Ghi nhận vào Database (PHẢI ĐỢI)
-    if (user) {
-        try {
-            console.log("Đang lưu hoạt động...");
-            // ÉP TRÌNH DUYỆT ĐỢI LƯU XONG
-            await addDoc(collection(db, "activities"), {
-                uid: user.uid,
-                action: "Bắt đầu luyện đề: " + selected.name,
-                topic: type,
-                timestamp: serverTimestamp()
-            });
-            console.log("Lưu database thành công!");
-        } catch (e) { 
-            console.error("Lưu DB lỗi:", e); 
-        }
-    }
-
-    // 3. Sau khi lưu xong (hoặc lỗi) mới chuyển trang
-    window.location.href = selected.path;
-};
 
     // --- C. ĐỒNG BỘ THÔNG TIN USER ---
     onAuthStateChanged(auth, (user) => {
@@ -333,22 +237,20 @@ window.goToExam = async (type) => {
         }
     });
 
-    // --- D. FETCH MENU & LOGOUT ---
-fetch('menu.html')
-    .then(res => res.text())
-    .then(html => {
-        const placeholder = document.getElementById('menu-placeholder');
-        placeholder.innerHTML = html;
-        
-        // --- QUAN TRỌNG NHẤT: Ép trình duyệt chạy lại Script bên trong menu ---
-        const scripts = placeholder.querySelectorAll('script');
-        scripts.forEach(oldScript => {
-            const newScript = document.createElement('script');
-            newScript.text = oldScript.text; // Copy nội dung script
-            document.body.appendChild(newScript); // Chèn vào body để thực thi
-        });
-    })
-    .catch(err => console.error("Lỗi tải menu:", err));
+    // --- D. FETCH MENU ---
+    fetch('menu.html')
+        .then(res => res.text())
+        .then(html => {
+            const placeholder = document.getElementById('menu-placeholder');
+            placeholder.innerHTML = html;
+            const scripts = placeholder.querySelectorAll('script');
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                newScript.text = oldScript.text;
+                document.body.appendChild(newScript);
+            });
+        })
+        .catch(err => console.error("Lỗi tải menu:", err));
 
     window.addEventListener('trigger-firebase-signout', async () => {
         try {
@@ -358,8 +260,8 @@ fetch('menu.html')
     });
     
     window.alertLocked = () => {
-    alert("Chủ đề này đang được biên soạn. Bạn vui lòng quay lại sau nhé!");
-};
+        alert("Chủ đề này đang được biên soạn. Bạn vui lòng quay lại sau nhé!");
+    };
 </script>
 </body>
 </html>
