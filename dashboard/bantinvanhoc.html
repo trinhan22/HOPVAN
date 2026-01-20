@@ -156,6 +156,37 @@
         
         .highlight { background: #fff3cd; color: #d97706; padding: 0 3px; border-radius: 4px; }
 
+        /* Hiệu ứng Highlight chữ Gradient */
+        .highlight-text {
+            background: linear-gradient(90deg, #FF8F50, #FF5E62);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            display: inline-block; /* Để gradient hoạt động tốt */
+        }
+
+        /* Hiệu ứng Nền mờ (Dùng cho các cụm từ quan trọng) */
+        .highlight-bg {
+            background: rgba(255, 143, 80, 0.15); /* Màu cam nhạt */
+            color: #FF5E62;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 6px;
+            border-bottom: 2px solid #FF8F50;
+        }
+
+        /* Hiệu ứng Gạch chân Gradient */
+        .highlight-line {
+            text-decoration: none;
+            background-image: linear-gradient(90deg, #FF8F50, #FF5E62);
+            background-position: bottom left;
+            background-size: 100% 3px;
+            background-repeat: no-repeat;
+            color: #333; /* Màu chữ đậm để dễ đọc */
+            font-weight: 700;
+            padding-bottom: 2px;
+        }
+
         /* --- MODAL --- */
         .modal-overlay {
             display: none; position: fixed; inset: 0; background: rgba(255, 245, 236, 0.9);
@@ -374,14 +405,19 @@
     onAuthStateChanged(auth, (u) => { if(!u) window.location.href="../log.html"; });
     
     // FETCH MENU & RESTORE ICONS
-    fetch('menu.html').then(r => r.text()).then(html => {
-        const ph = document.getElementById('menu-placeholder');
-        ph.innerHTML = html;
-        ph.querySelectorAll('script').forEach(s => {
-            const n = document.createElement('script'); n.text = s.text; document.body.appendChild(n);
-        });
-        setTimeout(() => document.querySelectorAll('.sb-link').forEach(l => l.href.includes('bantinvanhoc') && l.classList.add('active')), 100);
-    });
+    fetch('menu.html')
+        .then(res => res.text())
+        .then(html => {
+            const placeholder = document.getElementById('menu-placeholder');
+            placeholder.innerHTML = html;
+            const scripts = placeholder.querySelectorAll('script');
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                newScript.text = oldScript.text;
+                document.body.appendChild(newScript);
+            });
+        })
+        .catch(err => console.error("Lỗi tải menu:", err));
 
     window.addEventListener('trigger-firebase-signout', async () => { await signOut(auth); window.location.href = "../index.html"; });
 </script>
