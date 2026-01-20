@@ -4,11 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hopvan - Nhật Ký Học Tập</title>
-    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
-    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
-    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
-    <meta property="og:url" content="https://hopvan.netlify.app" />
-    <meta property="og:type" content="article" />
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -23,25 +18,26 @@
         #menu-placeholder { width: var(--sidebar-width); flex-shrink: 0; z-index: 100; }
         .main-content { flex-grow: 1; padding: 40px; position: relative; min-height: 100vh; }
 
-        /* --- GREETING CARD --- */
+        /* --- HEADER --- */
         .welcome-card {
             background: linear-gradient(135deg, #FF9F68 0%, #FF5E62 100%);
             border-radius: 35px; padding: 40px; color: #ffffff;
             box-shadow: 0 20px 40px rgba(255, 94, 98, 0.3); 
-            position: relative; overflow: hidden; margin-bottom: 60px;
+            position: relative; overflow: hidden; margin-bottom: 80px; /* Tăng khoảng cách dưới header */
             border: 1px solid rgba(255, 255, 255, 0.2);
             animation: slideDown 0.8s ease;
         }
         @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* --- STRAIGHT PATH SYSTEM --- */
+        /* --- PATH SYSTEM --- */
         .path-wrapper { 
             position: relative; 
             width: 100%; 
-            max-width: 500px; 
+            max-width: 450px; /* Nới rộng container một chút */
             margin: 0 auto; 
-            padding-top: 20px; 
-            min-height: 1200px; 
+            padding-top: 20px;
+            padding-bottom: 100px; 
+            min-height: 1500px; 
             display: flex;
             justify-content: center;
         }
@@ -51,21 +47,33 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            gap: 160px; /* Tăng gap để nhãn không đè lên node dưới */
+            /* --- TĂNG KHOẢNG CÁCH DỌC Ở ĐÂY (80px -> 140px) --- */
+            gap: 140px; 
             z-index: 10; 
             width: 100%;
         }
         
         .level-node {
-            width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 2.2rem; cursor: pointer; position: relative;
+            width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 2rem; cursor: pointer; position: relative;
             background: white; z-index: 20;
             box-shadow: 0 10px 0 #eee, 0 15px 30px rgba(0,0,0,0.05);
             opacity: 0; transform: scale(0.3) translateY(50px);
         }
         
+        /* --- TĂNG ĐỘ UỐN LƯỢN (60px -> 80px) --- */
+        .node-left { transform: translateX(-80px); }
+        .node-right { transform: translateX(80px); }
+
+        /* Animation xuất hiện (cần khớp với transform vị trí) */
         .level-node.node-appear { opacity: 1; transform: scale(1) translateY(0); }
+        .level-node.node-left.node-appear { transform: translateX(-80px) scale(1) translateY(0); }
+        .level-node.node-right.node-appear { transform: translateX(80px) scale(1) translateY(0); }
+
+        /* Hover Effect */
         .level-node:hover { transform: translateY(-12px) scale(1.1); box-shadow: 0 15px 0 #eee, 0 25px 40px rgba(255, 143, 80, 0.2); }
+        .level-node.node-left:hover { transform: translateX(-80px) translateY(-12px) scale(1.1); }
+        .level-node.node-right:hover { transform: translateX(80px) translateY(-12px) scale(1.1); }
 
         /* Trạng thái Level */
         .level-passed { background: linear-gradient(135deg, #58cc02, #46a302); color: white; border-bottom: 8px solid #3b8a02; box-shadow: 0 10px 20px rgba(88, 204, 2, 0.3); }
@@ -76,42 +84,49 @@
         }
         .level-locked { background: #e5e5e5; color: #afafaf; cursor: not-allowed; pointer-events: none; border-bottom: 8px solid #ccc; }
         
+        /* Bounce Animation */
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        /* Override bounce cho các node lệch */
+        .node-left.level-current { animation: bounceLeft 2s infinite; }
+        .node-right.level-current { animation: bounceRight 2s infinite; }
+        @keyframes bounceLeft { 0%, 100% { transform: translateX(-80px) translateY(0); } 50% { transform: translateX(-80px) translateY(-15px); } }
+        @keyframes bounceRight { 0%, 100% { transform: translateX(80px) translateY(0); } 50% { transform: translateX(80px) translateY(-15px); } }
 
         .completed-medal { font-size: 1.8rem; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2)); animation: medalPop 0.5s ease; }
         @keyframes medalPop { from { transform: scale(0) rotate(-45deg); } to { transform: scale(1) rotate(0); } }
 
-        /* --- SỬA NHÃN TIÊU ĐỀ NẰM DƯỚI VÀ CENTER --- */
+        /* --- NHÃN TIÊU ĐỀ --- */
         .node-label {
             position: absolute; 
-            top: 115px; /* Nằm dưới ô tròn 100px */
+            top: 105px; 
             left: 50%;
-            transform: translateX(-50%); /* Căn giữa */
+            transform: translateX(-50%); 
             background: white; padding: 8px 18px; border-radius: 14px;
             box-shadow: 0 6px 15px rgba(0,0,0,0.06); font-size: 13px; font-weight: 800; color: #5d4037;
-            white-space: nowrap; border: 2px solid #fff; pointer-events: none;
+            white-space: nowrap; border: 2px solid #fff; pointer-events: none; z-index: 30;
         }
         .level-node:hover .node-label { background: var(--primary); color: white; transform: translate(-50%, 8px); }
 
-        /* --- SVG PATH ANIMATIONS --- */
+        /* --- SVG PATH --- */
         #path-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
         
         .path-line {
-            stroke: #FF8F50;
-            stroke-width: 10;
+            stroke: #e5e7eb; 
+            stroke-width: 12;
             stroke-linecap: round;
+            stroke-linejoin: round;
             fill: none;
-            stroke-dasharray: 15, 20;
-            animation: flowLine 8s linear infinite;
-            opacity: 0.3;
         }
-        @keyframes flowLine { from { stroke-dashoffset: 350; } to { stroke-dashoffset: 0; } }
 
         .path-draw-anim {
+            stroke: #FF8F50;
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
             stroke-dasharray: 3000;
             stroke-dashoffset: 3000;
             animation: drawLine 2.5s ease-out forwards;
-            opacity: 0.6;
         }
         @keyframes drawLine { to { stroke-dashoffset: 0; } }
 
@@ -119,6 +134,12 @@
             #menu-placeholder { width: 0; display: none; }
             .node-label { font-size: 11px; padding: 6px 12px; }
             .path-wrapper { max-width: 100%; }
+            /* Mobile giảm độ lệch */
+            .node-left { transform: translateX(-50px); }
+            .node-right { transform: translateX(50px); }
+            
+            .level-node.node-left.node-appear { transform: translateX(-50px) scale(1) translateY(0); }
+            .level-node.node-right.node-appear { transform: translateX(50px) scale(1) translateY(0); }
         }
     </style>
 </head>
@@ -137,7 +158,7 @@
                         <div class="bg-white/20 backdrop-blur-md px-5 py-3 rounded-[22px] flex items-center gap-3 font-black text-white border border-white/30 shadow-lg">
                             <i class="fas fa-fire text-yellow-300"></i> Streak: <span id="streak-val">0</span>
                         </div>
-                        <div class="bg-white/20 backdrop-blur-md px-5 py-3 rounded-[22px] flex items-center gap-3 font-black text-white border border-white/30 shadow-lg">
+                        <div class="bg-white/20 backdrop-blur-md px-5 py-3 rounded-2xl flex items-center gap-3 font-black text-white border border-white/30 shadow-lg">
                             <i class="fas fa-crown text-yellow-400"></i> Level: <span id="level-val">0</span>
                         </div>
                     </div>
@@ -176,7 +197,7 @@
             document.getElementById('avatar-initial').innerText = name[0].toUpperCase();
 
             try {
-                // --- ĐỒNG BỘ STREAK TỪ COLLECTION "users" (GIỐNG DASHBOARD) ---
+                // --- ĐỒNG BỘ STREAK ---
                 const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef);
                 const todayStr = new Date().toLocaleDateString('en-CA');
@@ -197,7 +218,7 @@
                 }
                 document.getElementById('streak-val').innerText = streakValue;
 
-                // --- LẤY LEVEL TỪ COLLECTION "users_progress" ---
+                // --- LẤY LEVEL ---
                 const progressRef = doc(db, "users_progress", user.uid);
                 const progressSnap = await getDoc(progressRef);
                 let currentLevel = progressSnap.exists() ? progressSnap.data().currentLevel : 1;
@@ -219,7 +240,13 @@
             if (lvl.id < userLevel) status = 'level-passed';
             else if (lvl.id === userLevel) status = 'level-current';
 
-            node.className = `level-node ${status}`;
+            // Logic Zigzag: Giữa (0) -> Trái (1) -> Giữa (2) -> Phải (3)
+            let posClass = '';
+            const posIndex = index % 4;
+            if (posIndex === 1) posClass = 'node-left';
+            if (posIndex === 3) posClass = 'node-right';
+
+            node.className = `level-node ${status} ${posClass}`;
             
             if (lvl.id < userLevel) {
                 node.innerHTML = '<i class="fas fa-medal completed-medal"></i>';
@@ -241,62 +268,77 @@
             setTimeout(() => node.classList.add('node-appear'), index * 150);
         });
         
-        setTimeout(drawBeautifulPath, 800);
+        setTimeout(drawCurvedPath, 800);
     }
 
-    function drawBeautifulPath() {
+    function drawCurvedPath() {
         const nodes = document.querySelectorAll('.level-node');
         const svg = document.getElementById('path-svg');
         const wrapper = document.querySelector('.path-wrapper');
         if (!svg || nodes.length < 2) return;
 
+        // Tăng chiều cao SVG để bao trọn do gap tăng lên
         svg.setAttribute('height', wrapper.scrollHeight);
         svg.setAttribute('width', wrapper.clientWidth);
         svg.innerHTML = "";
 
         let pathData = "";
+        
         nodes.forEach((node, i) => {
-            const rect = node.getBoundingClientRect();
+            if (i === nodes.length - 1) return; 
+
+            const rect1 = node.getBoundingClientRect();
+            const rect2 = nodes[i+1].getBoundingClientRect();
             const wrapperRect = wrapper.getBoundingClientRect();
-            const x = rect.left + rect.width / 2 - wrapperRect.left;
-            const y = rect.top + rect.height / 2 - wrapperRect.top;
-            if (i === 0) pathData += `M ${x} ${y}`;
-            else pathData += ` L ${x} ${y}`; // Đường thẳng đứng xuyên qua tâm các ô
+
+            // Tính tâm của nút (đã tính offset gap tự động nhờ vị trí DOM)
+            const x1 = rect1.left + rect1.width / 2 - wrapperRect.left;
+            const y1 = node.offsetTop + node.offsetHeight / 2;
+
+            const x2 = rect2.left + rect2.width / 2 - wrapperRect.left;
+            const y2 = nodes[i+1].offsetTop + nodes[i+1].offsetHeight / 2;
+
+            if (i === 0) pathData += `M ${x1} ${y1}`;
+
+            // Vẽ đường cong Bezier mềm mại hơn với khoảng cách dài hơn
+            const cp1x = x1; 
+            const cp1y = y1 + (y2 - y1) / 2;
+            const cp2x = x2;
+            const cp2y = y1 + (y2 - y1) / 2;
+
+            pathData += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`;
         });
 
+        // Đường nền màu xám
         const pathLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
         pathLine.setAttribute("d", pathData);
         pathLine.classList.add('path-line');
         svg.appendChild(pathLine);
 
+        // Đường màu cam chạy đè lên
         const pathDraw = document.createElementNS("http://www.w3.org/2000/svg", "path");
         pathDraw.setAttribute("d", pathData);
         pathDraw.setAttribute("fill", "none");
-        pathDraw.setAttribute("stroke", "#FF8F50");
-        pathDraw.setAttribute("stroke-width", "10");
-        pathDraw.setAttribute("stroke-linecap", "round");
         pathDraw.classList.add('path-draw-anim');
         svg.appendChild(pathDraw);
     }
 
-    // Nạp Menu & Highlight
-fetch('menu.html')
-    .then(res => res.text())
-    .then(html => {
-        const placeholder = document.getElementById('menu-placeholder');
-        placeholder.innerHTML = html;
-        
-        // --- QUAN TRỌNG NHẤT: Ép trình duyệt chạy lại Script bên trong menu ---
-        const scripts = placeholder.querySelectorAll('script');
-        scripts.forEach(oldScript => {
-            const newScript = document.createElement('script');
-            newScript.text = oldScript.text; // Copy nội dung script
-            document.body.appendChild(newScript); // Chèn vào body để thực thi
-        });
-    })
-    .catch(err => console.error("Lỗi tải menu:", err));
+    // Nạp Menu
+    fetch('menu.html')
+        .then(res => res.text())
+        .then(html => {
+            const placeholder = document.getElementById('menu-placeholder');
+            placeholder.innerHTML = html;
+            const scripts = placeholder.querySelectorAll('script');
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                newScript.text = oldScript.text; 
+                document.body.appendChild(newScript); 
+            });
+        })
+        .catch(err => console.error("Lỗi tải menu:", err));
 
-    window.addEventListener('resize', drawBeautifulPath);
+    window.addEventListener('resize', drawCurvedPath);
 </script>
 
 </body>
