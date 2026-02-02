@@ -10,7 +10,6 @@
     <meta property="og:url" content="https://hopvan.netlify.app" />
     <meta property="og:type" content="article" />
 
-    <!-- Favicon -->
     <link rel="icon" type="image/webp" href="LOGO.WEBP" />
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,57 +17,35 @@
     
     <style>
         :root {
-            --primary: #FF8F50; /* Cam đậm hơn chút để nổi trên nền kính */
-            --primary-light: #FFB085;
+            --primary: #FF8F50;
+            --primary-dark: #E67E22;
             --text-main: #2D3436;
             --text-light: #636E72;
-            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-bg: rgba(255, 255, 255, 0.7);
             --glass-border: rgba(255, 255, 255, 0.8);
             --blur: 20px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+        html { scroll-behavior: smooth; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body { 
+            color: var(--text-main); 
+            background-color: #FFF5EC; 
+            overflow-x: hidden; 
+            min-height: 100vh; 
+            position: relative; 
+            line-height: 1.6;
         }
 
-        body {
-            color: var(--text-main);
-            background-color: #FFF5EC;
-            overflow-x: hidden;
-            min-height: 100vh;
-            position: relative;
-        }
-
-        /* --- MESH GRADIENT BACKGROUND (Nền loang màu nghệ thuật) --- */
-        .background-blobs {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
-
-        .blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.6;
-            animation: floatBlob 10s infinite alternate;
-        }
-
+        /* --- BACKGROUND (Hiệu ứng nền loang màu) --- */
+        .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatBlob 10s infinite alternate; }
         .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
         .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
         .blob-3 { width: 300px; height: 300px; background: #FFD1D1; top: 40%; left: 40%; animation-delay: -2s; }
-
-        @keyframes floatBlob {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, 50px) scale(1.1); }
-        }
+        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
 
         /* --- UTILS --- */
         .glass {
@@ -78,168 +55,210 @@
             border: 1px solid var(--glass-border);
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
         }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .section-padding { padding: 100px 0; }
+        .text-gradient { background: linear-gradient(45deg, var(--primary), #FF5E62); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* --- HEADER (Floating Pill) --- */
-        header {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 1200px;
-            padding: 15px 30px;
-            border-radius: 100px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .logo img { height: 40px; width: auto; object-fit: contain; }
-
-        .logo span {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(45deg, var(--primary), #FF5E62);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-        }
-
-        .nav-links { display: flex; gap: 40px; }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text-main);
-            font-weight: 600;
-            font-size: 0.95rem;
-            position: relative;
-            transition: color 0.3s;
-        }
-
-        .nav-links a::after {
-            content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px;
-            background: var(--primary); transition: width 0.3s;
-        }
-
-        .nav-links a:hover::after { width: 100%; }
+        /* --- HEADER --- */
+        header { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 1200px; padding: 12px 30px; border-radius: 100px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; transition: top 0.3s; }
+        .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo img { height: 40px; width: auto; }
+        .logo span { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        
+        .nav-links { display: flex; gap: 30px; }
+        .nav-links a { text-decoration: none; color: var(--text-main); font-weight: 600; font-size: 0.95rem; transition: 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), #FF758C);
-            color: white;
-            padding: 12px 30px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            box-shadow: 0 10px 20px rgba(255, 143, 80, 0.3);
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
+            color: white; padding: 12px 30px; border-radius: 50px; text-decoration: none; font-weight: 700;
+            box-shadow: 0 10px 20px rgba(255, 143, 80, 0.3); transition: all 0.3s; border: none; cursor: pointer;
         }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(255, 143, 80, 0.4); }
 
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 25px rgba(255, 143, 80, 0.4);
-        }
-
-        /* --- USER PROFILE STYLES (Mới) --- */
-        .user-profile {
-            display: none; /* Mặc định ẩn, hiện bằng JS */
-            align-items: center;
-            gap: 15px;
-        }
-        .user-name {
-            font-weight: 700;
-            color: var(--primary);
-        }
-        .btn-logout {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--text-light);
-            font-size: 1.2rem;
-            transition: color 0.3s;
-        }
+        /* User Profile */
+        .user-profile { display: none; align-items: center; gap: 15px; }
+        .user-name { font-weight: 700; color: var(--primary); }
+        .btn-logout { background: none; border: none; cursor: pointer; color: var(--text-light); font-size: 1.2rem; transition: 0.3s; }
         .btn-logout:hover { color: #FF5E62; }
 
-
-        /* --- HERO SECTION --- */
+        /* --- HERO SECTION (Giữ nguyên bản cũ) --- */
         .hero { padding-top: 180px; padding-bottom: 100px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 50px; }
-        .hero-text h1 { font-size: 4rem; line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px; }
+        .hero-text h1 { font-size: 4rem; line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px; font-weight: 800; color: var(--text-main); }
+        
         .highlight-text { color: var(--primary); position: relative; display: inline-block; }
         .highlight-text::before { content: ''; position: absolute; bottom: 5px; left: 0; width: 100%; height: 15px; background: rgba(252, 169, 106, 0.3); z-index: -1; transform: skew(-10deg); }
+        
         .hero-text p { font-size: 1.2rem; color: var(--text-light); margin-bottom: 40px; line-height: 1.6; max-width: 90%; }
         .stat-row { display: flex; gap: 40px; margin-bottom: 40px; }
-        .stat-item h3 { font-size: 2rem; color: var(--text-main); }
+        .stat-item h3 { font-size: 2rem; color: var(--text-main); font-weight: 800; }
         .stat-item p { font-size: 0.9rem; margin-bottom: 0; }
+        
         .hero-card-wrapper { position: relative; }
         .main-card { background: white; border-radius: 30px; padding: 20px; box-shadow: 0 30px 60px rgba(0,0,0,0.08); transform: rotate(-3deg); border: 8px solid rgba(255,255,255,0.5); transition: transform 0.5s; }
         .main-card:hover { transform: rotate(0deg) scale(1.02); }
         .main-card img { width: 100%; border-radius: 20px; }
+        
         .floating-badge { position: absolute; padding: 15px 25px; border-radius: 20px; display: flex; align-items: center; gap: 15px; animation: floatBadge 4s infinite ease-in-out; z-index: 2; }
         .badge-1 { top: -20px; right: -20px; animation-delay: 0s; }
         .badge-2 { bottom: 40px; left: -40px; animation-delay: 2s; }
         @keyframes floatBadge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        /* --- BENTO GRID FEATURES --- */
-        .features { padding: 100px 0; }
+        /* --- FEATURES (BENTO GRID - Đã chỉnh sửa dãn chữ) --- */
         .section-header { text-align: center; margin-bottom: 60px; }
-        .section-header h2 { font-size: 2.5rem; margin-bottom: 15px; }
-        .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 280px); gap: 24px; }
+        .section-header h2 { font-size: 2.5rem; margin-bottom: 10px; font-weight: 800; color: var(--text-main); }
+        
+        .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        
+        .bento-item { 
+            border-radius: 30px; 
+            padding: 40px; 
+            transition: 0.3s; 
+            position: relative; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            min-height: 280px; 
+            background: rgba(255,255,255,0.6); 
+            border: 1px solid white; 
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+        }
+        
+        .bento-item:hover { 
+            transform: translateY(-5px); 
+            background: rgba(255,255,255,0.95); 
+            box-shadow: 0 20px 40px -10px rgba(255, 143, 80, 0.15);
+        }
+        
         .bento-item.large { grid-column: span 2; }
-        .bento-item { border-radius: 30px; padding: 40px; transition: all 0.4s; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(255,255,255,0.4); }
-        .bento-item:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.05); background: rgba(255,255,255,0.85); }
-        .bento-icon { width: 60px; height: 60px; background: white; border-radius: 15px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .bento-item h3 { font-size: 1.5rem; margin-bottom: 10px; }
-        .bento-item p { color: var(--text-light); font-size: 1rem; }
-        .bento-decoration { position: absolute; right: -20px; bottom: -20px; font-size: 10rem; opacity: 0.05; color: var(--text-main); transform: rotate(-15deg); }
-
-        /* --- CALL TO ACTION --- */
-        .cta-section { margin: 100px 0; padding: 80px; border-radius: 40px; background: linear-gradient(135deg, var(--primary), #FF5E62); text-align: center; color: white; position: relative; overflow: hidden; }
-        .cta-section h2 { font-size: 3rem; margin-bottom: 20px; position: relative; z-index: 2; }
-        .cta-btn-white { background: white; color: var(--primary); padding: 15px 40px; border-radius: 50px; font-weight: 800; text-decoration: none; display: inline-block; margin-top: 30px; position: relative; z-index: 2; transition: transform 0.3s; }
-        .cta-btn-white:hover { transform: scale(1.05); }
-
-        /* --- Footer Simple --- */
-        footer { text-align: center; padding: 40px; color: var(--text-light); font-size: 0.9rem; }
-
-        /* --- MOBILE RESPONSIVE --- */
-        .mobile-menu-btn { display: none; font-size: 1.5rem; color: var(--primary); cursor: pointer; }
-        @media (max-width: 768px) {
-            header { width: 95%; padding: 12px 20px; top: 15px; }
-            .logo span { font-size: 1.2rem; }
-            .nav-links { display: none; }
-            .btn-primary { padding: 8px 20px; font-size: 0.9rem; }
-            .hero { grid-template-columns: 1fr; padding-top: 120px; gap: 40px; text-align: center; }
-            .hero-text h1 { font-size: 2.5rem; }
-            .hero-text p { margin: 0 auto 30px auto; }
-            .stat-row { justify-content: center; gap: 30px; }
-            .hero-card-wrapper { margin-top: 20px; width: 90%; margin-left: auto; margin-right: auto; }
-            .floating-badge { padding: 10px 15px; }
-            .badge-1 { top: -10px; right: -10px; }
-            .badge-2 { bottom: 20px; left: -10px; }
-            .features { padding: 60px 0; }
-            .bento-grid { grid-template-columns: 1fr; grid-template-rows: auto; gap: 20px; }
-            .bento-item.large { grid-column: span 1; }
-            .bento-item { min-height: 200px; }
-            .cta-section { padding: 40px 20px; border-radius: 20px; }
-            .cta-section h2 { font-size: 2rem; }
-            .mobile-menu-btn { display: block; margin-right: 10px; }
+        
+        .bento-icon { 
+            width: 56px; height: 56px; 
+            background: white; 
+            border-radius: 16px; 
+            display: flex; justify-content: center; align-items: center; 
+            font-size: 1.6rem; color: var(--primary); 
+            margin-bottom: 25px; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05); 
+        }
+        
+        /* Chỉnh sửa Typography cho Bento thoáng hơn */
+        .bento-item h3 { 
+            font-size: 1.5rem; 
+            margin-bottom: 15px; 
+            font-weight: 800; 
+            color: var(--text-main);
+        }
+        .bento-item p { 
+            color: var(--text-light); 
+            font-size: 1.05rem; 
+            line-height: 1.8; /* Dãn dòng */
+            margin-bottom: 0;
+        }
+        
+        .bento-decoration { 
+            position: absolute; right: -10px; bottom: -10px; 
+            font-size: 8rem; opacity: 0.05; 
+            color: var(--text-main); 
+            transform: rotate(-15deg); 
+            pointer-events: none; 
         }
 
+        /* --- REVIEWS SECTION --- */
+        .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .review-card { 
+            background: rgba(255,255,255,0.7); 
+            border-radius: 25px; padding: 35px; 
+            border: 1px solid white; 
+            transition: 0.3s; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.03); 
+        }
+        .review-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); background: white; }
+        .user-info { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .user-avatar { width: 50px; height: 50px; border-radius: 50%; background: #eee; object-fit: cover; border: 2px solid white; box-shadow: 0 5px 10px rgba(0,0,0,0.1); }
+        .stars { color: #FFC107; font-size: 0.9rem; margin-bottom: 5px; }
+        .review-text { font-style: italic; color: var(--text-light); line-height: 1.7; font-size: 1rem; }
+
+        /* --- ABOUT US SECTION --- */
+        .about-wrap { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 60px; align-items: center; }
+        .about-img { width: 100%; border-radius: 30px; transform: rotate(2deg); border: 8px solid white; box-shadow: 0 20px 40px rgba(0,0,0,0.1); transition: 0.3s; }
+        .about-img:hover { transform: rotate(0deg) scale(1.02); }
+        .check-list { list-style: none; margin-top: 25px; }
+        .check-list li { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-size: 1.1rem; color: var(--text-main); }
+        .check-list i { color: white; background: var(--primary); padding: 5px; border-radius: 50%; box-shadow: 0 5px 10px rgba(255, 143, 80, 0.3); font-size: 0.8rem; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+
+        /* --- CTA SECTION (Khôi phục) --- */
+        .cta-section { 
+            margin: 100px 0; 
+            padding: 80px; 
+            border-radius: 40px; 
+            background: linear-gradient(135deg, var(--primary), #FF5E62); 
+            text-align: center; 
+            color: white; 
+            position: relative; 
+            overflow: hidden; 
+            box-shadow: 0 30px 60px rgba(255, 94, 98, 0.3);
+        }
+        .cta-section h2 { 
+            font-size: 3rem; 
+            margin-bottom: 20px; 
+            position: relative; 
+            z-index: 2; 
+            font-weight: 800;
+        }
+        .cta-btn-white { 
+            background: white; 
+            color: var(--primary); 
+            padding: 18px 45px; 
+            border-radius: 50px; 
+            font-weight: 800; 
+            font-size: 1.1rem;
+            text-decoration: none; 
+            display: inline-block; 
+            margin-top: 30px; 
+            position: relative; 
+            z-index: 2; 
+            transition: transform 0.3s, box-shadow 0.3s; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .cta-btn-white:hover { 
+            transform: scale(1.05); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        /* --- FOOTER --- */
+        footer { background: rgba(255,255,255,0.8); border-top: 1px solid rgba(255,255,255,0.5); padding: 80px 0 30px; margin-top: 80px; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px; margin-bottom: 40px; }
+        .footer-brand span { font-size: 1.8rem; font-weight: 900; background: linear-gradient(45deg, var(--primary), #FF5E62); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .footer-brand p { margin-top: 20px; color: var(--text-light); line-height: 1.7; max-width: 350px; font-size: 1rem; }
+        .footer-col h4 { font-size: 1.2rem; margin-bottom: 25px; color: var(--text-main); font-weight: 800; }
+        .footer-col ul { list-style: none; }
+        .footer-col li { margin-bottom: 15px; }
+        .footer-col a { text-decoration: none; color: var(--text-light); transition: 0.3s; font-size: 1rem; }
+        .footer-col a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-bottom { text-align: center; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 30px; font-size: 0.95rem; color: #888; }
+
+        /* --- MOBILE --- */
+        .mobile-menu-btn { display: none; font-size: 1.5rem; color: var(--primary); cursor: pointer; }
+        @media (max-width: 992px) {
+            .hero { grid-template-columns: 1fr; text-align: center; padding-top: 120px; }
+            .stat-row { justify-content: center; }
+            .hero-card-wrapper { width: 80%; margin: 40px auto 0; }
+            .bento-grid, .reviews-grid, .about-wrap { grid-template-columns: 1fr; }
+            .bento-item.large { grid-column: span 1; }
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
+            .footer-brand p { margin: 15px auto; }
+            .footer-brand div { justify-content: center; }
+        }
+        @media (max-width: 768px) {
+            .nav-links { display: none; } 
+            .mobile-menu-btn { display: block; }
+            header { width: 95%; padding: 10px 20px; }
+            .hero h1 { font-size: 2.5rem; }
+            .cta-section { padding: 40px 20px; border-radius: 20px; }
+            .cta-section h2 { font-size: 2rem; }
+        }
     </style>
 </head>
 <body>
@@ -251,21 +270,21 @@
     </div>
 
     <header class="glass">
-        <div class="mobile-menu-btn" style="display: none; margin-right: 10px;">
+        <div class="mobile-menu-btn">
             <i class="fas fa-bars"></i>
         </div>
 
-        <div class="logo">
+        <a href="#" class="logo">
             <img src="LOGO.WEBP" alt="Logo"> 
             <span>HOPVAN</span>
-        </div>
+        </a>
 
         <nav class="nav-links">
-            <a href="">Trang chủ</a>
-            <a href="dashboard/phongluyende.html">Phòng luyện đề</a>
-            <a href="dashboard/bantinvanhoc.html">Bản tin Văn học</a>
-            <a href="dashboard/congdong.html">Cộng đồng</a>
-            <a href="dashboard/nhatkyhoctap.html">Nhật ký học tập</a>
+            <a href="#features">Tính năng</a>
+            <a href="#reviews">Đánh giá</a>
+            <a href="#about">Về chúng tôi</a>
+            <a href="https://discord.com/invite/EhsQyEAk2k" target="_blank">Cộng đồng</a>
+            <a href="chuongtrinhgdpt2018.html">Chương trình GDPT 2018</a>
         </nav>
 
         <div style="display: flex; gap: 15px; align-items: center;">
@@ -321,52 +340,107 @@
             </div>
         </section>
 
-        <section class="features">
+        <section id="features" class="section-padding">
             <div class="section-header">
                 <h2>Hệ sinh thái học tập</h2>
                 <p style="color: var(--text-light)">Tất cả công cụ bạn cần để đạt 9+ môn Văn</p>
             </div>
 
             <div class="bento-grid">
-                <div class="bento-item glass large">
+                <div class="bento-item large">
                     <div class="bento-icon"><i class="fas fa-pen-fancy"></i></div>
                     <div>
                         <h3>Phòng luyện đề</h3>
-                        <p>Hệ thống tự động random đề, tính giờ và chấm điểm chi tiết từng câu chữ ngay sau khi nộp.</p>
+                        <p>Hệ thống tự động random đề, tính giờ và chấm điểm chi tiết từng câu chữ ngay sau khi nộp. Nhận xét lỗi dùng từ, lỗi ngữ pháp và gợi ý sửa.</p>
                     </div>
                     <i class="fas fa-robot bento-decoration"></i>
                 </div>
 
-                <div class="bento-item glass">
+                <div class="bento-item">
                     <div class="bento-icon"><i class="fas fa-book-reader"></i></div>
-                    <div>
-                        <h3>Bản tin Văn học</h3>
-                        <p>Gồm kho tài liệu học tập & những dẫn chứng "đắt giá".</p>
-                    </div>
+                    <h3>Bản tin Văn học</h3>
+                    <p>Gồm kho tài liệu học tập & những dẫn chứng "đắt giá".</p>
                 </div>
 
-                <div class="bento-item glass">
+                <div class="bento-item">
                     <div class="bento-icon"><i class="fas fa-users"></i></div>
-                    <div>
-                        <h3>Cộng đồng</h3>
-                        <p>Thảo luận, chia sẻ bí kíp cùng các bạn học sinh trên cả nước.</p>
-                    </div>
+                    <h3>Cộng đồng</h3>
+                    <p>Thảo luận, chia sẻ bí kíp cùng các bạn học sinh trên cả nước.</p>
                 </div>
 
-                <div class="bento-item glass large">
+                <div class="bento-item large">
                     <div class="bento-icon"><i class="fas fa-route"></i></div>
                     <div>
-                        <h3>Nhật ký học tập</h3>
-                        <p>Hệ thống mở khóa bài học theo năng lực (Gamification). Học đến đâu chắc đến đó.</p>
+                        <h3>Nhật ký học tập (Gamification)</h3>
+                        <p>Biến việc học thành trò chơi. Hoàn thành bài học để mở khóa cấp độ mới, tích lũy streak và nhận huy hiệu vinh danh.</p>
                     </div>
                     <i class="fas fa-flag-checkered bento-decoration"></i>
                 </div>
             </div>
         </section>
 
+        <section id="about" class="section-padding">
+            <div class="about-wrap">
+                <div>
+                    <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 20px;">Về chúng tôi</h2>
+                    <p style="font-size: 1.1rem; color: var(--text-light); line-height: 1.8; margin-bottom: 25px;">
+                        Hopvan được xây dựng bởi đội ngũ đam mê văn học và công nghệ, với sứ mệnh xóa bỏ nỗi sợ môn Văn của học sinh Việt Nam. Chúng tôi tin rằng, với phương pháp đúng đắn và sự hỗ trợ của AI, ai cũng có thể viết hay.
+                    </p>
+                    <ul class="check-list">
+                        <li><i class="fas fa-check"></i> <span>Nội dung bám sát chương trình GDPT 2018</span></li>
+                        <li><i class="fas fa-check"></i> <span>Công nghệ AI chữa bài tiên tiến</span></li>
+                        <li><i class="fas fa-check"></i> <span>Giao diện thân thiện, dễ sử dụng</span></li>
+                        <li><i class="fas fa-check"></i> <span>Tiến trình học tập tối ưu theo cá nhân</span></li>
+                    </ul>
+                </div>
+                <div>
+                    <img src="https://img.freepik.com/free-vector/team-goals-concept-illustration_114360-5182.jpg" alt="About Team" class="about-img">
+                </div>
+            </div>
+        </section>
+
+        <section id="reviews" class="section-padding">
+            <div class="section-header">
+                <h2>Học viên nói gì về Hopvan?</h2>
+                <p>Những câu chuyện thành công từ cộng đồng</p>
+            </div>
+            <div class="reviews-grid">
+                <div class="review-card">
+                    <div class="user-info">
+                        <img src="LOGO.WEBP" alt="User" class="user-avatar">
+                        <div>
+                            <div style="font-weight: 700;">Trí Nhân</div>
+                            <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                        </div>
+                    </div>
+                    <p class="review-text">"Nhờ tính năng chấm bài AI mà mình biết được lỗi dùng từ lặp lại. Điểm thi học kỳ vừa rồi mình tăng từ 6.5 lên 8.5. Cảm ơn Hopvan!"</p>
+                </div>
+                <div class="review-card">
+                    <div class="user-info">
+                        <img src="LOGO.WEBP" alt="User" class="user-avatar">
+                        <div>
+                            <div style="font-weight: 700;">Cát Tường</div>
+                            <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                        </div>
+                    </div>
+                    <p class="review-text">"Mình rất thích phần Bản tin Văn học, nhiều dẫn chứng mới lạ, không bị đụng hàng. Giao diện web cũng rất đẹp và mượt."</p>
+                </div>
+                <div class="review-card">
+                    <div class="user-info">
+                        <img src="LOGO.WEBP" alt="User" class="user-avatar">
+                        <div>
+                            <div style="font-weight: 700;">Đăng Khoa</div>
+                            <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                        </div>
+                    </div>
+                    <p class="review-text">"Hệ thống Nhật ký học tập giúp mình có động lực học mỗi ngày để giữ streak. Cảm giác như đang chơi game vậy, rất cuốn!"</p>
+                </div>
+            </div>
+        </section>
+
         <section class="cta-section">
             <h2>Sẵn sàng bứt phá điểm số?</h2>
-            <p style="opacity: 0.9; margin-top: 10px;">Tham gia cùng 10.000+ học sinh đang ôn luyện mỗi ngày.</p>
+            <p style="opacity: 0.9; margin-top: 15px; font-size: 1.15rem; margin-bottom: 10px;">Tham gia ngay hôm nay để trải nghiệm phương pháp học Văn hoàn toàn mới.</p>
             <a href="log.html" class="cta-btn-white">Đăng ký tài khoản ngay</a>
             
             <div style="position: absolute; width: 300px; height: 300px; background: rgba(255,255,255,0.1); border-radius: 50%; top: -100px; left: -100px;"></div>
@@ -374,17 +448,52 @@
         </section>
     </div>
 
-<script src="chatbot.js"></script>
-
     <footer>
-        <p>&copy; 2026 - hopvan.netlify.app</p>
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <a href="#" class="logo">
+                    <img src="LOGO.WEBP" alt="Logo"> 
+                    <span>HOPVAN</span>
+                </a>
+                <p>Nền tảng học tập Ngữ Văn tích hợp AI tiên phong tại Việt Nam. Đồng hành cùng bạn trên con đường chinh phục tri thức.</p>
+                <div style="margin-top: 25px; display: flex; gap: 20px;">
+                    <a href="#" style="color: var(--primary); font-size: 1.4rem;"><i class="fab fa-facebook"></i></a>
+                    <a href="#" style="color: var(--primary); font-size: 1.4rem;"><i class="fab fa-tiktok"></i></a>
+                    <a href="#" style="color: var(--primary); font-size: 1.4rem;"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Liên kết nhanh</h4>
+                <ul>
+                    <li><a href="dashboard/bantinvanhoc.html">Bản tin Văn học</a></li>
+                    <li><a href="dashboard/nhatkyhoctap.html">Nhật ký học tập</a></li>
+                    <li><a href="dashboard/phongluyende.html">Phòng luyện đề</a></li>
+                    <li><a href="huongdansudung.html">Hướng dẫn sử dụng</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Hỗ trợ</h4>
+                <ul>
+                    <li><a href="huongdansudung.html">Câu hỏi thường gặp</a></li>
+                    <li><a href="huongdansudung.html">Điều khoản sử dụng</a></li>
+                    <li><a href="huongdansudung.html">Chính sách bảo mật</a></li>
+                    <li><a href="huongdansudung.html">Liên hệ</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Hopvan. All rights reserved.</p>
+        </div>
     </footer>
+
+    <script src="chatbot.js"></script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // Cấu hình Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
             authDomain: "hopvan-9a648.firebaseapp.com",
@@ -398,28 +507,22 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // Elements
         const btnHocNgay = document.getElementById('btn-hoc-ngay');
         const userProfile = document.getElementById('user-profile');
         const displayName = document.getElementById('display-name');
         const logoutBtn = document.getElementById('logout-btn');
 
-        // 1. Kiểm tra trạng thái đăng nhập
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Đã đăng nhập -> Ẩn nút "Học ngay", Hiện "Chào user"
-                console.log("User logged in:", user.displayName);
                 btnHocNgay.style.display = 'none';
                 userProfile.style.display = 'flex';
                 displayName.textContent = user.displayName || "Bạn mình";
             } else {
-                // Chưa đăng nhập -> Hiện nút "Học ngay", Ẩn profile
                 btnHocNgay.style.display = 'inline-block';
                 userProfile.style.display = 'none';
             }
         });
 
-        // 2. Xử lý Đăng xuất
         logoutBtn.addEventListener('click', () => {
             if(confirm("Bạn muốn đăng xuất?")) {
                 signOut(auth).then(() => {
@@ -428,58 +531,30 @@
             }
         });
 
-        // 3. Menu Mobile Responsive
-// --- LOGIC MENU MOBILE HOÀN THIỆN ---
-    const menuBtn = document.getElementById('mobile-toggle');
-    const navMenu = document.getElementById('nav-menu');
-    const body = document.body;
-
-    menuBtn.addEventListener('click', () => {
-        const isOpen = navMenu.classList.toggle('active');
-        body.classList.toggle('menu-open');
+        // Mobile Menu Toggle
+        const menuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
         
-        // Đổi icon từ Bars sang X
-        const icon = menuBtn.querySelector('i');
-        if (isOpen) {
-            icon.classList.remove('fa-bars');
-            icon.classList.add('fa-times');
-            menuBtn.style.transform = 'rotate(90deg)';
-        } else {
-            icon.classList.remove('fa-times');
-            icon.classList.add('fa-bars');
-            menuBtn.style.transform = 'rotate(0deg)';
+        // Logic mobile menu đơn giản
+        if(menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                const isHidden = window.getComputedStyle(navLinks).display === 'none';
+                if(isHidden) {
+                    navLinks.style.display = 'flex';
+                    navLinks.style.flexDirection = 'column';
+                    navLinks.style.position = 'absolute';
+                    navLinks.style.top = '70px';
+                    navLinks.style.left = '20px';
+                    navLinks.style.right = '20px';
+                    navLinks.style.background = 'white';
+                    navLinks.style.padding = '20px';
+                    navLinks.style.borderRadius = '20px';
+                    navLinks.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+                } else {
+                    navLinks.style.display = 'none';
+                }
+            });
         }
-    });
-
-    // Tự động đóng menu khi nhấn vào một link
-    const navLinks = document.querySelectorAll('.nav-links a');
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            navMenu.classList.remove('active');
-            body.classList.remove('menu-open');
-            const icon = menuBtn.querySelector('i');
-            icon.classList.replace('fa-times', 'fa-bars');
-        });
-    });
-
-    // Cập nhật trạng thái Auth vào menu Mobile
-    onAuthStateChanged(auth, (user) => {
-        const mobileActions = document.getElementById('mobile-only-actions');
-        if (user) {
-            btnHocNgay.style.display = 'none';
-            userProfile.style.display = 'flex';
-            displayName.textContent = user.displayName || "Bạn mình";
-            
-            // Trên Mobile, chúng ta có thể hiện lời chào trong menu
-            mobileActions.innerHTML = `<p class="font-bold text-orange-500">Chào, ${user.displayName || "Bạn"}</p>`;
-        } else {
-            btnHocNgay.style.display = 'inline-block';
-            userProfile.style.display = 'none';
-            
-            // Trên Mobile hiện nút Học ngay to rõ
-            mobileActions.innerHTML = `<a href="log.html" class="btn-primary">Bắt đầu ngay</a>`;
-        }
-    });
     </script>
 </body>
 </html>

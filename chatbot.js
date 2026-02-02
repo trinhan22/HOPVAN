@@ -176,7 +176,7 @@ function initChatbot() {
             
             <div class="chat-messages" id="chat-messages">
                 <div class="msg msg-bot">
-                    Chào bạn! 👋<br>
+                    Chào bạn!<br>
                     Mình là <strong>Gia sư AI Hopvan</strong>. Bạn cần tìm dẫn chứng, sửa mở bài, hay phân tích tác phẩm nào không?
                 </div>
             </div>
