@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hướng dẫn sử dụng - Hopvan</title>
+    <link rel="icon" type="image/webp" href="LOGO.WEBP" />
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --primary-dark: #FF5E62;
+            --bg-color: #FFF5EC;
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: #2D3436;
+        }
+
+        /* --- Custom Scrollbar --- */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #ffd1b3; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* --- Text Gradients --- */
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- Sidebar Styles --- */
+        aside {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 143, 80, 0.2);
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: #636E72;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 4px solid transparent;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .sidebar-link:hover {
+            background-color: #fff0e6;
+            color: var(--primary-dark);
+            transform: translateX(5px);
+        }
+
+        .sidebar-link.active {
+            background: linear-gradient(90deg, #fff0e6, transparent);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        .sidebar-heading {
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #b2bec3;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            padding: 0 1rem;
+        }
+
+        /* --- Prose Content Styles --- */
+        .prose h1 { font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem; line-height: 1.2; }
+        
+        .prose h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #2D3436;
+            margin-top: 4rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #ffe0cc;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .prose h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .prose p { line-height: 1.8; margin-bottom: 1.2rem; color: #4b5563; font-size: 1.05rem; }
+        
+        .prose ul, .prose ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+        .prose li { margin-bottom: 0.5rem; position: relative; }
+        
+        /* Bullet points đẹp */
+        .prose ul li::before {
+            content: "\f058"; /* FontAwesome Check Circle */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: var(--primary);
+            position: absolute;
+            left: -1.5rem;
+            top: 2px;
+        }
+        .prose ul { list-style: none; }
+
+        .prose ol { list-style-type: decimal; color: var(--primary-dark); font-weight: 700; }
+        .prose ol li span { color: #4b5563; font-weight: 400; }
+
+        .note-box {
+            background: #fff8f0;
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+            font-style: italic;
+            color: #5d4037;
+        }
+
+        /* --- Animation --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="flex">
+        <aside class="w-80 h-screen sticky top-0 shadow-xl hidden lg:flex flex-col z-50">
+            <div class="p-6 border-b border-orange-100">
+                <a href="index.html" class="flex items-center gap-3 text-decoration-none">
+                    <img src="LOGO.WEBP" class="h-10 w-auto" alt="Logo">
+                    <span class="text-2xl font-black gradient-text tracking-tight">HOPVAN</span>
+                </a>
+                <p class="text-xs text-gray-400 font-bold mt-2 tracking-widest uppercase">Trung tâm trợ giúp</p>
+            </div>
+
+            <nav id="sidebar-nav" class="flex-1 overflow-y-auto p-4">
+                <a href="#intro" class="sidebar-link active">
+                    <i class="fas fa-info-circle w-6"></i> Giới thiệu chung
+                </a>
+
+                <div class="sidebar-heading">Tài liệu & Kiến thức</div>
+                <a href="#bantin" class="sidebar-link">
+                    <i class="fas fa-newspaper w-6"></i> Bản tin Văn học
+                </a>
+                
+                <div class="sidebar-heading">Lộ trình học tập</div>
+                <a href="#nhatky" class="sidebar-link">
+                    <i class="fas fa-route w-6"></i> Nhật ký học tập
+                </a>
+                <a href="#luyende" class="sidebar-link">
+                    <i class="fas fa-pen-fancy w-6"></i> Phòng luyện đề AI
+                </a>
+
+                <div class="sidebar-heading">Công cụ hỗ trợ</div>
+                <a href="#chatbot" class="sidebar-link">
+                    <i class="fas fa-robot w-6"></i> Gia sư AI
+                </a>
+                
+                <div class="mt-10 p-4 bg-orange-50 rounded-xl border border-orange-100">
+                    <p class="text-sm font-bold text-gray-600 mb-2">Cần hỗ trợ thêm?</p>
+                    <a href="#" class="text-orange-500 text-sm font-bold hover:underline">Liên hệ Admin &rarr;</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-6 md:p-16 w-full max-w-5xl mx-auto">
+            <article class="prose w-full">
+                
+                <section id="intro" class="reveal min-h-[60vh] flex flex-col justify-center">
+                    <h1 class="gradient-text">Chào mừng đến với Hopvan! 👋</h1>
+                    <p class="text-xl text-gray-500 font-medium">
+                        Nền tảng học Ngữ Văn 4.0 giúp bạn xóa bỏ nỗi sợ viết văn, tích lũy kiến thức xã hội và chinh phục điểm 9+ trong các kỳ thi.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                        <div class="p-6 bg-white rounded-2xl shadow-sm border border-orange-100">
+                            <i class="fas fa-bolt text-3xl text-yellow-400 mb-4"></i>
+                            <h3 class="!mt-0 !mb-2 text-lg">Học nhanh</h3>
+                            <p class="!mb-0 text-sm">Tiếp cận kiến thức trọng tâm, không lan man.</p>
+                        </div>
+                        <div class="p-6 bg-white rounded-2xl shadow-sm border border-orange-100">
+                            <i class="fas fa-magic text-3xl text-orange-400 mb-4"></i>
+                            <h3 class="!mt-0 !mb-2 text-lg">AI Thông minh</h3>
+                            <p class="!mb-0 text-sm">Chấm bài và sửa lỗi chi tiết từng câu chữ.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="bantin" class="reveal">
+                    <h2><i class="fas fa-book-open text-orange-500"></i> Bản tin Văn học</h2>
+                    <p>Nơi cập nhật những dẫn chứng Nghị luận xã hội (NLXH) nóng hổi, các nhận định lý luận văn học sắc bén.</p>
+                    
+                    
+                    <h3>Cách sử dụng:</h3>
+                    <ol>
+                        <li><span>Truy cập vào mục <strong>"Bản tin Văn học"</strong> trên thanh menu hoặc Footer.</span></li>
+                        <li><span>Sử dụng bộ lọc (Filter) để chọn chủ đề bạn quan tâm: <em>NLXH, Lý luận, Kỹ năng...</em></span></li>
+                        <li><span>Nhấp vào từng thẻ bài viết để xem chi tiết nội dung, phân tích và bài học rút ra.</span></li>
+                    </ol>
+                    
+                    <div class="note-box">
+                        💡 <strong>Mẹo:</strong> Hãy ghi chép lại các "keyword" đắt giá từ bản tin vào sổ tay của bạn để áp dụng ngay vào bài làm nhé!
+                    </div>
+                </section>
+
+                <section id="nhatky" class="reveal">
+                    <h2><i class="fas fa-map-signs text-orange-500"></i> Nhật ký học tập (Gamification)</h2>
+                    <p>Biến việc học nhàm chán thành một hành trình thú vị. Bạn sẽ đi qua các vùng đất tri thức khác nhau.</p>
+                    
+
+                    <h3>Hệ thống cấp độ:</h3>
+                    <ul>
+                        <li><strong>Level Nodes:</strong> Các nút tròn đại diện cho bài học. Nút màu <strong>Cam</strong> là bài hiện tại, nút <strong>Xanh</strong> là đã hoàn thành.</li>
+                        <li><strong>Streak (Chuỗi ngày):</strong> Duy trì đăng nhập và học tập mỗi ngày để giữ ngọn lửa Streak không bị tắt.</li>
+                        <li><strong>Vùng đất:</strong> Hành trình chia làm 3 chặng: <em>Khởi động (Rừng)</em> -> <em>Tăng tốc (Biển)</em> -> <em>Về đích (Vũ trụ)</em>.</li>
+                    </ul>
+                </section>
+
+                <section id="luyende" class="reveal">
+                    <h2><i class="fas fa-brain text-orange-500"></i> Phòng luyện đề AI</h2>
+                    <p>Đây là tính năng mạnh mẽ nhất của Hopvan. AI sẽ đóng vai trò là giám khảo chấm bài cho bạn 24/7.</p>
+                    
+
+                    <h3>Quy trình luyện đề:</h3>
+                    <ol>
+                        <li><span>Chọn đề bài từ kho đề hoặc nhập đề bài của riêng bạn.</span></li>
+                        <li><span>Viết bài trực tiếp vào khung soạn thảo hoặc dán bài làm của bạn vào.</span></li>
+                        <li><span>Nhấn nút <strong>"Chấm điểm ngay"</strong>.</span></li>
+                        <li><span>Đợi khoảng 5-10 giây, AI sẽ trả về:
+                            <ul class="mt-2 text-sm text-gray-500">
+                                <li>- Số điểm ước lượng (thang điểm 10).</li>
+                                <li>- Nhận xét ưu/nhược điểm.</li>
+                                <li>- Gợi ý sửa lỗi dùng từ, ngữ pháp chi tiết.</li>
+                            </ul>
+                        </span></li>
+                    </ol>
+                </section>
+
+                <section id="chatbot" class="reveal pb-20">
+                    <h2><i class="fas fa-comments text-orange-500"></i> Gia sư AI</h2>
+                    <p>Bí ý tưởng? Quên kiến thức? Đừng lo, Gia sư AI luôn túc trực ở góc màn hình.</p>
+                    
+
+                    <h3>Bạn có thể hỏi gì?</h3>
+                    <ul>
+                        <li>"Tìm cho mình dẫn chứng về lòng dũng cảm."</li>
+                        <li>"Mở bài cho tác phẩm Vợ chồng A Phủ như thế nào cho hay?"</li>
+                        <li>"Giải thích ý nghĩa nhan đề Người lái đò Sông Đà."</li>
+                    </ul>
+                    <p>Chỉ cần nhấn vào biểu tượng <strong>Chat</strong> ở góc dưới bên phải màn hình để bắt đầu trò chuyện.</p>
+                </section>
+
+            </article>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('#sidebar-nav .sidebar-link');
+
+            // 1. Hiệu ứng xuất hiện khi cuộn (Scroll Reveal)
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.15 });
+            
+            document.querySelectorAll('.reveal').forEach(el => {
+                revealObserver.observe(el);
+            });
+
+            // 2. Highlight Sidebar khi cuộn (Scroll Spy)
+            const activeLinkObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active');
+                                // Scroll sidebar to active link if needed
+                                link.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: "-20% 0px -70% 0px" }); // Điều chỉnh vùng nhận diện
+
+            sections.forEach(section => {
+                activeLinkObserver.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
