@@ -19,6 +19,7 @@
         :root {
             --primary: #FF8F50;
             --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
+            --purple-gradient: linear-gradient(135deg,  #FF5E62, #FF8F50 ); /* Gradient mới cho Full Đề */
             --text-main: #2D3436;
             --text-light: #636E72;
             --glass-bg: rgba(255, 255, 255, 0.65);
@@ -33,8 +34,6 @@
         .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
         .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; }
         @keyframes floatBlob { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 50px); } }
-
-        .dashboard-container { width: 100%; height: 100%; display: flex; position: relative; }
 
         .main-content {
             margin-left: var(--sidebar-width);
@@ -55,6 +54,7 @@
         .section-title { display: flex; align-items: center; gap: 12px; font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
         .section-desc { color: var(--text-light); margin-bottom: 30px; font-size: 1rem; }
 
+        /* GRID 2 CỘT CHO 4 THẺ */
         .practice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1000px; }
         
         .card {
@@ -62,17 +62,26 @@
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); height: 260px;
             display: flex; flex-direction: column; justify-content: space-between;
         }
-        .card:hover { transform: translateY(-12px) scale(1.02); box-shadow: 0 30px 60px rgba(255, 143, 80, 0.2); }
+        .card:hover { transform: translateY(-12px) scale(1.02); box-shadow: 0 30px 60px rgba(0,0,0,0.1); }
+        
+        /* CARD STYLES */
         .card-orange { background: var(--primary-gradient); color: white; }
+        .card-purple { background: var(--purple-gradient); color: white; } /* Style mới cho Full Test */
         .card-white { background: white; color: var(--text-main); border: 1px solid rgba(0,0,0,0.03); }
+        
         .card-title { font-size: 1.8rem; font-weight: 800; line-height: 1.2; z-index: 2; }
         .card-desc { font-size: 1rem; opacity: 0.9; max-width: 85%; z-index: 2; margin-top: 10px; }
+        
         .card-btn { display: inline-flex; align-items: center; gap: 10px; padding: 12px 25px; border-radius: 50px; font-weight: 700; font-size: 0.95rem; transition: 0.3s; z-index: 2; width: fit-content; }
-        .card-orange .card-btn { background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(10px); }
-        .card-white .card-btn { background: #FFF5EC; color: var(--primary); }
+        
+        /* Button colors inside cards */
+        .card-orange .card-btn, .card-purple .card-btn { background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(10px); }
+        .card-white .card-btn { background: #f3f4f6; color: var(--text-main); }
+        
         .card-icon-bg { position: absolute; right: -20px; bottom: -20px; font-size: 10rem; opacity: 0.1; transform: rotate(-15deg); transition: 0.5s; }
         .card:hover .card-icon-bg { transform: rotate(0deg) scale(1.1); opacity: 0.2; }
 
+        /* MODAL */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(8px); animation: fadeIn 0.3s; }
         .modal-box { background: white; width: 90%; max-width: 850px; padding: 50px; border-radius: 40px; position: relative; animation: popUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 40px 100px rgba(0,0,0,0.15); }
         .close-modal { position: absolute; top: 25px; right: 30px; font-size: 1.8rem; cursor: pointer; color: #ccc; transition: 0.2s; }
@@ -110,33 +119,51 @@
         <div class="user-header">
             <div class="welcome-text">
                 <h2 id="welcome-name">Xin chào,</h2>
-                <p style="color: var(--text-light); margin-top: 5px;">Hãy cùng bắt đầu học tập cùng với Hopvan nhé.</p>
+                <p style="color: var(--text-light); margin-top: 5px;">Hãy chọn chế độ luyện tập phù hợp hôm nay.</p>
             </div>
             <div class="user-avatar" id="avatar-initial"></div>
         </div>
 
         <div class="section-title">
-            <i class="fas fa-feather-alt" style="color: var(--primary);"></i> Phòng Luyện Đề AI
+            <i class="fas fa-feather-alt" style="color: var(--primary);"></i> Trung Tâm Luyện Đề
         </div>
-        <p class="section-desc">Hệ thống chấm điểm và sửa lỗi tự động.</p>
+        <p class="section-desc">Hệ thống chấm điểm AI & Ngân hàng câu hỏi đa dạng.</p>
 
         <div class="practice-grid">
             <div class="card card-orange" onclick="goToExam('random')">
                 <div class="card-content">
-                    <div class="card-title">Luyện đề<br>Ngẫu nhiên</div>
-                    <p class="card-desc">Thử thách bản thân với đề bài bất kỳ từ kho dữ liệu.</p>
+                    <div class="card-title">Luyện Đề<br>Ngẫu Nhiên</div>
+                    <p class="card-desc">Thử thách với 1 đề bài bất kỳ từ kho dữ liệu.</p>
                 </div>
                 <div class="card-btn">Bắt đầu ngay <i class="fas fa-arrow-right"></i></div>
                 <i class="fas fa-dice card-icon-bg"></i>
             </div>
 
+            <div class="card card-purple" onclick="goToExam('full')">
+                <div class="card-content">
+                    <div class="card-title">Luyện Đề<br>Tổng Hợp</div>
+                    <p class="card-desc">Full cấu trúc BGD: Đọc Hiểu + NLXH + NLVH (120p).</p>
+                </div>
+                <div class="card-btn">Thi thử ngay <i class="fas fa-file-signature"></i></div>
+                <i class="fas fa-scroll card-icon-bg"></i>
+            </div>
+
             <div class="card card-white" onclick="openTopicModal()">
                 <div class="card-content">
-                    <div class="card-title">Chọn theo<br>Chủ đề</div>
-                    <p class="card-desc">Ôn tập chuyên sâu: Nghị Luận VH, Nghị Luận XH, Đọc Hiểu...</p>
+                    <div class="card-title" style="color: var(--primary);">Chọn Theo<br>Chủ Đề</div>
+                    <p class="card-desc">Ôn tập chuyên sâu: NLXH, NLVH, Đọc Hiểu.</p>
                 </div>
                 <div class="card-btn">Xem danh sách <i class="fas fa-list-ul"></i></div>
-                <i class="fas fa-layer-group card-icon-bg"></i>
+                <i class="fas fa-layer-group card-icon-bg" style="color: var(--primary);"></i>
+            </div>
+
+            <div class="card card-white" onclick="goToExam('quiz')">
+                <div class="card-content">
+                    <div class="card-title" style="color: var(--primary);">Trắc Nghiệm<br>Văn Học</div>
+                    <p class="card-desc">Ôn nhanh kiến thức tác giả, tác phẩm qua câu hỏi ngắn.</p>
+                </div>
+                <div class="card-btn">Vào thi <i class="fas fa-check-circle"></i></div>
+                <i class="fas fa-tasks card-icon-bg" style="color: var(--primary);"></i>
             </div>
         </div>
     </main>
@@ -195,40 +222,27 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // --- A. LOGIC MODAL (PHẢI GÁN VÀO WINDOW) ---
-    window.openTopicModal = () => {
-        const modal = document.getElementById('topicModal');
-        if(modal) modal.style.display = 'flex';
-    };
+    // --- LOGIC MODAL ---
+    window.openTopicModal = () => { document.getElementById('topicModal').style.display = 'flex'; };
+    window.closeTopicModal = () => { document.getElementById('topicModal').style.display = 'none'; };
+    window.addEventListener('click', (e) => { if (e.target === document.getElementById('topicModal')) window.closeTopicModal(); });
 
-    window.closeTopicModal = () => {
-        const modal = document.getElementById('topicModal');
-        if(modal) modal.style.display = 'none';
-    };
-
-    window.addEventListener('click', (e) => {
-        const modal = document.getElementById('topicModal');
-        if (e.target === modal) window.closeTopicModal();
-    });
-
-    // --- B. HÀM CHUYỂN TRANG (ĐÃ XOÁ LƯU DATABASE) ---
+    // --- HÀM CHUYỂN TRANG (CẬP NHẬT MỚI) ---
     window.goToExam = (type) => {
         const topicMap = {
             'random':    { path: '../phongluyende/index.html' },
             'nlxh':      { path: '../phongluyende/nghiluanxahoi.html' },
-            'doc-hieu':  { path: '../phongluyende/dochieu.html' }
+            'doc-hieu':  { path: '../phongluyende/dochieu.html' },
+            'full':      { path: '../phongluyende/detonghop.html' }, // File mới
+            'quiz':      { path: '../phongluyende/tracnghiem.html' } // File mới
         };
 
         const selected = topicMap[type] || topicMap['random'];
-
-        // Lưu trạng thái vào LocalStorage để trang sau biết đang làm chủ đề gì
         localStorage.setItem('selectedTopic', type);
-
-        // Chuyển hướng trực tiếp không cần đợi Database
         window.location.href = selected.path;
     };
 
-    // --- C. ĐỒNG BỘ THÔNG TIN USER ---
+    // --- AUTH & MENU ---
     onAuthStateChanged(auth, (user) => {
         if (user) {
             const name = user.displayName || user.email.split('@')[0];
@@ -239,31 +253,21 @@
         }
     });
 
-    // --- D. FETCH MENU ---
-    fetch('menu.html')
-        .then(res => res.text())
-        .then(html => {
-            const placeholder = document.getElementById('menu-placeholder');
-            placeholder.innerHTML = html;
-            const scripts = placeholder.querySelectorAll('script');
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement('script');
-                newScript.text = oldScript.text;
-                document.body.appendChild(newScript);
-            });
-        })
-        .catch(err => console.error("Lỗi tải menu:", err));
+    fetch('menu.html').then(res => res.text()).then(html => {
+        const placeholder = document.getElementById('menu-placeholder');
+        placeholder.innerHTML = html;
+        placeholder.querySelectorAll('script').forEach(oldScript => {
+            const newScript = document.createElement('script');
+            newScript.text = oldScript.text;
+            document.body.appendChild(newScript);
+        });
+    });
 
     window.addEventListener('trigger-firebase-signout', async () => {
-        try {
-            await signOut(auth);
-            window.location.href = "../index.html";
-        } catch (error) { alert("Lỗi: " + error.message); }
+        try { await signOut(auth); window.location.href = "../index.html"; } catch (error) { alert("Lỗi: " + error.message); }
     });
     
-    window.alertLocked = () => {
-        alert("Chủ đề này đang được biên soạn. Bạn vui lòng quay lại sau nhé!");
-    };
+    window.alertLocked = () => { alert("Chủ đề này đang được biên soạn. Bạn vui lòng quay lại sau nhé!"); };
 </script>
 </body>
 </html>

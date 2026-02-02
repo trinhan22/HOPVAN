@@ -1,0 +1,28 @@
+{
+  "fulltest": [
+    {
+      "id": "DE01",
+      "reading_text": "Trích đoạn: 'Cuộc sống không phải là chờ đợi cơn bão qua đi, mà là học cách khiêu vũ dưới mưa...' (Vivian Greene)",
+      "reading_questions": [
+        "Xác định phương thức biểu đạt chính của đoạn trích.",
+        "Theo tác giả, thái độ sống tích cực được thể hiện qua hình ảnh nào?",
+        "Anh/Chị hiểu như thế nào về câu nói 'học cách khiêu vũ dưới mưa'?",
+        "Thông điệp ý nghĩa nhất đối với anh/chị qua đoạn trích trên?"
+      ],
+      "nlxh_topic": "Từ nội dung đoạn trích phần Đọc hiểu, anh/chị hãy viết một đoạn văn (khoảng 200 chữ) trình bày suy nghĩ về ý nghĩa của việc giữ gìn tinh thần lạc quan trong khó khăn.",
+      "nlvh_topic": "Phân tích sức sống tiềm tàng của nhân vật Mị trong đêm tình mùa xuân (Vợ chồng A Phủ - Tô Hoài). Từ đó, nhận xét về giá trị nhân đạo của tác phẩm."
+    },
+    {
+      "id": "DE02",
+      "reading_text": "Thơ: 'Đất nước' (Nguyễn Khoa Điềm) - Đoạn đầu...",
+      "reading_questions": [
+        "Đoạn trích trên được viết theo thể thơ nào?",
+        "Chỉ ra biện pháp tu từ được sử dụng trong câu thơ: 'Đất Nước là nơi em đánh rơi chiếc khăn trong nỗi nhớ thầm'.",
+        "Nêu hiệu quả nghệ thuật của việc sử dụng chất liệu văn hóa dân gian trong đoạn trích.",
+        "Suy nghĩ của anh/chị về trách nhiệm của thế hệ trẻ đối với đất nước?"
+      ],
+      "nlxh_topic": "Viết đoạn văn (200 chữ) bàn về vai trò của khát vọng trong cuộc sống giới trẻ hiện nay.",
+      "nlvh_topic": "Cảm nhận của anh/chị về vẻ đẹp hùng vĩ và trữ tình của hình tượng Người lái đò sông Đà (Nguyễn Tuân)."
+    }
+  ]
+}

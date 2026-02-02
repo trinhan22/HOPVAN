@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hopvan - Luyện Đề Tổng Hợp</title>
+    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
+    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+    <meta property="og:url" content="https://hopvan.netlify.app" />
+    <meta property="og:type" content="article" />
+
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --sidebar-width: 280px;
+        }
+
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: #FFF5EC; height: 100vh; overflow: hidden; display: flex; }
+
+        /* --- BACKGROUND BLOBS --- */
+        .background-blobs { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: floatBlob 10s infinite alternate; }
+        .blob-1 { width: 600px; height: 600px; background: #FCA96A; top: -150px; left: -150px; }
+        .blob-2 { width: 500px; height: 500px; background: #FCD5B5; bottom: -100px; right: -100px; }
+        @keyframes floatBlob { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, 60px); } }
+
+        /* --- MAIN LAYOUT --- */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            height: 100vh;
+            background: var(--glass-bg);
+            backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
+            border-left: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 40px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* --- EXAM STYLES --- */
+        .prompt-card {
+            background: white; border-radius: 30px; padding: 0; 
+            border: 1px solid rgba(255, 143, 80, 0.2);
+            box-shadow: 0 15px 35px rgba(255, 143, 80, 0.05);
+            position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
+            height: 100%; max-height: 600px;
+        }
+        .prompt-header {
+            background: var(--primary-gradient); color: white;
+            padding: 15px 25px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .prompt-body {
+            padding: 25px; overflow-y: auto; flex: 1;
+        }
+        
+        /* Style nội dung đề thi */
+        .exam-section { margin-bottom: 25px; border-bottom: 2px dashed #ffe4d6; padding-bottom: 20px; }
+        .exam-section:last-child { border-bottom: none; }
+        .section-label { font-weight: 900; color: #ea580c; text-transform: uppercase; margin-bottom: 10px; display: block; }
+        .question-text { color: #374151; line-height: 1.8; font-size: 0.95rem; }
+        .highlight-text { background: #fff7ed; padding: 15px; border-left: 4px solid #FF8F50; border-radius: 8px; margin: 10px 0; font-style: italic; color: #431407; }
+
+        .workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; min-height: 600px; margin-top: 30px; }
+
+        .editor-container {
+            background: white; border-radius: 30px; border: 1px solid rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.02); transition: 0.3s;
+        }
+        .editor-container:focus-within { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 20px 50px rgba(255, 143, 80, 0.15); }
+
+        .writing-area { 
+            flex: 1; width: 100%; padding: 30px; border: none; outline: none; resize: none; 
+            font-size: 1.1rem; line-height: 1.9; color: #2D3436; background: transparent;
+        }
+
+        /* AI Result */
+        .ai-result-view { padding: 30px; font-size: 1.1rem; line-height: 1.9; overflow-y: auto; background-color: #fafafa; }
+        .text-good { color: #10B981; background: #ECFDF5; font-weight: 600; padding: 2px 4px; border-radius: 6px; }
+        .text-bad { color: #EF4444; background: #FEF2F2; text-decoration: line-through; padding: 2px 4px; border-radius: 6px; }
+        
+        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .loader-robot { font-size: 4rem; color: var(--primary); animation: robotBounce 1s infinite alternate; }
+        @keyframes robotBounce { from { transform: translateY(0); } to { transform: translateY(-20px); } }
+
+        @media (max-width: 1024px) {
+            .main-content { margin-left: 0; width: 100%; padding: 20px; }
+            .workspace-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loader-robot"><i class="fas fa-robot"></i></div>
+        <h3 class="text-2xl font-black mt-6 bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent">AI ĐANG CHẤM BÀI...</h3>
+        <p class="text-gray-500 mt-2 font-medium">Đề tổng hợp khá dài, bạn đợi xíu nhé!</p>
+    </div>
+
+    <div class="dashboard-container">
+        <div id="menu-placeholder"></div>
+
+        <main class="main-content">
+            <div class="flex justify-between items-center mb-8">
+                <div class="flex items-center gap-5">
+                    <button class="md:hidden text-2xl" onclick="toggleSidebarGlobal()"><i class="fas fa-bars"></i></button>
+                    <div>
+                        <h2 class="text-3xl font-black text-gray-800 tracking-tight">Thi Thử Tốt Nghiệp THPT</h2>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
+                            <p class="text-sm text-gray-500 font-bold uppercase tracking-widest">Mô phỏng 120 phút</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="randomizeQuestion()" class="bg-white px-5 py-3 rounded-2xl font-bold text-gray-500 hover:text-orange-600 hover:bg-orange-50 transition-all shadow-sm border border-gray-100">
+                        <i class="fas fa-sync-alt mr-2"></i> Đổi đề khác
+                    </button>
+                    <div class="bg-black text-white px-6 py-3 rounded-2xl font-black flex items-center gap-3 shadow-xl">
+                        <i class="fas fa-clock text-orange-400"></i> <span id="timer" class="text-xl">120:00</span>
+                    </div>
+                    <div class="user-avatar" id="avatar-initial" style="width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.4rem; box-shadow: 0 8px 20px rgba(255, 143, 80, 0.3); transform: rotate(-5deg);"></div>
+                </div>
+            </div>
+
+            <div class="workspace-grid" style="margin-top: 0;">
+                
+                <div class="prompt-card">
+                    <div class="prompt-header">
+                        <div class="font-bold uppercase tracking-widest text-sm"><i class="fas fa-file-alt mr-2"></i> Đề thi chính thức</div>
+                        <span id="exam-code" class="bg-white/20 px-3 py-1 rounded text-xs font-bold">Mã đề: ...</span>
+                    </div>
+                    <div class="prompt-body" id="prompt-content">
+                        <div class="animate-pulse space-y-4">
+                            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                            <div class="h-4 bg-gray-200 rounded"></div>
+                            <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-6">
+                    <div class="editor-container h-full">
+                        <div class="px-6 py-4 bg-gray-50/50 border-b flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Bài làm của bạn</span>
+                                <button onclick="document.getElementById('file-upload').click()" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:text-orange-500 hover:border-orange-200 transition shadow-sm">
+                                    <i class="fas fa-paperclip"></i> Tải tệp (.docx)
+                                </button>
+                                <input type="file" id="file-upload" class="hidden" accept=".txt, .docx">
+                            </div>
+                            <span id="word-count" class="text-xs font-black bg-gray-200 text-gray-600 px-3 py-1 rounded-lg">0 TỪ</span>
+                        </div>
+                        <textarea id="student-essay" class="writing-area" placeholder="Lưu ý: Hãy ghi rõ 'Câu 1:', 'Câu 2:' để AI chấm chính xác hơn..."></textarea>
+                    </div>
+
+                    <div class="editor-container" style="height: auto; min-height: 100px;">
+                        <div class="px-8 py-4 bg-gray-50/50 border-b flex justify-between items-center">
+                            <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Chấm thi tự động</span>
+                            <button id="submit-btn" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-2.5 rounded-xl font-black text-sm hover:scale-105 transition shadow-lg active:scale-95">NỘP BÀI</button>
+                        </div>
+                        <div id="ai-correction-box" class="ai-result-view text-gray-400 flex items-center justify-center text-center p-6">
+                            <div>
+                                <i class="fas fa-robot text-4xl mb-3 opacity-20"></i>
+                                <p class="text-sm">Kết quả chấm thi sẽ hiện ở đây.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="overall-feedback-box" class="mt-10 pb-20 hidden">
+                <div class="bg-white rounded-3xl p-8 border border-orange-100 shadow-lg">
+                    <h3 class="text-2xl font-black text-gray-800 mb-6 flex items-center gap-3">
+                        <i class="fas fa-chart-pie text-orange-500"></i> Kết quả chi tiết
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <h4 class="font-bold text-green-600 uppercase text-sm border-b pb-2">Điểm mạnh</h4>
+                            <ul id="idea-list" class="space-y-2 text-gray-700 text-sm list-disc pl-5"></ul>
+                        </div>
+                        <div class="space-y-4">
+                            <h4 class="font-bold text-red-500 uppercase text-sm border-b pb-2">Cần cải thiện</h4>
+                            <ul id="missing-list" class="space-y-2 text-gray-700 text-sm list-disc pl-5"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const API_URL = `/.netlify/functions/gemini-proxy`;
+    let questionsData = [];
+    window.currentExamData = null;
+
+    // --- TIMER 120 PHÚT ---
+    let timeLeft = 7200; 
+    const timerElement = document.getElementById('timer');
+    function startTimer() {
+        const countdown = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                timerElement.innerText = "00:00:00";
+                alert("Hết giờ làm bài!");
+            } else {
+                timeLeft--;
+                let h = Math.floor(timeLeft / 3600);
+                let m = Math.floor((timeLeft % 3600) / 60);
+                let s = timeLeft % 60;
+                timerElement.innerText = `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
+        }, 1000);
+    }
+
+    onAuthStateChanged(auth, (u) => {
+        if (u) {
+            const n = u.displayName || u.email;
+            document.getElementById('avatar-initial').innerText = n.charAt(0).toUpperCase();
+            startTimer();
+        } else { window.location.href = "../log.html"; }
+    });
+
+    // --- TẢI ĐỀ THI FULL ---
+    async function loadQuestions() {
+        try {
+            const r = await fetch('questions-full.json');
+            const data = await r.json();
+            questionsData = data.fulltest;
+            randomizeQuestion();
+        } catch (e) {
+            document.getElementById('prompt-content').innerHTML = `<p class="text-red-500">Lỗi tải đề. Vui lòng kiểm tra file data.</p>`;
+        }
+    }
+
+    window.randomizeQuestion = () => {
+        if (!questionsData || questionsData.length === 0) return;
+        const q = questionsData[Math.floor(Math.random() * questionsData.length)];
+        window.currentExamData = q;
+
+        document.getElementById('exam-code').innerText = `Mã đề: ${q.id}`;
+        
+        // Render Đề bài (Vẫn giữ cấu trúc nhưng dùng class màu cam)
+        const htmlContent = `
+            <div class="exam-section">
+                <span class="section-label">I. ĐỌC HIỂU (3.0 điểm)</span>
+                <div class="highlight-text">${q.reading_text}</div>
+                <div class="question-text font-bold mt-2">Thực hiện các yêu cầu sau:</div>
+                <ul class="list-decimal pl-5 question-text space-y-2 mt-2">
+                    ${q.reading_questions.map(quest => `<li>${quest}</li>`).join('')}
+                </ul>
+            </div>
+            <div class="exam-section">
+                <span class="section-label">II. LÀM VĂN (7.0 điểm)</span>
+                <div class="mb-4">
+                    <p class="font-bold text-gray-800">Câu 1 (2.0 điểm):</p>
+                    <p class="question-text">${q.nlxh_topic}</p>
+                </div>
+                <div>
+                    <p class="font-bold text-gray-800">Câu 2 (5.0 điểm):</p>
+                    <p class="question-text">${q.nlvh_topic}</p>
+                </div>
+            </div>
+        `;
+        document.getElementById('prompt-content').innerHTML = htmlContent;
+    };
+
+    loadQuestions();
+
+    // --- UPLOAD FILE ---
+    document.getElementById('file-upload').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        const textarea = document.getElementById('student-essay');
+        if (file.name.endsWith('.docx')) {
+            reader.onload = function(event) {
+                mammoth.extractRawText({arrayBuffer: event.target.result})
+                    .then(result => { textarea.value = result.value; textarea.dispatchEvent(new Event('input')); })
+                    .catch(err => alert("Lỗi đọc file: " + err.message));
+            };
+            reader.readAsArrayBuffer(file);
+        } else if (file.name.endsWith('.txt')) {
+            reader.onload = function(event) { textarea.value = event.target.result; textarea.dispatchEvent(new Event('input')); };
+            reader.readAsText(file);
+        }
+    });
+
+    // --- CHẤM BÀI ---
+    document.getElementById('submit-btn').onclick = async () => {
+        const content = document.getElementById('student-essay').value.trim();
+        if (content.split(/\s+/).length < 50) return alert("Bài làm quá ngắn!");
+
+        const loading = document.getElementById('loading-overlay');
+        loading.style.display = 'flex';
+
+        const q = window.currentExamData;
+        const systemPrompt = `
+            Bạn là giám khảo chấm thi Tốt nghiệp THPT môn Ngữ Văn.
+            ĐỀ BÀI:
+            1. Đọc hiểu: ${q.reading_text} - Câu hỏi: ${q.reading_questions.join('; ')}
+            2. NLXH: ${q.nlxh_topic}
+            3. NLVH: ${q.nlvh_topic}
+            
+            BÀI LÀM CỦA HỌC SINH:
+            ${content}
+
+            YÊU CẦU:
+            Hãy chấm điểm chi tiết cho cả 3 phần trên thang điểm 10.
+            TRẢ VỀ KẾT QUẢ DẠNG JSON (Không Markdown):
+            {
+                "correction_html": "HTML hiển thị kết quả chấm (chia rõ phần I, II, nhận xét từng câu, bôi đậm lỗi sai/đúng)",
+                "idea_feedback": ["Danh sách các ý hay/đúng học sinh đã làm được"],
+                "missing_points": ["Danh sách các ý thiếu sót hoặc cần khắc phục"]
+            }
+        `;
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
+            });
+
+            const data = await response.json();
+            const rawText = data.candidates[0].content.parts[0].text;
+            const jsonResult = JSON.parse(rawText.replace(/```json|```/g, "").trim());
+
+            const box = document.getElementById('ai-correction-box');
+            box.innerHTML = jsonResult.correction_html;
+            box.style.textAlign = 'left';
+            box.classList.remove('flex', 'items-center', 'justify-center', 'text-gray-400');
+            
+            document.getElementById('idea-list').innerHTML = jsonResult.idea_feedback.map(i => `<li>${i}</li>`).join('');
+            document.getElementById('missing-list').innerHTML = jsonResult.missing_points.map(i => `<li>${i}</li>`).join('');
+            document.getElementById('overall-feedback-box').classList.remove('hidden');
+
+            if (auth.currentUser) {
+                await addDoc(collection(db, "activities"), {
+                    uid: auth.currentUser.uid,
+                    action: `Hoàn thành Full Test (Mã ${q.id})`,
+                    type: "fulltest",
+                    timestamp: serverTimestamp()
+                });
+            }
+
+        } catch (e) {
+            alert("Lỗi xử lý AI: " + e.message);
+        } finally { loading.style.display = 'none'; }
+    };
+
+    document.getElementById('student-essay').oninput = function() {
+        const c = this.value.trim().split(/\s+/).filter(x => x).length;
+        document.getElementById('word-count').innerText = `${c} TỪ`;
+    };
+
+    fetch('menu.html').then(r => r.text()).then(h => {
+        const p = document.getElementById('menu-placeholder'); p.innerHTML = h;
+        p.querySelectorAll('script').forEach(s => { const ns = document.createElement('script'); ns.text = s.text; document.body.appendChild(ns); });
+    });
+</script>
+</body>
+</html>

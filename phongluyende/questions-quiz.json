@@ -1,0 +1,40 @@
+{
+  "quiz": [
+    {
+      "id": 1,
+      "question": "Tác phẩm 'Vợ chồng A Phủ' của Tô Hoài được in trong tập truyện nào?",
+      "options": [
+        "Truyện Tây Bắc",
+        "Gió đại ngàn",
+        "Cát bụi chân ai",
+        "Dế Mèn phiêu lưu ký"
+      ],
+      "correct_index": 0,
+      "explanation": "'Vợ chồng A Phủ' (1952) là truyện ngắn đặc sắc in trong tập 'Truyện Tây Bắc', giải Nhất giải thưởng Hội Văn nghệ Việt Nam 1954-1955."
+    },
+    {
+      "id": 2,
+      "question": "Ai là người được mệnh danh là 'Ông vua phóng sự đất Bắc'?",
+      "options": [
+        "Ngô Tất Tố",
+        "Nam Cao",
+        "Vũ Trọng Phụng",
+        "Nguyên Hồng"
+      ],
+      "correct_index": 2,
+      "explanation": "Vũ Trọng Phụng nổi tiếng với các phóng sự sắc sảo như 'Cơm thầy cơm cô', 'Kỹ nghệ lấy Tây'..."
+    },
+    {
+      "id": 3,
+      "question": "Chi tiết 'bát cháo hành' trong tác phẩm 'Chí Phèo' tượng trưng cho điều gì?",
+      "options": [
+        "Sự nghèo đói cùng cực",
+        "Tình yêu thương và sự thức tỉnh lương tri",
+        "Kỹ năng nấu ăn của Thị Nở",
+        "Một phương thuốc giải rượu"
+      ],
+      "correct_index": 1,
+      "explanation": "Bát cháo hành là biểu tượng của tình người ấm áp (lần đầu tiên Chí được cho mà không phải dọa nạt), giúp đánh thức phần 'người' trong con quỷ dữ."
+    }
+  ]
+}
