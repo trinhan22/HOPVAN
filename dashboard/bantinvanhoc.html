@@ -308,10 +308,10 @@
             // DỮ LIỆU FALLBACK (Phòng khi chưa có file JSON)
             if(allNews.length === 0) {
                 allNews = [
-                    {id: 1, category: "Đang tải...", topic: "Đang tải...", title: "Đang tải...", img: "../panel.webp", summary: "Đang tải...", content: "<p>Đang tải...</p>"},
-                    {id: 2, category: "Đang tải...", topic: "Đang tải...", title: "Đang tải...", img: "../panel.webp", summary: "Đang tải...", content: "<p>Đang tải...</p>"},
-                    {id: 3, category: "Đang tải...", topic: "Đang tải...", title: "Đang tải...", img: "../panel.webp", summary: "Đang tải...", content: "<p>Đang tải...</p>"},
-                    {id: 4, category: "Đang tải...", topic: "Đang tải...", title: "Đang tải...", img: "../panel.webp", summary: "Đang tải...", content: "<p>Đang tải...</p>"}
+                    {id: 1, category: "Đang tải...", topic: "Đang tải...", title: "Đang tải...", img: "../panel.webp", content: "<p>Đang tải...</p>"},
+                    {id: 2, category: "Đang tải...", topic: "Đang tải...", title: "Đang tải...", img: "../panel.webp", content: "<p>Đang tải...</p>"},
+                    {id: 3, category: "Đang tải...", topic: "Đang tải...", title: "Đang tải...", img: "../panel.webp", content: "<p>Đang tải...</p>"},
+                    {id: 4, category: "Đang tải...", topic: "Đang tải...", title: "Đang tải...", img: "../panel.webp", content: "<p>Đang tải...</p>"}
                 ];
             }
             allNews.sort(() => Math.random() - 0.5);
@@ -319,6 +319,23 @@
         } catch (e) {
             document.getElementById('news-grid').innerHTML = '<p class="text-center font-bold text-gray-400">Đang cập nhật...</p>';
         }
+    }
+
+    // --- HÀM TẠO SUMMARY TỰ ĐỘNG ---
+    function getSummary(htmlString, limit = 120) {
+        // 1. Tạo một thẻ div ảo để chứa HTML và lấy ra text thuần
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = htmlString;
+        
+        // 2. Lấy nội dung text (loại bỏ các thẻ <p>, <span>...)
+        let plainText = tempDiv.textContent || tempDiv.innerText || "";
+        
+        // 3. Xử lý chuỗi
+        plainText = plainText.trim(); // Xóa khoảng trắng thừa đầu đuôi
+        
+        // 4. Cắt chuỗi và thêm dấu ...
+        if (plainText.length <= limit) return plainText;
+        return plainText.substring(0, limit).trim() + "...";
     }
 
     // 2. RENDER GRID (ANIMATION STAGGERED)
@@ -336,6 +353,8 @@
                 titleHtml = item.title.replace(regex, '<span class="highlight">$1</span>');
             }
 
+            const summary = getSummary(item.content); // Tự động tạo summary
+
             // Thêm animation-delay để thẻ bay lên lần lượt
             return `
             <div class="article-card" style="animation-delay: ${index * 0.1}s" onclick="window.openDetail('${item.id}')">
@@ -346,7 +365,7 @@
                 <div class="card-body">
                     <span class="card-topic"><i class="fas fa-hashtag text-orange-400"></i> ${item.topic}</span>
                     <h3 class="card-title">${titleHtml}</h3>
-                    <p class="card-summary">${item.summary}</p>
+                    <p class="card-summary">${summary}</p>
                 </div>
             </div>
             `;
