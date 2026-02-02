@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
     <style>
         :root { --primary: #FF8F50; --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62); --glass-bg: rgba(255, 255, 255, 0.75); --sidebar-width: 280px; }
         * { font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.3s ease; }
@@ -87,7 +89,13 @@
         <div class="workspace-grid">
             <div class="editor-container">
                 <div class="px-8 py-5 bg-gray-50/50 border-b flex justify-between items-center">
-                    <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Khu vực làm bài</span>
+                    <div class="flex items-center gap-3">
+                        <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Khu vực làm bài</span>
+                        <button onclick="document.getElementById('file-upload').click()" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:text-orange-500 hover:border-orange-200 transition shadow-sm">
+                            <i class="fas fa-paperclip"></i> Tải tệp (.docx)
+                        </button>
+                        <input type="file" id="file-upload" class="hidden" accept=".txt, .docx">
+                    </div>
                     <span id="word-count" class="text-xs font-black bg-gray-200 text-gray-600 px-3 py-1 rounded-lg">0 TỪ</span>
                 </div>
                 <textarea id="student-essay" class="writing-area" placeholder="Hãy bắt đầu bài viết của bạn tại đây..."></textarea>
@@ -171,7 +179,37 @@
 
     loadQuestions();
 
-    // 3. AI Grading & Database Update
+    // 3. LOGIC XỬ LÝ UPLOAD FILE (DOCX/TXT)
+    document.getElementById('file-upload').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        const textarea = document.getElementById('student-essay');
+
+        if (file.name.endsWith('.docx')) {
+            reader.onload = function(event) {
+                const arrayBuffer = event.target.result;
+                mammoth.extractRawText({arrayBuffer: arrayBuffer})
+                    .then(result => {
+                        textarea.value = result.value;
+                        textarea.dispatchEvent(new Event('input')); // Cập nhật bộ đếm từ
+                    })
+                    .catch(err => alert("Lỗi đọc file Word: " + err.message));
+            };
+            reader.readAsArrayBuffer(file);
+        } else if (file.name.endsWith('.txt')) {
+            reader.onload = function(event) {
+                textarea.value = event.target.result;
+                textarea.dispatchEvent(new Event('input'));
+            };
+            reader.readAsText(file);
+        } else {
+            alert("Vui lòng chọn file .docx hoặc .txt");
+        }
+    });
+
+    // 4. AI Grading & Database Update
     document.getElementById('submit-btn').onclick = async () => {
         const content = document.getElementById('student-essay').value.trim();
         const wordCount = content.split(/\s+/).filter(x => x).length;

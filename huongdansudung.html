@@ -3,275 +3,388 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hướng dẫn sử dụng - Hopvan</title>
+    <title>Trung tâm Hỗ trợ - Hopvan</title>
     <link rel="icon" type="image/webp" href="LOGO.WEBP" />
     
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         :root {
             --primary: #FF8F50;
             --primary-dark: #FF5E62;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
             --bg-color: #FFF5EC;
         }
         
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-color);
-            color: #2D3436;
+            color: var(--text-main);
         }
 
-        /* --- Custom Scrollbar --- */
-        ::-webkit-scrollbar { width: 8px; }
+        /* --- Scrollbar --- */
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #ffd1b3; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #fed7aa; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-
-        /* --- Text Gradients --- */
-        .gradient-text {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
 
         /* --- Sidebar Styles --- */
         aside {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 143, 80, 0.2);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 4px 0 24px rgba(0,0,0,0.02);
         }
 
         .sidebar-link {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 0.75rem 1rem;
+            gap: 12px;
+            padding: 12px 16px;
             border-radius: 12px;
             font-size: 0.95rem;
-            color: #636E72;
+            color: var(--text-sub);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border-left: 4px solid transparent;
-            margin-bottom: 5px;
+            position: relative;
             font-weight: 600;
+            margin-bottom: 4px;
         }
 
         .sidebar-link:hover {
-            background-color: #fff0e6;
+            background-color: rgba(255, 255, 255, 0.8);
             color: var(--primary-dark);
-            transform: translateX(5px);
+            transform: translateX(4px);
         }
 
+        /* Active State Pro */
         .sidebar-link.active {
-            background: linear-gradient(90deg, #fff0e6, transparent);
+            background: linear-gradient(90deg, #fff7ed 0%, #ffffff 100%);
             color: var(--primary);
-            border-left-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(255, 143, 80, 0.1);
         }
+        .sidebar-link.active::before {
+            content: ''; position: absolute; left: 0; top: 15%; height: 70%; width: 4px;
+            background: var(--primary); border-radius: 0 4px 4px 0;
+        }
+
+        /* Icons */
+        .icon-box {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px;
+            background: white;
+            color: #94a3b8;
+            border: 1px solid #f1f5f9;
+            transition: 0.3s;
+        }
+        .sidebar-link:hover .icon-box, .sidebar-link.active .icon-box {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 10px rgba(255, 143, 80, 0.3);
+        }
+        .icon-svg { width: 18px; height: 18px; stroke-width: 2; stroke: currentColor; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 
         .sidebar-heading {
-            font-size: 0.85rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #b2bec3;
-            margin-top: 2rem;
-            margin-bottom: 0.75rem;
-            padding: 0 1rem;
+            font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 1px; color: #cbd5e1; margin: 24px 0 12px 16px;
         }
 
-        /* --- Prose Content Styles --- */
-        .prose h1 { font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem; line-height: 1.2; }
-        
+        /* --- Content Styles --- */
+        .prose h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; line-height: 1.1; color: var(--text-main); }
+        .prose p { line-height: 1.7; color: var(--text-sub); margin-bottom: 1.5rem; }
+
+        .section-card {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            transition: 0.5s;
+        }
+        .section-card:hover { background: white; box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
+
         .prose h2 {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #2D3436;
-            margin-top: 4rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 3px solid #ffe0cc;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            font-size: 1.75rem; font-weight: 800; color: var(--text-main);
+            margin-bottom: 20px; display: flex; align-items: center; gap: 15px;
         }
-
-        .prose h3 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-            margin-top: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .prose p { line-height: 1.8; margin-bottom: 1.2rem; color: #4b5563; font-size: 1.05rem; }
         
-        .prose ul, .prose ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
-        .prose li { margin-bottom: 0.5rem; position: relative; }
+        .h2-number {
+            font-size: 3rem; font-weight: 900; opacity: 0.1; line-height: 1;
+            position: absolute; left: 20px; top: 20px; color: var(--primary);
+        }
+
+        /* --- Mockup Image (ĐÃ SỬA LẠI) --- */
+        .mockup-window {
+            background: #1e293b;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.2);
+            overflow: hidden;
+            margin: 30px 0;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        .mockup-header {
+            background: #0f172a; padding: 12px 16px; display: flex; gap: 8px;
+        }
+        .mockup-dot { width: 10px; height: 10px; rounded: 50%; border-radius: 50%; }
         
-        /* Bullet points đẹp */
-        .prose ul li::before {
-            content: "\f058"; /* FontAwesome Check Circle */
-            font-family: "Font Awesome 6 Free";
-            font-weight: 900;
-            color: var(--primary);
-            position: absolute;
-            left: -1.5rem;
-            top: 2px;
+        /* Cập nhật class này để chứa ảnh */
+        .mockup-content {
+            background: #f8fafc; /* Màu nền dự phòng */
+            position: relative;
+            overflow: hidden; /* Đảm bảo ảnh không tràn ra ngoài bo góc */
+            line-height: 0; /* Loại bỏ khoảng trắng thừa dưới ảnh */
         }
-        .prose ul { list-style: none; }
-
-        .prose ol { list-style-type: decimal; color: var(--primary-dark); font-weight: 700; }
-        .prose ol li span { color: #4b5563; font-weight: 400; }
-
-        .note-box {
-            background: #fff8f0;
-            border-left: 4px solid var(--primary);
-            padding: 1.5rem;
-            border-radius: 0 12px 12px 0;
-            margin: 1.5rem 0;
-            font-style: italic;
-            color: #5d4037;
+        /* Class cho ảnh bên trong mockup để nó tràn viền đẹp */
+        .mockup-content img {
+            width: 100%;
+            height: auto;
+            display: block;
         }
 
-        /* --- Animation --- */
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        /* --- Lists --- */
+        .step-list { list-style: none; padding: 0; counter-reset: my-counter; }
+        .step-list li {
+            position: relative; padding-left: 50px; margin-bottom: 20px;
         }
+        .step-list li::before {
+            counter-increment: my-counter; content: counter(my-counter);
+            position: absolute; left: 0; top: 0;
+            width: 32px; height: 32px; background: white;
+            border: 2px solid #fdba74; color: var(--primary);
+            border-radius: 50%; font-weight: 700; font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 10px rgba(255, 143, 80, 0.1);
+        }
+        .step-list li strong { color: var(--text-main); }
+
+        /* Discord Button */
+        .btn-discord {
+            background: #5865F2; color: white; padding: 14px 30px; border-radius: 12px;
+            font-weight: 700; display: inline-flex; align-items: center; gap: 10px;
+            transition: 0.3s; box-shadow: 0 10px 20px rgba(88, 101, 242, 0.2);
+        }
+        .btn-discord:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(88, 101, 242, 0.3); }
+
+        /* Animation */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
         .reveal.visible { opacity: 1; transform: translateY(0); }
 
     </style>
 </head>
 <body class="antialiased">
 
-    <div class="flex">
-        <aside class="w-80 h-screen sticky top-0 shadow-xl hidden lg:flex flex-col z-50">
-            <div class="p-6 border-b border-orange-100">
-                <a href="index.html" class="flex items-center gap-3 text-decoration-none">
-                    <img src="LOGO.WEBP" class="h-10 w-auto" alt="Logo">
-                    <span class="text-2xl font-black gradient-text tracking-tight">HOPVAN</span>
-                </a>
-                <p class="text-xs text-gray-400 font-bold mt-2 tracking-widest uppercase">Trung tâm trợ giúp</p>
-            </div>
+    <div class="flex relative">
+        <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+            <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+            <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+            <div class="absolute -bottom-32 left-20 w-[500px] h-[500px] bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+        </div>
 
-            <nav id="sidebar-nav" class="flex-1 overflow-y-auto p-4">
+        <aside class="w-80 h-screen sticky top-0 hidden lg:flex flex-col z-50">
+            <a href="index.html" class="p-8 pb-6 flex items-center gap-4 hover:opacity-80 transition-opacity cursor-pointer text-decoration-none group">
+                <img src="LOGO.WEBP" alt="Hopvan Logo" class="w-12 h-12 object-contain drop-shadow-md bg-white rounded-xl p-1 group-hover:scale-105 transition-transform">
+                <div>
+                    <span class="block text-2xl font-black text-gray-800 tracking-tight leading-none group-hover:text-orange-500 transition-colors">HOPVAN</span>
+                    <span class="text-xs font-bold text-orange-500 uppercase tracking-widest">Help Center</span>
+                </div>
+            </a>
+
+            <nav id="sidebar-nav" class="flex-1 overflow-y-auto px-6 py-4">
                 <a href="#intro" class="sidebar-link active">
-                    <i class="fas fa-info-circle w-6"></i> Giới thiệu chung
+                    <div class="icon-box"><svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div>
+                    Giới thiệu chung
                 </a>
 
-                <div class="sidebar-heading">Tài liệu & Kiến thức</div>
+                <div class="sidebar-heading">Kiến thức</div>
                 <a href="#bantin" class="sidebar-link">
-                    <i class="fas fa-newspaper w-6"></i> Bản tin Văn học
+                    <div class="icon-box"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>
+                    Bản tin Văn học
                 </a>
                 
-                <div class="sidebar-heading">Lộ trình học tập</div>
+                <div class="sidebar-heading">Luyện tập</div>
                 <a href="#nhatky" class="sidebar-link">
-                    <i class="fas fa-route w-6"></i> Nhật ký học tập
+                    <div class="icon-box"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M9 11a3 3 0 1 0 6 0 3 3 0 0 0-6 0"></path><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 0 1-2.827 0l-4.244-4.243a8 8 0 1 1 11.314 0z"></path></svg></div>
+                    Nhật ký học tập
                 </a>
                 <a href="#luyende" class="sidebar-link">
-                    <i class="fas fa-pen-fancy w-6"></i> Phòng luyện đề AI
+                    <div class="icon-box"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></div>
+                    Phòng luyện đề AI
                 </a>
 
-                <div class="sidebar-heading">Công cụ hỗ trợ</div>
-                <a href="#chatbot" class="sidebar-link">
-                    <i class="fas fa-robot w-6"></i> Gia sư AI
+                <div class="sidebar-heading">Kết nối</div>
+                <a href="#congdong" class="sidebar-link">
+                    <div class="icon-box"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+                    Cộng đồng học tập
                 </a>
                 
-                <div class="mt-10 p-4 bg-orange-50 rounded-xl border border-orange-100">
-                    <p class="text-sm font-bold text-gray-600 mb-2">Cần hỗ trợ thêm?</p>
-                    <a href="#" class="text-orange-500 text-sm font-bold hover:underline">Liên hệ Admin &rarr;</a>
+                <div class="mt-10 p-5 bg-white rounded-2xl border border-orange-100 shadow-sm relative overflow-hidden group cursor-pointer hover:shadow-md transition">
+                    <div class="absolute -right-4 -top-4 bg-orange-50 w-16 h-16 rounded-full group-hover:scale-150 transition duration-500"></div>
+                    <p class="text-sm font-bold text-gray-800 relative z-10">Gặp khó khăn?</p>
+                    <p class="text-xs text-gray-500 mt-1 mb-3 relative z-10">Nhắn tin ngay cho đội ngũ hỗ trợ.</p>
+                    <a href="https://discord.com/invite/EhsQyEAk2k" target="_blank" class="text-orange-500 text-xs font-black hover:underline uppercase tracking-wide relative z-10 flex items-center gap-1">
+                        Liên hệ Admin <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    </a>
                 </div>
             </nav>
         </aside>
 
         <main class="flex-1 p-6 md:p-16 w-full max-w-5xl mx-auto">
-            <article class="prose w-full">
+            <article class="prose w-full max-w-none">
                 
-                <section id="intro" class="reveal min-h-[60vh] flex flex-col justify-center">
-                    <h1 class="gradient-text">Chào mừng đến với Hopvan! 👋</h1>
-                    <p class="text-xl text-gray-500 font-medium">
-                        Nền tảng học Ngữ Văn 4.0 giúp bạn xóa bỏ nỗi sợ viết văn, tích lũy kiến thức xã hội và chinh phục điểm 9+ trong các kỳ thi.
+                <section id="intro" class="reveal min-h-[50vh] flex flex-col justify-center mb-10">
+                    <span class="text-orange-500 font-bold uppercase tracking-widest text-sm mb-2">Hướng dẫn sử dụng</span>
+                    <h1 class="text-5xl font-black text-gray-900 mb-6 tracking-tight">
+                        Làm chủ kiến thức <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-600">cùng Hopvan AI</span>
+                    </h1>
+                    <p class="text-lg text-gray-600 mb-8 max-w-2xl">
+                        Tài liệu này sẽ giúp bạn làm quen với các tính năng cốt lõi của Hopvan: từ việc cập nhật kiến thức, luyện đề thông minh đến kết nối cộng đồng.
                     </p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-                        <div class="p-6 bg-white rounded-2xl shadow-sm border border-orange-100">
-                            <i class="fas fa-bolt text-3xl text-yellow-400 mb-4"></i>
-                            <h3 class="!mt-0 !mb-2 text-lg">Học nhanh</h3>
-                            <p class="!mb-0 text-sm">Tiếp cận kiến thức trọng tâm, không lan man.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="p-5 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>
+                            <span class="font-bold text-gray-700">Dễ sử dụng</span>
                         </div>
-                        <div class="p-6 bg-white rounded-2xl shadow-sm border border-orange-100">
-                            <i class="fas fa-magic text-3xl text-orange-400 mb-4"></i>
-                            <h3 class="!mt-0 !mb-2 text-lg">AI Thông minh</h3>
-                            <p class="!mb-0 text-sm">Chấm bài và sửa lỗi chi tiết từng câu chữ.</p>
+                        <div class="p-5 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
+                            <span class="font-bold text-gray-700">Phản hồi tức thì</span>
                         </div>
                     </div>
                 </section>
 
-                <section id="bantin" class="reveal">
-                    <h2><i class="fas fa-book-open text-orange-500"></i> Bản tin Văn học</h2>
-                    <p>Nơi cập nhật những dẫn chứng Nghị luận xã hội (NLXH) nóng hổi, các nhận định lý luận văn học sắc bén.</p>
+                <section id="bantin" class="reveal section-card relative overflow-hidden">
+                    <span class="h2-number">01</span>
+                    <h2>Bản tin Văn học</h2>
+                    <p>Kho tàng dẫn chứng NLXH và lý luận văn học được cập nhật mỗi ngày. Đây là nguồn tư liệu giúp bài văn của bạn trở nên sâu sắc và thực tế hơn.</p>
                     
+                    <div class="mockup-window">
+                        <div class="mockup-header">
+                            <div class="mockup-dot bg-red-500"></div>
+                            <div class="mockup-dot bg-yellow-500"></div>
+                            <div class="mockup-dot bg-green-500"></div>
+                        </div>
+                        <div class="mockup-content">
+                            <img src="IMG/bantin.png" alt="Giao diện Bản tin Văn học" class="w-full">
+                        </div>
+                    </div>
                     
-                    <h3>Cách sử dụng:</h3>
-                    <ol>
-                        <li><span>Truy cập vào mục <strong>"Bản tin Văn học"</strong> trên thanh menu hoặc Footer.</span></li>
-                        <li><span>Sử dụng bộ lọc (Filter) để chọn chủ đề bạn quan tâm: <em>NLXH, Lý luận, Kỹ năng...</em></span></li>
-                        <li><span>Nhấp vào từng thẻ bài viết để xem chi tiết nội dung, phân tích và bài học rút ra.</span></li>
-                    </ol>
-                    
-                    <div class="note-box">
-                        💡 <strong>Mẹo:</strong> Hãy ghi chép lại các "keyword" đắt giá từ bản tin vào sổ tay của bạn để áp dụng ngay vào bài làm nhé!
+                    <div class="bg-orange-50 p-6 rounded-xl border border-orange-100 mt-6">
+                        <h4 class="font-bold text-orange-600 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                            Các bước thực hiện:
+                        </h4>
+                        <ol class="step-list">
+                            <li>Truy cập vào mục <strong>"Bản tin Văn học"</strong> trên thanh menu.</li>
+                            <li>Sử dụng <strong>Bộ lọc (Filter)</strong> để chọn chủ đề (VD: Nghị luận xã hội, Người tốt việc tốt...).</li>
+                            <li>Bấm vào bài viết để xem chi tiết và <strong>lưu lại các từ khóa đắt giá</strong> vào sổ tay.</li>
+                        </ol>
                     </div>
                 </section>
 
-                <section id="nhatky" class="reveal">
-                    <h2><i class="fas fa-map-signs text-orange-500"></i> Nhật ký học tập (Gamification)</h2>
-                    <p>Biến việc học nhàm chán thành một hành trình thú vị. Bạn sẽ đi qua các vùng đất tri thức khác nhau.</p>
+                <section id="nhatky" class="reveal section-card relative overflow-hidden">
+                    <span class="h2-number">02</span>
+                    <h2>Nhật ký học tập (Gamification)</h2>
+                    <p>Biến hành trình ôn thi thành một trò chơi thú vị. Hệ thống chia lộ trình học thành các chặng đường, giúp bạn chinh phục kiến thức từng bước một.</p>
                     
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+                        <div class="bg-white p-5 rounded-xl border text-center shadow-sm hover:shadow-md transition duration-300">
+                            <div class="text-orange-500 mb-3 flex justify-center">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                            </div>
+                            <div class="font-bold text-gray-800">Level Nodes</div>
+                            <div class="text-xs text-gray-500 mt-1">Các bài học cần vượt qua</div>
+                        </div>
 
-                    <h3>Hệ thống cấp độ:</h3>
-                    <ul>
-                        <li><strong>Level Nodes:</strong> Các nút tròn đại diện cho bài học. Nút màu <strong>Cam</strong> là bài hiện tại, nút <strong>Xanh</strong> là đã hoàn thành.</li>
-                        <li><strong>Streak (Chuỗi ngày):</strong> Duy trì đăng nhập và học tập mỗi ngày để giữ ngọn lửa Streak không bị tắt.</li>
-                        <li><strong>Vùng đất:</strong> Hành trình chia làm 3 chặng: <em>Khởi động (Rừng)</em> -> <em>Tăng tốc (Biển)</em> -> <em>Về đích (Vũ trụ)</em>.</li>
-                    </ul>
+                        <div class="bg-white p-5 rounded-xl border text-center shadow-sm hover:shadow-md transition duration-300">
+                            <div class="text-red-500 mb-3 flex justify-center">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 0-2.5 2.5c0 1.38 1.12 2.5 2.5 2.5z"></path><path d="M12 1v4"></path><path d="M12 21a9 9 0 0 0 9-9c0-3.87-2.61-7.14-6.24-8.47a1 1 0 0 0-1.28 1.22C13.89 6.2 14 7.6 14 9a5 5 0 0 1-9.72 1.63 1 1 0 0 0-1.3-.92A9 9 0 0 0 12 21z"></path></svg>
+                            </div>
+                            <div class="font-bold text-gray-800">Streak</div>
+                            <div class="text-xs text-gray-500 mt-1">Chuỗi ngày học liên tục</div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-xl border text-center shadow-sm hover:shadow-md transition duration-300">
+                            <div class="text-blue-500 mb-3 flex justify-center">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                            </div>
+                            <div class="font-bold text-gray-800">Map</div>
+                            <div class="text-xs text-gray-500 mt-1">Bản đồ tri thức</div>
+                        </div>
+                    </div>
+
+                    <div class="mockup-window">
+                        <div class="mockup-header">
+                            <div class="mockup-dot bg-red-500"></div>
+                            <div class="mockup-dot bg-yellow-500"></div>
+                            <div class="mockup-dot bg-green-500"></div>
+                        </div>
+                        <div class="mockup-content">
+                            <img src="IMG/nhatky.png" alt="Giao diện Nhật ký học tập" class="w-full">
+                        </div>
+                    </div>
                 </section>
 
-                <section id="luyende" class="reveal">
-                    <h2><i class="fas fa-brain text-orange-500"></i> Phòng luyện đề AI</h2>
-                    <p>Đây là tính năng mạnh mẽ nhất của Hopvan. AI sẽ đóng vai trò là giám khảo chấm bài cho bạn 24/7.</p>
+                <section id="luyende" class="reveal section-card relative overflow-hidden">
+                    <span class="h2-number">03</span>
+                    <h2>Phòng luyện đề AI</h2>
+                    <p>Trợ lý ảo đóng vai trò giám khảo, chấm và sửa bài cho bạn 24/7 với tốc độ cực nhanh.</p>
                     
+                    <div class="mockup-window">
+                        <div class="mockup-header">
+                            <div class="mockup-dot bg-red-500"></div>
+                            <div class="mockup-dot bg-yellow-500"></div>
+                            <div class="mockup-dot bg-green-500"></div>
+                        </div>
+                        <div class="mockup-content">
+                            <img src="IMG/luyende.png" alt="Giao diện Phòng luyện đề" class="w-full">
+                        </div>
+                    </div>
 
-                    <h3>Quy trình luyện đề:</h3>
-                    <ol>
-                        <li><span>Chọn đề bài từ kho đề hoặc nhập đề bài của riêng bạn.</span></li>
-                        <li><span>Viết bài trực tiếp vào khung soạn thảo hoặc dán bài làm của bạn vào.</span></li>
-                        <li><span>Nhấn nút <strong>"Chấm điểm ngay"</strong>.</span></li>
-                        <li><span>Đợi khoảng 5-10 giây, AI sẽ trả về:
-                            <ul class="mt-2 text-sm text-gray-500">
-                                <li>- Số điểm ước lượng (thang điểm 10).</li>
-                                <li>- Nhận xét ưu/nhược điểm.</li>
-                                <li>- Gợi ý sửa lỗi dùng từ, ngữ pháp chi tiết.</li>
-                            </ul>
-                        </span></li>
+                    <h4 class="font-bold text-gray-800 mb-4 mt-6">Quy trình chấm bài:</h4>
+                    <ol class="step-list">
+                        <li><strong>Chọn đề bài:</strong> Lấy đề ngẫu nhiên từ kho hoặc nhập đề của giáo viên.</li>
+                        <li><strong>Làm bài:</strong> Viết trực tiếp hoặc dán văn bản vào khung soạn thảo.</li>
+                        <li><strong>Nhận kết quả:</strong> Bấm "Chấm ngay". AI sẽ trả về điểm số, nhận xét ưu/nhược điểm và gợi ý sửa lỗi ngữ pháp.</li>
                     </ol>
                 </section>
 
-                <section id="chatbot" class="reveal pb-20">
-                    <h2><i class="fas fa-comments text-orange-500"></i> Gia sư AI</h2>
-                    <p>Bí ý tưởng? Quên kiến thức? Đừng lo, Gia sư AI luôn túc trực ở góc màn hình.</p>
+                <section id="congdong" class="reveal section-card relative overflow-hidden !bg-indigo-50 !border-indigo-100 pb-16">
+                    <span class="h2-number !text-indigo-200">04</span>
+                    <h2 class="!text-indigo-900">Cộng đồng học tập</h2>
+                    <p class="!text-indigo-700">Học một mình dễ nản? Tham gia máy chủ Discord của Hopvan để kết nối với hàng ngàn bạn học sinh giỏi Văn trên toàn quốc.</p>
                     
-
-                    <h3>Bạn có thể hỏi gì?</h3>
-                    <ul>
-                        <li>"Tìm cho mình dẫn chứng về lòng dũng cảm."</li>
-                        <li>"Mở bài cho tác phẩm Vợ chồng A Phủ như thế nào cho hay?"</li>
-                        <li>"Giải thích ý nghĩa nhan đề Người lái đò Sông Đà."</li>
-                    </ul>
-                    <p>Chỉ cần nhấn vào biểu tượng <strong>Chat</strong> ở góc dưới bên phải màn hình để bắt đầu trò chuyện.</p>
+                    <div class="flex flex-col md:flex-row gap-8 items-center mt-8">
+                        <div class="flex-1 space-y-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded bg-white text-indigo-500 flex items-center justify-center shadow-sm font-bold">?</div>
+                                <span class="font-bold text-indigo-900">Hỏi đáp bài tập 24/7</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded bg-white text-indigo-500 flex items-center justify-center shadow-sm font-bold">▶</div>
+                                <span class="font-bold text-indigo-900">Livestream chữa đề</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded bg-white text-indigo-500 flex items-center justify-center shadow-sm font-bold">pdf</div>
+                                <span class="font-bold text-indigo-900">Kho tài liệu độc quyền</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1 text-center">
+                            <a href="https://discord.com/invite/EhsQyEAk2k" target="_blank" class="btn-discord group">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037 13.626 13.626 0 0 0-.62 1.27 18.258 18.258 0 0 0-5.46 0 14.12 14.12 0 0 0-.622-1.27.073.073 0 0 0-.078-.037 19.74 19.74 0 0 0-4.886 1.515.07.07 0 0 0-.03.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.118.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                                <span>Tham gia Discord ngay</span>
+                                <svg class="w-4 h-4 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </a>
+                            <p class="text-xs text-indigo-400 mt-2">Miễn phí tham gia • Cộng đồng văn minh</p>
+                        </div>
+                    </div>
                 </section>
 
             </article>
@@ -283,20 +396,20 @@
             const sections = document.querySelectorAll('section[id]');
             const navLinks = document.querySelectorAll('#sidebar-nav .sidebar-link');
 
-            // 1. Hiệu ứng xuất hiện khi cuộn (Scroll Reveal)
+            // 1. Scroll Reveal
             const revealObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('visible');
                     }
                 });
-            }, { threshold: 0.15 });
+            }, { threshold: 0.1 });
             
             document.querySelectorAll('.reveal').forEach(el => {
                 revealObserver.observe(el);
             });
 
-            // 2. Highlight Sidebar khi cuộn (Scroll Spy)
+            // 2. Sidebar Active State
             const activeLinkObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -305,13 +418,12 @@
                             link.classList.remove('active');
                             if (link.getAttribute('href') === `#${id}`) {
                                 link.classList.add('active');
-                                // Scroll sidebar to active link if needed
                                 link.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                             }
                         });
                     }
                 });
-            }, { rootMargin: "-20% 0px -70% 0px" }); // Điều chỉnh vùng nhận diện
+            }, { rootMargin: "-20% 0px -70% 0px" });
 
             sections.forEach(section => {
                 activeLinkObserver.observe(section);
