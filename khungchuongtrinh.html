@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chương trình GDPT 2018 - Hopvan</title>
+    <link rel="icon" type="image/webp" href="LOGO.WEBP" />
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --primary-dark: #FF5E62;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --bg-color: #FFF5EC;
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Scrollbar --- */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #fed7aa; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* --- Background Animation --- */
+        .background-blobs { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; animation: floatBlob 10s infinite alternate; }
+        .blob-1 { width: 600px; height: 600px; background: #FCA96A; top: -100px; left: -100px; }
+        .blob-2 { width: 500px; height: 500px; background: #FCD5B5; bottom: -100px; right: -100px; }
+        @keyframes floatBlob { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, 60px); } }
+
+        /* --- Sidebar Styles --- */
+        aside {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 4px 0 24px rgba(0,0,0,0.02);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px; border-radius: 12px;
+            font-size: 0.95rem; color: var(--text-sub);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative; font-weight: 600; margin-bottom: 6px; cursor: pointer;
+        }
+
+        .sidebar-link:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: var(--primary-dark); transform: translateX(4px);
+        }
+
+        .sidebar-link.active {
+            background: linear-gradient(90deg, #fff7ed 0%, #ffffff 100%);
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(255, 143, 80, 0.1);
+        }
+        .sidebar-link.active::before {
+            content: ''; position: absolute; left: 0; top: 15%; height: 70%; width: 4px;
+            background: var(--primary); border-radius: 0 4px 4px 0;
+        }
+
+        .icon-box {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            background: white; color: #94a3b8; border: 1px solid #f1f5f9; transition: 0.3s;
+        }
+        .sidebar-link.active .icon-box {
+            background: var(--primary); color: white; border-color: var(--primary);
+            box-shadow: 0 4px 10px rgba(255, 143, 80, 0.3);
+        }
+        .icon-svg { width: 20px; height: 20px; stroke-width: 2; stroke: currentColor; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+        .sidebar-heading {
+            font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 1px; color: #cbd5e1; margin: 24px 0 12px 16px;
+        }
+
+        /* --- PDF Viewer Container --- */
+        .pdf-wrapper {
+            flex: 1; height: 100%; display: flex; flex-direction: column;
+            overflow: hidden; padding: 20px;
+        }
+        
+        .pdf-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding: 0 10px;
+        }
+
+        .pdf-frame-container {
+            flex: 1; background: white; border-radius: 20px;
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 143, 80, 0.2);
+            overflow: hidden; position: relative;
+        }
+
+        iframe { width: 100%; height: 100%; border: none; }
+
+        .btn-download {
+            background: linear-gradient(135deg, #FF8F50, #FF5E62);
+            color: white; padding: 10px 20px; border-radius: 50px;
+            font-weight: 700; text-decoration: none; font-size: 0.9rem;
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 5px 15px rgba(255, 94, 98, 0.3);
+            transition: 0.3s;
+        }
+        .btn-download:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 94, 98, 0.4); }
+
+        /* Mobile Toggle */
+        .mobile-toggle { display: none; }
+        @media (max-width: 1024px) {
+            aside { position: fixed; left: -100%; z-index: 100; height: 100%; width: 280px; box-shadow: 5px 0 30px rgba(0,0,0,0.1); }
+            aside.open { left: 0; }
+            .mobile-toggle { display: block; font-size: 1.5rem; color: var(--primary); cursor: pointer; }
+            .pdf-wrapper { padding: 15px; }
+        }
+        
+        /* Loading Overlay for PDF */
+        .pdf-loading {
+            position: absolute; inset: 0; background: white;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 10; transition: opacity 0.5s;
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid #fff7ed;
+            border-top: 4px solid var(--primary); border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="flex h-full">
+        
+        <aside id="main-sidebar" class="flex flex-col">
+            <a href="index.html" class="p-8 pb-6 flex items-center gap-4 hover:opacity-80 transition-opacity cursor-pointer text-decoration-none group">
+                <img src="LOGO.WEBP" alt="Hopvan Logo" class="w-12 h-12 object-contain drop-shadow-md bg-white rounded-xl p-1 group-hover:scale-105 transition-transform">
+                <div>
+                    <span class="block text-2xl font-black text-gray-800 tracking-tight leading-none group-hover:text-orange-500 transition-colors">HOPVAN</span>
+                    <span class="text-xs font-bold text-orange-500 uppercase tracking-widest">GDPT 2018</span>
+                </div>
+            </a>
+
+            <nav class="flex-1 overflow-y-auto px-6 py-4 flex flex-col">
+                <div class="sidebar-heading">Văn bản Chương trình</div>
+                
+                <div class="sidebar-link active" onclick="loadPDF('tongthe', this)">
+                    <div class="icon-box">
+                        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                    </div>
+                    <span>Chương trình Tổng thể</span>
+                </div>
+
+                <div class="sidebar-link" onclick="loadPDF('nguvan', this)">
+                    <div class="icon-box">
+                        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                    </div>
+                    <span>Môn Ngữ Văn</span>
+                </div>
+
+                <div class="mt-auto pt-6">
+                    <div class="p-5 bg-white rounded-2xl border border-orange-100 shadow-sm relative overflow-hidden group cursor-pointer hover:shadow-md transition">
+                        <div class="absolute -right-4 -top-4 bg-orange-50 w-16 h-16 rounded-full group-hover:scale-150 transition duration-500"></div>
+                        
+                        <p class="text-sm font-bold text-gray-800 relative z-10">Gặp khó khăn?</p>
+                        <p class="text-xs text-gray-500 mt-1 mb-3 relative z-10 leading-relaxed">Nhắn tin ngay cho đội ngũ hỗ trợ.</p>
+                        
+                        <a href="https://discord.com/invite/EhsQyEAk2k" target="_blank" class="text-orange-500 text-xs font-black hover:underline uppercase tracking-wide relative z-10 flex items-center gap-1">
+                            Liên hệ Admin 
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+            
+            <div id="sidebar-overlay" class="fixed inset-0 bg-black/20 backdrop-blur-sm z-[-1] hidden lg:hidden" onclick="toggleSidebar()"></div>
+        </aside>
+
+        <main class="pdf-wrapper">
+            <div class="pdf-header">
+                <div class="flex items-center gap-4">
+                    <i class="fas fa-bars mobile-toggle" onclick="toggleSidebar()"></i>
+                    <div>
+                        <h1 id="doc-title" class="text-2xl font-black text-gray-800 leading-none">Chương trình Tổng thể</h1>
+                        <p class="text-sm text-gray-500 font-medium mt-1">Khung chương trình GDPT 2018 - Bộ GD&ĐT</p>
+                    </div>
+                </div>
+                
+                <a id="download-btn" href="#" target="_blank" class="btn-download">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <span class="hidden sm:inline">Tải về máy</span>
+                </a>
+            </div>
+
+            <div class="pdf-frame-container">
+                <div id="pdf-loading" class="pdf-loading">
+                    <div class="spinner"></div>
+                    <p class="text-orange-500 font-bold mt-4 text-sm animate-pulse">Đang tải tài liệu...</p>
+                </div>
+                
+                <iframe id="pdf-viewer" src="" allow="autoplay"></iframe>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- CẤU HÌNH LINK PDF TẠI ĐÂY ---
+        const pdfData = {
+            'tongthe': {
+                title: 'Chương trình Tổng thể',
+                // Link demo: thay bằng link PDF của bạn
+                url: 'data/ctgdpt2018_tong_the_193202020.pdf'
+            },
+            'nguvan': {
+                title: 'Chương trình môn Ngữ Văn',
+                // Link demo: thay bằng link PDF của bạn
+                url: 'data/ctngu_van_193202020.pdf' 
+            }
+        };
+
+        // --- LOGIC ---
+        const iframe = document.getElementById('pdf-viewer');
+        const titleEl = document.getElementById('doc-title');
+        const downloadBtn = document.getElementById('download-btn');
+        const loadingEl = document.getElementById('pdf-loading');
+        const sidebar = document.getElementById('main-sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        function loadPDF(key, element) {
+            document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
+            if(element) element.classList.add('active');
+
+            loadingEl.style.opacity = '1';
+            loadingEl.style.zIndex = '10';
+
+            const data = pdfData[key];
+            if (!data) return;
+
+            titleEl.textContent = data.title;
+            const downloadUrl = data.url.includes('url=') ? decodeURIComponent(data.url.split('url=')[1].split('&')[0]) : data.url;
+            downloadBtn.href = downloadUrl;
+
+            iframe.src = data.url;
+
+            iframe.onload = () => {
+                setTimeout(() => {
+                    loadingEl.style.opacity = '0';
+                    setTimeout(() => loadingEl.style.zIndex = '-1', 500);
+                }, 1000); 
+            };
+
+            if(window.innerWidth <= 1024) {
+                toggleSidebar();
+            }
+        }
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            if (sidebar.classList.contains('open')) {
+                sidebar.style.left = '0';
+                overlay.style.display = 'block';
+            } else {
+                sidebar.style.left = '-100%';
+                overlay.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPDF('tongthe', document.querySelector('.sidebar-link.active'));
+        });
+
+    </script>
+</body>
+</html>
