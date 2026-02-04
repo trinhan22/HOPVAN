@@ -166,7 +166,7 @@
                     <div id="input-section" class="editor-container h-full transition-all duration-500">
                         <div class="px-6 py-4 bg-gray-50/50 border-b flex justify-between items-center">
                             <div class="flex items-center gap-3">
-                                <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Bài làm của bạn</span>
+                                <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Bài làm</span>
                                 <button onclick="document.getElementById('file-upload').click()" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:text-orange-500 hover:border-orange-200 transition shadow-sm">
                                     <i class="fas fa-paperclip"></i> Tải tệp (.docx)
                                 </button>
@@ -174,12 +174,12 @@
                             </div>
                             <span id="word-count" class="text-xs font-black bg-gray-200 text-gray-600 px-3 py-1 rounded-lg">0 TỪ</span>
                         </div>
-                        <textarea id="student-essay" class="writing-area" placeholder="Lưu ý: Hãy ghi rõ 'Câu 1:', 'Câu 2:' để AI chấm chính xác hơn..."></textarea>
+                        <textarea id="student-essay" class="writing-area" placeholder="Hãy bắt đầu bài viết của bạn tại đây..."></textarea>
                     </div>
 
                     <div id="output-section" class="editor-container h-auto min-h-[100px] transition-all duration-500">
                         <div class="px-8 py-4 bg-gray-50/50 border-b flex justify-between items-center">
-                            <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Giáo viên AI</span>
+                            <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Phản hồi từ giáo viên AI</span>
                             <button id="submit-btn" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-2.5 rounded-xl font-black text-sm hover:scale-105 transition shadow-lg active:scale-95">NỘP BÀI</button>
                         </div>
                         
@@ -312,9 +312,8 @@
         aiBox.className = "ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400";
         aiBox.innerHTML = `
             <div>
-                <i class="fas fa-magic text-5xl mb-4 opacity-20"></i>
-                <p class="font-bold text-lg">Sẵn sàng chấm thi</p>
-                <p class="text-xs font-medium opacity-60 mt-1">Đã đổi đề mới!</p>
+                <i class="fas fa-robot text-5xl mb-4 opacity-20"></i>
+                <p class="font-bold">Sẵn sàng chấm bài</p>
             </div>`;
     };
 
