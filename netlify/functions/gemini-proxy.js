@@ -18,7 +18,7 @@ exports.handler = async (event) => {
     const API_KEY = process.env.GEMINI_API_KEY; 
     
     // 3. Cấu hình Model (Sử dụng gemini-1.5-flash để tốc độ phản hồi nhanh nhất)
-    const MODEL_NAME = "gemini-2.5-flash"; 
+    const MODEL_NAME = "gemini-2.0-flash"; 
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
 
 
