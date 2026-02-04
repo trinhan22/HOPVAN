@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hopvan - Luyện Đề Tổng Hợp</title>
+    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
+    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+    <meta property="og:url" content="https://hopvan.netlify.app" />
+    <meta property="og:type" content="article" />
+
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -49,7 +55,7 @@
             box-shadow: 0 15px 35px rgba(255, 143, 80, 0.05);
             position: relative; overflow: hidden;
             display: flex; flex-direction: column;
-            height: 100%; max-height: 650px;
+            height: 100%;
         }
         .prompt-header {
             background: var(--primary-gradient); color: white;
@@ -63,7 +69,7 @@
         .question-text { color: #374151; line-height: 1.8; font-size: 0.95rem; }
         .highlight-text { background: #fff7ed; padding: 15px; border-left: 4px solid #FF8F50; border-radius: 8px; margin: 10px 0; font-style: italic; color: #431407; }
 
-        .workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; min-height: 650px; margin-top: 20px; }
+        .workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; height: calc(100vh - 140px); margin-top: 20px; }
 
         .editor-container {
             background: white; border-radius: 30px; border: 1px solid rgba(0,0,0,0.05);
@@ -98,8 +104,9 @@
         @keyframes robotBounce { from { transform: translateY(0); } to { transform: translateY(-20px); } }
 
         @media (max-width: 1024px) {
-            .main-content { margin-left: 0; width: 100%; padding: 20px; }
-            .workspace-grid { grid-template-columns: 1fr; }
+            .main-content { margin-left: 0; width: 100%; padding: 20px; height: auto; }
+            .workspace-grid { grid-template-columns: 1fr; height: auto; }
+            .prompt-card { height: 500px; }
         }
     </style>
 </head>
@@ -154,11 +161,12 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-6">
-                    <div class="editor-container h-full">
+                <div class="flex flex-col h-full gap-4 relative">
+                    
+                    <div id="input-section" class="editor-container h-full transition-all duration-500">
                         <div class="px-6 py-4 bg-gray-50/50 border-b flex justify-between items-center">
                             <div class="flex items-center gap-3">
-                                <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Bài làm</span>
+                                <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Bài làm của bạn</span>
                                 <button onclick="document.getElementById('file-upload').click()" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:text-orange-500 hover:border-orange-200 transition shadow-sm">
                                     <i class="fas fa-paperclip"></i> Tải tệp (.docx)
                                 </button>
@@ -169,13 +177,13 @@
                         <textarea id="student-essay" class="writing-area" placeholder="Lưu ý: Hãy ghi rõ 'Câu 1:', 'Câu 2:' để AI chấm chính xác hơn..."></textarea>
                     </div>
 
-                    <div class="editor-container" style="min-height: 200px; flex: 1;">
+                    <div id="output-section" class="editor-container h-auto min-h-[100px] transition-all duration-500">
                         <div class="px-8 py-4 bg-gray-50/50 border-b flex justify-between items-center">
-                            <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Phản hồi từ giáo viên AI</span>
+                            <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Giáo viên AI</span>
                             <button id="submit-btn" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-2.5 rounded-xl font-black text-sm hover:scale-105 transition shadow-lg active:scale-95">NỘP BÀI</button>
                         </div>
                         
-                        <div id="ai-correction-box" class="ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400">
+                        <div id="ai-correction-box" class="ai-result-view text-gray-400 flex flex-col items-center justify-center text-center p-6 h-full">
                             <div>
                                 <i class="fas fa-magic text-5xl mb-4 opacity-20"></i>
                                 <p class="font-bold text-lg">Sẵn sàng chấm bài</p>
@@ -255,7 +263,7 @@
             questionsData = data.fulltest;
             randomizeQuestion();
         } catch (e) {
-            document.getElementById('prompt-content').innerHTML = `<p class="text-red-500 font-bold p-4">Lỗi tải đề. Vui lòng kiểm tra kết nối mạng.</p>`;
+            document.getElementById('prompt-content').innerHTML = `<p class="text-red-500 font-bold p-4">Lỗi tải đề. Vui lòng kiểm tra file data.</p>`;
         }
     }
 
@@ -266,6 +274,7 @@
 
         document.getElementById('exam-code').innerText = `Mã đề: ${q.id}`;
         
+        // Render Đề bài
         const htmlContent = `
             <div class="exam-section">
                 <span class="section-label">I. ĐỌC HIỂU (3.0 điểm)</span>
@@ -289,17 +298,23 @@
         `;
         document.getElementById('prompt-content').innerHTML = htmlContent;
 
-        // Reset
+        // Reset UI khi đổi đề
         document.getElementById('student-essay').value = "";
         document.getElementById('overall-feedback-box').classList.add('hidden');
+        
+        // Hiện lại khung nhập liệu và thu nhỏ khung kết quả
+        document.getElementById('input-section').classList.remove('hidden');
+        document.getElementById('output-section').classList.remove('h-full');
+        document.getElementById('output-section').classList.add('h-auto', 'min-h-[100px]');
         
         // Căn giữa Box AI
         const aiBox = document.getElementById('ai-correction-box');
         aiBox.className = "ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400";
         aiBox.innerHTML = `
             <div>
-                <i class="fas fa-robot text-5xl mb-4 opacity-20"></i>
-                <p class="font-bold">Sẵn sàng chấm bài</p>
+                <i class="fas fa-magic text-5xl mb-4 opacity-20"></i>
+                <p class="font-bold text-lg">Sẵn sàng chấm thi</p>
+                <p class="text-xs font-medium opacity-60 mt-1">Đã đổi đề mới!</p>
             </div>`;
     };
 
@@ -324,7 +339,7 @@
         }
     });
 
-    // --- CHẤM BÀI FULL ---
+    // --- CHẤM BÀI FULL (FIX GIAO DIỆN) ---
     document.getElementById('submit-btn').onclick = async () => {
         const content = document.getElementById('student-essay').value.trim();
         if (content.split(/\s+/).length < 50) return alert("Bài làm quá ngắn để chấm tổng hợp!");
@@ -334,31 +349,18 @@
 
         const q = window.currentExamData;
         
+        // Prompt giữ nguyên
         const systemPrompt = `
-            BẠN LÀ: Giám khảo chấm thi Tốt nghiệp THPT môn Ngữ Văn uy tín (Quy chế Bộ GD&ĐT).
-            THÁI ĐỘ: Nghiêm túc, công tâm, tinh tường phát hiện gian lận (văn mẫu/AI), nhận xét chi tiết từng phần.
+            BẠN LÀ: Giám khảo chấm thi Tốt nghiệp THPT môn Ngữ Văn uy tín.
+            NHIỆM VỤ: Chấm bài làm của học sinh cho đề thi gồm 3 phần (Đọc hiểu, NLXH, NLVH).
 
-            NHIỆM VỤ: THỰC HIỆN ĐỒNG THỜI CÁC BƯỚC SAU:
-
-            === BƯỚC 1: CHECK ĐẠO VĂN/AI (QUAN TRỌNG) ===
-            - Phân tích văn phong để tìm dấu hiệu của AI (ChatGPT, Gemini...): câu từ sáo rỗng, cấu trúc lặp lại, thiếu cảm xúc cá nhân.
-            - Đánh giá 'human_score' (0-100).
-
-            === BƯỚC 2: CHẤM ĐIỂM CHUYÊN MÔN (THANG 10) ===
-            - Phần I: Đọc hiểu (3.0 điểm): Kiểm tra độ chính xác của câu trả lời.
-            - Phần II.1: NLXH (2.0 điểm): Kiểm tra cấu trúc đoạn văn, dẫn chứng thực tế.
-            - Phần II.2: NLVH (5.0 điểm): Kiểm tra kiến thức tác phẩm, lý luận văn học.
-            => Tổng điểm = Điểm I + Điểm II.1 + Điểm II.2
-
-            === BƯỚC 3: SỬA BÀI CHI TIẾT (HTML) ===
-            - Tạo HTML bài làm với các thẻ highlight: <span class="text-bad">lỗi sai</span>, <span class="text-good">ý hay</span>, <span class="text-fix">gợi ý sửa</span>.
-
-            TRẢ VỀ JSON DUY NHẤT:
+            YÊU CẦU TRẢ VỀ:
+            Bạn hãy trả về duy nhất một object JSON (không thêm bất kỳ văn bản nào khác ngoài JSON) với cấu trúc sau:
             {
-              "human_score": (0-100),
-              "ai_comment": "Nhận xét ngắn về độ chân thực.",
-              "score": (Tổng điểm trên 10, ví dụ 7.25),
-              "correction_html": "HTML kết quả chấm chi tiết...",
+              "human_score": (Số nguyên 0-100 đánh giá độ tự nhiên, không phải AI viết),
+              "ai_comment": "Nhận xét ngắn về độ chân thực của văn phong.",
+              "score": (Tổng điểm trên thang 10, ví dụ 7.5),
+              "correction_html": "Chuỗi HTML chi tiết kết quả chấm. Trong HTML này, hãy dùng thẻ <span class='text-bad'>lỗi sai</span>, <span class='text-good'>ý hay</span> để highlight.",
               "idea_feedback": ["Điểm mạnh 1", "Điểm mạnh 2"],
               "missing_points": ["Điểm yếu 1", "Điểm yếu 2"]
             }
@@ -381,9 +383,20 @@
 
             const data = await response.json();
             const rawText = data.candidates[0].content.parts[0].text;
-            const res = JSON.parse(rawText.replace(/```json|```/g, "").trim());
+            const jsonStr = rawText.replace(/```json|```/g, "").trim();
+            const res = JSON.parse(jsonStr);
 
-            // --- RENDER KẾT QUẢ ---
+            // --- XỬ LÝ GIAO DIỆN KHI CÓ KẾT QUẢ ---
+            
+            // 1. Ẩn khung nhập liệu
+            document.getElementById('input-section').classList.add('hidden');
+            
+            // 2. Mở rộng khung kết quả
+            const outputSec = document.getElementById('output-section');
+            outputSec.classList.remove('h-auto', 'min-h-[100px]');
+            outputSec.classList.add('h-full'); // Chiếm toàn bộ chiều cao
+
+            // 3. Render Kết quả bên trong
             let barColor = '#22c55e';
             let verdictText = "Tự nhiên";
             if (res.human_score < 50) { barColor = '#ef4444'; verdictText = "Nghi vấn AI"; }
@@ -410,7 +423,7 @@
 
             const box = document.getElementById('ai-correction-box');
             
-            // Chuyển sang căn trái để hiển thị nội dung dài
+            // Chuyển sang căn trái, cho phép cuộn
             box.className = "ai-result-view h-full text-left text-gray-800 overflow-y-auto";
             box.innerHTML = aiMeterHTML + res.correction_html;
 
@@ -430,7 +443,8 @@
             }
 
         } catch (e) {
-            alert("Lỗi xử lý AI: " + e.message);
+            console.error("AI Error:", e);
+            alert("Lỗi xử lý AI. Vui lòng thử lại!");
         } finally { loading.style.display = 'none'; }
     };
 
