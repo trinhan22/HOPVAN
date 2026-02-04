@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Level 3: Nghị Luận Xã Hội</title>
+    <title>Level 8: Nghị Luận Văn Học</title>
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
                         #fff9f5;
         }
 
-        /* --- BACKGROUND BLOBS --- */
+        /* --- BACKGROUND BLOBS (Cam Đào) --- */
         .bg-blob { position: fixed; filter: blur(80px); z-index: -1; opacity: 0.6; animation: float 25s infinite alternate ease-in-out; }
         .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #ffe4d3; animation-delay: -5s; }
         .blob-2 { bottom: 0%; right: -5%; width: 450px; height: 450px; background: #ffdec2; }
@@ -37,7 +37,7 @@
         .glass-header:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.9); }
 
         .liquid-glass {
-            background: rgba(255, 255, 255, 0.45);
+            background: rgba(255, 255, 255, 0.5);
             box-shadow: 0 15px 40px -5px rgba(255, 130, 60, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-radius: 24px; transition: transform 0.3s;
@@ -45,10 +45,13 @@
 
         /* --- CONTENT STYLES --- */
         .quote-box {
-            font-family: 'Merriweather', serif; font-style: italic; color: #4b5563;
-            border-left: 4px solid var(--primary); padding-left: 20px; margin: 20px 0;
-            font-size: 1.1rem; line-height: 1.8;
+            font-family: 'Merriweather', serif; color: #4b5563;
+            background: rgba(255,255,255,0.6); padding: 30px; border-radius: 20px;
+            font-size: 1.05rem; line-height: 1.9; position: relative;
+            border: 1px solid rgba(255,255,255,0.7); font-style: italic;
+            box-shadow: inset 0 2px 10px rgba(255, 143, 80, 0.05);
         }
+        .quote-icon { position: absolute; top: -15px; left: 20px; font-size: 30px; color: var(--primary); background: #fff9f5; padding: 0 10px; border-radius: 50%; }
 
         .glass-textarea {
             width: 100%; height: 400px;
@@ -60,7 +63,7 @@
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
         }
         .glass-textarea:focus {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             border-color: var(--primary);
             box-shadow: 0 10px 30px rgba(255, 143, 80, 0.15);
         }
@@ -81,10 +84,9 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* Highlight text from AI */
         .text-good { background: #dcfce7; color: #166534; padding: 2px 4px; border-radius: 4px; font-weight: 600; }
         .text-bad { background: #fee2e2; color: #991b1b; text-decoration: line-through; padding: 2px 4px; border-radius: 4px; }
-        .text-fix { color: #2563eb; font-weight: 700; font-style: italic; margin-left: 4px; }
+        .text-fix { color: #ea580c; font-weight: 700; font-style: italic; margin-left: 4px; } /* Màu cam cho text sửa */
 
         @media (max-width: 1024px) { #menu-placeholder { display: none; } .main-content { padding: 20px; } }
     </style>
@@ -126,37 +128,40 @@
             
             <div class="liquid-glass p-8 mb-10 relative overflow-hidden bg-gradient-to-br from-white/60 to-white/20">
                 <div class="relative z-10">
-                    <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Level 3</span>
-                    <h1 class="text-4xl font-black text-gray-800 mt-4 mb-2">Nghị Luận Xã Hội</h1>
-                    <p class="text-gray-500 font-medium">Viết đoạn văn 200 chữ. Đạt <span class="text-orange-600 font-bold">6.0/10 điểm</span> để qua màn.</p>
+                    <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Level 8</span>
+                    <h1 class="text-4xl font-black text-gray-800 mt-4 mb-2">Nghị Luận Văn Học</h1>
+                    <p class="text-gray-500 font-medium">Viết đoạn văn 200 chữ. Đạt <span class="text-orange-600 font-bold">7.0/10 điểm</span> để hoàn thành.</p>
                 </div>
-                <i class="fas fa-pen-nib absolute -right-6 -bottom-8 text-9xl text-orange-500/10 rotate-12"></i>
+                <i class="fas fa-feather-alt absolute -right-6 -bottom-8 text-9xl text-orange-500/10 rotate-12"></i>
             </div>
 
             <div class="liquid-glass p-10 mb-8">
-                <h2 class="text-2xl font-black text-gray-800 mb-6">Chủ đề: Sức Mạnh Của Lòng Thấu Cảm</h2>
+                <h2 class="text-2xl font-black text-gray-800 mb-6">Chủ đề: Vẻ Đẹp Khuất Lấp</h2>
                 
-                <div class="quote-box">
-                    "Thấu cảm là khả năng nhìn thế giới bằng con mắt của người khác, lắng nghe bằng đôi tai của người khác và cảm nhận bằng trái tim của người khác."
+                <div class="quote-box mb-8">
+                    <i class="fas fa-quote-left quote-icon"></i>
+                    <p>
+                        "Vui nhất là lúc ngồi nhìn đàn con tôi chúng nó được ăn no... Ông trời sinh ra người đàn bà là để đẻ con, rồi nuôi con cho đến khi khôn lớn cho nên phải gánh lấy cái khổ. Đàn bà ở thuyền chúng tôi phải có người đàn ông để chèo chống khi phong ba, để cùng làm ăn nuôi nấng đặng một sắp con nhà nào cũng trên dưới chục đứa."
+                    </p>
+                    <div class="text-right text-sm font-bold mt-4 text-orange-500">— Lời người đàn bà hàng chài (Trích <i>Chiếc thuyền ngoài xa</i> - Nguyễn Minh Châu)</div>
                 </div>
 
-                <p class="text-gray-700 mb-6 leading-relaxed font-medium">
-                    <span class="text-orange-500 font-bold uppercase text-xs tracking-wider mr-2">Yêu cầu:</span> 
-                    Hãy viết một đoạn văn (khoảng 200 chữ) trình bày suy nghĩ của anh/chị về ý nghĩa của sự thấu cảm trong cuộc sống hiện đại.
+                <p class="text-gray-700 mb-6 leading-relaxed font-medium bg-orange-50 p-4 rounded-xl border border-orange-100">
+                    <span class="text-orange-600 font-black uppercase text-xs tracking-wider mr-2"><i class="fas fa-pen-nib"></i> Yêu cầu:</span> 
+                    Từ đoạn trích trên, anh/chị hãy viết một đoạn văn (khoảng 200 chữ) cảm nhận về <strong>vẻ đẹp tình mẫu tử và sự hy sinh thầm lặng</strong> của người đàn bà hàng chài.
                 </p>
 
                 <div class="relative">
-                    <textarea id="student-essay" class="glass-textarea" placeholder="Bắt đầu viết bài làm của bạn tại đây... (Tối thiểu 100 từ)"></textarea>
+                    <textarea id="student-essay" class="glass-textarea" placeholder="Viết đoạn văn của bạn tại đây... (Tập trung phân tích sâu vào chi tiết, không lan man)"></textarea>
                     <div class="absolute bottom-4 right-6 text-xs font-bold text-gray-400 bg-white/50 px-2 py-1 rounded-lg backdrop-blur-sm">
                         <span id="word-count">0</span> TỪ
                     </div>
                 </div>
 
                 <div class="mt-8 text-center" id="submit-area">
-                    <button onclick="submitEssay()" class="group relative inline-flex items-center justify-center px-12 py-5 font-black text-white transition-all duration-300 bg-gray-900 rounded-3xl hover:shadow-2xl hover:shadow-orange-500/30 hover:scale-105 active:scale-95 overflow-hidden">
+                    <button onclick="submitEssay()" class="group relative inline-flex items-center justify-center px-12 py-5 font-black text-white transition-all duration-300 bg-gradient-to-r from-orange-500 to-red-500 rounded-3xl hover:shadow-2xl hover:shadow-orange-500/30 hover:scale-105 active:scale-95 overflow-hidden">
                         <span class="text-xl relative z-10">NỘP BÀI & CHẤM ĐIỂM</span>
-                        <div class="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <i class="fas fa-paper-plane ml-3 relative z-10 group-hover:translate-x-1 transition-transform"></i>
+                        <div class="absolute inset-0 bg-white/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </button>
                 </div>
             </div>
@@ -171,33 +176,33 @@
                     </div>
                     <div class="text-center md:text-left mt-6 md:mt-0 md:ml-8 flex-1">
                         <h3 class="text-3xl font-black text-gray-800 mb-2" id="result-title">Đang chấm...</h3>
-                        <p class="text-gray-500 font-medium italic" id="result-desc">Giáo viên AI đang đọc bài của bạn...</p>
+                        <p class="text-gray-500 font-medium italic" id="result-desc">Giáo viên AI đang phân tích chiều sâu đoạn văn...</p>
                     </div>
                 </div>
 
                 <div class="space-y-8">
                     <div>
                         <h4 class="font-black text-gray-700 uppercase text-xs tracking-widest mb-4 flex items-center gap-2">
-                            <i class="fas fa-edit text-orange-500"></i> Sửa lỗi chi tiết
+                            <i class="fas fa-edit text-orange-500"></i> Nhận xét chi tiết
                         </h4>
                         <div id="ai-correction" class="bg-white/50 p-6 rounded-2xl border border-white leading-loose text-gray-700 text-lg shadow-inner"></div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-green-50/50 p-6 rounded-2xl border border-green-100/50">
-                            <h4 class="font-bold text-green-700 mb-3 flex items-center gap-2"><i class="fas fa-check-circle"></i> Điểm mạnh</h4>
+                            <h4 class="font-bold text-green-700 mb-3 flex items-center gap-2"><i class="fas fa-check-circle"></i> Điểm sáng</h4>
                             <ul id="pros-list" class="text-sm text-green-800 space-y-2 list-disc pl-4"></ul>
                         </div>
                         <div class="bg-red-50/50 p-6 rounded-2xl border border-red-100/50">
-                            <h4 class="font-bold text-red-700 mb-3 flex items-center gap-2"><i class="fas fa-exclamation-circle"></i> Cần cải thiện</h4>
+                            <h4 class="font-bold text-red-700 mb-3 flex items-center gap-2"><i class="fas fa-exclamation-circle"></i> Cần khắc phục</h4>
                             <ul id="cons-list" class="text-sm text-red-800 space-y-2 list-disc pl-4"></ul>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onclick="nextLevel()" id="next-btn" class="hidden w-full sm:w-auto bg-green-500 text-white px-8 py-4 rounded-2xl font-black hover:bg-green-600 transition shadow-lg shadow-green-500/30 hover:-translate-y-1">
-                        MỞ KHÓA LEVEL 4 <i class="fas fa-lock-open ml-2"></i>
+                    <button onclick="finishCourse()" id="next-btn" class="hidden w-full sm:w-auto bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-2xl font-black hover:shadow-xl hover:-translate-y-1 transition shadow-lg shadow-orange-500/30">
+                        HOÀN THÀNH LEVEL 8 <i class="fas fa-star ml-2 text-yellow-300"></i>
                     </button>
                     <button onclick="location.reload()" id="retry-btn" class="hidden w-full sm:w-auto bg-white/70 text-gray-600 px-8 py-4 rounded-2xl font-black hover:bg-white transition shadow-sm border border-gray-200">
                         LÀM LẠI BÀI <i class="fas fa-redo ml-2"></i>
@@ -215,7 +220,7 @@
             <div class="absolute inset-0 flex items-center justify-center text-3xl">🤖</div>
         </div>
         <h3 class="font-black text-2xl mt-6 text-gray-800">AI ĐANG CHẤM BÀI...</h3>
-        <p class="text-gray-500 mt-2 font-medium">Đang phân tích ý tưởng và diễn đạt</p>
+        <p class="text-gray-500 mt-2 font-medium">Đang đánh giá khả năng cảm thụ văn học</p>
     </div>
 
 <script type="module">
@@ -242,24 +247,24 @@
         p.querySelectorAll('script').forEach(s=>{const n=document.createElement('script');n.text=s.text;document.body.appendChild(n)});
     });
 
-    window.submitEssay = async () => {
+    window.submitExam = async () => {
         const content = document.getElementById('student-essay').value.trim();
         const wordCount = content.split(/\s+/).filter(x => x).length;
 
-        if (wordCount < 50) return alert("Bài viết quá ngắn! Hãy viết ít nhất 50 từ.");
+        if (wordCount < 50) return alert("Bài viết quá ngắn. Hãy viết ít nhất 50 từ để đảm bảo ý.");
 
         document.getElementById('loading-overlay').style.display = 'flex';
 
-        // Prompt chấm NLXH
+        // Prompt chấm NLVH 200 chữ (Level 8)
         const systemPrompt = `
-            VAI TRÒ: Giáo viên Ngữ Văn chấm bài Nghị Luận Xã Hội (Đoạn văn 200 chữ).
-            ĐỀ BÀI: "Sức mạnh của lòng thấu cảm".
+            VAI TRÒ: Giáo viên Ngữ Văn chấm bài Nghị Luận Văn Học (Đoạn văn 200 chữ).
+            ĐỀ BÀI: Vẻ đẹp tình mẫu tử và đức hy sinh của người đàn bà hàng chài qua lời thoại tại tòa án.
             
             TIÊU CHÍ CHẤM (Thang 10):
-            1. Bố cục (2.0): Mở đoạn, Thân đoạn, Kết đoạn rõ ràng.
-            2. Nội dung (4.0): Giải thích, Bàn luận, Dẫn chứng, Phản đề/Bài học.
-            3. Diễn đạt (2.0): Trôi chảy, không sai chính tả/ngữ pháp.
-            4. Sáng tạo (2.0): Có giọng văn riêng, dẫn chứng mới mẻ.
+            1. Nội dung (5.0): Phân tích được tình yêu con sâu sắc ("Vui nhất là lúc ngồi nhìn đàn con ăn no") và sự hy sinh chấp nhận khổ đau vì con.
+            2. Nghệ thuật (2.0): Nhận xét về ngôn ngữ mộc mạc, chân chất nhưng thấm đẫm triết lý đời thường.
+            3. Diễn đạt (2.0): Văn phong mạch lạc, giàu cảm xúc, đúng dung lượng.
+            4. Sáng tạo (1.0): Có liên hệ hoặc cái nhìn sâu sắc.
 
             BÀI LÀM CỦA HỌC SINH:
             "${content}"
@@ -267,9 +272,9 @@
             YÊU CẦU JSON DUY NHẤT (Không Markdown):
             {
                 "score": (Số thực, max 10.0),
-                "title": "Nhận xét ngắn (VD: Tốt, Khá, Cần cố gắng)",
-                "desc": "Lời khuyên tổng quát (1 câu)",
-                "correction_html": "Bài làm gốc nhưng thêm thẻ <span class='text-bad'>lỗi</span> <span class='text-fix'>sửa</span> và <span class='text-good'>ý hay</span>.",
+                "title": "Nhận xét ngắn",
+                "desc": "Lời khuyên tổng quát",
+                "correction_html": "Bài làm gốc thêm thẻ <span class='text-bad'>lỗi</span> <span class='text-fix'>sửa</span> <span class='text-good'>ý hay</span>.",
                 "pros": ["Điểm mạnh 1", "Điểm mạnh 2"],
                 "cons": ["Điểm yếu 1", "Điểm yếu 2"]
             }
@@ -308,7 +313,7 @@
             const titleEl = document.getElementById('result-title');
             const ringEl = document.getElementById('score-ring');
 
-            if (score >= 6.0) {
+            if (score >= 7.0) { // Level 8 cần 7.0 điểm
                 titleEl.className = "text-3xl font-black text-green-600 mb-2";
                 ringEl.style.background = `conic-gradient(#10B981 ${score*10}%, rgba(255,255,255,0.5) 0%)`;
                 document.getElementById('next-btn').classList.remove('hidden');
@@ -324,17 +329,15 @@
             if(userUid) {
                 await addDoc(collection(db, "activities"), {
                     uid: userUid,
-                    action: `NLXH Level 3: ${score}/10 điểm`,
+                    action: `NLVH Level 8: ${score}/10 điểm`,
                     score: score,
                     timestamp: serverTimestamp()
                 });
 
-                if (score >= 6.0) {
+                if (score >= 7.0) {
+                    // Level 8 là Level cao cấp, có thể coi là hoàn thành xuất sắc
                     const userRef = doc(db, "users_progress", userUid);
-                    const snap = await getDoc(userRef);
-                    if(!snap.exists() || snap.data().currentLevel < 4) {
-                        await setDoc(userRef, { currentLevel: 4, lastPassed: serverTimestamp() }, { merge: true });
-                    }
+                    await setDoc(userRef, { currentLevel: 9, masteredAt: serverTimestamp() }, { merge: true });
                 }
             }
 
@@ -346,7 +349,10 @@
         }
     };
 
-    window.nextLevel = () => window.location.href = "../dashboard/nhatkyhoctap.html";
+    window.finishCourse = () => {
+        alert("Chúc mừng! Bạn đã hoàn thành Level 8.");
+        window.location.href = "../dashboard/nhatkyhoctap.html";
+    };
 
     // Word Count
     document.getElementById('student-essay').oninput = function() {
@@ -374,7 +380,7 @@
             
             if(totalSeconds < 300) timerCircle.classList.replace('text-orange-500', 'text-red-500');
         } else {
-            submitEssay();
+            submitExam();
         }
     }, 1000);
 </script>

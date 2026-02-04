@@ -2,122 +2,226 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Level 6: Sóng - Xuân Quỳnh</title>
-    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
-    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
-    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
-    <meta property="og:url" content="https://hopvan.netlify.app" />
-    <meta property="og:type" content="article" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 6: Đọc Hiểu - Sóng</title>
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
-
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        :root { --primary: #FF8F50; --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62); --sidebar-width: 280px; }
-        * { font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: #FFF5EC; min-height: 100vh; display: flex; }
+        :root { --primary: #FF8F50; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: flex; color: #2d3436;
+            background: radial-gradient(at 0% 0%, hsla(25,100%,95%,1) 0, transparent 50%), 
+                        radial-gradient(at 100% 100%, hsla(15,100%,96%,1) 0, transparent 50%), 
+                        #fff9f5;
+        }
 
-        #menu-placeholder { width: var(--sidebar-width); flex-shrink: 0; }
-        .main-content { flex-grow: 1; padding: 40px; overflow-y: auto; }
+        /* --- BACKGROUND BLOBS --- */
+        .bg-blob { position: fixed; filter: blur(80px); z-index: -1; opacity: 0.6; animation: float 25s infinite alternate ease-in-out; }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #ffe4d3; animation-delay: -5s; }
+        .blob-2 { bottom: 0%; right: -5%; width: 450px; height: 450px; background: #ffdec2; }
+        @keyframes float { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(40px, 40px) rotate(15deg); } }
 
-        .exam-card { background: white; border-radius: 35px; padding: 40px; border: 1px solid rgba(255, 143, 80, 0.2); box-shadow: 0 15px 35px rgba(255, 143, 80, 0.05); }
-        .editor-container { background: white; border-radius: 30px; border: 2px solid #f0f0f0; overflow: hidden; transition: 0.3s; }
-        .editor-container:focus-within { border-color: var(--primary); box-shadow: 0 10px 30px rgba(255, 143, 80, 0.1); }
-        
-        .writing-area { width: 100%; height: 450px; padding: 30px; border: none; outline: none; resize: none; font-size: 1.15rem; line-height: 2; color: #2d3436; background: #fafafa; }
+        #menu-placeholder { width: 280px; flex-shrink: 0; }
+        .main-content { flex-grow: 1; padding: 40px; overflow-y: auto; height: 100vh; position: relative; scroll-behavior: smooth; }
 
-        /* AI Feedback Styles */
-        .text-good { color: #10B981; background: #ECFDF5; font-weight: 600; padding: 2px 4px; border-radius: 6px; }
-        .text-bad { color: #EF4444; background: #FEF2F2; text-decoration: line-through; padding: 2px 4px; border-radius: 6px; }
-        .text-fix { color: #3B82F6; font-weight: 700; font-style: italic; }
+        /* --- LIQUID GLASS STYLES --- */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 10px 30px rgba(255, 143, 80, 0.15);
+            border-radius: 9999px; transition: all 0.3s;
+        }
+        .glass-header:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.9); }
 
-        .score-circle { width: 100px; height: 100px; border-radius: 50%; border: 8px solid #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 900; }
+        .liquid-glass {
+            background: rgba(255, 255, 255, 0.45);
+            box-shadow: 0 15px 40px -5px rgba(255, 130, 60, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px; transition: transform 0.3s;
+        }
+
+        /* --- CONTENT STYLES --- */
+        .poem-box {
+            font-family: 'Merriweather', serif; color: #4b5563;
+            background: rgba(255,255,255,0.5); padding: 40px; border-radius: 20px;
+            font-size: 1.1rem; line-height: 2.2; text-align: center;
+            border: 1px solid rgba(255,255,255,0.6);
+            position: relative; overflow: hidden;
+        }
+        .wave-decoration {
+            position: absolute; bottom: -20px; left: 0; width: 100%; height: 100px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffedd5" fill-opacity="0.5" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background-size: cover; pointer-events: none;
+        }
+
+        /* Question Inputs */
+        .q-input-group { margin-bottom: 25px; }
+        .q-label { font-weight: 800; color: #c2410c; margin-bottom: 12px; display: block; font-size: 1rem; }
+        .glass-input {
+            width: 100%; padding: 16px; border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 16px; background: rgba(255,255,255,0.5);
+            font-size: 1rem; transition: 0.3s; backdrop-filter: blur(5px);
+        }
+        .glass-input:focus {
+            background: rgba(255,255,255,0.9); border-color: var(--primary); outline: none;
+            box-shadow: 0 8px 20px rgba(255, 143, 80, 0.15);
+        }
+
+        /* --- AI RESULT --- */
+        .ai-result { display: none; margin-top: 40px; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+        .score-circle {
+            width: 120px; height: 120px; border-radius: 50%;
+            background: conic-gradient(var(--primary) 0%, rgba(255,255,255,0.5) 0%);
+            display: flex; align-items: center; justify-content: center;
+            position: relative; margin: 0 auto;
+            box-shadow: 0 15px 30px rgba(255, 143, 80, 0.25);
+        }
+        .score-inner {
+            width: 90px; height: 90px; background: rgba(255,255,255,0.9); border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        /* Badges */
+        .badge-correct { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; border: 1px solid #86efac; }
+        .badge-partial { background: #fef9c3; color: #854d0e; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; border: 1px solid #fde047; }
+        .badge-wrong { background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; border: 1px solid #fca5a5; }
 
         @media (max-width: 1024px) { #menu-placeholder { display: none; } .main-content { padding: 20px; } }
     </style>
 </head>
 <body>
 
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+
     <div id="menu-placeholder"></div>
 
     <main class="main-content">
-        <div class="flex justify-between items-center mb-8">
-            <a href="../dashboard/nhatkyhoctap.html" class="bg-white px-5 py-2.5 rounded-2xl font-bold text-gray-500 hover:text-orange-500 shadow-sm transition-all flex items-center gap-2">
-                <i class="fas fa-arrow-left"></i> Quay lại lộ trình
-            </a>
-            <div class="flex items-center gap-4">
-                <div class="bg-black text-white px-6 py-2.5 rounded-2xl font-black flex items-center gap-3">
-                    <i class="fas fa-clock text-orange-400"></i> <span id="timer">45:00</span>
+        <div class="sticky top-6 z-50 mb-12 px-2">
+            <div class="max-w-5xl mx-auto glass-header px-6 py-3 flex justify-between items-center">
+                <a href="../dashboard/nhatkyhoctap.html" class="flex items-center gap-3 text-gray-600 font-bold hover:text-orange-500 transition group">
+                    <div class="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center shadow-sm text-orange-400 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                    <span class="hidden sm:inline">Quay lại lộ trình</span>
+                </a>
+                
+                <div class="flex items-center gap-4">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Thời gian còn lại</p>
+                        <p class="text-base font-black text-gray-800" id="timer-text">30 phút 00 giây</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center shadow-lg relative overflow-hidden bg-white">
+                        <svg class="w-10 h-10 absolute" viewBox="0 0 36 36">
+                            <path class="text-gray-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" />
+                            <path class="text-orange-500 transition-all duration-1000 ease-linear" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" id="timer-circle" />
+                        </svg>
+                        <span class="text-xs font-black relative z-10 text-gray-700" id="timer-mini">30</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            <div class="space-y-6">
-                <div class="exam-card">
-                    <span class="bg-orange-500 text-white px-4 py-1.5 rounded-xl font-black text-xs uppercase tracking-widest">Level 6: Nghị luận văn học</span>
-                    <h2 class="text-3xl font-black text-gray-800 mt-4 mb-6 leading-tight">Sóng (Xuân Quỳnh)</h2>
-                    
-                    <div class="p-6 bg-orange-50 rounded-3xl border-2 border-orange-100 italic text-gray-700 leading-relaxed mb-6">
-                        "Dữ dội và dịu êm<br>Ồn ào và lặng lẽ<br>Sông không hiểu nổi mình<br>Sóng tìm ra tận bể..."
-                    </div>
+        <div class="max-w-4xl mx-auto pb-20">
+            
+            <div class="liquid-glass p-8 mb-10 relative overflow-hidden bg-gradient-to-br from-white/60 to-white/20">
+                <div class="relative z-10">
+                    <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Level 6</span>
+                    <h1 class="text-4xl font-black text-gray-800 mt-4 mb-2">Đọc Hiểu: Sóng</h1>
+                    <p class="text-gray-500 font-medium">Hoàn thành bài tập đạt tối thiểu <span class="text-orange-600 font-bold">6.0/10 điểm</span> để qua màn.</p>
+                </div>
+                <i class="fas fa-water absolute -right-6 -bottom-8 text-9xl text-orange-500/10 rotate-12"></i>
+            </div>
 
-                    <div class="space-y-4 text-gray-800">
-                        <p class="font-bold text-lg"><i class="fas fa-pen-nib text-orange-500 mr-2"></i> Yêu cầu đề bài:</p>
-                        <p class="text-lg leading-relaxed">Hãy phân tích vẻ đẹp tâm hồn người phụ nữ đang yêu qua hai khổ thơ đầu của tác phẩm <strong>"Sóng"</strong>. Từ đó, nhận xét về sự đổi mới trong quan niệm tình yêu của Xuân Quỳnh.</p>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-dashed border-gray-200">
-                        <p class="text-sm font-bold text-gray-400 uppercase tracking-tighter mb-3">Gợi ý từ AI:</p>
-                        <ul class="text-gray-500 text-sm space-y-2">
-                            <li>• Những trạng thái đối lập của sóng cũng là những cung bậc cảm xúc của trái tim người phụ nữ.</li>
-                            <li>• Khát vọng vươn tới cái cao rộng, bao dung ("Sóng tìm ra tận bể").</li>
-                            <li>• Quy luật muôn đời của tình yêu: "Nỗi khát vọng tình yêu / Bồi hồi trong ngực trẻ".</li>
-                        </ul>
-                    </div>
+            <div class="liquid-glass p-8 mb-8">
+                <div class="poem-box">
+                    <p>
+                        "Dữ dội và dịu êm<br>
+                        Ồn ào và lặng lẽ<br>
+                        Sông không hiểu nổi mình<br>
+                        Sóng tìm ra tận bể<br>
+                        <br>
+                        Ôi con sóng ngày xưa<br>
+                        Và ngày sau vẫn thế<br>
+                        Nỗi khát vọng tình yêu<br>
+                        Bồi hồi trong ngực trẻ"<br>
+                    </p>
+                    <div class="text-right text-sm font-bold text-gray-400 mt-4 not-italic font-sans pr-4">— Trích <i>Sóng</i> (Xuân Quỳnh)</div>
+                    <div class="wave-decoration"></div>
                 </div>
             </div>
 
-            <div class="space-y-6">
-                <div class="editor-container" id="editor-box">
-                    <div class="px-8 py-4 bg-gray-50 border-b flex justify-between items-center">
-                        <span class="font-black text-xs text-gray-400 uppercase">Bài làm của bạn</span>
-                        <span id="word-count" class="text-xs font-black bg-gray-200 text-gray-600 px-3 py-1 rounded-lg">0 TỪ</span>
-                    </div>
-                    <textarea id="student-essay" class="writing-area" placeholder="Hãy bắt đầu viết tại đây..."></textarea>
-                    <div class="p-4 bg-white border-t">
-                        <button id="submit-btn" class="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white py-4 rounded-2xl font-black text-lg shadow-lg hover:scale-[1.02] active:scale-95 transition-all">
-                            NỘP BÀI CHẤM ĐIỂM
-                        </button>
-                    </div>
+            <div id="questions-form" class="space-y-6 liquid-glass p-8">
+                <div class="q-input-group">
+                    <label class="q-label">Câu 1 (2.0 điểm): Đoạn thơ trên được viết theo thể thơ nào? Nêu phương thức biểu đạt chính.</label>
+                    <input type="text" class="glass-input" id="ans-1" placeholder="Ví dụ: Thể thơ... PTBĐ...">
+                </div>
+                
+                <div class="q-input-group">
+                    <label class="q-label">Câu 2 (2.0 điểm): Chỉ ra các cặp từ trái nghĩa được sử dụng trong khổ thơ đầu. Hiệu quả nghệ thuật của chúng là gì?</label>
+                    <input type="text" class="glass-input" id="ans-2" placeholder="Các cặp từ là...">
                 </div>
 
-                <div id="result-box" class="hidden exam-card animate-render-in">
-                    <div class="flex items-center gap-6 mb-8">
-                        <div id="score-display" class="score-circle">0</div>
-                        <div>
-                            <h3 id="grade-title" class="text-2xl font-black text-gray-800">...</h3>
-                            <p id="grade-desc" class="text-gray-500">...</p>
+                <div class="q-input-group">
+                    <label class="q-label">Câu 3 (3.0 điểm): Hình ảnh 'Sóng tìm ra tận bể' gợi cho anh/chị suy nghĩ gì về hành trình của tình yêu?</label>
+                    <textarea class="glass-input h-24 resize-none" id="ans-3" placeholder="Giải thích ý nghĩa..."></textarea>
+                </div>
+
+                <div class="q-input-group">
+                    <label class="q-label">Câu 4 (3.0 điểm): Anh/chị cảm nhận như thế nào về 'Nỗi khát vọng tình yêu' của tuổi trẻ trong đoạn thơ?</label>
+                    <textarea class="glass-input h-28 resize-none" id="ans-4" placeholder="Viết đoạn văn ngắn trình bày suy nghĩ..."></textarea>
+                </div>
+
+                <div class="mt-8 text-center" id="submit-area">
+                    <button onclick="submitExam()" class="group relative inline-flex items-center justify-center px-12 py-5 font-black text-white transition-all duration-300 bg-gray-900 rounded-3xl hover:shadow-2xl hover:shadow-orange-500/30 hover:scale-105 active:scale-95 overflow-hidden">
+                        <span class="text-xl relative z-10">NỘP BÀI & CHẤM ĐIỂM</span>
+                        <div class="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="result-box" class="liquid-glass p-10 ai-result">
+                <div class="flex flex-col md:flex-row items-center mb-10 border-b border-white/50 pb-8">
+                    <div class="score-circle" id="score-ring">
+                        <div class="score-inner">
+                            <span class="text-4xl font-black text-gray-800" id="score-text">0</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Điểm</span>
                         </div>
                     </div>
-                    <div id="ai-correction" class="p-6 bg-gray-50 rounded-3xl mb-6 text-lg leading-relaxed"></div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-green-50 p-4 rounded-2xl border border-green-100"><p class="font-bold text-green-700 text-xs mb-2">Điểm tốt:</p><ul id="pros-list" class="text-[11px] text-green-800 space-y-1"></ul></div>
-                        <div class="bg-red-50 p-4 rounded-2xl border border-red-100"><p class="font-bold text-red-700 text-xs mb-2">Cần cải thiện:</p><ul id="cons-list" class="text-[11px] text-red-800 space-y-1"></ul></div>
+                    <div class="text-center md:text-left mt-6 md:mt-0 md:ml-8 flex-1">
+                        <h3 class="text-3xl font-black text-gray-800 mb-2" id="result-title">Đang chấm...</h3>
+                        <p class="text-gray-500 font-medium italic" id="result-desc">Giáo viên AI đang phân tích...</p>
                     </div>
-                    <button onclick="location.reload()" class="w-full mt-6 py-3 rounded-xl font-bold text-gray-400 hover:bg-gray-100 transition-all uppercase text-xs tracking-widest">THỬ LẠI</button>
+                </div>
+
+                <div id="feedback-content" class="space-y-4"></div>
+
+                <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="nextLevel()" id="next-btn" class="hidden w-full sm:w-auto bg-green-500 text-white px-8 py-4 rounded-2xl font-black hover:bg-green-600 transition shadow-lg shadow-green-500/30 hover:-translate-y-1">
+                        MỞ KHÓA LEVEL 7 <i class="fas fa-lock-open ml-2"></i>
+                    </button>
+                    <button onclick="location.reload()" id="retry-btn" class="hidden w-full sm:w-auto bg-white/70 text-gray-600 px-8 py-4 rounded-2xl font-black hover:bg-white transition shadow-sm border border-gray-200">
+                        LÀM LẠI BÀI <i class="fas fa-redo ml-2"></i>
+                    </button>
                 </div>
             </div>
+
         </div>
     </main>
 
-    <div id="loading-overlay" class="fixed inset-0 bg-white/90 backdrop-blur-md z-[2000] hidden flex-col items-center justify-center">
-        <div class="text-6xl animate-bounce text-orange-500"><i class="fas fa-robot"></i></div>
-        <h3 class="font-black text-2xl mt-4">GIÁO VIÊN AI ĐANG CHẤM BÀI...</h3>
-        <p class="text-gray-400 mt-2">Vui lòng đợi giây lát</p>
+    <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[2000] hidden flex-col items-center justify-center transition-all">
+        <div class="relative w-24 h-24">
+            <div class="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-orange-500 rounded-full border-t-transparent animate-spin"></div>
+            <div class="absolute inset-0 flex items-center justify-center text-3xl">🤖</div>
+        </div>
+        <h3 class="font-black text-2xl mt-6 text-gray-800">AI ĐANG CHẤM BÀI...</h3>
+        <p class="text-gray-500 mt-2 font-medium">Đang đối chiếu đáp án chuẩn</p>
     </div>
 
 <script type="module">
@@ -134,107 +238,169 @@
     let userUid = null;
 
     onAuthStateChanged(auth, (u) => {
-        if (u) { userUid = u.uid; } else { window.location.href = "../../log.html"; }
+        if (u) userUid = u.uid;
+        else window.location.href = "../log.html";
     });
 
-    // Nạp Menu & Highlight Nhật ký
-fetch('menu.html')
-    .then(res => res.text())
-    .then(html => {
-        const placeholder = document.getElementById('menu-placeholder');
-        placeholder.innerHTML = html;
-        
-        // --- QUAN TRỌNG NHẤT: Ép trình duyệt chạy lại Script bên trong menu ---
-        const scripts = placeholder.querySelectorAll('script');
-        scripts.forEach(oldScript => {
-            const newScript = document.createElement('script');
-            newScript.text = oldScript.text; // Copy nội dung script
-            document.body.appendChild(newScript); // Chèn vào body để thực thi
-        });
-    })
-    .catch(err => console.error("Lỗi tải menu:", err));
+    // Fetch Menu
+    fetch('menu.html').then(r=>r.text()).then(h=>{
+        const p = document.getElementById('menu-placeholder'); p.innerHTML=h;
+        p.querySelectorAll('script').forEach(s=>{const n=document.createElement('script');n.text=s.text;document.body.appendChild(n)});
+    });
 
-    document.getElementById('submit-btn').onclick = async () => {
-        const content = document.getElementById('student-essay').value.trim();
-        if (content.split(/\s+/).length < 50) return alert("Bài viết hơi ngắn để phân tích một tác phẩm như Sóng!");
+    window.submitExam = async () => {
+        const ans1 = document.getElementById('ans-1').value;
+        const ans2 = document.getElementById('ans-2').value;
+        const ans3 = document.getElementById('ans-3').value;
+        const ans4 = document.getElementById('ans-4').value;
+
+        if(!ans1 || !ans2 || !ans3 || !ans4) return alert("Vui lòng trả lời đủ 4 câu hỏi!");
 
         document.getElementById('loading-overlay').style.display = 'flex';
 
-        const systemPrompt = `Bạn là chuyên gia Ngữ Văn chấm bài Nghị luận văn học tác phẩm Sóng - Xuân Quỳnh. 
-        Hãy chấm điểm thang 100. YÊU CẦU TRẢ VỀ JSON: {
-            "score": 85,
-            "grade_title": "Nhận xét ngắn",
-            "grade_desc": "Lời nhắn tổng quan ngắn gọn",
-            "correction_html": "Bài làm bọc trong các thẻ span text-good, text-bad, text-fix",
-            "pros": ["ưu điểm về cảm thụ"], "cons": ["lỗi về phân tích"]
-        }`;
+        // PROMPT CHẤM ĐỌC HIỂU
+        const systemPrompt = `
+            VAI TRÒ: Giáo viên Ngữ Văn chấm bài Đọc Hiểu THPT.
+            VĂN BẢN: 2 khổ đầu bài thơ "Sóng" - Xuân Quỳnh.
+            
+            BAREM CHẤM (Thang 10):
+            1. (2.0đ) Thể thơ: Ngũ ngôn (5 chữ). PTBĐ: Biểu cảm.
+            2. (2.0đ) Cặp từ đối lập: Dữ dội - dịu êm, Ồn ào - lặng lẽ. Hiệu quả: Diễn tả các trạng thái cực đoan, phức tạp của sóng và tâm hồn người phụ nữ.
+            3. (3.0đ) "Sóng tìm ra tận bể": Khát vọng vươn tới cái lớn lao, tìm kiếm tình yêu đích thực, sự thấu hiểu.
+            4. (3.0đ) "Nỗi khát vọng...": Tình yêu là khát vọng muôn đời, mãnh liệt nhất của tuổi trẻ.
+
+            BÀI LÀM:
+            1. ${ans1}
+            2. ${ans2}
+            3. ${ans3}
+            4. ${ans4}
+
+            YÊU CẦU JSON DUY NHẤT:
+            {
+                "score": (Số thực, max 10.0),
+                "feedback": [
+                    { "q": "Câu 1", "status": "correct|partial|wrong", "comment": "Nhận xét ngắn" },
+                    { "q": "Câu 2", "status": "...", "comment": "..." },
+                    { "q": "Câu 3", "status": "...", "comment": "..." },
+                    { "q": "Câu 4", "status": "...", "comment": "..." }
+                ],
+                "advice": "Lời khuyên chung"
+            }
+        `;
 
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\n\nBÀI LÀM:\n" + content }] }] })
+                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
             });
 
             const data = await response.json();
+            
+            if (data.error) throw new Error(data.error.message);
+            if (!data.candidates || data.candidates.length === 0) throw new Error("AI không trả lời.");
+
             const rawText = data.candidates[0].content.parts[0].text;
-            const result = JSON.parse(rawText.substring(rawText.indexOf('{'), rawText.lastIndexOf('}') + 1));
+            const res = JSON.parse(rawText.replace(/```json|```/g, "").trim());
 
-            // Hiển thị kết quả
-            document.getElementById('result-box').classList.remove('hidden');
-            document.getElementById('score-display').innerText = result.score;
-            document.getElementById('score-display').style.borderColor = result.score >= 60 ? '#58cc02' : '#ff4b4b';
-            document.getElementById('grade-title').innerText = result.grade_title;
-            document.getElementById('grade-desc').innerText = result.grade_desc;
-            document.getElementById('ai-correction').innerHTML = result.correction_html;
-            document.getElementById('pros-list').innerHTML = result.pros.map(i => `<li>• ${i}</li>`).join('');
-            document.getElementById('cons-list').innerHTML = result.cons.map(i => `<li>• ${i}</li>`).join('');
-            document.getElementById('editor-box').style.display = 'none';
+            // 1. Hiển thị kết quả
+            document.getElementById('result-box').style.display = 'block';
+            document.getElementById('submit-area').style.display = 'none';
+            document.getElementById('result-box').scrollIntoView({ behavior: 'smooth' });
 
-            // Mở khóa Level 7 trên Firebase
-            if (result.score >= 60 && userUid) {
-                const userRef = doc(db, "users_progress", userUid);
-                const snap = await getDoc(userRef);
-                let currentLvl = snap.exists() ? snap.data().currentLevel : 1;
-
-                if (currentLvl <= 6) {
-                    await setDoc(userRef, { currentLevel: 7 }, { merge: true });
-                }
-                alert("Chúc mừng! Bạn đã mở khóa Level 7 thành công.");
+            const score = res.score;
+            document.getElementById('score-text').innerText = score;
+            
+            // Xử lý Đậu / Trượt
+            const titleEl = document.getElementById('result-title');
+            const ringEl = document.getElementById('score-ring');
+            
+            if (score >= 6.0) {
+                titleEl.innerText = "ĐẠT YÊU CẦU";
+                titleEl.className = "text-3xl font-black text-green-600 mb-2";
+                ringEl.style.background = `conic-gradient(#10B981 ${score*10}%, rgba(255,255,255,0.5) 0%)`;
+                document.getElementById('next-btn').classList.remove('hidden');
+                document.getElementById('next-btn').classList.add('flex');
+            } else {
+                titleEl.innerText = "CẦN CỐ GẮNG";
+                titleEl.className = "text-3xl font-black text-red-500 mb-2";
+                ringEl.style.background = `conic-gradient(#EF4444 ${score*10}%, rgba(255,255,255,0.5) 0%)`;
+                document.getElementById('retry-btn').classList.remove('hidden');
+                document.getElementById('retry-btn').classList.add('flex');
             }
 
-            await addDoc(collection(db, "activities"), {
-                uid: userUid,
-                action: "Hoàn thành Level 6: Sóng (" + result.score + "đ)",
-                timestamp: serverTimestamp()
-            });
+            // 2. Render Chi tiết
+            const statusStyle = {
+                "correct": { class: "badge-correct", text: "ĐÚNG" },
+                "partial": { class: "badge-partial", text: "THIẾU Ý" },
+                "wrong": { class: "badge-wrong", text: "SAI" }
+            };
+
+            const html = res.feedback.map(f => `
+                <div class="bg-white/60 rounded-xl p-4 border border-white shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-gray-700">${f.q}</span>
+                        <span class="${statusStyle[f.status].class}">${statusStyle[f.status].text}</span>
+                    </div>
+                    <p class="text-sm text-gray-600 italic"><i class="fas fa-comment-dots text-orange-400 mr-2"></i>${f.comment}</p>
+                </div>
+            `).join('');
+            
+            document.getElementById('feedback-content').innerHTML = html + 
+                `<div class="bg-blue-50/80 text-blue-900 p-4 rounded-xl text-sm font-bold mt-4 border border-blue-100 flex gap-3 backdrop-blur-sm">
+                    <i class="fas fa-lightbulb text-lg mt-0.5"></i>
+                    <div>${res.advice}</div>
+                </div>`;
+
+            // 3. Lưu Database & Mở khóa
+            if(userUid) {
+                await addDoc(collection(db, "activities"), {
+                    uid: userUid,
+                    action: `Đọc hiểu Level 6: ${score}/10 điểm`,
+                    score: score,
+                    timestamp: serverTimestamp()
+                });
+
+                if (score >= 6.0) {
+                    const userRef = doc(db, "users_progress", userUid);
+                    const snap = await getDoc(userRef);
+                    if(!snap.exists() || snap.data().currentLevel < 7) {
+                        await setDoc(userRef, { currentLevel: 7, lastPassed: serverTimestamp() }, { merge: true });
+                    }
+                }
+            }
 
         } catch (e) {
             console.error(e);
-            alert("Lỗi chấm văn. Bạn hãy thử lại sau nhé!");
+            alert("Lỗi kết nối AI: " + e.message);
         } finally {
             document.getElementById('loading-overlay').style.display = 'none';
         }
     };
 
-    document.getElementById('student-essay').oninput = function() {
-        const words = this.value.trim().split(/\s+/).filter(x => x).length;
-        document.getElementById('word-count').innerText = words + " TỪ";
-    };
+    window.nextLevel = () => window.location.href = "../dashboard/nhatkyhoctap.html";
 
-    // Word count
-    document.getElementById('student-essay').oninput = function() {
-        const words = this.value.trim().split(/\s+/).filter(x => x).length;
-        document.getElementById('word-count').innerText = words + " TỪ";
-    };
+    // Timer Logic 20:00
+    let totalSeconds = 1800; 
+    const timerCircle = document.getElementById('timer-circle');
+    const timerText = document.getElementById('timer-text');
+    const timerMini = document.getElementById('timer-mini');
 
-    // Timer
-    let timeLeft = 2700;
     setInterval(() => {
-        if(timeLeft > 0) {
-            timeLeft--;
-            const m = Math.floor(timeLeft/60), s = timeLeft%60;
-            document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`;
+        if(totalSeconds > 0) {
+            totalSeconds--;
+            const m = Math.floor(totalSeconds / 60);
+            const s = totalSeconds % 60;
+            
+            timerText.innerText = `${m} phút ${s < 10 ? '0'+s : s} giây`;
+            timerMini.innerText = m;
+
+            const percent = (totalSeconds / 1800) * 100;
+            timerCircle.setAttribute('stroke-dasharray', `${percent}, 100`);
+            
+            if(totalSeconds < 300) timerCircle.classList.replace('text-orange-500', 'text-red-500');
+        } else {
+            submitExam();
         }
     }, 1000);
 </script>

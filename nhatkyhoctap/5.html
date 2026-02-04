@@ -2,125 +2,174 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Level 5: Sự Tử Tế</title>
-    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
-    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
-    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
-    <meta property="og:url" content="https://hopvan.netlify.app" />
-    <meta property="og:type" content="article" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 5: Trắc Nghiệm Văn Học</title>
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
-
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        :root { --primary: #FF8F50; --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62); --sidebar-width: 280px; }
-        * { font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: #FFF5EC; min-height: 100vh; display: flex; }
+        :root { --primary: #FF8F50; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: flex; color: #2d3436;
+            background: radial-gradient(at 0% 0%, hsla(25,100%,95%,1) 0, transparent 50%), 
+                        radial-gradient(at 100% 100%, hsla(15,100%,96%,1) 0, transparent 50%), 
+                        #fff9f5;
+        }
 
-        #menu-placeholder { width: var(--sidebar-width); flex-shrink: 0; }
-        .main-content { flex-grow: 1; padding: 40px; overflow-y: auto; }
+        /* --- BACKGROUND BLOBS --- */
+        .bg-blob { position: fixed; filter: blur(80px); z-index: -1; opacity: 0.6; animation: float 25s infinite alternate ease-in-out; }
+        .blob-1 { top: -5%; left: -5%; width: 500px; height: 500px; background: #ffe4d3; animation-delay: -5s; }
+        .blob-2 { bottom: 5%; right: -5%; width: 400px; height: 400px; background: #ffdec2; }
+        @keyframes float { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(40px, 40px) rotate(15deg); } }
 
-        /* Khung đề bài & làm bài */
-        .exam-card { background: white; border-radius: 35px; padding: 40px; border: 1px solid rgba(255, 143, 80, 0.2); box-shadow: 0 15px 35px rgba(255, 143, 80, 0.05); }
-        .editor-container { background: white; border-radius: 30px; border: 2px solid #f0f0f0; overflow: hidden; transition: 0.3s; }
-        .editor-container:focus-within { border-color: var(--primary); box-shadow: 0 10px 30px rgba(255, 143, 80, 0.1); }
+        #menu-placeholder { width: 280px; flex-shrink: 0; }
+        .main-content { flex-grow: 1; padding: 40px; overflow-y: auto; height: 100vh; position: relative; scroll-behavior: smooth; }
+
+        /* --- LIQUID GLASS STYLES --- */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 10px 30px rgba(255, 143, 80, 0.15);
+            border-radius: 9999px; transition: all 0.3s;
+        }
+        .glass-header:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.9); }
+
+        .liquid-glass {
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(255, 130, 60, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px; transition: transform 0.3s; margin-bottom: 2rem;
+        }
+
+        /* --- QUESTION STYLES --- */
+        .option-box {
+            display: flex; align-items: center; gap: 12px; padding: 16px;
+            border: 2px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.4);
+            border-radius: 16px; cursor: pointer; transition: all 0.2s;
+            position: relative; overflow: hidden;
+        }
+        .option-box:hover { background: rgba(255,255,255,0.8); border-color: #fdba74; transform: translateX(5px); }
         
-        .writing-area { width: 100%; height: 450px; padding: 30px; border: none; outline: none; resize: none; font-size: 1.15rem; line-height: 2; color: #2d3436; background: #fafafa; }
+        input[type="radio"]:checked + span { color: #c2410c; font-weight: 700; }
+        .option-box:has(input:checked) {
+            background: #fff7ed; border-color: var(--primary); box-shadow: 0 4px 15px rgba(255, 143, 80, 0.15);
+        }
 
-        /* AI Feedback Styles */
-        .text-good { color: #10B981; background: #ECFDF5; font-weight: 600; padding: 2px 4px; border-radius: 6px; }
-        .text-bad { color: #EF4444; background: #FEF2F2; text-decoration: line-through; padding: 2px 4px; border-radius: 6px; }
-        .text-fix { color: #3B82F6; font-weight: 700; font-style: italic; }
+        .option-radio {
+            appearance: none; width: 22px; height: 22px; border: 2px solid #cbd5e1; border-radius: 50%;
+            display: grid; place-content: center; transition: 0.2s; flex-shrink: 0;
+        }
+        .option-radio::before {
+            content: ""; width: 12px; height: 12px; border-radius: 50%; transform: scale(0); 
+            transition: 0.2s; background: var(--primary);
+        }
+        .option-radio:checked { border-color: var(--primary); }
+        .option-radio:checked::before { transform: scale(1); }
 
-        .score-circle { width: 100px; height: 100px; border-radius: 50%; border: 8px solid #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 900; }
+        /* Kết quả */
+        .option-box.correct { background-color: #d1fae5; border-color: #10b981; color: #065f46; }
+        .option-box.wrong { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; opacity: 0.8; }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px);
+            z-index: 1000; display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.open { display: flex; opacity: 1; }
+        
+        .modal-box {
+            background: white; width: 90%; max-width: 480px; border-radius: 40px;
+            padding: 40px; text-align: center; position: relative;
+            box-shadow: 0 30px 60px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0,0,0,0.05);
+            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modal-overlay.open .modal-box { transform: scale(1); }
+
+        @keyframes pop { 0% { transform: scale(0.8); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .modal-icon { animation: pop 0.6s 0.2s backwards; }
 
         @media (max-width: 1024px) { #menu-placeholder { display: none; } .main-content { padding: 20px; } }
     </style>
 </head>
 <body>
 
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+
+    <div id="result-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div id="modal-icon" class="text-8xl mb-6 modal-icon drop-shadow-lg"></div>
+            
+            <h2 id="modal-title" class="text-4xl font-black mb-3 uppercase tracking-tighter"></h2>
+            <p id="modal-message" class="text-gray-500 font-medium mb-8 leading-relaxed"></p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-orange-50 rounded-2xl p-4 border border-orange-100">
+                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Số câu đúng</div>
+                    <div id="modal-correct" class="text-3xl font-black text-gray-800"></div>
+                </div>
+                <div class="bg-orange-50 rounded-2xl p-4 border border-orange-100">
+                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tổng điểm</div>
+                    <div id="modal-score" class="text-3xl font-black text-orange-500"></div>
+                </div>
+            </div>
+
+            <button id="modal-btn" class="w-full py-4 rounded-2xl font-bold text-white text-lg shadow-xl shadow-orange-200 transition-all transform hover:-translate-y-1 active:scale-95">
+            </button>
+        </div>
+    </div>
+
     <div id="menu-placeholder"></div>
 
     <main class="main-content">
-        <div class="flex justify-between items-center mb-8">
-            <a href="../dashboard/nhatkyhoctap.html" class="bg-white px-5 py-2.5 rounded-2xl font-bold text-gray-500 hover:text-orange-500 shadow-sm transition-all flex items-center gap-2">
-                <i class="fas fa-arrow-left"></i> Quay lại lộ trình
-            </a>
-            <div class="flex items-center gap-4">
-                <div class="bg-black text-white px-6 py-2.5 rounded-2xl font-black flex items-center gap-3">
-                    <i class="fas fa-clock text-orange-400"></i> <span id="timer">45:00</span>
+        <div class="sticky top-6 z-50 mb-12 px-2">
+            <div class="max-w-5xl mx-auto glass-header px-6 py-3 flex justify-between items-center">
+                <a href="../dashboard/nhatkyhoctap.html" class="flex items-center gap-3 text-gray-600 font-bold hover:text-orange-500 transition group">
+                    <div class="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center shadow-sm text-orange-400 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                    <span class="hidden sm:inline">Quay lại lộ trình</span>
+                </a>
+                
+                <div class="flex items-center gap-4">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Thời gian còn lại</p>
+                        <p class="text-base font-black text-gray-800" id="timer-text">30 phút 00 giây</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center shadow-lg relative overflow-hidden bg-white">
+                        <svg class="w-10 h-10 absolute" viewBox="0 0 36 36">
+                            <path class="text-gray-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" />
+                            <path class="text-orange-500 transition-all duration-1000 ease-linear" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" id="timer-circle" />
+                        </svg>
+                        <span class="text-xs font-black relative z-10 text-gray-700" id="timer-mini">30</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            <div class="space-y-6">
-                <div class="exam-card">
-                    <span class="bg-orange-500 text-white px-4 py-1.5 rounded-xl font-black text-xs uppercase tracking-widest">Level 5: Nghị Luận Xã Hội</span>
-                    <h2 class="text-3xl font-black text-gray-800 mt-4 mb-6 leading-tight">Chủ đề: Sức mạnh của sự tử tế</h2>
-                    
-                    <div class="p-6 bg-orange-50 rounded-3xl border-2 border-orange-100 italic text-gray-700 leading-relaxed mb-6">
-                        "Sự tử tế là ngôn ngữ mà người điếc có thể nghe và người mù có thể thấy. Đôi khi, một hành động nhỏ cũng có thể làm thay đổi cả một cuộc đời."
-                    </div>
-
-                    <div class="space-y-4 text-gray-800">
-                        <p class="font-bold text-lg"><i class="fas fa-pen-nib text-orange-500 mr-2"></i> Yêu cầu làm bài:</p>
-                        <p class="text-lg leading-relaxed">Viết một đoạn văn (khoảng 200 chữ) trình bày suy nghĩ của anh/chị về <strong>ý nghĩa của sự tử tế</strong> trong mối quan hệ giữa người với người ở xã hội hiện đại.</p>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-dashed border-gray-200">
-                        <p class="text-sm font-bold text-gray-400 uppercase tracking-tighter mb-3">Gợi ý từ giáo viên:</p>
-                        <ul class="text-gray-500 text-sm space-y-2">
-                            <li>• Giải thích: Sự tử tế là tấm lòng nhân hậu, luôn nghĩ và làm điều tốt cho người khác.</li>
-                            <li>• Vai trò: Gắn kết cộng đồng, xoa dịu nỗi đau, đẩy lùi sự vô cảm.</li>
-                            <li>• Liên hệ: Những tấm gương giúp đỡ nhau trong đại dịch, mùa bão lũ.</li>
-                            <li>• Bài học: Hãy tử tế từ những việc nhỏ nhất hàng ngày.</li>
-                        </ul>
-                    </div>
+        <div class="max-w-3xl mx-auto pb-20">
+            <div class="liquid-glass p-8 mb-10 relative overflow-hidden bg-gradient-to-br from-white/60 to-white/20">
+                <div class="relative z-10">
+                    <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Level 5</span>
+                    <h1 class="text-4xl font-black text-gray-800 mt-4 mb-2">Trắc Nghiệm Văn Học</h1>
+                    <p class="text-gray-500 font-medium">Thử thách tổng hợp kiến thức. Cần đạt <span class="text-orange-600 font-bold">7.0/10 điểm</span> để qua màn.</p>
                 </div>
+                <i class="fas fa-layer-group absolute -right-6 -bottom-8 text-9xl text-orange-500/10 rotate-12"></i>
             </div>
 
-            <div class="space-y-6">
-                <div class="editor-container" id="editor-box">
-                    <div class="px-8 py-4 bg-gray-50 border-b flex justify-between items-center">
-                        <span class="font-black text-xs text-gray-400 uppercase">Bài làm của bạn</span>
-                        <span id="word-count" class="text-xs font-black bg-gray-200 text-gray-600 px-3 py-1 rounded-lg">0 TỪ</span>
-                    </div>
-                    <textarea id="student-essay" class="writing-area" placeholder="Hãy bắt đầu viết tại đây..."></textarea>
-                    <div class="p-4 bg-white border-t">
-                        <button id="submit-btn" class="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white py-4 rounded-2xl font-black text-lg shadow-lg hover:scale-[1.02] active:scale-95 transition-all">
-                            NỘP BÀI CHẤM ĐIỂM
-                        </button>
-                    </div>
-                </div>
+            <form id="quiz-form" class="space-y-8"></form>
 
-                <div id="result-box" class="hidden exam-card animate-render-in">
-                    <div class="flex items-center gap-6 mb-8">
-                        <div id="score-display" class="score-circle">0</div>
-                        <div>
-                            <h3 id="grade-title" class="text-2xl font-black text-gray-800">...</h3>
-                            <p id="grade-desc" class="text-gray-500">...</p>
-                        </div>
-                    </div>
-                    <div id="ai-correction" class="p-6 bg-gray-50 rounded-3xl mb-6 text-lg leading-relaxed border border-gray-100 shadow-inner"></div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-green-50 p-4 rounded-2xl border border-green-100"><p class="font-bold text-green-700 text-xs mb-2">Ưu điểm:</p><ul id="pros-list" class="text-[11px] text-green-800 space-y-1"></ul></div>
-                        <div class="bg-red-50 p-4 rounded-2xl border border-red-100"><p class="font-bold text-red-700 text-xs mb-2">Cần cải thiện:</p><ul id="cons-list" class="text-[11px] text-red-800 space-y-1"></ul></div>
-                    </div>
-                    <button onclick="location.reload()" class="w-full mt-6 py-3 rounded-xl font-bold text-gray-400 hover:bg-gray-100 transition-all uppercase text-xs tracking-widest">THỬ LẠI</button>
-                </div>
+            <div class="mt-12 text-center">
+                <button type="button" onclick="submitQuiz()" class="group relative inline-flex items-center justify-center px-12 py-5 font-black text-white transition-all duration-300 bg-gray-900 rounded-3xl hover:shadow-2xl hover:shadow-orange-500/20 hover:scale-105 active:scale-95 overflow-hidden">
+                    <span class="text-xl relative z-10">NỘP BÀI & CHẤM ĐIỂM</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </button>
             </div>
         </div>
     </main>
-
-    <div id="loading-overlay" class="fixed inset-0 bg-white/90 backdrop-blur-md z-[2000] hidden flex-col items-center justify-center">
-        <div class="text-6xl animate-bounce text-orange-500"><i class="fas fa-robot"></i></div>
-        <h3 class="font-black text-2xl mt-4">GIÁO VIÊN AI ĐANG CHẤM BÀI...</h3>
-        <p class="text-gray-400 mt-2">Vui lòng đợi giây lát</p>
-    </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -132,114 +181,170 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const API_URL = `../.netlify/functions/gemini-proxy`;
     let userUid = null;
+    
+    // 20 Câu hỏi Tổng hợp Nâng cao (Level 5)
+    const quizData = [
+        { q: "Chi tiết 'bát cháo hành' trong 'Chí Phèo' thể hiện tư tưởng gì của Nam Cao?", a: ["Phê phán xã hội", "Niềm tin vào bản chất lương thiện", "Thương cảm cho số phận nông dân", "Tố cáo chế độ nhà tù"], correct: 1 },
+        { q: "Cảm hứng chủ đạo trong bài thơ 'Đất Nước' của Nguyễn Khoa Điềm là gì?", a: ["Đất nước của nhân dân", "Đất nước của các triều đại", "Đất nước của những anh hùng", "Đất nước tươi đẹp"], correct: 0 },
+        { q: "Phong cách nghệ thuật của Tố Hữu được mệnh danh là gì?", a: ["Tài hoa, uyên bác", "Trữ tình chính trị", "Hiện thực trào phúng", "Hướng nội, suy tư"], correct: 1 },
+        { q: "Trong 'Người lái đò Sông Đà', Nguyễn Tuân gọi Sông Đà là gì?", a: ["Kẻ thù số một", "Cố nhân", "Người tình", "Vị thần linh"], correct: 1 },
+        { q: "Chi tiết nào là 'nút thắt' cởi bỏ bi kịch cho Mỵ trong đêm mùa đông?", a: ["Tiếng sáo", "Bát rượu", "Giọt nước mắt của A Phủ", "Ngọn lửa"], correct: 2 },
+        { q: "Tác phẩm nào mở đầu cho trào lưu văn học hiện thực phê phán 1930-1945?", a: ["Tắt đèn", "Bước đường cùng", "Số đỏ", "Kép Tư Bền"], correct: 2 },
+        { q: "Ý nghĩa biểu tượng của 'Tiếng đàn' trong bài thơ 'Đàn ghi ta của Lorca'?", a: ["Nghệ thuật bất tử", "Sự hủy diệt", "Tình yêu đôi lứa", "Nỗi đau chiến tranh"], correct: 0 },
+        { q: "Nhân vật Chiến và Việt trong 'Những đứa con trong gia đình' giống nhau ở điểm nào nhất?", a: ["Tính cách trẻ con", "Lòng căm thù giặc sâu sắc", "Thích đi bắn chim", "Hay tranh giành nhau"], correct: 1 },
+        { q: "Trong 'Hồn Trương Ba, da hàng thịt', bi kịch của Trương Ba là gì?", a: ["Bị chết oan", "Sống nhờ thể xác người khác", "Bị người thân xa lánh", "Không được chơi cờ"], correct: 1 },
+        { q: "Câu thơ 'Dữ dội và dịu êm / Ồn ào và lặng lẽ' trong bài 'Sóng' nói lên điều gì?", a: ["Các trạng thái của sóng", "Sự phức tạp của tâm hồn người phụ nữ", "Vẻ đẹp của biển", "Sự thay đổi của thời tiết"], correct: 1 },
+        { q: "Ai là người đề xuất quan điểm 'Văn học là nhân học'?", a: ["M. Gorki", "Nam Cao", "Thạch Lam", "Nguyễn Minh Châu"], correct: 0 },
+        { q: "Hình ảnh 'chiếc thuyền ngoài xa' trong tác phẩm cùng tên tượng trưng cho điều gì?", a: ["Vẻ đẹp lãng mạn của nghệ thuật", "Sự bấp bênh của kiếp người", "Khoảng cách giữa nghệ thuật và đời sống", "Vẻ đẹp thiên nhiên hùng vĩ"], correct: 2 },
+        { q: "Đặc điểm nổi bật nhất của thơ Xuân Quỳnh là gì?", a: ["Triết lý, suy tưởng", "Hùng tráng, bi tráng", "Trắc ẩn, âu lo, nữ tính", "Trào phúng, châm biếm"], correct: 2 },
+        { q: "Tác phẩm 'Vợ nhặt' được in trong tập truyện nào?", a: ["Con chó xấu xí", "Nên vợ nên chồng", "Gió đầu mùa", "Truyện ngắn Kim Lân"], correct: 0 },
+        { q: "Chất 'chất vàng mười' trong 'Người lái đò Sông Đà' dùng để chỉ ai?", a: ["Sông Đà", "Thiên nhiên Tây Bắc", "Người lao động Tây Bắc", "Bộ đội Tây Tiến"], correct: 2 },
+        { q: "Quan điểm sáng tác của Hồ Chí Minh là gì?", a: ["Nghệ thuật vị nghệ thuật", "Văn hóa nghệ thuật cũng là một mặt trận", "Viết để giải trí", "Viết để thể hiện cái tôi"], correct: 1 },
+        { q: "Trong 'Rừng xà nu', cụ Mết đại diện cho điều gì?", a: ["Thế hệ trẻ", "Truyền thống và sức mạnh buôn làng", "Sự đau thương mất mát", "Tương lai tươi sáng"], correct: 1 },
+        { q: "Biện pháp tu từ chủ đạo trong đoạn thơ 'Dốc lên khúc khuỷu dốc thăm thẳm...' (Tây Tiến)?", a: ["Điệp từ", "Nhân hóa", "Ẩn dụ", "So sánh"], correct: 0 },
+        { q: "Giá trị nhân đạo mới mẻ của 'Vợ chồng A Phủ' so với văn học hiện thực trước 1945 là gì?", a: ["Phát hiện nỗi đau khổ", "Tố cáo giai cấp thống trị", "Chỉ ra con đường giải phóng", "Ca ngợi vẻ đẹp con người"], correct: 2 },
+        { q: "Hai câu thơ: 'Cha mẹ thương nhau bằng gừng cay muối mặn' sử dụng chất liệu gì?", a: ["Thành ngữ dân gian", "Ca dao", "Tục ngữ", "Truyền thuyết"], correct: 0 }
+    ];
 
     onAuthStateChanged(auth, (u) => {
-        if (u) { userUid = u.uid; } else { window.location.href = "../../log.html"; }
+        if (u) { userUid = u.uid; initQuiz(); } 
+        else { window.location.href = "../log.html"; }
     });
 
-    // Nạp Menu & Highlight Nhật ký
-fetch('menu.html')
-    .then(res => res.text())
-    .then(html => {
-        const placeholder = document.getElementById('menu-placeholder');
-        placeholder.innerHTML = html;
-        
-        // --- QUAN TRỌNG NHẤT: Ép trình duyệt chạy lại Script bên trong menu ---
-        const scripts = placeholder.querySelectorAll('script');
-        scripts.forEach(oldScript => {
-            const newScript = document.createElement('script');
-            newScript.text = oldScript.text; // Copy nội dung script
-            document.body.appendChild(newScript); // Chèn vào body để thực thi
+    fetch('menu.html').then(r=>r.text()).then(h=>{
+        const p = document.getElementById('menu-placeholder'); p.innerHTML=h;
+        p.querySelectorAll('script').forEach(s=>{const n=document.createElement('script');n.text=s.text;document.body.appendChild(n)});
+    });
+
+    function initQuiz() {
+        const form = document.getElementById('quiz-form');
+        quizData.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = "liquid-glass p-8 relative overflow-hidden"; 
+            div.innerHTML = `
+                <div class="flex items-center gap-3 mb-5 relative z-10">
+                    <span class="bg-orange-100 text-orange-600 font-black w-8 h-8 flex items-center justify-center rounded-lg text-sm border border-orange-200 shadow-sm">${index + 1}</span>
+                    <h3 class="font-bold text-gray-800 text-lg">${item.q}</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 relative z-10">
+                    ${item.a.map((opt, i) => `
+                        <label class="option-box" id="lbl-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}" class="option-radio">
+                            <span class="text-gray-700 font-medium">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+            form.appendChild(div);
         });
-    })
-    .catch(err => console.error("Lỗi tải menu:", err));
+    }
 
-    document.getElementById('submit-btn').onclick = async () => {
-        const content = document.getElementById('student-essay').value.trim();
-        if (content.split(/\s+/).length < 50) return alert("Bài viết hơi ngắn, hãy mở rộng thêm ý tưởng của bạn nhé!");
+    function showResultModal(score, pass, correctCount) {
+        const modal = document.getElementById('result-modal');
+        const icon = document.getElementById('modal-icon');
+        const title = document.getElementById('modal-title');
+        const message = document.getElementById('modal-message');
+        const btn = document.getElementById('modal-btn');
 
-        document.getElementById('loading-overlay').style.display = 'flex';
+        document.getElementById('modal-score').innerText = `${score}/10`;
+        document.getElementById('modal-correct').innerText = `${correctCount}/20`;
 
-        const systemPrompt = `Bạn là chuyên gia giáo dục chấm bài văn. 
-        Đề bài: Ý nghĩa của sự tử tế trong xã hội hiện đại. Hãy chấm điểm thang 100.
-        YÊU CẦU TRẢ VỀ JSON: {
-            "score": 85,
-            "grade_title": "Rất tốt / Khá / Cần cố gắng",
-            "grade_desc": "Lời nhắn tổng quan ngắn gọn",
-            "correction_html": "Bài làm bọc trong các thẻ span text-good, text-bad, text-fix",
-            "pros": ["Điểm cộng về ý tưởng"], "cons": ["Điểm cần bổ sung"]
-        }`;
+        if (pass) {
+            icon.innerText = '👑'; // Vương miện cho Level cao nhất
+            title.innerText = 'TUYỆT VỜI!';
+            title.classList.add('text-green-600');
+            message.innerText = "Bạn đã chinh phục Level 5 - Mức độ khó nhất!";
+            
+            btn.innerText = "MỞ KHÓA LEVEL 6";
+            btn.className = "w-full py-4 rounded-2xl font-bold text-white text-lg shadow-xl shadow-green-200 bg-green-500 hover:bg-green-600 transition-all transform active:scale-95";
+            btn.onclick = () => window.location.href = "../dashboard/nhatkyhoctap.html";
+        } else {
+            icon.innerText = '📚';
+            title.innerText = 'CỐ GẮNG HƠN!';
+            title.classList.add('text-red-500');
+            message.innerText = "Kiến thức tổng hợp cần sự chắc chắn. Hãy ôn lại và thử lại nhé (Cần 7.0 điểm).";
+            
+            btn.innerText = "LÀM LẠI BÀI THI";
+            btn.className = "w-full py-4 rounded-2xl font-bold text-white text-lg shadow-xl shadow-red-200 bg-red-500 hover:bg-red-600 transition-all transform active:scale-95";
+            btn.onclick = () => location.reload();
+        }
 
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\n\nBÀI LÀM:\n" + content }] }] })
-            });
+        modal.classList.add('open');
+    }
 
-            if (!response.ok) throw new Error("AI đang bận, bạn thử lại nhé!");
+    window.submitQuiz = async () => {
+        let score = 0;
+        let correctCount = 0;
 
-            const data = await response.json();
-            const rawText = data.candidates[0].content.parts[0].text;
-            const result = JSON.parse(rawText.substring(rawText.indexOf('{'), rawText.lastIndexOf('}') + 1));
-
-            // Hiển thị kết quả
-            document.getElementById('result-box').classList.remove('hidden');
-            document.getElementById('score-display').innerText = result.score;
-            document.getElementById('score-display').style.borderColor = result.score >= 60 ? '#58cc02' : '#ff4b4b';
-            document.getElementById('grade-title').innerText = result.grade_title;
-            document.getElementById('grade-desc').innerText = result.grade_desc;
-            document.getElementById('ai-correction').innerHTML = result.correction_html;
-            document.getElementById('pros-list').innerHTML = result.pros.map(i => `<li>• ${i}</li>`).join('');
-            document.getElementById('cons-list').innerHTML = result.cons.map(i => `<li>• ${i}</li>`).join('');
-            document.getElementById('editor-box').style.display = 'none';
-
-            // Mở khóa Level 6 trên Firebase
-            if (result.score >= 60 && userUid) {
-                const userRef = doc(db, "users_progress", userUid);
-                const snap = await getDoc(userRef);
-                let currentLvl = snap.exists() ? snap.data().currentLevel : 1;
-
-                if (currentLvl <= 5) {
-                    await setDoc(userRef, { currentLevel: 6 }, { merge: true });
-                }
-                alert("Chúc mừng! Bạn đã mở khóa Level 6 thành công.");
+        quizData.forEach((item, index) => {
+            const radios = document.getElementsByName(`q${index}`);
+            let selected = -1;
+            for(let r of radios) {
+                if(r.checked) selected = parseInt(r.value);
+                r.disabled = true;
             }
 
-            await addDoc(collection(db, "activities"), {
-                uid: userUid,
-                action: "Hoàn thành Level 5: Sự tử tế (" + result.score + "đ)",
-                timestamp: serverTimestamp()
-            });
+            const correctLbl = document.getElementById(`lbl-${index}-${item.correct}`);
+            correctLbl.classList.add('correct');
 
-        } catch (e) {
-            console.error(e);
-            alert("Lỗi chấm văn. Bạn hãy thử lại sau nhé!");
-        } finally {
-            document.getElementById('loading-overlay').style.display = 'none';
+            if(selected === item.correct) {
+                score += 0.5; 
+                correctCount++;
+            } else if (selected !== -1) {
+                document.getElementById(`lbl-${index}-${selected}`).classList.add('wrong');
+            }
+        });
+
+        const totalScore = score;
+        const pass = totalScore >= 7.0; // Level 5 cần 7.0 điểm
+
+        showResultModal(totalScore, pass, correctCount);
+
+        if(userUid) {
+            try {
+                await addDoc(collection(db, "activities"), {
+                    uid: userUid,
+                    action: `Làm trắc nghiệm Level 5: ${totalScore}/10 điểm`,
+                    score: totalScore,
+                    timestamp: serverTimestamp()
+                });
+
+                if(pass) {
+                    const userRef = doc(db, "users_progress", userUid);
+                    const userSnap = await getDoc(userRef);
+                    let currentLevel = 1;
+                    if(userSnap.exists()) currentLevel = userSnap.data().currentLevel || 1;
+
+                    if(currentLevel < 6) {
+                        await setDoc(userRef, { currentLevel: 6, lastPassed: serverTimestamp() }, { merge: true });
+                    }
+                }
+            } catch (e) { console.error(e); }
         }
     };
 
-    document.getElementById('student-essay').oninput = function() {
-        const words = this.value.trim().split(/\s+/).filter(x => x).length;
-        document.getElementById('word-count').innerText = words + " TỪ";
-    };
+    // Timer (30 minutes)
+    let totalSeconds = 1800; 
+    const timerCircle = document.getElementById('timer-circle');
+    const timerText = document.getElementById('timer-text');
+    const timerMini = document.getElementById('timer-mini');
 
-    // Word count
-    document.getElementById('student-essay').oninput = function() {
-        const words = this.value.trim().split(/\s+/).filter(x => x).length;
-        document.getElementById('word-count').innerText = words + " TỪ";
-    };
-
-    // Timer
-    let timeLeft = 2700;
     setInterval(() => {
-        if(timeLeft > 0) {
-            timeLeft--;
-            const m = Math.floor(timeLeft/60), s = timeLeft%60;
-            document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`;
+        if(totalSeconds > 0) {
+            totalSeconds--;
+            const m = Math.floor(totalSeconds / 60);
+            const s = totalSeconds % 60;
+            
+            timerText.innerText = `${m} phút ${s < 10 ? '0'+s : s} giây`;
+            timerMini.innerText = m;
+
+            const percent = (totalSeconds / 1800) * 100;
+            timerCircle.setAttribute('stroke-dasharray', `${percent}, 100`);
+            
+            if(totalSeconds < 300) timerCircle.classList.replace('text-orange-500', 'text-red-500');
+        } else {
+            submitQuiz();
         }
     }, 1000);
 </script>
