@@ -159,7 +159,7 @@
                 </div>
 
                 <div class="mt-8 text-center" id="submit-area">
-                    <button onclick="submitEssay()" class="group relative inline-flex items-center justify-center px-12 py-5 font-black text-white transition-all duration-300 bg-gradient-to-r from-orange-500 to-red-500 rounded-3xl hover:shadow-2xl hover:shadow-orange-500/30 hover:scale-105 active:scale-95 overflow-hidden">
+                    <button onclick="submitExam()" class="group relative inline-flex items-center justify-center px-12 py-5 font-black text-white transition-all duration-300 bg-gradient-to-r from-orange-500 to-red-500 rounded-3xl hover:shadow-2xl hover:shadow-orange-500/30 hover:scale-105 active:scale-95 overflow-hidden">
                         <span class="text-xl relative z-10">NỘP BÀI & CHẤM ĐIỂM</span>
                         <div class="absolute inset-0 bg-white/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </button>
@@ -220,7 +220,7 @@
             <div class="absolute inset-0 flex items-center justify-center text-3xl"></div>
         </div>
         <h3 class="font-black text-2xl mt-6 text-gray-800">AI ĐANG CHẤM BÀI...</h3>
-        <p class="text-gray-500 mt-2 font-medium">Đang phân tích ý tưởng và diễn đạt</p>
+        <p class="text-gray-500 mt-2 font-medium">Đang đánh giá khả năng cảm thụ văn học</p>
     </div>
 
 <script type="module">
@@ -247,6 +247,7 @@
         p.querySelectorAll('script').forEach(s=>{const n=document.createElement('script');n.text=s.text;document.body.appendChild(n)});
     });
 
+    // Đã sửa lại tên hàm thành submitExam cho khớp với HTML
     window.submitExam = async () => {
         const content = document.getElementById('student-essay').value.trim();
         const wordCount = content.split(/\s+/).filter(x => x).length;
@@ -335,7 +336,7 @@
                 });
 
                 if (score >= 7.0) {
-                    // Level 8 là Level cao cấp, có thể coi là hoàn thành xuất sắc
+                    // Level 8 là Level cao cấp
                     const userRef = doc(db, "users_progress", userUid);
                     await setDoc(userRef, { currentLevel: 9, masteredAt: serverTimestamp() }, { merge: true });
                 }

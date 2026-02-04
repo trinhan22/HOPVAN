@@ -19,7 +19,6 @@
                         #fff9f5;
         }
 
-        /* --- BACKGROUND BLOBS --- */
         .bg-blob { position: fixed; filter: blur(80px); z-index: -1; opacity: 0.6; animation: float 25s infinite alternate ease-in-out; }
         .blob-1 { top: -5%; left: -5%; width: 500px; height: 500px; background: #ffe4d3; animation-delay: -5s; }
         .blob-2 { bottom: 5%; right: -5%; width: 400px; height: 400px; background: #ffdec2; }
@@ -28,15 +27,12 @@
         #menu-placeholder { width: 280px; flex-shrink: 0; }
         .main-content { flex-grow: 1; padding: 40px; overflow-y: auto; height: 100vh; position: relative; scroll-behavior: smooth; }
 
-        /* --- LIQUID GLASS STYLES --- */
+        /* Glass Styles */
         .glass-header {
             background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 10px 30px rgba(255, 143, 80, 0.15);
             border-radius: 9999px; transition: all 0.3s;
         }
-        .glass-header:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.9); }
-
-        /* --- QUESTION STYLES --- */
         .liquid-glass {
             background: rgba(255, 255, 255, 0.4);
             box-shadow: 0 8px 32px 0 rgba(255, 130, 60, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
@@ -44,6 +40,7 @@
             border-radius: 24px; transition: transform 0.3s; margin-bottom: 2rem;
         }
 
+        /* Question Styles */
         .option-box {
             display: flex; align-items: center; gap: 12px; padding: 16px;
             border: 2px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.4);
@@ -68,11 +65,10 @@
         .option-radio:checked { border-color: var(--primary); }
         .option-radio:checked::before { transform: scale(1); }
 
-        /* Kết quả */
         .option-box.correct { background-color: #d1fae5; border-color: #10b981; color: #065f46; }
         .option-box.wrong { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; opacity: 0.8; }
 
-        /* --- MODAL --- */
+        /* Modal */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px);
             z-index: 1000; display: none; align-items: center; justify-content: center;
@@ -88,8 +84,18 @@
         }
         .modal-overlay.open .modal-box { transform: scale(1); }
 
-        @keyframes pop { 0% { transform: scale(0.8); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        .modal-icon { animation: pop 0.6s 0.2s backwards; }
+        /* === HIỆU ỨNG LOADING === */
+        .btn-loading { 
+            opacity: 0.8; 
+            pointer-events: none; /* Khóa click */
+            cursor: wait;
+            background: #cbd5e1 !important; 
+            color: #475569 !important;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .fa-circle-notch { animation: spin 1s linear infinite; margin-right: 8px; }
 
         @media (max-width: 1024px) { #menu-placeholder { display: none; } .main-content { padding: 20px; } }
     </style>
@@ -117,7 +123,7 @@
                 </div>
             </div>
 
-            <button id="modal-btn" class="w-full py-4 rounded-2xl font-bold text-white text-lg shadow-xl shadow-orange-200 transition-all transform hover:-translate-y-1 active:scale-95">
+            <button id="modal-btn" class="w-full py-4 rounded-2xl font-bold text-white text-lg shadow-xl shadow-orange-200 transition-all transform active:scale-95 flex items-center justify-center">
             </button>
         </div>
     </div>
@@ -137,14 +143,14 @@
                 <div class="flex items-center gap-4">
                     <div class="text-right hidden sm:block">
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Thời gian còn lại</p>
-                        <p class="text-base font-black text-gray-800" id="timer-text">20 phút 00 giây</p>
+                        <p class="text-base font-black text-gray-800" id="timer-text">30 phút 00 giây</p>
                     </div>
                     <div class="w-12 h-12 rounded-full flex items-center justify-center shadow-lg relative overflow-hidden bg-white">
                         <svg class="w-10 h-10 absolute" viewBox="0 0 36 36">
                             <path class="text-gray-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" />
                             <path class="text-orange-500 transition-all duration-1000 ease-linear" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" id="timer-circle" />
                         </svg>
-                        <span class="text-xs font-black relative z-10 text-gray-700" id="timer-mini">20</span>
+                        <span class="text-xs font-black relative z-10 text-gray-700" id="timer-mini">30</span>
                     </div>
                 </div>
             </div>
@@ -240,43 +246,27 @@
         });
     }
 
-    function showResultModal(score, pass, correctCount) {
-        const modal = document.getElementById('result-modal');
-        const icon = document.getElementById('modal-icon');
-        const title = document.getElementById('modal-title');
-        const message = document.getElementById('modal-message');
+    // --- HÀM CẬP NHẬT TRẠNG THÁI LOADING ---
+    function updateModalButton(status, pass) {
         const btn = document.getElementById('modal-btn');
-
-        // Hiển thị điểm trên thang 10
-        document.getElementById('modal-score').innerText = `${score}/10`;
-        document.getElementById('modal-correct').innerText = `${correctCount}/20`;
-
-        if (pass) {
-            icon.innerText = '';
-            title.innerText = 'XUẤT SẮC!';
-            title.classList.add('text-green-600');
-            message.innerText = "Chúc mừng! Bạn đã đủ điều kiện để mở khóa Level 2.";
-            
-            btn.innerText = "MỞ KHÓA LEVEL 2 NGAY";
-            btn.className = "w-full py-4 rounded-2xl font-bold text-white text-lg shadow-xl shadow-green-200 bg-green-500 hover:bg-green-600 transition-all transform active:scale-95";
+        if (status === 'loading') {
+            btn.innerHTML = '<i class="fas fa-circle-notch"></i> ĐANG LƯU DỮ LIỆU...';
+            btn.classList.add('btn-loading'); 
+        } else if (status === 'success' && pass) {
+            btn.innerHTML = 'MỞ KHÓA LEVEL 2 NGAY <i class="fas fa-unlock ml-2"></i>';
+            btn.classList.remove('btn-loading');
+            btn.className = "w-full py-4 rounded-2xl font-bold text-white text-lg shadow-xl shadow-green-200 bg-green-500 hover:bg-green-600 transition-all transform active:scale-95 flex items-center justify-center";
             btn.onclick = () => window.location.href = "../dashboard/nhatkyhoctap.html";
         } else {
-            icon.innerText = '';
-            title.innerText = 'RẤT TIẾC!';
-            title.classList.add('text-red-500');
-            message.innerText = "Bạn chưa đạt 6.0 điểm. Hãy ôn tập kỹ hơn về các biện pháp nghệ thuật nhé!";
-            
-            btn.innerText = "LÀM LẠI BÀI THI";
-            btn.className = "w-full py-4 rounded-2xl font-bold text-white text-lg shadow-xl shadow-red-200 bg-red-500 hover:bg-red-600 transition-all transform active:scale-95";
+            btn.innerHTML = 'LÀM LẠI BÀI THI <i class="fas fa-redo ml-2"></i>';
+            btn.classList.remove('btn-loading');
+            btn.className = "w-full py-4 rounded-2xl font-bold text-white text-lg shadow-xl shadow-red-200 bg-red-500 hover:bg-red-600 transition-all transform active:scale-95 flex items-center justify-center";
             btn.onclick = () => location.reload();
         }
-
-        modal.classList.add('open');
     }
 
     window.submitQuiz = async () => {
         let score = 0;
-        let answered = 0;
         let correctCount = 0;
 
         quizData.forEach((item, index) => {
@@ -287,13 +277,11 @@
                 r.disabled = true;
             }
 
-            if(selected !== -1) answered++;
-
             const correctLbl = document.getElementById(`lbl-${index}-${item.correct}`);
-            correctLbl.classList.add('correct');
+            if(correctLbl) correctLbl.classList.add('correct');
 
             if(selected === item.correct) {
-                score += 0.5; // Mỗi câu 0.5 điểm (Tổng 10đ)
+                score += 0.5; 
                 correctCount++;
             } else if (selected !== -1) {
                 document.getElementById(`lbl-${index}-${selected}`).classList.add('wrong');
@@ -301,10 +289,34 @@
         });
 
         const totalScore = score;
-        const pass = totalScore >= 6.0; // Đậu nếu >= 6.0 điểm
+        const pass = totalScore >= 6.0;
 
-        showResultModal(totalScore, pass, correctCount);
+        // Hiện Popup ngay
+        const modal = document.getElementById('result-modal');
+        const icon = document.getElementById('modal-icon');
+        const title = document.getElementById('modal-title');
+        const message = document.getElementById('modal-message');
 
+        document.getElementById('modal-score').innerText = `${totalScore}/10`;
+        document.getElementById('modal-correct').innerText = `${correctCount}/20`;
+
+        if (pass) {
+            icon.innerText = '';
+            title.innerText = 'XUẤT SẮC!';
+            title.className = "text-4xl font-black mb-3 uppercase tracking-tighter text-green-600";
+            message.innerText = "Chúc mừng! Bạn đã chinh phục Level 1.";
+            updateModalButton('loading', true);
+        } else {
+            icon.innerText = '';
+            title.innerText = 'RẤT TIẾC!';
+            title.className = "text-4xl font-black mb-3 uppercase tracking-tighter text-red-500";
+            message.innerText = "Cần đạt 6.0 điểm để qua màn. Hãy thử lại!";
+            updateModalButton('fail', false);
+        }
+
+        modal.classList.add('open');
+
+        // Lưu Firebase
         if(userUid) {
             try {
                 await addDoc(collection(db, "activities"), {
@@ -320,16 +332,23 @@
                     let currentLevel = 1;
                     if(userSnap.exists()) currentLevel = userSnap.data().currentLevel || 1;
 
+                    // Mở khóa Level 2
                     if(currentLevel < 2) {
                         await setDoc(userRef, { currentLevel: 2, lastPassed: serverTimestamp() }, { merge: true });
                     }
+                    
+                    updateModalButton('success', true);
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error(e);
+                alert("Lỗi lưu điểm. Vui lòng kiểm tra mạng!");
+                updateModalButton('fail', false);
+            }
         }
     };
 
-    // Timer (30 minutes)
-    let totalSeconds = 1200; 
+    // Timer
+    let totalSeconds = 1800; 
     const timerCircle = document.getElementById('timer-circle');
     const timerText = document.getElementById('timer-text');
     const timerMini = document.getElementById('timer-mini');
@@ -342,10 +361,8 @@
             
             timerText.innerText = `${m} phút ${s < 10 ? '0'+s : s} giây`;
             timerMini.innerText = m;
-
-            const percent = (totalSeconds / 1200) * 100;
+            const percent = (totalSeconds / 1800) * 100;
             timerCircle.setAttribute('stroke-dasharray', `${percent}, 100`);
-            
             if(totalSeconds < 300) timerCircle.classList.replace('text-orange-500', 'text-red-500');
         } else {
             submitQuiz();
