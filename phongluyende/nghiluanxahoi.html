@@ -344,7 +344,23 @@
                 body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
             });
 
+            // ĐOẠN MỚI (AN TOÀN HƠN)
             const data = await response.json();
+
+            // 1. In lỗi ra màn hình Console để kiểm tra (Bấm F12 -> Console để xem)
+            console.log("Dữ liệu AI trả về:", data); 
+
+            // 2. Kiểm tra xem có lỗi từ Google không
+            if (data.error) {
+                throw new Error(data.error.message || "Lỗi từ phía Google AI");
+            }
+
+            // 3. Kiểm tra xem có câu trả lời không
+            if (!data.candidates || data.candidates.length === 0) {
+                throw new Error("AI không trả về kết quả nào. Có thể do bộ lọc nội dung.");
+            }
+
+            // 4. Nếu ngon lành thì mới đọc kết quả
             const rawText = data.candidates[0].content.parts[0].text;
             const res = JSON.parse(rawText.replace(/```json|```/g, "").trim());
 
