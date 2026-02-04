@@ -14,7 +14,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
     <style>
@@ -80,6 +79,15 @@
         .text-bad { color: #EF4444; background: #FEF2F2; text-decoration: line-through; padding: 2px 4px; border-radius: 6px; }
         .text-fix { color: #3B82F6; font-weight: 700; font-style: italic; }
 
+        /* AI METER (Thanh đo độ chân thực) */
+        .ai-meter-box {
+            background: #fff; padding: 20px; border-radius: 20px; margin-bottom: 25px;
+            border: 1px solid #f0f0f0; box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .meter-label { font-weight: 800; color: #2d3436; font-size: 0.9rem; text-transform: uppercase; }
+        .meter-score { font-weight: 900; font-size: 1.2rem; }
+
         /* Loading */
         .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .loader-robot { font-size: 4rem; color: var(--primary); animation: robotBounce 1s infinite alternate; }
@@ -109,7 +117,7 @@
                 <div class="flex items-center gap-5">
                     <button class="md:hidden text-2xl" onclick="toggleSidebarGlobal()"><i class="fas fa-bars"></i></button>
                     <div>
-                        <h2 class="text-3xl font-black text-gray-800 tracking-tight">Phòng Luyện Đề - Ngẫu Nhiên</h2>
+                        <h2 class="text-3xl font-black text-gray-800 tracking-tight">Luyện Đề Ngẫu Nhiên</h2>
                         <div class="flex items-center gap-2 mt-1">
                             <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                             <p class="text-sm text-gray-500 font-bold uppercase tracking-widest">Trạng thái: Sẵn sàng</p>
@@ -131,7 +139,7 @@
                     <option value="dochieu">Đọc hiểu</option>
                 </select>
                 <button onclick="randomizeQuestion()" class="bg-white px-6 py-4 rounded-2xl font-bold text-gray-500 hover:text-orange-500 hover:bg-orange-50 transition-all shadow-sm">
-                    <i class="fas fa-random mr-2"></i> Đổi đề bài
+                    <i class="fas fa-random mr-2"></i> Đổi đề khác
                 </button>
             </div>
 
@@ -180,12 +188,13 @@
                 <div class="editor-container">
                     <div class="px-8 py-5 bg-gray-50/50 border-b flex justify-between items-center">
                         <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Phản hồi từ giáo viên AI</span>
-                        <button id="submit-btn" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-2.5 rounded-xl font-black text-sm hover:scale-105 transition shadow-lg active:scale-95">NỘP BÀI CHẤM</button>
+                        <button id="submit-btn" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-2.5 rounded-xl font-black text-sm hover:scale-105 transition shadow-lg active:scale-95">NỘP BÀI</button>
                     </div>
-                    <div id="ai-correction-box" class="ai-result-view text-gray-400 flex items-center justify-center text-center">
+                    
+                    <div id="ai-correction-box" class="ai-result-view text-gray-400 flex flex-col items-center justify-center text-center h-full">
                         <div>
-                            <i class="fas fa-magic text-5xl mb-4 opacity-20"></i>
-                            <p class="font-bold">Hoàn thành bài viết và nhấn "Nộp bài"<br>để AI tiến hành sửa lỗi chi tiết</p>
+                            <i class="fas fa-robot text-5xl mb-4 opacity-20"></i>
+                            <p class="font-bold">Hoàn thành bài viết và nhấn "Nộp bài"<br>để AI chấm điểm</p>
                         </div>
                     </div>
                 </div>
@@ -224,7 +233,7 @@
     window.currentExamData = null;
 
     // --- LOGIC ĐỒNG HỒ ĐẾM NGƯỢC ---
-    let timeLeft = 1800; // 30 phút tính bằng giây
+    let timeLeft = 1800; // 30 phút
     const timerElement = document.getElementById('timer');
 
     function startTimer() {
@@ -300,6 +309,20 @@
             hintBox.classList.remove('hidden');
             hintBox.querySelector('span').innerText = "Gợi ý: " + q.hint;
         }
+        
+        // Reset kết quả
+        document.getElementById('student-essay').value = "";
+        
+        // Căn giữa dòng chữ "Sẵn sàng chấm bài"
+        const aiBox = document.getElementById('ai-correction-box');
+        aiBox.className = "ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400";
+        aiBox.innerHTML = `
+            <div>
+                <i class="fas fa-robot text-5xl mb-4 opacity-20"></i>
+                <p class="font-bold">Sẵn sàng chấm bài</p>
+            </div>
+        `;
+        document.getElementById('overall-feedback-box').style.display = 'none';
     };
 
     document.getElementById('topic-select').onchange = randomizeQuestion;
@@ -344,38 +367,115 @@
         loading.style.display = 'flex';
 
         const exam = window.currentExamData;
-        const systemPrompt = `Bạn là giáo viên Văn chuyên nghiệp. Hãy chấm bài và trả về JSON chuẩn: {"correction_html": "...", "idea_feedback": [], "missing_points": []}`;
+        
+        // PROMPT MỚI: TÍCH HỢP CHẤM ĐIỂM + CHECK AI
+        const systemPrompt = `
+            BẠN LÀ: Một giáo viên Ngữ văn lớp 12 uy tín, chuyên gia luyện thi Tốt nghiệp THPT theo chương trình GDPT 2018.
+            THÁI ĐỘ: Nghiêm túc, tỉ mỉ, ngôn ngữ phê bình văn học mang tính học thuật cao (hàn lâm), khích lệ nhưng thẳng thắn chỉ ra lỗi sai.
+
+            NHIỆM VỤ CỦA BẠN LÀ THỰC HIỆN ĐỒNG THỜI 4 BƯỚC SAU ĐÂY KHI NHẬN ĐƯỢC BÀI LÀM CỦA HỌC SINH:
+
+            === BƯỚC 1: KIỂM TRA ĐỘ TRUNG THỰC (AI DETECTION) ===
+            Phân tích văn phong để xác định xem học sinh có tự viết hay sử dụng AI (như ChatGPT, Gemini) để copy-paste.
+            - Dấu hiệu AI: Cấu trúc câu quá hoàn hảo nhưng vô hồn, lặp từ nối "tóm lại/hơn nữa/bên cạnh đó" máy móc, liệt kê ý đều chằn chặn, thiếu cảm xúc cá nhân.
+            - Dấu hiệu Con người: Có giọng văn riêng, có cảm xúc, có thể mắc lỗi diễn đạt nhỏ nhưng ý tứ sáng tạo, dùng từ ngữ đời thường hoặc so sánh độc đáo.
+            => Đánh giá thang điểm human_score (0-100).
+
+            === BƯỚC 2: CHẤM ĐIỂM CHUYÊN MÔN ===
+            Chấm theo thang điểm 10. Đánh giá kỹ năng viết, bố cục, luận điểm và dẫn chứng.
+
+            === BƯỚC 3: SỬA BÀI CHI TIẾT (CORRECTION) ===
+            Tạo ra một phiên bản HTML của bài làm, trong đó:
+            - Tô đỏ lỗi sai/diễn đạt kém: Dùng thẻ <span class="text-bad">nội dung lỗi</span>
+            - Gợi ý sửa ngay bên cạnh: Dùng thẻ <span class="text-fix">nội dung đề xuất</span>
+            - Tô xanh những ý hay/sáng tạo: Dùng thẻ <span class="text-good">ý hay</span>
+
+            === BƯỚC 4: TỔNG HỢP VÀ TRẢ VỀ KẾT QUẢ (JSON) ===
+            Tuyệt đối không trả lời bằng văn bản thường. Chỉ trả về 1 object JSON duy nhất với cấu trúc sau:
+            {
+              "human_score": (Số nguyên 0-100),
+              "ai_comment": "Nhận xét ngắn về độ tự nhiên của văn phong.",
+              "score": (Số điểm trên thang 10, ví dụ 8.5),
+              "correction_html": "Chuỗi HTML bài làm đã được highlight lỗi (text-bad) và sửa lỗi (text-fix). Giữ nguyên các đoạn văn bản gốc của học sinh.",
+              "idea_feedback": ["Điểm tích cực 1", "Điểm tích cực 2"],
+              "missing_points": ["Hạn chế 1", "Hạn chế 2"]
+            }
+
+            --- THÔNG TIN ĐỀ BÀI ---
+            LOẠI ĐỀ: ${exam.type === 'nlvh' ? 'Nghị luận Văn học' : (exam.type === 'dochieu' ? 'Đọc hiểu' : 'Nghị luận Xã hội')}
+            YÊU CẦU ĐỀ: ${exam.topic || exam.title}
+            VĂN BẢN TRÍCH DẪN (nếu có): ${exam.text || "Không có"}
+            
+            --- BÀI LÀM CỦA HỌC SINH ---
+            ${content}
+        `;
 
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\n\nBÀI LÀM:\n" + content }] }] })
+                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
             });
 
             const data = await response.json();
             const rawText = data.candidates[0].content.parts[0].text;
-            const jsonResult = JSON.parse(rawText.replace(/```json|```/g, "").trim());
+            const res = JSON.parse(rawText.replace(/```json|```/g, "").trim());
 
+            // --- HIỂN THỊ KẾT QUẢ ---
+            
+            // 1. Màu sắc thanh đo AI
+            let barColor = '#22c55e'; // Xanh
+            let verdictText = "Văn phong Tự nhiên";
+            if (res.human_score < 50) { barColor = '#ef4444'; verdictText = "Nghi vấn văn AI"; } // Đỏ
+            else if (res.human_score < 75) { barColor = '#f59e0b'; verdictText = "Hơi giống máy"; } // Vàng
+
+            const aiMeterHTML = `
+                <div class="ai-meter-box">
+                    <div>
+                        <div class="meter-label">Độ Chân Thực</div>
+                        <div style="font-size: 0.8rem; color: #888;">${res.ai_comment}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="meter-score" style="color: ${barColor}">${res.human_score}%</div>
+                        <div style="font-size: 0.7rem; font-weight: 700; color: ${barColor}">${verdictText}</div>
+                    </div>
+                </div>
+                <div style="width: 100%; height: 6px; background: #eee; border-radius: 10px; margin-bottom: 20px; overflow: hidden;">
+                    <div style="width: ${res.human_score}%; height: 100%; background: ${barColor}; border-radius: 10px;"></div>
+                </div>
+                <div style="margin-bottom: 20px; font-weight: 800; font-size: 1.2rem; color: var(--primary);">
+                    ĐIỂM SỐ: ${res.score}/10
+                </div>
+            `;
+
+            // 2. Render vào box và thay đổi Class để căn trái
             const box = document.getElementById('ai-correction-box');
-            box.innerHTML = jsonResult.correction_html;
-            box.style.textAlign = 'left';
-            box.classList.remove('flex', 'items-center', 'justify-center', 'text-gray-400');
-            document.getElementById('idea-list').innerHTML = jsonResult.idea_feedback.map(i => `<li>• ${i}</li>`).join('');
-            document.getElementById('missing-list').innerHTML = jsonResult.missing_points.map(i => `<li>• ${i}</li>`).join('');
+            
+            // Reset class để bỏ căn giữa, chuyển sang căn trái và scroll
+            box.className = "ai-result-view h-full text-left text-gray-800 overflow-y-auto"; 
+            
+            box.innerHTML = aiMeterHTML + res.correction_html;
+
+            // 3. Render ý chính
+            document.getElementById('idea-list').innerHTML = res.idea_feedback.map(i => `<li>• ${i}</li>`).join('');
+            document.getElementById('missing-list').innerHTML = res.missing_points.map(i => `<li>• ${i}</li>`).join('');
             document.getElementById('overall-feedback-box').style.display = 'block';
 
+            // 4. Lưu Firebase
             if (auth.currentUser) {
                 await addDoc(collection(db, "activities"), {
                     uid: auth.currentUser.uid,
-                    action: "Hoàn thành đề ngẫu nhiên: " + (exam.title || exam.topic).substring(0, 35) + "...",
-                    type: exam.type,
+                    action: `Hoàn thành đề: ${(exam.title || exam.topic).substring(0, 30)}... (${res.score} điểm)`,
+                    type: "essay",
+                    human_score: res.human_score,
+                    score: res.score,
                     timestamp: serverTimestamp()
                 });
             }
 
         } catch (e) {
             alert("Lỗi xử lý AI, vui lòng thử lại.");
+            console.error(e);
         } finally { loading.style.display = 'none'; }
     };
 

@@ -11,36 +11,92 @@
     <meta property="og:type" content="article" />
 
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
     <style>
-        :root { --primary: #FF8F50; --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62); --glass-bg: rgba(255, 255, 255, 0.75); --sidebar-width: 280px; }
-        * { font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.3s ease; }
+        :root {
+            --primary: #FF8F50;
+            --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --sidebar-width: 280px;
+        }
+
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background-color: #FFF5EC; height: 100vh; overflow: hidden; display: flex; }
+
+        /* --- BACKGROUND --- */
         .background-blobs { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
         .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: floatBlob 10s infinite alternate; }
         .blob-1 { width: 600px; height: 600px; background: #FCA96A; top: -150px; left: -150px; }
         .blob-2 { width: 500px; height: 500px; background: #FCD5B5; bottom: -100px; right: -100px; }
         @keyframes floatBlob { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, 60px); } }
 
-        .main-content { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); height: 100vh; background: var(--glass-bg); backdrop-filter: blur(35px); padding: 40px; overflow-y: auto; }
-        .prompt-card { background: white; border-radius: 30px; padding: 35px; border: 1px solid rgba(255, 143, 80, 0.2); box-shadow: 0 15px 35px rgba(255, 143, 80, 0.05); position: relative; overflow: hidden; }
-        .prompt-card::before { content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: var(--primary-gradient); }
-        .workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; min-height: 550px; }
-        .editor-container { background: white; border-radius: 30px; border: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden; }
+        /* --- MAIN LAYOUT --- */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            height: 100vh;
+            background: var(--glass-bg);
+            backdrop-filter: blur(35px);
+            border-left: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 40px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* --- UI ELEMENTS --- */
+        .prompt-card {
+            background: white; border-radius: 30px; padding: 30px;
+            border: 1px solid rgba(255, 143, 80, 0.2);
+            box-shadow: 0 15px 35px rgba(255, 143, 80, 0.05);
+            position: relative; overflow: hidden; margin-bottom: 30px;
+        }
+        .prompt-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: var(--primary-gradient);
+        }
+
+        .workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; min-height: 500px; }
+
+        .editor-container {
+            background: white; border-radius: 30px; border: 1px solid rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.02); transition: 0.3s;
+        }
         .editor-container:focus-within { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 20px 50px rgba(255, 143, 80, 0.1); }
-        .writing-area { flex: 1; width: 100%; padding: 30px; border: none; outline: none; resize: none; font-size: 1.1rem; line-height: 1.9; color: #2D3436; background: transparent; }
+
+        .writing-area { 
+            flex: 1; width: 100%; padding: 30px; border: none; outline: none; resize: none; 
+            font-size: 1.1rem; line-height: 1.9; color: #2D3436; background: transparent;
+        }
+
+        /* AI METER & CORRECTION */
         .ai-result-view { padding: 30px; font-size: 1.1rem; line-height: 1.9; overflow-y: auto; background-color: #fafafa; }
+        
+        .ai-meter-box {
+            background: #fff; padding: 20px; border-radius: 20px; margin-bottom: 25px;
+            border: 1px solid #f0f0f0; box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .meter-label { font-weight: 800; color: #2d3436; font-size: 0.9rem; text-transform: uppercase; }
+        .meter-score { font-weight: 900; font-size: 1.2rem; }
+
         .text-good { color: #10B981; background: #ECFDF5; font-weight: 600; padding: 2px 4px; border-radius: 6px; }
         .text-bad { color: #EF4444; background: #FEF2F2; text-decoration: line-through; padding: 2px 4px; border-radius: 6px; }
         .text-fix { color: #3B82F6; font-weight: 700; font-style: italic; }
 
-        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        @media (max-width: 1024px) { .main-content { margin-left: 0; width: 100%; padding: 20px; } .workspace-grid { grid-template-columns: 1fr; } }
+        /* Loading */
+        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .loader-robot { font-size: 4rem; color: var(--primary); animation: robotBounce 1s infinite alternate; }
+        @keyframes robotBounce { from { transform: translateY(0); } to { transform: translateY(-20px); } }
+
+        @media (max-width: 1024px) {
+            .main-content { margin-left: 0; width: 100%; padding: 20px; }
+            .workspace-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -48,92 +104,101 @@
     <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
 
     <div class="loading-overlay" id="loading-overlay">
-        <div class="text-6xl animate-bounce text-orange-500"><i class="fas fa-robot"></i></div>
+        <div class="loader-robot"><i class="fas fa-robot"></i></div>
         <h3 class="text-2xl font-black mt-6 bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent">AI ĐANG CHẤM BÀI...</h3>
-        <p class="text-gray-500 mt-2 font-medium text-center px-4">Chờ chút nhé, giáo viên AI đang đọc bài văn của bạn</p>
+        <p class="text-gray-500 mt-2 font-medium">Chờ chút nhé, giáo viên AI đang đọc bài văn của bạn</p>
     </div>
 
-    <div id="menu-placeholder"></div>
+    <div class="dashboard-container">
+        <div id="menu-placeholder"></div>
 
-    <main class="main-content">
-        <div class="flex justify-between items-center mb-10">
-            <div class="flex items-center gap-5">
-                <button class="md:hidden text-2xl" onclick="toggleSidebarGlobal()"><i class="fas fa-bars"></i></button>
-                <div>
-                    <h2 class="text-3xl font-black text-gray-800 tracking-tight">Phòng Luyện Đề - Đọc Hiểu</h2>
-                    <div class="flex items-center gap-2 mt-1">
-                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                        <p class="text-sm text-gray-500 font-bold uppercase tracking-widest">Trạng thái: Sẵn sàng</p>
-                    </div>
-                </div>
-            </div>
-            <div class="flex items-center gap-4">
-                <button onclick="randomizeQuestion()" class="bg-white px-6 py-3.5 rounded-2xl font-bold text-gray-500 hover:text-orange-500 hover:bg-orange-50 transition-all shadow-sm flex items-center gap-2 active:scale-95 border border-gray-100">
-                    <i class="fas fa-random text-orange-400"></i> Đổi đề bài
-                </button>
-                <div class="bg-black text-white px-6 py-3.5 rounded-2xl font-black flex items-center gap-3 shadow-xl">
-                    <i class="fas fa-clock text-orange-400"></i> <span id="timer" class="text-xl">30:00</span>
-                </div>
-                <div class="user-avatar" id="avatar-initial" style="width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.4rem; box-shadow: 0 8px 20px rgba(255, 143, 80, 0.3); transform: rotate(-5deg);"></div>
-            </div>
-        </div>
-
-        <div class="prompt-card mb-10">
-            <div class="flex justify-between items-center mb-6">
-                <span class="bg-orange-500 text-white px-4 py-1.5 rounded-xl font-black text-xs uppercase">Văn bản đọc hiểu</span>
-                <span id="prompt-title" class="text-gray-400 font-bold italic"></span>
-            </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="bg-orange-50/50 p-6 rounded-3xl border-2 border-orange-100/50 italic text-gray-700 leading-relaxed max-h-[400px] overflow-y-auto" id="prompt-passage">Đang tải văn bản...</div>
-                <div class="space-y-4">
-                    <h4 class="font-black text-gray-800 flex items-center gap-2 underline decoration-orange-300"><i class="fas fa-list-ol text-orange-500"></i> Hệ thống câu hỏi</h4>
-                    <div id="questions-container" class="space-y-3"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="workspace-grid">
-            <div class="editor-container">
-                <div class="px-8 py-5 bg-gray-50/50 border-b flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Khu vực làm bài</span>
-                        <button onclick="document.getElementById('file-upload').click()" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:text-orange-500 hover:border-orange-200 transition shadow-sm">
-                            <i class="fas fa-paperclip"></i> Tải tệp (.docx)
-                        </button>
-                        <input type="file" id="file-upload" class="hidden" accept=".txt, .docx">
-                    </div>
-                    <span id="word-count" class="text-xs font-black bg-gray-200 text-gray-600 px-3 py-1 rounded-lg">0 TỪ</span>
-                </div>
-                <textarea id="student-essay" class="writing-area" placeholder="Trả lời câu 1, 2, 3... tại đây"></textarea>
-            </div>
-            <div class="editor-container">
-                <div class="px-8 py-5 bg-gray-50/50 border-b flex justify-between items-center">
-                    <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Phản hồi từ giáo viên AI</span>
-                    <button id="submit-btn" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-2.5 rounded-xl font-black text-sm hover:scale-105 transition shadow-lg">NỘP BÀI</button>
-                </div>
-                <div id="ai-correction-box" class="ai-result-view text-gray-400 flex items-center justify-center text-center">
+        <main class="main-content">
+            <div class="flex justify-between items-center mb-8">
+                <div class="flex items-center gap-5">
+                    <button class="md:hidden text-2xl" onclick="toggleSidebarGlobal()"><i class="fas fa-bars"></i></button>
                     <div>
-                        <i class="fas fa-magic text-5xl mb-4 opacity-20"></i>
-                        <p class="font-bold">Nhấn "Nộp bài" để AI đối chiếu<br>với đáp án mẫu.</p>
+                        <h2 class="text-3xl font-black text-gray-800 tracking-tight">Luyện Đề Đọc Hiểu</h2>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                            <p class="text-sm text-gray-500 font-bold uppercase tracking-widest">Trạng thái: Sẵn sàng</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="randomizeQuestion()" class="bg-white px-5 py-3 rounded-2xl font-bold text-gray-500 hover:text-orange-500 hover:bg-orange-50 transition-all shadow-sm border border-gray-100 flex items-center gap-2">
+                        <i class="fas fa-sync-alt text-orange-400"></i> Đổi đề khác
+                    </button>
+                    <div class="bg-black text-white px-6 py-3 rounded-2xl font-black flex items-center gap-3 shadow-xl">
+                        <i class="fas fa-clock text-orange-400"></i> <span id="timer" class="text-xl">20:00</span>
+                    </div>
+                    <div class="user-avatar" id="avatar-initial" style="width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.4rem; box-shadow: 0 8px 20px rgba(255, 143, 80, 0.3); transform: rotate(-5deg);"></div>
+                </div>
+            </div>
+
+            <div class="prompt-card">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="bg-orange-50 text-orange-600 px-4 py-1.5 rounded-xl font-black text-xs uppercase tracking-widest">Văn bản Đọc Hiểu</span>
+                    <span id="prompt-title" class="text-gray-400 font-bold text-sm italic"></span>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <div class="text-xs font-black text-gray-400 mb-2 uppercase">Ngữ liệu:</div>
+                        <div id="prompt-passage" class="bg-orange-50/50 p-6 rounded-2xl border-l-4 border-orange-300 italic text-gray-700 leading-relaxed text-sm max-h-[300px] overflow-y-auto">
+                            Đang tải dữ liệu...
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-xs font-black text-gray-400 mb-2 uppercase">Yêu cầu:</div>
+                        <div id="questions-container" class="space-y-3">
+                            </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div id="overall-feedback-box" class="mt-10 pb-20 hidden">
-            <h3 class="text-2xl font-black text-gray-800 mb-6 flex items-center gap-3"><i class="fas fa-star text-yellow-400"></i> Tổng kết đánh giá</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="p-8 bg-green-50 rounded-[40px] border border-green-100 shadow-sm">
-                    <h4 class="text-green-700 font-black text-lg mb-4 flex items-center gap-2"><i class="fas fa-check-circle"></i> Điểm đạt được</h4>
-                    <ul id="idea-list" class="space-y-3 text-green-800 font-medium"></ul>
+            <div class="workspace-grid">
+                <div class="editor-container">
+                    <div class="px-6 py-4 bg-gray-50/50 border-b flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Bài làm</span>
+                            <button onclick="document.getElementById('file-upload').click()" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:text-orange-500 transition shadow-sm">
+                                <i class="fas fa-paperclip"></i> Tải tệp (.docx)
+                            </button>
+                            <input type="file" id="file-upload" class="hidden" accept=".txt, .docx">
+                        </div>
+                        <span id="word-count" class="text-xs font-black bg-gray-200 text-gray-600 px-3 py-1 rounded-lg">0 TỪ</span>
+                    </div>
+                    <textarea id="student-essay" class="writing-area" placeholder="Hãy bắt đầu bài viết của bạn tại đây..."></textarea>
                 </div>
-                <div class="p-8 bg-red-50 rounded-[40px] border border-red-100 shadow-sm">
-                    <h4 class="text-red-700 font-black text-lg mb-4 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i> Cần lưu ý</h4>
-                    <ul id="missing-list" class="space-y-3 text-red-800 font-medium"></ul>
+
+                <div class="editor-container">
+                    <div class="px-8 py-5 bg-gray-50/50 border-b flex justify-between items-center">
+                        <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Phản hồi từ giáo viên AI</span>
+                        <button id="submit-btn" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-2.5 rounded-xl font-black text-sm hover:scale-105 transition shadow-lg active:scale-95">NỘP BÀI</button>
+                    </div>
+                    <div id="ai-correction-box" class="ai-result-view text-gray-400 flex flex-col items-center justify-center text-center h-full">
+                        <div>
+                            <i class="fas fa-robot text-5xl mb-4 opacity-20"></i>
+                            <p class="font-bold">Hoàn thành bài viết và nhấn "Nộp bài"<br>để AI chấm điểm</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </main>
+
+            <div id="overall-feedback-box" class="mt-10 pb-20 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="p-8 bg-green-50 rounded-[40px] border border-green-100 shadow-sm">
+                        <h4 class="text-green-700 font-black text-lg mb-4"><i class="fas fa-check-circle"></i> Điểm đạt được</h4>
+                        <ul id="idea-list" class="space-y-3 text-green-800 font-medium text-sm"></ul>
+                    </div>
+                    <div class="p-8 bg-red-50 rounded-[40px] border border-red-100 shadow-sm">
+                        <h4 class="text-red-700 font-black text-lg mb-4"><i class="fas fa-exclamation-triangle"></i> Cần khắc phục</h4>
+                        <ul id="missing-list" class="space-y-3 text-red-800 font-medium text-sm"></ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -149,145 +214,211 @@
     let questionsData = [];
     window.currentExamData = null;
 
+    // --- TIMER (20 Phút cho Đọc Hiểu) ---
+    let timeLeft = 1200; 
+    const timerElement = document.getElementById('timer');
+    function startTimer() {
+        const countdown = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                timerElement.innerText = "00:00";
+                alert("Hết thời gian!");
+            } else {
+                timeLeft--;
+                let m = Math.floor(timeLeft / 60).toString().padStart(2,'0');
+                let s = (timeLeft % 60).toString().padStart(2,'0');
+                timerElement.innerText = `${m}:${s}`;
+            }
+        }, 1000);
+    }
+
     onAuthStateChanged(auth, (u) => {
         if (u) {
-            const n = u.displayName || u.email.split('@')[0];
+            const n = u.displayName || u.email;
             document.getElementById('avatar-initial').innerText = n.charAt(0).toUpperCase();
+            startTimer();
         } else { window.location.href = "../log.html"; }
     });
 
+    // --- TẢI ĐỀ TỪ questions-dochieu.json ---
+    // (Lưu ý: Bạn cần đảm bảo file json này có cấu trúc đúng)
     async function loadQuestions() {
         try {
-            const r = await fetch('questions-dochieu.json'); 
+            // Fallback: Nếu không có file riêng, thử lấy từ questions.json và lọc loại 'dochieu'
+            const r = await fetch('questions.json');
             const data = await r.json();
-            questionsData = data.dochieu;
+            questionsData = data.dochieu || [];
+            if(questionsData.length === 0) throw new Error("No data");
             randomizeQuestion();
         } catch (e) {
-            document.getElementById('prompt-passage').innerText = "Lỗi: Không tìm thấy file dữ liệu câu hỏi.";
+            document.getElementById('prompt-passage').innerText = "Lỗi tải đề bài. Vui lòng kiểm tra kết nối.";
         }
     }
 
     window.randomizeQuestion = () => {
-        if (!questionsData.length) return;
+        if (questionsData.length === 0) return;
         const q = questionsData[Math.floor(Math.random() * questionsData.length)];
-        window.currentExamData = q;
+        window.currentExamData = { ...q, type: 'dochieu' };
 
-        document.getElementById('prompt-title').innerText = q.title || "Văn bản Đọc hiểu";
+        document.getElementById('prompt-title').innerText = q.title || "Văn bản Đọc Hiểu";
         document.getElementById('prompt-passage').innerText = q.text;
-        document.getElementById('questions-container').innerHTML = q.questions.map((item, i) => `
-            <div class="p-4 bg-white border border-orange-100 rounded-2xl shadow-sm hover:border-orange-300 transition-all">
-                <p class="text-gray-800 font-bold"><span class="text-orange-500">Câu ${i+1}:</span> ${item.q}</p>
-                <p class="text-[10px] text-gray-400 mt-1 font-medium italic"><i class="fas fa-lightbulb text-orange-300"></i> Gợi ý: ${item.hint}</p>
+        
+        const qContainer = document.getElementById('questions-container');
+        qContainer.innerHTML = q.questions.map((item, i) => `
+            <div class="p-3 bg-white border border-gray-100 rounded-xl shadow-sm">
+                <p class="font-bold text-gray-800 text-sm"><span class="text-orange-500">Câu ${i+1}:</span> ${item.q}</p>
             </div>
         `).join('');
 
+        // Reset UI
         document.getElementById('student-essay').value = "";
+        document.getElementById('ai-correction-box').innerHTML = `
+            <div class="flex flex-col items-center justify-center h-full text-gray-400 text-center">
+                <i class="fas fa-robot text-5xl mb-4 opacity-20"></i>
+                <p class="font-bold">Sẵn sàng chấm bài</p>
+            </div>`;
         document.getElementById('overall-feedback-box').classList.add('hidden');
-        document.getElementById('ai-correction-box').innerHTML = `<div><i class="fas fa-magic text-5xl mb-4 opacity-20"></i><p class="font-bold">Đã đổi đề bài! Hãy bắt đầu làm bài nhé.</p></div>`;
     };
 
     loadQuestions();
 
-    // 3. LOGIC XỬ LÝ UPLOAD FILE (DOCX/TXT)
+    // --- UPLOAD FILE ---
     document.getElementById('file-upload').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         const textarea = document.getElementById('student-essay');
-
         if (file.name.endsWith('.docx')) {
             reader.onload = function(event) {
-                const arrayBuffer = event.target.result;
-                mammoth.extractRawText({arrayBuffer: arrayBuffer})
-                    .then(result => {
-                        textarea.value = result.value;
-                        textarea.dispatchEvent(new Event('input')); // Cập nhật bộ đếm từ
-                    })
-                    .catch(err => alert("Lỗi đọc file Word: " + err.message));
+                mammoth.extractRawText({arrayBuffer: event.target.result}).then(r => {
+                    textarea.value = r.value; textarea.dispatchEvent(new Event('input'));
+                });
             };
             reader.readAsArrayBuffer(file);
         } else if (file.name.endsWith('.txt')) {
             reader.onload = function(event) {
-                textarea.value = event.target.result;
-                textarea.dispatchEvent(new Event('input'));
+                textarea.value = event.target.result; textarea.dispatchEvent(new Event('input'));
             };
             reader.readAsText(file);
-        } else {
-            alert("Vui lòng chọn file .docx hoặc .txt");
         }
     });
 
+    // --- CHẤM BÀI (PROMPT MỚI) ---
     document.getElementById('submit-btn').onclick = async () => {
         const content = document.getElementById('student-essay').value.trim();
-        if (content.split(/\s+/).length < 20) return alert("Bài làm quá ngắn, hãy trả lời đầy đủ các câu hỏi!");
+        if (content.split(/\s+/).length < 10) return alert("Bài làm quá ngắn!");
 
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex';
 
-        const exam = window.currentExamData;
-        const examInfo = `DẠNG BÀI: ĐỌC HIỂU. VĂN BẢN: ${exam.text}. ĐÁP ÁN CẦN ĐẠT: ${exam.questions.map((q, i) => `Câu ${i+1}: ${q.hint}`).join('\n')}`;
+        const q = window.currentExamData;
+        
+        // SYSTEM PROMPT (TEACHER K12 + READING COMPREHENSION + AI CHECK)
+        const systemPrompt = `
+            BẠN LÀ: Giáo viên Ngữ văn lớp 12 uy tín, chuyên gia luyện thi THPT (GDPT 2018).
+            THÁI ĐỘ: Nghiêm túc, tỉ mỉ, ngôn ngữ phê bình văn học mang tính học thuật (hàn lâm), khích lệ nhưng thẳng thắn.
 
-        const systemPrompt = `Bạn là giáo viên Ngữ Văn. Chấm bài Đọc hiểu dựa trên đáp án. TRẢ VỀ JSON: {"correction_html": "bài làm kèm span class text-good/text-bad", "idea_feedback": ["liệt kê câu đúng"], "missing_points": ["liệt kê câu sai/thiếu"]}`;
+            NHIỆM VỤ:
+            1. KIỂM TRA ĐỘ TRUNG THỰC (AI DETECTION):
+               - Phân tích văn phong để xác định có phải AI viết không.
+               - Đánh giá thang điểm 'human_score' (0-100).
+            
+            2. CHẤM ĐIỂM CHUYÊN MÔN (ĐỌC HIỂU):
+               - Kiểm tra độ chính xác kiến thức Tiếng Việt (PTBĐ, Phong cách ngôn ngữ, Biện pháp tu từ...).
+               - Đánh giá khả năng tóm tắt và rút ra thông điệp.
+               - So sánh với Gợi ý đáp án (nếu có trong dữ liệu).
+            
+            3. SỬA BÀI CHI TIẾT:
+               - Tạo HTML, tô đỏ lỗi (<span class="text-bad">), tô xanh ý hay (<span class="text-good">), gợi ý sửa (<span class="text-fix">).
+
+            TRẢ VỀ JSON DUY NHẤT:
+            {
+              "human_score": (0-100),
+              "ai_comment": "Nhận xét ngắn về độ tự nhiên.",
+              "score": (Điểm số thang 10, ví dụ 7.5),
+              "correction_html": "HTML bài làm đã sửa...",
+              "idea_feedback": ["Điểm tích cực 1", "Điểm tích cực 2"],
+              "missing_points": ["Hạn chế 1", "Hạn chế 2"]
+            }
+
+            --- THÔNG TIN ĐỀ BÀI ---
+            VĂN BẢN: ${q.text}
+            CÂU HỎI: ${JSON.stringify(q.questions)}
+            
+            --- BÀI LÀM HỌC SINH ---
+            ${content}
+        `;
 
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt + "\n--- DATA ---\n" + examInfo + "\n--- BÀI LÀM ---\n" + content }] }] })
+                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
             });
 
             const data = await response.json();
-            let rawText = data.candidates[0].content.parts[0].text;
-            const result = JSON.parse(rawText.substring(rawText.indexOf('{'), rawText.lastIndexOf('}') + 1));
+            const rawText = data.candidates[0].content.parts[0].text;
+            const res = JSON.parse(rawText.replace(/```json|```/g, "").trim());
 
-            document.getElementById('ai-correction-box').innerHTML = result.correction_html;
-            document.getElementById('ai-correction-box').style.textAlign = 'left';
-            document.getElementById('ai-correction-box').classList.remove('flex', 'items-center', 'justify-center', 'text-gray-400');
-            document.getElementById('idea-list').innerHTML = result.idea_feedback.map(i => `<li>• ${i}</li>`).join('');
-            document.getElementById('missing-list').innerHTML = result.missing_points.map(i => `<li>• ${i}</li>`).join('');
+            // --- RENDER KẾT QUẢ ---
+            let barColor = '#22c55e'; // Green
+            let verdictText = "Tự nhiên";
+            if (res.human_score < 50) { barColor = '#ef4444'; verdictText = "Nghi vấn AI"; }
+            else if (res.human_score < 75) { barColor = '#f59e0b'; verdictText = "Hơi giống máy"; }
+
+            const aiMeterHTML = `
+                <div class="ai-meter-box">
+                    <div>
+                        <div class="meter-label">Độ Chân Thực</div>
+                        <div style="font-size: 0.8rem; color: #888;">${res.ai_comment}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="meter-score" style="color: ${barColor}">${res.human_score}%</div>
+                        <div style="font-size: 0.7rem; font-weight: 700; color: ${barColor}">${verdictText}</div>
+                    </div>
+                </div>
+                <div style="width: 100%; height: 6px; background: #eee; border-radius: 10px; margin-bottom: 20px; overflow: hidden;">
+                    <div style="width: ${res.human_score}%; height: 100%; background: ${barColor}; border-radius: 10px;"></div>
+                </div>
+                <div style="margin-bottom: 20px; font-weight: 800; font-size: 1.2rem; color: var(--primary);">
+                    ĐIỂM SỐ: ${res.score}/3.0
+                </div>
+            `;
+
+            const box = document.getElementById('ai-correction-box');
+            box.innerHTML = aiMeterHTML + res.correction_html;
+            box.classList.remove('flex', 'items-center', 'justify-center', 'text-center');
+            box.classList.add('text-left');
+
+            document.getElementById('idea-list').innerHTML = res.idea_feedback.map(i => `<li>• ${i}</li>`).join('');
+            document.getElementById('missing-list').innerHTML = res.missing_points.map(i => `<li>• ${i}</li>`).join('');
             document.getElementById('overall-feedback-box').classList.remove('hidden');
 
-            // --- CẬP NHẬT DATABASE KHI HOÀN THÀNH ---
             if (auth.currentUser) {
                 await addDoc(collection(db, "activities"), {
                     uid: auth.currentUser.uid,
-                    action: "Hoàn thành Đọc hiểu: " + (exam.title || "Văn bản mới"),
-                    type: "dochieu",
+                    action: `Đọc hiểu: ${q.title.substring(0, 30)}... (${res.score} điểm)`,
+                    type: "reading", // Loại bài riêng cho Đọc hiểu
+                    human_score: res.human_score,
+                    score: res.score, // Lưu điểm
                     timestamp: serverTimestamp()
                 });
-                console.log("Đã cập nhật hoạt động đọc hiểu lên Firestore.");
             }
+
         } catch (e) {
-            console.error(e);
-            alert("Hệ thống AI đang bận hoặc có lỗi kết nối. Hãy thử lại sau nhé!");
-        } finally {
-            loading.style.display = 'none';
-        }
+            alert("Lỗi xử lý AI: " + e.message);
+        } finally { loading.style.display = 'none'; }
     };
 
-    // Utils
     document.getElementById('student-essay').oninput = function() {
         const c = this.value.trim().split(/\s+/).filter(x => x).length;
         document.getElementById('word-count').innerText = `${c} TỪ`;
     };
 
-    let s = 1800; 
-    const timerEl = document.getElementById('timer');
-    setInterval(() => { 
-        if(s > 0) { 
-            s--; 
-            const m = Math.floor(s/60), sec = s%60; 
-            timerEl.innerText = `${m}:${sec<10?'0'+sec:sec}`; 
-        } 
-    }, 1000);
-
     fetch('menu.html').then(r => r.text()).then(html => {
         const ph = document.getElementById('menu-placeholder'); ph.innerHTML = html;
         ph.querySelectorAll('script').forEach(old => { const ns = document.createElement('script'); ns.text = old.text; document.body.appendChild(ns); });
     });
-
-    window.addEventListener('trigger-firebase-signout', async () => { await signOut(auth); window.location.href = "../index.html"; });
 </script>
 </body>
 </html>

@@ -145,10 +145,23 @@
         }
         .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); }
 
+        /* MODAL POPUP (CONFIRMATION) */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            z-index: 1000; justify-content: center; align-items: center; padding: 20px;
+            animation: fadeIn 0.2s ease;
+        }
+        .modal-box {
+            background: white; border-radius: 20px; padding: 30px; width: 100%; max-width: 400px;
+            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            transform: scale(0.9); animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes popIn { to { transform: scale(1); } }
+        
         /* Loading */
         .loading-overlay { 
-            position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(5px);
-            z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center;
+            position: fixed; inset: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(5px);
+            z-index: 1100; display: none; flex-direction: column; align-items: center; justify-content: center;
         }
 
         /* Mobile */
@@ -170,6 +183,22 @@
     <div class="loading-overlay" id="loading-overlay">
         <i class="fas fa-circle-notch fa-spin text-4xl text-orange-500"></i>
         <p class="mt-3 font-bold text-gray-600">Đang nộp bài...</p>
+    </div>
+
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-box">
+            <div class="text-orange-500 text-5xl mb-4"><i class="fas fa-question-circle"></i></div>
+            <h3 class="text-2xl font-black text-gray-800 mb-2">Nộp bài thi?</h3>
+            <p id="confirm-msg" class="text-gray-600 mb-6 font-medium">Bạn có chắc chắn muốn nộp bài không?</p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeConfirmModal()" class="px-5 py-2.5 rounded-lg font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition">
+                    Xem lại
+                </button>
+                <button onclick="submitQuiz()" class="px-5 py-2.5 rounded-lg font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:shadow-lg transition">
+                    Nộp ngay
+                </button>
+            </div>
+        </div>
     </div>
 
     <header class="exam-header">
@@ -222,7 +251,7 @@
             </div>
 
             <div class="sidebar-footer">
-                <button onclick="submitQuiz()" id="btn-submit" class="btn-submit">
+                <button onclick="openConfirmModal()" id="btn-submit" class="btn-submit">
                     Nộp Bài Thi
                 </button>
                 <button onclick="resetQuiz()" id="btn-retry" class="btn-submit hidden bg-gray-500 !bg-none !bg-gray-600">
@@ -289,7 +318,6 @@
         document.getElementById('score-text').classList.add('hidden');
 
         allQuestions.forEach((q, index) => {
-            // Render Card
             const card = document.createElement('div');
             card.className = 'q-card';
             card.id = `q-${index}`;
@@ -318,7 +346,6 @@
             `;
             qContainer.appendChild(card);
 
-            // Render Matrix Dot
             const dot = document.createElement('div');
             dot.className = 'q-dot';
             dot.innerText = index + 1;
@@ -342,13 +369,33 @@
         document.getElementById(`dot-${qIndex}`).classList.add('done');
     };
 
-    // 5. Submit & Save to Firebase
-    window.submitQuiz = async () => {
-        if (Object.keys(userAnswers).length < allQuestions.length) {
-            if (!confirm(`Bạn mới làm ${Object.keys(userAnswers).length}/${allQuestions.length} câu. Nộp bài luôn?`)) return;
-        }
+    // 5. Modal Logic
+    window.openConfirmModal = () => {
+        const modal = document.getElementById('confirm-modal');
+        const msg = document.getElementById('confirm-msg');
+        
+        const doneCount = Object.keys(userAnswers).length;
+        const total = allQuestions.length;
+        const remain = total - doneCount;
 
+        if(remain > 0) {
+            msg.innerHTML = `Bạn mới hoàn thành <b class="text-orange-600">${doneCount}/${total}</b> câu.<br>Vẫn còn <b class="text-red-500">${remain}</b> câu chưa làm.`;
+        } else {
+            msg.innerHTML = `Bạn đã hoàn thành tất cả <b class="text-green-600">${total}</b> câu.<br>Bạn có chắc muốn nộp bài không?`;
+        }
+        
+        modal.style.display = 'flex';
+    };
+
+    window.closeConfirmModal = () => {
+        document.getElementById('confirm-modal').style.display = 'none';
+    };
+
+    // 6. Submit Logic
+    window.submitQuiz = async () => {
+        closeConfirmModal(); // Đóng modal trước
         document.getElementById('loading-overlay').style.display = 'flex';
+        
         isSubmitted = true;
         let score = 0;
 
@@ -387,7 +434,7 @@
         
         clearInterval(timerInterval);
 
-        // --- SAVE TO FIRESTORE ---
+        // Save to Firestore
         if (auth.currentUser) {
             try {
                 await addDoc(collection(db, "activities"), {
@@ -396,10 +443,8 @@
                     type: "quiz",
                     timestamp: serverTimestamp()
                 });
-                console.log("Kết quả đã được lưu.");
             } catch (e) {
                 console.error("Lỗi lưu kết quả: ", e);
-                alert("Có lỗi khi lưu kết quả thi.");
             }
         }
 
@@ -413,20 +458,20 @@
         }
     };
 
-    // 6. Timer
-    let timeLeft = 2700; 
+    // 7. Timer
+    let timeLeft = 2700; // 45 phút
     let timerInterval;
     
     function startTimer() {
         clearInterval(timerInterval);
-        timeLeft = 2700;
+        timeLeft = 2700; 
         const el = document.getElementById('timer');
         
         timerInterval = setInterval(() => {
             if(timeLeft <= 0) {
                 clearInterval(timerInterval);
-                submitQuiz();
-                alert("Hết giờ làm bài!");
+                submitQuiz(); // Tự động nộp
+                alert("Hết giờ làm bài! Hệ thống đã tự động nộp bài.");
             } else {
                 timeLeft--;
                 const m = Math.floor(timeLeft / 60);
@@ -436,7 +481,7 @@
         }, 1000);
     }
 
-    // 7. Mobile UI
+    // 8. Mobile UI
     window.toggleSidebar = () => {
         document.getElementById('sidebar').classList.toggle('open');
         document.getElementById('mobile-overlay').classList.toggle('show');
