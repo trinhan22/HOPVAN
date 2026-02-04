@@ -176,10 +176,12 @@
                         <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Phản hồi từ giáo viên AI</span>
                         <button id="submit-btn" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-2.5 rounded-xl font-black text-sm hover:scale-105 transition shadow-lg active:scale-95">NỘP BÀI</button>
                     </div>
-                    <div id="ai-correction-box" class="ai-result-view text-gray-400 flex flex-col items-center justify-center text-center h-full">
+                    
+                    <div id="ai-correction-box" class="ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400">
                         <div>
-                            <i class="fas fa-robot text-5xl mb-4 opacity-20"></i>
-                            <p class="font-bold">Hoàn thành bài viết và nhấn "Nộp bài"<br>để AI chấm điểm</p>
+                            <i class="fas fa-magic text-5xl mb-4 opacity-20"></i>
+                            <p class="font-bold text-lg">Sẵn sàng chấm bài</p>
+                            <p class="text-xs font-medium opacity-60 mt-1">Hoàn thành bài viết và nhấn "Nộp bài"<br>để AI chấm điểm</p>
                         </div>
                     </div>
                 </div>
@@ -241,7 +243,6 @@
     });
 
     // --- TẢI ĐỀ TỪ questions-dochieu.json ---
-    // (Lưu ý: Bạn cần đảm bảo file json này có cấu trúc đúng)
     async function loadQuestions() {
         try {
             // Fallback: Nếu không có file riêng, thử lấy từ questions.json và lọc loại 'dochieu'
@@ -272,11 +273,15 @@
 
         // Reset UI
         document.getElementById('student-essay').value = "";
-        document.getElementById('ai-correction-box').innerHTML = `
-            <div class="flex flex-col items-center justify-center h-full text-gray-400 text-center">
+        
+        const aiBox = document.getElementById('ai-correction-box');
+        aiBox.className = "ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400";
+        aiBox.innerHTML = `
+            <div>
                 <i class="fas fa-robot text-5xl mb-4 opacity-20"></i>
                 <p class="font-bold">Sẵn sàng chấm bài</p>
             </div>`;
+            
         document.getElementById('overall-feedback-box').classList.add('hidden');
     };
 
@@ -331,7 +336,7 @@
             3. SỬA BÀI CHI TIẾT:
                - Tạo HTML, tô đỏ lỗi (<span class="text-bad">), tô xanh ý hay (<span class="text-good">), gợi ý sửa (<span class="text-fix">).
 
-            TRẢ VỀ JSON DUY NHẤT:
+            TRẢ VỀ JSON DUY NHẤT (Không Markdown):
             {
               "human_score": (0-100),
               "ai_comment": "Nhận xét ngắn về độ tự nhiên.",
@@ -381,14 +386,14 @@
                     <div style="width: ${res.human_score}%; height: 100%; background: ${barColor}; border-radius: 10px;"></div>
                 </div>
                 <div style="margin-bottom: 20px; font-weight: 800; font-size: 1.2rem; color: var(--primary);">
-                    ĐIỂM SỐ: ${res.score}/3.0
+                    ĐIỂM SỐ: ${res.score}/10
                 </div>
             `;
 
             const box = document.getElementById('ai-correction-box');
+            // Xóa class căn giữa, thêm class căn trái
+            box.className = "ai-result-view h-full text-left text-gray-800 overflow-y-auto";
             box.innerHTML = aiMeterHTML + res.correction_html;
-            box.classList.remove('flex', 'items-center', 'justify-center', 'text-center');
-            box.classList.add('text-left');
 
             document.getElementById('idea-list').innerHTML = res.idea_feedback.map(i => `<li>• ${i}</li>`).join('');
             document.getElementById('missing-list').innerHTML = res.missing_points.map(i => `<li>• ${i}</li>`).join('');
