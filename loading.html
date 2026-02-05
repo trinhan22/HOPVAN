@@ -19,7 +19,6 @@
             --text: #2d3436;
         }
 
-        /* FIX LỖI ICON: Tách font chữ và font icon */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body, html { 
@@ -28,10 +27,8 @@
             font-family: 'Montserrat', sans-serif;
         }
 
-        /* Chữ dùng Montserrat */
         h1, p, span, div, b { font-family: 'Montserrat', sans-serif !important; }
         
-        /* Icon ép dùng Font Awesome */
         i, .fa-solid, .fas, .fa-brands { 
             font-family: "Font Awesome 6 Free" !important; 
             font-weight: 900 !important; 
@@ -45,14 +42,13 @@
             display: flex; justify-content: center; align-items: center;
         }
 
-        /* NỀN GRID CHẠY NHẸ */
         .grid-floor { 
             position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; 
             background-image: linear-gradient(rgba(255, 94, 98, 0.04) 1px, transparent 1px), 
                               linear-gradient(90deg, rgba(255, 94, 98, 0.04) 1px, transparent 1px); 
             background-size: 100px 100px; 
             transform: perspective(1000px) rotateX(60deg); 
-            animation: gridFlow 25s linear infinite; 
+            animation: gridFlow 15s linear infinite; 
             z-index: 1; opacity: 0.6;
         }
         @keyframes gridFlow { 0% { transform: perspective(1000px) rotateX(60deg) translateY(0); } 100% { transform: perspective(1000px) rotateX(60deg) translateY(100px); } }
@@ -67,14 +63,12 @@
             will-change: opacity;
         }
 
-        /* TYPOGRAPHY */
         .headline { font-size: 2.8rem; font-weight: 900; line-height: 1.2; color: var(--text); text-transform: uppercase; letter-spacing: -1px; }
         .gradient-text { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; }
         
         .icon-box { font-size: 4.5rem; margin-bottom: 20px; color: var(--primary); }
         .badge { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--secondary); margin-bottom: 12px; background: rgba(255, 94, 98, 0.08); padding: 5px 22px; border-radius: 50px; letter-spacing: 2px; }
 
-        /* PROGRESS BAR RIÊNG BIỆT */
         .loader-wrap { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); width: 220px; height: 3px; background: rgba(0,0,0,0.05); border-radius: 10px; overflow: hidden; z-index: 100; }
         .loader-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
     </style>
@@ -87,7 +81,10 @@
         <div class="grid-floor"></div>
         
         <div class="scene-container">
-            <div class="scene" id="s1"><img src="LOGO.WEBP" style="width: 190px; opacity: 0.9;"></div>
+            <div class="scene" id="s1">
+                <img src="LOGO.WEBP" style="width: 130px; margin-bottom: 15px; opacity: 0.9;">
+                <h1 class="headline" style="font-size: 3.2rem;">HOPVAN</h1>
+            </div>
             
             <div class="scene" id="s2">
                 <div class="badge">Nội dung</div>
@@ -104,13 +101,7 @@
             <div class="scene" id="s4">
                 <div class="badge">Dữ liệu</div>
                 <i class="fa-solid fa-layer-group icon-box"></i>
-                <h1 class="headline">KHO HỌC LIỆU<br><span class="gradient-text">KHỔNG LỒ</span></h1>
-            </div>
-
-            <div class="scene" id="s5">
-                <img src="LOGO.WEBP" style="width: 130px; margin-bottom: 15px; opacity: 0.9;">
-                <h1 class="headline" style="font-size: 3.2rem;">HOPVAN</h1>
-                <p style="font-weight: 700; color: #999; letter-spacing: 2px; font-size: 0.8rem;">KHỞI TẠO THÀNH CÔNG</p>
+                <h1 class="headline">KHO HỌC LIỆU<br><span class="gradient-text">ĐA DẠNG</span></h1>
             </div>
         </div>
 
@@ -127,23 +118,24 @@
         const tl = gsap.timeline({ 
             paused: true,
             onComplete: () => { 
-                gsap.to("body", { opacity: 0, duration: 0.5, onComplete: () => {
+                gsap.to("body", { opacity: 0, duration: 0.3, onComplete: () => {
                     window.location.href = 'dashboard/index.html'; 
                 }});
             }
         });
 
         function initAnimation() {
-            // 1. THANH PROGRESS CHẠY RIÊNG (Đúng 7 giây)
-            gsap.to("#bar", { width: "100%", duration: 7, ease: "sine.inOut" });
+            // 1. THANH PROGRESS CHẠY RIÊNG (Đúng 5 giây)
+            gsap.to("#bar", { width: "100%", duration: 5, ease: "none" });
 
-            // 2. TIMELINE SCENE (Tổng 7 giây)
-            const ids = ['#s1', '#s2', '#s3', '#s4', '#s5'];
-            const fadeTime = 0.6; // Thời gian hiện/ẩn
-            const stayTime = 0.6; // Thời gian dừng
-            const overlap = "-=0.2"; // Độ gối đầu
+            // 2. TIMELINE SCENE (Tổng 5 giây cho 4 cảnh)
+            const ids = ['#s1', '#s2', '#s3', '#s4'];
+            const fadeTime = 0.5; // Tăng nhẹ thời gian fade để mượt hơn
+            const stayTime = 0.6; // Tăng nhẹ thời gian dừng vì còn ít cảnh
+            const overlap = "-=0.2"; 
 
             ids.forEach((id, index) => {
+                // Fade In
                 tl.to(id, { 
                     autoAlpha: 1, 
                     duration: fadeTime, 
@@ -151,6 +143,7 @@
                     ease: "sine.inOut" 
                 }, index === 0 ? 0 : overlap);
                 
+                // Fade Out (Trừ cảnh cuối cùng s4)
                 if (index < ids.length - 1) {
                     tl.to(id, { 
                         autoAlpha: 0, 
