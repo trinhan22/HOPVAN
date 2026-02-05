@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hopvan - Loading...</title>
+    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
+    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+    <meta property="og:url" content="https://hopvan.netlify.app" />
+    <meta property="og:type" content="article" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/webp" href="LOGO.WEBP" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --secondary: #FF5E62;
+            --text: #2d3436;
+        }
+
+        /* TRIỆT ĐỂ LỖI ICON: Phân tách Font chữ và Font Icon */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body, html { 
+            width: 100%; height: 100%; overflow: hidden; 
+            background: #fff;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Chữ dùng Montserrat */
+        h1, p, span, div, b { font-family: 'Montserrat', sans-serif !important; }
+        
+        /* Icon ép dùng Font Awesome */
+        i, .fa-solid, .fas, .fa-brands { 
+            font-family: "Font Awesome 6 Free" !important; 
+            font-weight: 900 !important; 
+            font-style: normal !important;
+        }
+
+        #viewport-container { 
+            width: 100%; height: 100%; overflow: hidden; 
+            background: radial-gradient(circle at center, #fffcf9 0%, #fff0e3 100%);
+            position: relative;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* GRID NỀN CHẠY CHẬM SANG TRỌNG */
+        .grid-floor { 
+            position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; 
+            background-image: linear-gradient(rgba(255, 94, 98, 0.04) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(255, 94, 98, 0.04) 1px, transparent 1px); 
+            background-size: 100px 100px; 
+            transform: perspective(1000px) rotateX(60deg); 
+            animation: gridFlow 30s linear infinite; 
+            z-index: 1; opacity: 0.6;
+        }
+        @keyframes gridFlow { 0% { transform: perspective(1000px) rotateX(60deg) translateY(0); } 100% { transform: perspective(1000px) rotateX(60deg) translateY(100px); } }
+
+        .scene-container { position: relative; z-index: 10; width: 100%; height: 100%; }
+
+        .scene {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden;
+            text-align: center;
+            will-change: opacity;
+        }
+
+        /* TYPOGRAPHY */
+        .headline { font-size: 3rem; font-weight: 900; line-height: 1.2; color: var(--text); text-transform: uppercase; letter-spacing: -1px; }
+        .gradient-text { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; }
+        
+        .icon-box { font-size: 5rem; margin-bottom: 20px; color: var(--primary); }
+        .badge { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--secondary); margin-bottom: 15px; background: rgba(255, 94, 98, 0.08); padding: 6px 25px; border-radius: 50px; letter-spacing: 2px; }
+
+        /* THANH PROGRESS MẢNH CỰC XỊN */
+        .loader-wrap { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); width: 220px; height: 2px; background: rgba(0,0,0,0.05); border-radius: 10px; overflow: hidden; z-index: 100; }
+        .loader-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop src="https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3"></audio>
+
+    <div id="viewport-container">
+        <div class="grid-floor"></div>
+        
+        <div class="scene-container">
+            <div class="scene" id="s1">
+                <img src="LOGO.WEBP" style="width: 200px; opacity: 0.9;">
+            </div>
+
+            <div class="scene" id="s2">
+                <div class="badge">Tiêu chuẩn</div>
+                <i class="fa-solid fa-book-open icon-box"></i>
+                <h1 class="headline">HỆ THỐNG<br><span class="gradient-text">GDPT 2018</span></h1>
+            </div>
+
+            <div class="scene" id="s3">
+                <div class="badge">Công nghệ</div>
+                <i class="fa-solid fa-microchip icon-box"></i>
+                <h1 class="headline">AI CHẤM BÀI<br><span class="gradient-text">SIÊU TỐC</span></h1>
+            </div>
+
+            <div class="scene" id="s4">
+                <div class="badge">Dữ liệu</div>
+                <i class="fa-solid fa-layer-group icon-box"></i>
+                <h1 class="headline">KHO HỌC LIỆU<br><span class="gradient-text">KHỔNG LỒ</span></h1>
+            </div>
+
+            <div class="scene" id="s5">
+                <div class="badge">Kết nối</div>
+                <i class="fa-solid fa-people-group icon-box"></i>
+                <h1 class="headline">CỘNG ĐỒNG<br><span class="gradient-text">SÔI NỔI</span></h1>
+            </div>
+
+            <div class="scene" id="s6">
+                <img src="LOGO.WEBP" style="width: 140px; margin-bottom: 20px; opacity: 0.9;">
+                <h1 class="headline" style="font-size: 3.5rem;">HOPVAN</h1>
+                <p style="font-weight: 700; color: #999; letter-spacing: 3px; font-size: 0.8rem;">KHỞI TẠO THÀNH CÔNG</p>
+            </div>
+        </div>
+
+        <div class="loader-wrap">
+            <div class="loader-bar" id="bar"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <script>
+        const audio = document.getElementById('bg-music');
+        
+        // TỔNG TIMELINE ~9 GIÂY
+        const tl = gsap.timeline({ 
+            paused: true,
+            onComplete: () => { 
+                gsap.to("body", { opacity: 0, duration: 1, onComplete: () => {
+                    window.location.href = 'dashboard/index.html'; 
+                }});
+            }
+        });
+
+        function initAnimation() {
+            // 1. Thanh progress chạy trong 8.5s (dừng lại một chút trước khi redirect)
+            gsap.to("#bar", { width: "100%", duration: 12, ease: "power1.inOut" });
+
+            const fadeTime = 0.8;      // Thời gian mờ dần
+            const stayTime = 0.8;      // Thời gian dừng để đọc
+            const overlap = "-=0.2";   // Độ gối nhẹ giữa các cảnh
+
+            const ids = ['#s1', '#s2', '#s3', '#s4', '#s5', '#s6'];
+            
+            ids.forEach((id, index) => {
+                // Fade In
+                tl.to(id, { 
+                    autoAlpha: 1, 
+                    duration: fadeTime, 
+                    visibility: 'visible',
+                    ease: "sine.inOut" 
+                }, overlap);
+                
+                // Nếu không phải cảnh cuối thì Fade Out để cảnh sau lên
+                if (index < ids.length - 1) {
+                    tl.to(id, { 
+                        autoAlpha: 0, 
+                        duration: fadeTime,
+                        ease: "sine.inOut"
+                    }, `+=${stayTime}`);
+                }
+            });
+        }
+
+        window.addEventListener('load', () => {
+            initAnimation();
+            try { 
+                audio.volume = 0.5;
+                audio.play(); 
+            } catch(e) { console.log("Autoplay blocked"); }
+            tl.play();
+        });
+    </script>
+</body>
+</html>
