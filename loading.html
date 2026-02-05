@@ -5,12 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hopvan - Loading...</title>
     <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
-    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh." />
     <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
-    <meta property="og:url" content="https://hopvan.netlify.app" />
-    <meta property="og:type" content="article" />
-
-    <!-- Favicon -->
+    
     <link rel="icon" type="image/webp" href="LOGO.WEBP" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -22,7 +19,7 @@
             --text: #2d3436;
         }
 
-        /* TRIỆT ĐỂ LỖI ICON: Phân tách Font chữ và Font Icon */
+        /* FIX LỖI ICON: Tách font chữ và font icon */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body, html { 
@@ -48,14 +45,14 @@
             display: flex; justify-content: center; align-items: center;
         }
 
-        /* GRID NỀN CHẠY CHẬM SANG TRỌNG */
+        /* NỀN GRID CHẠY NHẸ */
         .grid-floor { 
             position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; 
             background-image: linear-gradient(rgba(255, 94, 98, 0.04) 1px, transparent 1px), 
                               linear-gradient(90deg, rgba(255, 94, 98, 0.04) 1px, transparent 1px); 
             background-size: 100px 100px; 
             transform: perspective(1000px) rotateX(60deg); 
-            animation: gridFlow 30s linear infinite; 
+            animation: gridFlow 25s linear infinite; 
             z-index: 1; opacity: 0.6;
         }
         @keyframes gridFlow { 0% { transform: perspective(1000px) rotateX(60deg) translateY(0); } 100% { transform: perspective(1000px) rotateX(60deg) translateY(100px); } }
@@ -71,14 +68,14 @@
         }
 
         /* TYPOGRAPHY */
-        .headline { font-size: 3rem; font-weight: 900; line-height: 1.2; color: var(--text); text-transform: uppercase; letter-spacing: -1px; }
+        .headline { font-size: 2.8rem; font-weight: 900; line-height: 1.2; color: var(--text); text-transform: uppercase; letter-spacing: -1px; }
         .gradient-text { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; }
         
-        .icon-box { font-size: 5rem; margin-bottom: 20px; color: var(--primary); }
-        .badge { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--secondary); margin-bottom: 15px; background: rgba(255, 94, 98, 0.08); padding: 6px 25px; border-radius: 50px; letter-spacing: 2px; }
+        .icon-box { font-size: 4.5rem; margin-bottom: 20px; color: var(--primary); }
+        .badge { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--secondary); margin-bottom: 12px; background: rgba(255, 94, 98, 0.08); padding: 5px 22px; border-radius: 50px; letter-spacing: 2px; }
 
-        /* THANH PROGRESS MẢNH CỰC XỊN */
-        .loader-wrap { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); width: 220px; height: 2px; background: rgba(0,0,0,0.05); border-radius: 10px; overflow: hidden; z-index: 100; }
+        /* PROGRESS BAR RIÊNG BIỆT */
+        .loader-wrap { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); width: 220px; height: 3px; background: rgba(0,0,0,0.05); border-radius: 10px; overflow: hidden; z-index: 100; }
         .loader-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
     </style>
 </head>
@@ -90,12 +87,10 @@
         <div class="grid-floor"></div>
         
         <div class="scene-container">
-            <div class="scene" id="s1">
-                <img src="LOGO.WEBP" style="width: 200px; opacity: 0.9;">
-            </div>
-
+            <div class="scene" id="s1"><img src="LOGO.WEBP" style="width: 190px; opacity: 0.9;"></div>
+            
             <div class="scene" id="s2">
-                <div class="badge">Tiêu chuẩn</div>
+                <div class="badge">Nội dung</div>
                 <i class="fa-solid fa-book-open icon-box"></i>
                 <h1 class="headline">HỆ THỐNG<br><span class="gradient-text">GDPT 2018</span></h1>
             </div>
@@ -113,15 +108,9 @@
             </div>
 
             <div class="scene" id="s5">
-                <div class="badge">Kết nối</div>
-                <i class="fa-solid fa-people-group icon-box"></i>
-                <h1 class="headline">CỘNG ĐỒNG<br><span class="gradient-text">SÔI NỔI</span></h1>
-            </div>
-
-            <div class="scene" id="s6">
-                <img src="LOGO.WEBP" style="width: 140px; margin-bottom: 20px; opacity: 0.9;">
-                <h1 class="headline" style="font-size: 3.5rem;">HOPVAN</h1>
-                <p style="font-weight: 700; color: #999; letter-spacing: 3px; font-size: 0.8rem;">KHỞI TẠO THÀNH CÔNG</p>
+                <img src="LOGO.WEBP" style="width: 130px; margin-bottom: 15px; opacity: 0.9;">
+                <h1 class="headline" style="font-size: 3.2rem;">HOPVAN</h1>
+                <p style="font-weight: 700; color: #999; letter-spacing: 2px; font-size: 0.8rem;">KHỞI TẠO THÀNH CÔNG</p>
             </div>
         </div>
 
@@ -135,36 +124,33 @@
     <script>
         const audio = document.getElementById('bg-music');
         
-        // TỔNG TIMELINE ~9 GIÂY
         const tl = gsap.timeline({ 
             paused: true,
             onComplete: () => { 
-                gsap.to("body", { opacity: 0, duration: 1, onComplete: () => {
+                gsap.to("body", { opacity: 0, duration: 0.5, onComplete: () => {
                     window.location.href = 'dashboard/index.html'; 
                 }});
             }
         });
 
         function initAnimation() {
-            // 1. Thanh progress chạy trong 8.5s (dừng lại một chút trước khi redirect)
-            gsap.to("#bar", { width: "100%", duration: 12, ease: "power1.inOut" });
+            // 1. THANH PROGRESS CHẠY RIÊNG (Đúng 7 giây)
+            gsap.to("#bar", { width: "100%", duration: 7, ease: "sine.inOut" });
 
-            const fadeTime = 0.8;      // Thời gian mờ dần
-            const stayTime = 0.8;      // Thời gian dừng để đọc
-            const overlap = "-=0.2";   // Độ gối nhẹ giữa các cảnh
+            // 2. TIMELINE SCENE (Tổng 7 giây)
+            const ids = ['#s1', '#s2', '#s3', '#s4', '#s5'];
+            const fadeTime = 0.6; // Thời gian hiện/ẩn
+            const stayTime = 0.6; // Thời gian dừng
+            const overlap = "-=0.2"; // Độ gối đầu
 
-            const ids = ['#s1', '#s2', '#s3', '#s4', '#s5', '#s6'];
-            
             ids.forEach((id, index) => {
-                // Fade In
                 tl.to(id, { 
                     autoAlpha: 1, 
                     duration: fadeTime, 
                     visibility: 'visible',
                     ease: "sine.inOut" 
-                }, overlap);
+                }, index === 0 ? 0 : overlap);
                 
-                // Nếu không phải cảnh cuối thì Fade Out để cảnh sau lên
                 if (index < ids.length - 1) {
                     tl.to(id, { 
                         autoAlpha: 0, 
@@ -178,9 +164,9 @@
         window.addEventListener('load', () => {
             initAnimation();
             try { 
-                audio.volume = 0.5;
+                audio.volume = 0.4;
                 audio.play(); 
-            } catch(e) { console.log("Autoplay blocked"); }
+            } catch(e) {}
             tl.play();
         });
     </script>
