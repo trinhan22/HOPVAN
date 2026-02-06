@@ -13,8 +13,8 @@
     <link rel="icon" type="image/webp" href="LOGO.WEBP" />
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
         :root {
@@ -52,7 +52,8 @@
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-right: 1px solid rgba(255, 255, 255, 0.6);
             box-shadow: 4px 0 24px rgba(0,0,0,0.02);
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
+            width: 280px; /* Cố định width cho PC */
         }
 
         .sidebar-link {
@@ -124,13 +125,31 @@
         }
         .btn-download:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 94, 98, 0.4); }
 
-        /* Mobile Toggle */
-        .mobile-toggle { display: none; }
+        /* --- TỐI ƯU MOBILE (THE HEART OF THE FIX) --- */
+        #sidebar-overlay { 
+            display: none; position: fixed; inset: 0; 
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); 
+            z-index: 90; /* Thấp hơn aside */
+        }
+
         @media (max-width: 1024px) {
-            aside { position: fixed; left: -100%; z-index: 100; height: 100%; width: 280px; box-shadow: 5px 0 30px rgba(0,0,0,0.1); }
-            aside.open { left: 0; }
-            .mobile-toggle { display: block; font-size: 1.5rem; color: var(--primary); cursor: pointer; }
+            aside { 
+                position: fixed !important; left: -300px; top: 0; 
+                z-index: 100 !important; height: 100vh; width: 280px; 
+                background: white !important; /* Đảm bảo menu không bị mờ đen */
+            }
+            aside.open { left: 0 !important; }
+            #sidebar-overlay.active { display: block !important; }
+            
+            .mobile-toggle { 
+                display: flex !important; /* Hiện nút 3 gạch */
+                background: white; border: 1px solid #fed7aa; 
+                width: 42px; height: 42px; border-radius: 10px; 
+                align-items: center; justify-content: center;
+            }
             .pdf-wrapper { padding: 15px; }
+            #doc-title { font-size: 1.1rem !important; }
+            .btn-download span { display: none; } /* Mobile chỉ hiện icon */
         }
         
         /* Loading Overlay for PDF */
@@ -154,6 +173,8 @@
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
     </div>
+
+    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <div class="flex h-full">
         
@@ -186,10 +207,8 @@
                 <div class="mt-auto pt-6">
                     <div class="p-5 bg-white rounded-2xl border border-orange-100 shadow-sm relative overflow-hidden group cursor-pointer hover:shadow-md transition">
                         <div class="absolute -right-4 -top-4 bg-orange-50 w-16 h-16 rounded-full group-hover:scale-150 transition duration-500"></div>
-                        
                         <p class="text-sm font-bold text-gray-800 relative z-10">Gặp khó khăn?</p>
                         <p class="text-xs text-gray-500 mt-1 mb-3 relative z-10 leading-relaxed">Nhắn tin ngay cho đội ngũ hỗ trợ.</p>
-                        
                         <a href="https://discord.com/invite/EhsQyEAk2k" target="_blank" class="text-orange-500 text-xs font-black hover:underline uppercase tracking-wide relative z-10 flex items-center gap-1">
                             Liên hệ Admin 
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
@@ -197,17 +216,17 @@
                     </div>
                 </div>
             </nav>
-            
-            <div id="sidebar-overlay" class="fixed inset-0 bg-black/20 backdrop-blur-sm z-[-1] hidden lg:hidden" onclick="toggleSidebar()"></div>
         </aside>
 
         <main class="pdf-wrapper">
             <div class="pdf-header">
-                <div class="flex items-center gap-4">
-                    <i class="fas fa-bars mobile-toggle" onclick="toggleSidebar()"></i>
+                <div class="flex items-center gap-3">
+                    <button class="mobile-toggle hidden lg:hidden" onclick="toggleSidebar()">
+                        <i class="fas fa-bars text-orange-500"></i>
+                    </button>
                     <div>
                         <h1 id="doc-title" class="text-2xl font-black text-gray-800 leading-none">Chương trình Tổng thể</h1>
-                        <p class="text-sm text-gray-500 font-medium mt-1">Khung chương trình GDPT 2018 - Bộ GD&ĐT</p>
+                        <p class="hidden sm:block text-sm text-gray-500 font-medium mt-1">Khung chương trình GDPT 2018 - Bộ GD&ĐT</p>
                     </div>
                 </div>
                 
@@ -222,39 +241,35 @@
                     <div class="spinner"></div>
                     <p class="text-orange-500 font-bold mt-4 text-sm animate-pulse">Đang tải tài liệu...</p>
                 </div>
-                
                 <iframe id="pdf-viewer" src="" allow="autoplay"></iframe>
             </div>
         </main>
     </div>
 
     <script>
-        // --- CẤU HÌNH LINK PDF TẠI ĐÂY ---
         const pdfData = {
-            'tongthe': {
-                title: 'Chương trình Tổng thể',
-                // Link demo: thay bằng link PDF của bạn
-                url: 'data/ctgdpt2018_tong_the_193202020.pdf'
-            },
-            'nguvan': {
-                title: 'Chương trình môn Ngữ Văn',
-                // Link demo: thay bằng link PDF của bạn
-                url: 'data/ctngu_van_193202020.pdf' 
-            }
+            'tongthe': { title: 'Chương trình Tổng thể', url: 'data/ctgdpt2018_tong_the_193202020.pdf' },
+            'nguvan': { title: 'Chương trình môn Ngữ Văn', url: 'data/ctngu_van_193202020.pdf' }
         };
 
-        // --- LOGIC ---
+        const sidebar = document.getElementById('main-sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
         const iframe = document.getElementById('pdf-viewer');
         const titleEl = document.getElementById('doc-title');
         const downloadBtn = document.getElementById('download-btn');
         const loadingEl = document.getElementById('pdf-loading');
-        const sidebar = document.getElementById('main-sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
 
         function loadPDF(key, element) {
+            // Sáng đèn môn được chọn
             document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
             if(element) element.classList.add('active');
 
+            // Hiện loading
             loadingEl.style.opacity = '1';
             loadingEl.style.zIndex = '10';
 
@@ -262,9 +277,7 @@
             if (!data) return;
 
             titleEl.textContent = data.title;
-            const downloadUrl = data.url.includes('url=') ? decodeURIComponent(data.url.split('url=')[1].split('&')[0]) : data.url;
-            downloadBtn.href = downloadUrl;
-
+            downloadBtn.href = data.url;
             iframe.src = data.url;
 
             iframe.onload = () => {
@@ -274,26 +287,16 @@
                 }, 1000); 
             };
 
+            // Đóng menu sau khi chọn trên Mobile
             if(window.innerWidth <= 1024) {
-                toggleSidebar();
-            }
-        }
-
-        function toggleSidebar() {
-            sidebar.classList.toggle('open');
-            if (sidebar.classList.contains('open')) {
-                sidebar.style.left = '0';
-                overlay.style.display = 'block';
-            } else {
-                sidebar.style.left = '-100%';
-                overlay.style.display = 'none';
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             loadPDF('tongthe', document.querySelector('.sidebar-link.active'));
         });
-
     </script>
 </body>
 </html>

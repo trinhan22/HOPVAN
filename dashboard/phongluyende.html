@@ -19,14 +19,14 @@
         :root {
             --primary: #FF8F50;
             --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
-            --purple-gradient: linear-gradient(135deg,  #FF5E62, #FF8F50 ); /* Gradient mới cho Full Đề */
+            --purple-gradient: linear-gradient(135deg,  #FF5E62, #FF8F50 );
             --text-main: #2D3436;
             --text-light: #636E72;
             --glass-bg: rgba(255, 255, 255, 0.65);
             --sidebar-width: 260px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.3s ease; }
         body { background-color: #FFF5EC; height: 100vh; overflow: hidden; display: flex; }
 
         .background-blobs { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
@@ -34,6 +34,18 @@
         .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
         .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; }
         @keyframes floatBlob { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 50px); } }
+
+        /* --- MOBILE HEADER & OVERLAY (MỚI THÊM) --- */
+        .mobile-header {
+            display: none; position: fixed; top: 0; left: 0; right: 0;
+            height: 60px; background: white; z-index: 100;
+            align-items: center; padding: 0 20px; border-bottom: 1px solid #eee;
+        }
+        #sidebar-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
+            z-index: 998;
+        }
 
         .main-content {
             margin-left: var(--sidebar-width);
@@ -45,6 +57,7 @@
             padding: 40px 60px;
             overflow-y: auto;
             position: relative;
+            -webkit-overflow-scrolling: touch;
         }
 
         .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
@@ -66,7 +79,7 @@
         
         /* CARD STYLES */
         .card-orange { background: var(--primary-gradient); color: white; }
-        .card-purple { background: var(--purple-gradient); color: white; } /* Style mới cho Full Test */
+        .card-purple { background: var(--purple-gradient); color: white; }
         .card-white { background: white; color: var(--text-main); border: 1px solid rgba(0,0,0,0.03); }
         
         .card-title { font-size: 1.8rem; font-weight: 800; line-height: 1.2; z-index: 2; }
@@ -74,7 +87,6 @@
         
         .card-btn { display: inline-flex; align-items: center; gap: 10px; padding: 12px 25px; border-radius: 50px; font-weight: 700; font-size: 0.95rem; transition: 0.3s; z-index: 2; width: fit-content; }
         
-        /* Button colors inside cards */
         .card-orange .card-btn, .card-purple .card-btn { background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(10px); }
         .card-white .card-btn { background: #f3f4f6; color: var(--text-main); }
         
@@ -102,10 +114,40 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes popUp { from { transform: scale(0.9) translateY(20px); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
+        /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 768px) {
-            .main-content { margin-left: 0; width: 100%; padding: 25px 20px; }
-            .practice-grid, .topics-grid { grid-template-columns: 1fr; }
-            .modal-box { padding: 30px 20px; }
+            .mobile-header { display: flex; z-index: 1000; }
+            #sidebar-overlay.active { display: block; }
+
+            /* Fix Sidebar - Ép menu về trái và trên cùng */
+            aside {
+                position: fixed !important; 
+                left: 0 !important; top: 0 !important; bottom: 0 !important;
+                transform: translateX(-100%); 
+                z-index: 9999 !important; 
+                width: 280px !important; 
+                background: white !important;
+                transition: transform 0.3s ease-in-out !important;
+            }
+            aside.open { 
+                transform: translateX(0) !important;
+                box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important;
+            }
+
+            .main-content { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 80px 20px 30px !important; /* Thêm padding-top để tránh header */
+            }
+            
+            .practice-grid, .topics-grid { grid-template-columns: 1fr !important; }
+            .modal-box { padding: 30px 20px; max-height: 90vh; overflow-y: auto; }
+            
+            /* Typography Mobile */
+            .user-header { margin-bottom: 25px; }
+            .welcome-text h2 { font-size: 1.8rem; }
+            .card { height: auto; min-height: 240px; }
+            .card-title { font-size: 1.6rem; }
         }
     </style>
 </head>
@@ -113,6 +155,18 @@
 
     <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
     
+    <div class="mobile-header lg:hidden">
+        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl mr-4 focus:outline-none">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="flex items-center gap-2">
+            <img src="../LOGO.WEBP" alt="Logo" class="w-8 h-8">
+            <span class="font-black text-orange-500 text-lg">HOPVAN</span>
+        </div>
+    </div>
+
+    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
     <div id="menu-placeholder"></div>
 
     <main class="main-content">
@@ -222,19 +276,42 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
+    // --- SIDEBAR TOGGLE LOGIC ---
+    window.toggleSidebar = () => {
+        const sidebar = document.querySelector('aside') || document.getElementById('main-sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        if (sidebar && overlay) {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+            
+            if (sidebar.classList.contains('open')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        }
+    };
+
     // --- LOGIC MODAL ---
-    window.openTopicModal = () => { document.getElementById('topicModal').style.display = 'flex'; };
-    window.closeTopicModal = () => { document.getElementById('topicModal').style.display = 'none'; };
+    window.openTopicModal = () => { 
+        document.getElementById('topicModal').style.display = 'flex'; 
+        document.body.style.overflow = 'hidden';
+    };
+    window.closeTopicModal = () => { 
+        document.getElementById('topicModal').style.display = 'none'; 
+        document.body.style.overflow = 'auto';
+    };
     window.addEventListener('click', (e) => { if (e.target === document.getElementById('topicModal')) window.closeTopicModal(); });
 
-    // --- HÀM CHUYỂN TRANG (CẬP NHẬT MỚI) ---
+    // --- HÀM CHUYỂN TRANG ---
     window.goToExam = (type) => {
         const topicMap = {
             'random':    { path: '../phongluyende/index.html' },
             'nlxh':      { path: '../phongluyende/nghiluanxahoi.html' },
             'doc-hieu':  { path: '../phongluyende/dochieu.html' },
-            'full':      { path: '../phongluyende/detonghop.html' }, // File mới
-            'quiz':      { path: '../phongluyende/tracnghiem.html' } // File mới
+            'full':      { path: '../phongluyende/detonghop.html' },
+            'quiz':      { path: '../phongluyende/tracnghiem.html' }
         };
 
         const selected = topicMap[type] || topicMap['random'];

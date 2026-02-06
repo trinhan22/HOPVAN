@@ -251,14 +251,57 @@
             .footer-brand p { margin: 15px auto; }
             .footer-brand div { justify-content: center; }
         }
-        @media (max-width: 768px) {
-            .nav-links { display: none; } 
-            .mobile-menu-btn { display: block; }
-            header { width: 95%; padding: 10px 20px; }
-            .hero h1 { font-size: 2.5rem; }
-            .cta-section { padding: 40px 20px; border-radius: 20px; }
-            .cta-section h2 { font-size: 2rem; }
-        }
+/* --- CHỈ CĂN GIỮA LOGO FOOTER TRÊN MOBILE --- */
+@media (max-width: 768px) {
+    footer .footer-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Căn giữa logo và các nội dung trong brand */
+        text-align: center;
+    }
+
+    footer .logo {
+        justify-content: center; /* Căn giữa icon và chữ HOPVAN bên trong link */
+        margin-bottom: 10px;
+    }
+
+    footer .footer-brand p {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    footer .footer-brand div {
+        justify-content: center; /* Căn giữa các icon mạng xã hội */
+    }
+    .mobile-menu-btn { display: block; order: -1; }
+    .nav-links { 
+        display: none; flex-direction: column; position: absolute; 
+        top: 70px; left: 0; right: 0; background: white; 
+        padding: 25px; border-radius: 25px; gap: 15px; 
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #eee;
+    }
+    .nav-links.active { display: flex; }
+
+    /* 2. Hero Section (Chuyển 2 cột thành 1 cột) */
+    .hero { grid-template-columns: 1fr; padding-top: 130px; text-align: center; gap: 30px; }
+    .hero-text h1 { font-size: 2.2rem; }
+    .hero-text p { margin: 0 auto 30px; font-size: 1rem; }
+    .stat-row { justify-content: center; gap: 20px; }
+    
+    /* 3. Hình ảnh & Badge (Chỉnh cho nhỏ gọn) */
+    .main-card { transform: rotate(0); padding: 10px; }
+    .floating-badge { display: none; } /* Tạm ẩn badge trên mobile để tránh đè chữ */
+
+    /* 4. Toàn bộ các Grid (Bento, Reviews, Footer) - Ép về 1 cột */
+    .bento-grid, .reviews-grid, .about-wrap, .footer-grid { grid-template-columns: 1fr !important; gap: 20px; }
+    .bento-item.large { grid-column: span 1 !important; }
+    .about-wrap { flex-direction: column-reverse; display: flex; }
+    .about-img { transform: rotate(0); }
+
+    /* 5. Tăng kích thước nút cho dễ bấm */
+    .btn-primary { width: 100%; text-align: center; padding: 15px; }
+    .section-padding { padding: 50px 0; }
+}
     </style>
 </head>
 <body>

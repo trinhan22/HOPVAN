@@ -38,6 +38,18 @@
         .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
         @keyframes floatBlob { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 50px); } }
 
+        /* --- MOBILE HEADER & OVERLAY --- */
+        .mobile-header {
+            display: none; position: fixed; top: 0; left: 0; right: 0;
+            height: 60px; background: white; z-index: 100;
+            align-items: center; padding: 0 20px; border-bottom: 1px solid #eee;
+        }
+        #sidebar-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
+            z-index: 998;
+        }
+
         .main-content {
             margin-left: var(--sidebar-width);
             width: calc(100% - var(--sidebar-width));
@@ -138,23 +150,49 @@
         .close-btn:hover { transform: rotate(90deg); background: #FF8F50; color: #fff; }
 
         .modal-table-container { flex-grow: 1; overflow-y: auto; padding-right: 10px; margin-top: 10px; }
-        .modal-table-container::-webkit-scrollbar { width: 4px; }
-        .modal-table-container::-webkit-scrollbar-track { background: transparent; margin: 20px 0; }
-        .modal-table-container::-webkit-scrollbar-thumb { background: #FF8F50; border-radius: 10px; }
-
         .modal-stats-row { display: flex; gap: 20px; margin-bottom: 20px; }
         .modal-stat-box { 
             flex: 1; background: #fafafa; padding: 15px; border-radius: 15px; text-align: center; border: 1px solid #eee;
         }
-        .ms-val { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
-        .ms-label { font-size: 0.8rem; color: #888; font-weight: 600; text-transform: uppercase; }
 
-        @media (max-width: 768px) { 
-            .main-content { margin-left: 0; width: 100%; padding: 20px 15px; } 
-            .stats-grid { grid-template-columns: 1fr; } 
-            .split-grid { grid-template-columns: 1fr; }
-            .tips-grid { grid-template-columns: 1fr; } 
-            .modal-stats-row { flex-direction: column; gap: 10px; }
+        /* --- MOBILE REFINEMENT --- */
+@media (max-width: 768px) { 
+            /* Fix Header Mobile */
+            .mobile-header { display: flex; z-index: 1000; }
+
+            /* Fix Sidebar - Ép nó về bên trái và nằm trên cùng */
+            aside {
+                position: fixed !important; 
+                left: 0 !important; 
+                top: 0 !important;
+                bottom: 0 !important;
+                transform: translateX(-100%); /* Giấu sang trái */
+                z-index: 9999 !important; 
+                width: 280px !important; 
+                background: white !important;
+                transition: transform 0.3s ease-in-out !important;
+            }
+            aside.open { 
+                transform: translateX(0) !important; /* Hiện ra */
+                box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important;
+            }
+
+            /* Fix Nội dung chính không bị lệch */
+            .main-content { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 80px 15px 20px !important; 
+            } 
+
+            /* Lớp phủ mờ */
+            #sidebar-overlay {
+                z-index: 9998 !important; /* Dưới sidebar nhưng trên content */
+                background: rgba(0,0,0,0.4) !important;
+            }
+            #sidebar-overlay.active { display: block !important; }
+
+            .stats-grid, .split-grid, .tips-grid { grid-template-columns: 1fr !important; } 
+            .welcome-text h2 { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -162,94 +200,103 @@
 
     <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
 
-    <div class="dashboard-container">
-        
-        <div id="menu-placeholder"></div>
-
-        <main class="main-content">
-            <div class="user-header">
-                <div class="welcome-text">
-                    <h2 id="welcome-name">Xin chào,</h2>
-                    <p>Hãy cùng bắt đầu học tập cùng với Hopvan nhé!</p>
-                </div>
-                <div class="user-avatar" id="avatar-initial"></div>
-            </div>
-
-            <div id="overview" class="content-section active">
-                <div class="stats-grid">
-                    <div class="stat-card" id="level-card">
-                        <h3><i class="fas fa-chart-line" style="color: #FF5E62;"></i> Trình độ</h3>
-                        <div class="value">Level 0</div>
-                        <div class="unit">Đang tải...</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3><i class="fas fa-file-alt" style="color: #FF9966;"></i> Đã làm</h3>
-                        <div class="value" id="total-exams">0</div> <div class="unit">đề thi</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3><i class="fas fa-fire" style="color: #e74c3c;"></i> Chuỗi</h3>
-                        <div class="value" id="streak-value">0</div> <div class="unit">ngày liên tiếp</div>
-                    </div>
-                </div>
-                
-                <div class="banner-cta">
-                    <div style="position: relative; z-index: 2;">
-                        <h2 style="font-size: 1.8rem; margin-bottom: 10px; color: white; font-weight: 800;">Sẵn sàng bứt phá điểm số?</h2>
-                        <p style="opacity: 0.9; margin-bottom: 20px;">Làm ngay một bài test để AI đánh giá năng lực của bạn.</p>
-                        <a href="phongluyende.html" style="background: white; color: #FF5E62; padding: 12px 30px; border: none; border-radius: 50px; font-weight: 800; cursor: pointer; text-decoration: none; display: inline-block;">Vào phòng luyện</a>
-                    </div>
-                    <i class="fas fa-rocket banner-decor"></i>
-                </div>
-
-                <div class="split-grid">
-                    <div class="activity-box">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 style="font-weight: 800; display: flex; align-items: center; color: var(--text-main); margin-bottom: 0;">
-                                <i class="fas fa-history" style="margin-right: 10px; color: var(--primary);"></i> Hoạt động gần đây
-                            </h3>
-                            <button onclick="openActivityModal()" style="background: none; border: none; color: #FF8F50; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                                Xem tất cả <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
-                            </button>
-                        </div>
-                        <ul class="activity-list" id="activity-list">
-                            <li style="text-align: center; color: #999; padding: 20px;">Đang tải dữ liệu...</li>
-                        </ul>
-                    </div>
-
-                    <div class="chart-box" onclick="openStatsModal()">
-                        <div class="chart-header">
-                            <h3 class="chart-title"><i class="fas fa-chart-pie text-orange-500 mr-2"></i> Thống kê Kết quả Học tập</h3>
-                            <i class="fas fa-expand-alt text-gray-400"></i>
-                        </div>
-                        <div class="chart-canvas-container">
-                            <canvas id="miniChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <h3 class="section-h3">
-                    <i class="fas fa-lightbulb" style="color: #FF8F50;"></i> Bí kíp điểm cao
-                </h3>
-                <div class="tips-grid">
-                    <div class="tip-card" onclick="window.location.href='bantinvanhoc.html'" style="cursor: pointer;">
-                        <img src="https://img.freepik.com/free-vector/creative-writing-concept-illustration_114360-8139.jpg" class="tip-img" alt="Tip">
-                        <div class="tip-content">
-                            <h4>Cách viết mở bài hiệu quả</h4>
-                            <p>3 công thức mở bài áp dụng cho mọi tác phẩm văn học hiện đại.</p>
-                        </div>
-                    </div>
-
-                    <div class="tip-card" onclick="window.location.href='bantinvanhoc.html'" style="cursor: pointer;">
-                        <img src="https://img.freepik.com/free-vector/writer-concept-illustration_114360-1490.jpg" class="tip-img" alt="Tip">
-                        <div class="tip-content">
-                            <h4>Dẫn chứng NLXH "đắt giá"</h4>
-                            <p>Tổng hợp những dẫn chứng thực tế mới nhất năm 2026.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+    <div class="mobile-header lg:hidden">
+        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl mr-4 focus:outline-none">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="flex items-center gap-2">
+            <img src="../LOGO.WEBP" alt="Logo" class="w-8 h-8">
+            <span class="font-black text-orange-500 text-lg">HOPVAN</span>
+        </div>
     </div>
+
+    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <div id="menu-placeholder"></div>
+
+    <main class="main-content">
+        <div class="user-header">
+            <div class="welcome-text">
+                <h2 id="welcome-name">Xin chào,</h2>
+                <p>Hãy cùng bắt đầu học tập cùng với Hopvan nhé!</p>
+            </div>
+            <div class="user-avatar" id="avatar-initial"></div>
+        </div>
+
+        <div id="overview" class="content-section active">
+            <div class="stats-grid">
+                <div class="stat-card" id="level-card">
+                    <h3><i class="fas fa-chart-line" style="color: #FF5E62;"></i> Trình độ</h3>
+                    <div class="value">Level 0</div>
+                    <div class="unit">Đang tải...</div>
+                </div>
+                <div class="stat-card">
+                    <h3><i class="fas fa-file-alt" style="color: #FF9966;"></i> Đã làm</h3>
+                    <div class="value" id="total-exams">0</div> <div class="unit">đề thi</div>
+                </div>
+                <div class="stat-card">
+                    <h3><i class="fas fa-fire" style="color: #e74c3c;"></i> Chuỗi</h3>
+                    <div class="value" id="streak-value">0</div> <div class="unit">ngày liên tiếp</div>
+                </div>
+            </div>
+            
+            <div class="banner-cta">
+                <div style="position: relative; z-index: 2;">
+                    <h2 style="font-size: 1.8rem; margin-bottom: 10px; color: white; font-weight: 800;">Sẵn sàng bứt phá điểm số?</h2>
+                    <p style="opacity: 0.9; margin-bottom: 20px;">Làm ngay một bài test để AI đánh giá năng lực của bạn.</p>
+                    <a href="phongluyende.html" style="background: white; color: #FF5E62; padding: 12px 30px; border: none; border-radius: 50px; font-weight: 800; cursor: pointer; text-decoration: none; display: inline-block;">Vào phòng luyện</a>
+                </div>
+                <i class="fas fa-rocket banner-decor"></i>
+            </div>
+
+            <div class="split-grid">
+                <div class="activity-box">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="font-weight: 800; display: flex; align-items: center; color: var(--text-main); margin-bottom: 0;">
+                            <i class="fas fa-history" style="margin-right: 10px; color: var(--primary);"></i> Hoạt động gần đây
+                        </h3>
+                        <button onclick="openActivityModal()" style="background: none; border: none; color: #FF8F50; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                            Xem tất cả <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+                        </button>
+                    </div>
+                    <ul class="activity-list" id="activity-list">
+                        <li style="text-align: center; color: #999; padding: 20px;">Đang tải dữ liệu...</li>
+                    </ul>
+                </div>
+
+                <div class="chart-box" onclick="openStatsModal()">
+                    <div class="chart-header">
+                        <h3 class="chart-title"><i class="fas fa-chart-pie text-orange-500 mr-2"></i> Thống kê Kết quả Học tập</h3>
+                        <i class="fas fa-expand-alt text-gray-400"></i>
+                    </div>
+                    <div class="chart-canvas-container">
+                        <canvas id="miniChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="section-h3">
+                <i class="fas fa-lightbulb" style="color: #FF8F50;"></i> Bí kíp điểm cao
+            </h3>
+            <div class="tips-grid">
+                <div class="tip-card" onclick="window.location.href='bantinvanhoc.html'">
+                    <img src="https://img.freepik.com/free-vector/creative-writing-concept-illustration_114360-8139.jpg" class="tip-img" alt="Tip">
+                    <div class="tip-content">
+                        <h4>Cách viết mở bài hiệu quả</h4>
+                        <p>3 công thức mở bài áp dụng cho mọi tác phẩm văn học hiện đại.</p>
+                    </div>
+                </div>
+
+                <div class="tip-card" onclick="window.location.href='bantinvanhoc.html'">
+                    <img src="https://img.freepik.com/free-vector/writer-concept-illustration_114360-1490.jpg" class="tip-img" alt="Tip">
+                    <div class="tip-content">
+                        <h4>Dẫn chứng NLXH "đắt giá"</h4>
+                        <p>Tổng hợp những dẫn chứng thực tế mới nhất năm 2026.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <div id="activityFullModal" class="modal">
         <div class="modal-content">
@@ -282,18 +329,9 @@
             </div>
             
             <div class="modal-stats-row">
-                <div class="modal-stat-box">
-                    <div class="ms-val" id="avg-quiz-score">0.0</div>
-                    <div class="ms-label">TB Trắc nghiệm</div>
-                </div>
-                <div class="modal-stat-box">
-                    <div class="ms-val" id="avg-essay-score">0.0</div>
-                    <div class="ms-label">TB Tự luận</div>
-                </div>
-                <div class="modal-stat-box">
-                    <div class="ms-val" id="total-tests-count">0</div>
-                    <div class="ms-label">Tổng số bài</div>
-                </div>
+                <div class="modal-stat-box"><div class="ms-val" id="avg-quiz-score">0.0</div><div class="ms-label">TB Trắc nghiệm</div></div>
+                <div class="modal-stat-box"><div class="ms-val" id="avg-essay-score">0.0</div><div class="ms-label">TB Tự luận</div></div>
+                <div class="modal-stat-box"><div class="ms-val" id="total-tests-count">0</div><div class="ms-label">Tổng số bài</div></div>
             </div>
 
             <div style="flex-grow: 1; position: relative; min-height: 300px;">
@@ -302,7 +340,7 @@
         </div>
     </div>
 
-<script src="../chatbot.js"></script>
+    <script src="../chatbot.js"></script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -328,6 +366,28 @@
             } else { window.location.href = "../log.html"; }
         });
 
+        // --- SIDEBAR TOGGLE LOGIC ---
+// --- FIX HOẠT ĐỘNG MENU ---
+        window.toggleSidebar = () => {
+            // Tìm thẻ aside (menu) và lớp phủ
+            const sidebar = document.querySelector('aside') || document.getElementById('main-sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+                
+                // Chặn cuộn trang khi mở menu
+                if (sidebar.classList.contains('open')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = 'auto';
+                }
+            } else {
+                console.error("Không tìm thấy Sidebar! Hãy kiểm tra ID trong menu.html");
+            }
+        };
+
         async function updateUserStreak(user) {
             const userRef = doc(db, "users", user.uid);
             const userSnap = await getDoc(userRef);
@@ -352,14 +412,9 @@
             const q = query(collection(db, "activities"), where("uid", "==", user.uid), orderBy("timestamp", "desc"));
             onSnapshot(q, (snapshot) => {
                 allActivities = snapshot.docs.map(doc => doc.data());
-                
-                // 1. Cập nhật số liệu tổng
-                const total = allActivities.length;
-                document.getElementById('total-exams').textContent = total;
-
-                // 2. Tính Level
+                document.getElementById('total-exams').textContent = allActivities.length;
                 let levelName = "Đồng";
-                const levelNum = Math.floor(total / 5) + 1;
+                const levelNum = Math.floor(allActivities.length / 5) + 1;
                 if (levelNum > 5) levelName = "Bạc";
                 if (levelNum > 15) levelName = "Vàng";
                 if (levelNum > 30) levelName = "Bạch Kim";
@@ -369,16 +424,11 @@
                     levelCard.querySelector('.value').textContent = `Level ${levelNum}`;
                     levelCard.querySelector('.unit').textContent = levelName;
                 }
-
-                // 3. Cập nhật List Hoạt động (Gần đây)
                 updateActivityList(allActivities.slice(0, 3));
-
-                // 4. Vẽ biểu đồ Mini
                 drawMiniChart(allActivities);
             });
         }
 
-        // --- HÀM XỬ LÝ ĐIỂM SỐ TỪ CHUỖI ACTION ---
         function extractScore(actionStr) {
             const match = actionStr.match(/(\d+(\.\d+)?)\s*điểm/i);
             return match ? parseFloat(match[1]) : null;
@@ -391,182 +441,57 @@
             } else {
                 listEl.innerHTML = dataList.map(data => {
                     const score = extractScore(data.action);
-                    const scoreDisplay = score !== null ? `<span style="color:var(--primary); font-weight:800;">${score}đ</span>` : '<span style="color:#aaa;">--</span>';
-                    
+                    const scoreDisplay = score !== null ? `<span style="color:var(--primary); font-weight:800;">${score}đ</span>` : '--';
                     let displayAction = data.action.replace(/\(.*\)/, "").trim(); 
                     if(displayAction.length > 25) displayAction = displayAction.substring(0, 25) + "...";
-
-                    return `
-                        <li class="activity-item">
-                            <div class="act-icon orange"><i class="fas fa-pen-nib"></i></div>
-                            <div style="flex-grow: 1;">
-                                <h4 style="font-weight: 800; font-size: 0.9rem;">${displayAction}</h4>
-                                <p style="font-size: 0.75rem; color:#999;">${data.timestamp ? data.timestamp.toDate().toLocaleDateString('vi-VN') : 'Vừa xong'}</p>
-                            </div>
-                            <div style="text-align:right;">${scoreDisplay}</div>
-                        </li>`;
+                    return `<li class="activity-item"><div class="act-icon orange"><i class="fas fa-pen-nib"></i></div><div style="flex-grow: 1;"><h4 style="font-weight: 800; font-size: 0.9rem;">${displayAction}</h4><p style="font-size: 0.75rem; color:#999;">${data.timestamp ? data.timestamp.toDate().toLocaleDateString('vi-VN') : 'Vừa xong'}</p></div><div style="text-align:right;">${scoreDisplay}</div></li>`;
                 }).join('');
             }
         }
 
-        // --- VẼ BIỂU ĐỒ (LOGIC MỚI: CHỈ LẤY 10 BÀI GẦN NHẤT CÓ ĐIỂM) ---
         function processChartData(activities) {
-            // 1. Lọc các bài có điểm
             const allScoredActs = activities.filter(a => extractScore(a.action) !== null);
-            
-            // 2. Lấy 10 bài gần nhất (activities đã được sắp xếp giảm dần theo thời gian)
             const last10Scored = allScoredActs.slice(0, 10);
-            
-            // 3. Đảo ngược lại để hiển thị trên biểu đồ theo trục thời gian (Cũ -> Mới)
             const chartActs = [...last10Scored].reverse(); 
-            
-            const labels = chartActs.map(a => {
-                const d = a.timestamp ? a.timestamp.toDate() : new Date();
-                return `${d.getDate()}/${d.getMonth()+1}`;
-            });
+            const labels = chartActs.map(a => { const d = a.timestamp ? a.timestamp.toDate() : new Date(); return `${d.getDate()}/${d.getMonth()+1}`; });
             const data = chartActs.map(a => extractScore(a.action));
-
-            // 4. Tính trung bình (chỉ dựa trên 10 bài này)
-            let quizSum = 0, quizCount = 0;
-            let essaySum = 0, essayCount = 0;
-
-            last10Scored.forEach(a => {
-                const s = extractScore(a.action);
-                if (a.type === 'quiz') { quizSum += s; quizCount++; }
-                else { essaySum += s; essayCount++; }
-            });
-
-            return {
-                labels, 
-                data,
-                avgQuiz: quizCount ? (quizSum/quizCount).toFixed(1) : 0,
-                avgEssay: essayCount ? (essaySum/essayCount).toFixed(1) : 0,
-                total: activities.length // Tổng số bài vẫn lấy toàn bộ
-            };
+            let quizSum = 0, quizCount = 0; let essaySum = 0, essayCount = 0;
+            last10Scored.forEach(a => { const s = extractScore(a.action); if (a.type === 'quiz') { quizSum += s; quizCount++; } else { essaySum += s; essayCount++; } });
+            return { labels, data, avgQuiz: quizCount ? (quizSum/quizCount).toFixed(1) : 0, avgEssay: essayCount ? (essaySum/essayCount).toFixed(1) : 0, total: activities.length };
         }
 
         function drawMiniChart(activities) {
             const chartData = processChartData(activities);
             const ctx = document.getElementById('miniChart').getContext('2d');
-
             if (miniChartInstance) miniChartInstance.destroy();
-
-            miniChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: chartData.labels,
-                    datasets: [{
-                        label: 'Điểm số',
-                        data: chartData.data,
-                        borderColor: '#FF8F50',
-                        backgroundColor: 'rgba(255, 143, 80, 0.1)',
-                        tension: 0.4,
-                        fill: true,
-                        pointRadius: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, max: 10, ticks: { display: false }, grid: { display: false } },
-                        x: { display: false }
-                    }
-                }
-            });
+            miniChartInstance = new Chart(ctx, { type: 'line', data: { labels: chartData.labels, datasets: [{ label: 'Điểm', data: chartData.data, borderColor: '#FF8F50', backgroundColor: 'rgba(255, 143, 80, 0.1)', tension: 0.4, fill: true, pointRadius: 3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 10, ticks: { display: false }, grid: { display: false } }, x: { display: false } } } });
         }
 
-        // --- MODAL FUNCTIONS ---
         window.openActivityModal = () => {
             const bodyEl = document.getElementById('full-activity-body');
             document.getElementById('modal-count-val').textContent = allActivities.length;
-            
-            if (allActivities.length === 0) {
-                bodyEl.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:50px; color:#999; font-weight:800;">Chưa có lịch sử.</td></tr>`;
-            } else {
-                bodyEl.innerHTML = allActivities.map(data => {
-                    const d = data.timestamp ? data.timestamp.toDate() : new Date();
-                    const score = extractScore(data.action);
-                    const scoreDisplay = score !== null ? `<span style="color:var(--primary); font-weight:900;">${score} điểm</span>` : '<span style="color:#aaa;">--</span>';
-                    
-                    return `
-                        <tr style="background: #fafafa; border-radius: 15px;">
-                            <td style="padding: 15px 10px; font-weight: 800; border-radius: 15px 0 0 15px;">${data.action}</td>
-                            <td style="font-weight: 600; color: #636e72; font-size: 0.85rem;">${d.toLocaleDateString('vi-VN')} ${d.toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})}</td>
-                            <td style="text-align: right; padding-right: 15px; border-radius: 0 15px 15px 0;">${scoreDisplay}</td>
-                        </tr>`;
-                }).join('');
-            }
+            bodyEl.innerHTML = allActivities.map(data => {
+                const d = data.timestamp ? data.timestamp.toDate() : new Date();
+                const score = extractScore(data.action);
+                const scoreDisplay = score !== null ? `<span style="color:var(--primary); font-weight:900;">${score} điểm</span>` : '--';
+                return `<tr style="background: #fafafa; border-radius: 15px;"><td style="padding: 15px 10px; font-weight: 800; border-radius: 15px 0 0 15px;">${data.action}</td><td style="font-weight: 600; color: #636e72; font-size: 0.85rem;">${d.toLocaleDateString('vi-VN')} ${d.toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})}</td><td style="text-align: right; padding-right: 15px; border-radius: 0 15px 15px 0;">${scoreDisplay}</td></tr>`;
+            }).join('');
             document.getElementById('activityFullModal').style.display = "flex";
-            document.body.style.overflow = "hidden"; 
         };
 
         window.openStatsModal = () => {
             const chartData = processChartData(allActivities);
-            
-            // Fill số liệu
             document.getElementById('avg-quiz-score').textContent = chartData.avgQuiz;
             document.getElementById('avg-essay-score').textContent = chartData.avgEssay;
             document.getElementById('total-tests-count').textContent = chartData.total;
-
             document.getElementById('statsFullModal').style.display = "flex";
-            document.body.style.overflow = "hidden";
-
-            // Vẽ biểu đồ lớn
             const ctx = document.getElementById('largeChart').getContext('2d');
             if (largeChartInstance) largeChartInstance.destroy();
-
-            largeChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: chartData.labels,
-                    datasets: [{
-                        label: 'Kết quả học tập',
-                        data: chartData.data,
-                        borderColor: '#FF5E62',
-                        backgroundColor: 'rgba(255, 94, 98, 0.2)',
-                        borderWidth: 3,
-                        tension: 0.3,
-                        fill: true,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#FF5E62',
-                        pointRadius: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.8)',
-                            titleFont: { size: 14 },
-                            bodyFont: { size: 14, weight: 'bold' },
-                            padding: 10,
-                            displayColors: false,
-                            callbacks: {
-                                label: function(context) { return context.parsed.y + ' điểm'; }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, max: 10, grid: { color: '#f0f0f0' } },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
+            largeChartInstance = new Chart(ctx, { type: 'line', data: { labels: chartData.labels, datasets: [{ label: 'Điểm', data: chartData.data, borderColor: '#FF5E62', backgroundColor: 'rgba(255, 94, 98, 0.2)', borderWidth: 3, tension: 0.3, fill: true, pointBackgroundColor: '#fff', pointBorderColor: '#FF5E62', pointRadius: 5 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 10, grid: { color: '#f0f0f0' } }, x: { grid: { display: false } } } } });
         };
 
-        window.closeActivityModal = () => {
-            document.getElementById('activityFullModal').style.display = "none";
-            document.body.style.overflow = "auto";
-        };
-
-        window.closeStatsModal = () => {
-            document.getElementById('statsFullModal').style.display = "none";
-            document.body.style.overflow = "auto";
-        };
+        window.closeActivityModal = () => document.getElementById('activityFullModal').style.display = "none";
+        window.closeStatsModal = () => document.getElementById('statsFullModal').style.display = "none";
 
         fetch('menu.html')
             .then(res => res.text())

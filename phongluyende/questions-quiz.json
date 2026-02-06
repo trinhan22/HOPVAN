@@ -2,353 +2,363 @@
   "quiz": [
     {
       "id": 1,
-      "question": "Tác phẩm 'Vợ chồng A Phủ' của Tô Hoài được in trong tập truyện nào?",
-      "options": ["Truyện Tây Bắc", "Gió đại ngàn", "Cát bụi chân ai", "Dế Mèn phiêu lưu ký"],
-      "correct_index": 0,
-      "explanation": "'Vợ chồng A Phủ' (1952) in trong tập 'Truyện Tây Bắc', giải Nhất giải thưởng Hội Văn nghệ Việt Nam 1954-1955."
+      "question": "Đọc đoạn trích sau: \n“Lang Cun Cẩn thay quần bảy gang\nMang áo chín sải\nGiắt múi khăn như đầu rái\nThắt dây tầm sải màu đen\nĐứng dậy rõ tướng con hùm\nNói sang sảng như sấm”\n(Đẻ đất đẻ nước, Thanh Hóa)\nQua đoạn thơ miêu tả Lang Cun Cẩn trong sử thi 'Đẻ đất đẻ nước', đặc điểm nào dưới đây là đặc trưng của kiểu nhân vật anh hùng trong sử thi dân gian?",
+      "options": [
+        "Thể hiện sức mạnh và tài năng để giải thích nguồn gốc sự hình thành các loài.",
+        "Miêu tả sức mạnh phi thường và vai trò của nhân vật trong bảo vệ cộng đồng.",
+        "Nêu lên nguồn gốc và vai trò của các vị thần linh bảo vệ bản làng.",
+        "Tái hiện phong tục tập quán của cộng đồng thông qua hình ảnh nhân vật anh hùng."
+      ],
+      "correct_index": 1,
+      "explanation": "Nhân vật anh hùng sử thi thường được miêu tả với ngoại hình cường điệu (áo chín sải) và sức mạnh phi thường (nói như sấm) để gánh vác sứ mệnh cộng đồng."
     },
     {
       "id": 2,
-      "question": "Ai được mệnh danh là 'Ông vua phóng sự đất Bắc'?",
-      "options": ["Ngô Tất Tố", "Nam Cao", "Vũ Trọng Phụng", "Nguyên Hồng"],
-      "correct_index": 2,
-      "explanation": "Vũ Trọng Phụng nổi tiếng với các phóng sự sắc sảo như 'Cơm thầy cơm cô', 'Kỹ nghệ lấy Tây'..."
+      "question": "Đọc đoạn trích sau: \n“Tích xưa theo thần thoại Nhật Bản... Tức thời, một ánh chớp lạnh xanh, liền theo đó, tiếng sấm nổ vang, làm rung động cả không trung, dường như cả thế gian đều rung rinh sắp đổ. Các vị thần đều tái mặt...”\nChi tiết 'một ánh chớp lạnh xanh, liền theo đó, tiếng sấm nổ vang, làm rung động cả không trung, dường như cả thế gian đều rung rinh sắp đổ' trong đoạn trích trên có ý nghĩa gì?",
+      "options": [
+        "Thể hiện sức mạnh và quyền năng tối thượng của vị thần.",
+        "Miêu tả hiện tượng thiên nhiên gây ra bởi cơn giận dữ của các vị thần.",
+        "Thể hiện sự yếu kém của các vị thần khác trước vị thần mạnh nhất.",
+        "Thể hiện sự tôn kính của các vị thần đối với người trọng tài."
+      ],
+      "correct_index": 0,
+      "explanation": "Các chi tiết kỳ ảo về thiên nhiên (sấm chớp, rung chuyển thế gian) nhằm nhấn mạnh uy lực và quyền năng vượt trội của vị thần đang thể hiện sức mạnh."
     },
     {
       "id": 3,
-      "question": "Chi tiết 'bát cháo hành' trong 'Chí Phèo' tượng trưng cho điều gì?",
-      "options": ["Sự nghèo đói", "Tình yêu thương và sự thức tỉnh", "Tài nấu ăn của Thị Nở", "Thuốc giải rượu"],
-      "correct_index": 1,
-      "explanation": "Bát cháo hành là biểu tượng của tình người ấm áp, đánh thức phần 'người' trong con quỷ dữ Chí Phèo."
+      "question": "Cụm từ “Vì muốn con có môi trường học tập tốt hơn” trong câu trên là thành phần gì của câu?",
+      "options": [
+        "Chủ ngữ",
+        "Vị ngữ",
+        "Trạng ngữ chỉ nguyên nhân",
+        "Bổ ngữ"
+      ],
+      "correct_index": 2,
+      "explanation": "Cụm từ bắt đầu bằng quan hệ từ 'Vì' dùng để chỉ nguyên nhân/lý do cho sự việc trong câu."
     },
     {
       "id": 4,
-      "question": "Bối cảnh của truyện ngắn 'Vợ nhặt' (Kim Lân)?",
-      "options": ["Kháng chiến chống Pháp", "Kháng chiến chống Mỹ", "Nạn đói năm 1945", "Cải cách ruộng đất"],
-      "correct_index": 2,
-      "explanation": "Tác phẩm tái hiện nạn đói thê thảm năm 1945, làm nổi bật khát vọng sống và tình người."
+      "question": "Phát hiện lỗi trong câu sau: 'Họ đã tổ chức buổi hội thảo về: công nghệ thông tin, trí tuệ nhân tạo và bảo mật mạng.'",
+      "options": [
+        "Câu sai logic ngữ nghĩa.",
+        "Câu mắc lỗi dùng từ.",
+        "Câu sai cấu tạo ngữ pháp.",
+        "Câu mắc lỗi dấu câu."
+      ],
+      "correct_index": 3,
+      "explanation": "Câu mắc lỗi dùng dấu hai chấm (:) không đúng vị trí sau giới từ 'về' trong ngữ cảnh này."
     },
     {
       "id": 5,
-      "question": "Phong cách nghệ thuật của Nguyễn Tuân gói gọn trong chữ nào?",
-      "options": ["Trữ tình chính trị", "Tài hoa, uyên bác", "Hướng về đời thường", "Đậm đà tính dân tộc"],
-      "correct_index": 1,
-      "explanation": "Nguyễn Tuân là nhà văn suốt đời đi tìm cái đẹp, phong cách tài hoa, uyên bác."
+      "question": "“Về môn Toán học, Dũng luôn giỏi đứng đầu lớp.” Cụm từ “Về môn Toán học” trong câu trên là thành phần gì của câu?",
+      "options": [
+        "Khởi ngữ.",
+        "Trạng ngữ.",
+        "Bổ ngữ.",
+        "Trạng từ."
+      ],
+      "correct_index": 0,
+      "explanation": "Đứng trước chủ ngữ 'Dũng' và bắt đầu bằng từ 'Về' để nêu lên đề tài được nói đến, đây là Khởi ngữ."
     },
     {
       "id": 6,
-      "question": "Bài thơ 'Tây Tiến' được sáng tác ở đâu?",
-      "options": ["Mường Hịch", "Phù Lưu Chanh", "Sài Khao", "Mai Châu"],
-      "correct_index": 1,
-      "explanation": "Quang Dũng viết 'Tây Tiến' năm 1948 tại Phù Lưu Chanh khi nhớ về đơn vị cũ."
+      "question": "Trong đoạn thơ 'Quê hương mến thương ơi! Tôi đã trở về đây...', chủ thể trữ tình trong đoạn thơ là gì?",
+      "options": [
+        "Quê hương.",
+        "Mẹ.",
+        "Tôi.",
+        "Cánh diều."
+      ],
+      "correct_index": 2,
+      "explanation": "Chủ thể trữ tình xuất hiện trực tiếp qua đại từ 'Tôi' - người đang bộc lộ cảm xúc và nhìn ngắm cảnh quê hương."
     },
     {
       "id": 7,
-      "question": "Nghệ sĩ Phùng ('Chiếc thuyền ngoài xa') phát hiện điều gì sau bức ảnh đẹp?",
-      "options": ["Kho báu", "Cảnh bạo lực gia đình", "Loài cá quý", "Vẻ đẹp tâm hồn"],
-      "correct_index": 1,
-      "explanation": "Phùng chứng kiến cảnh chồng đánh vợ, nhận ra nghịch lý giữa nghệ thuật và hiện thực."
+      "question": "Đoạn trích 'Văn tế nghĩa sĩ Cần Giuộc' (Súng giặc đất rền; lòng dân trời tỏ...) thể hiện cảm xúc gì đối với đấng anh hùng?",
+      "options": [
+        "Tiếc thương cho sự hy sinh vì nước vì dân của những anh hùng áo vải.",
+        "Cảm thương trước những khó khăn và gian truân mà những anh hùng đã trải qua.",
+        "Niềm tin rằng đấng anh hùng sống làm tướng, thác theo thần giúp đỡ nhân dân.",
+        "Xót xa trước những khó khăn, chiến tranh đã tàn phá đất đai và quê hương."
+      ],
+      "correct_index": 0,
+      "explanation": "Đoạn văn tế bộc lộ lòng tiếc thương sâu sắc của Nguyễn Đình Chiểu trước sự hy sinh quả cảm của những người nông dân nghĩa sĩ."
     },
     {
       "id": 8,
-      "question": "Hình tượng 'cây xà nu' (Nguyễn Trung Thành) tượng trưng cho?",
-      "options": ["Vẻ đẹp thiên nhiên", "Sức sống người dân Tây Nguyên", "Sự tàn khốc", "Nỗi đau mất mát"],
-      "correct_index": 1,
-      "explanation": "Cây xà nu ham ánh sáng, sức sống mãnh liệt biểu tượng cho các thế hệ người dân Tây Nguyên."
+      "question": "Tìm từ thích hợp điền vào chỗ trống sau đây: “Ẵm con chồng hơn .... cháu ngoại”",
+      "options": [
+        "Trông.",
+        "Bế.",
+        "Bồng.",
+        "Chăm."
+      ],
+      "correct_index": 2,
+      "explanation": "Câu tục ngữ đầy đủ là: 'Ẵm con chồng hơn bồng cháu ngoại'."
     },
     {
       "id": 9,
-      "question": "Tác giả vở kịch 'Hồn Trương Ba, da hàng thịt'?",
-      "options": ["Lưu Quang Vũ", "Xuân Trình", "Nguyễn Huy Tưởng", "Nam Cao"],
-      "correct_index": 0,
-      "explanation": "Lưu Quang Vũ là nhà viết kịch tài năng nhất văn học VN hiện đại."
+      "question": "Đọc đoạn trích 'Trên đỉnh Non Tản' (Nhiêu Tàm chết, cái nhọt mã đao...). Nghệ thuật nào sau đây KHÔNG được sử dụng trong đoạn trích?",
+      "options": [
+        "Sử dụng yếu tố kỳ ảo để tạo sự hấp dẫn, bên cạnh đó là cốt truyện đầy kịch tính",
+        "Miêu tả chi tiết, gợi hình, gợi cảm, ngôn ngữ sống động, chân thật",
+        "Sử dụng biện pháp tu từ để miêu tả, khắc họa diễn biến tâm lí các nhân vật.",
+        "Đan xen yếu tố hiện thực và huyền bí để tạo ra sức hấp dẫn, lôi cuốn cho tác phẩm."
+      ],
+      "correct_index": 2,
+      "explanation": "Đoạn trích tập trung vào chi tiết kỳ ảo và diễn biến sự việc lạ lùng, không tập trung khắc họa diễn biến tâm lý nội tâm nhân vật."
     },
     {
       "id": 10,
-      "question": "Đoạn trích 'Đất Nước' thuộc chương mấy trường ca 'Mặt đường khát vọng'?",
-      "options": ["Chương III", "Chương IV", "Chương V", "Chương VI"],
-      "correct_index": 2,
-      "explanation": "Đoạn trích thuộc chương V, thể hiện tư tưởng 'Đất Nước của Nhân dân'."
+      "question": "Trong đoạn trích 'Sống mòn' (Lúc nào cũng lo chết đói...), điểm nhìn trần thuật thuộc về:",
+      "options": [
+        "Tác giả Nam Cao với giọng kể khách quan, trung lập.",
+        "Nhân vật “Thứ” với dòng suy nghĩ từ nội tâm.",
+        "Một người kể chuyện giấu mặt với quan điểm toàn tri.",
+        "Một người ngoài cuộc kể lại câu chuyện của nhân vật."
+      ],
+      "correct_index": 1,
+      "explanation": "Đoạn trích là những trăn trở, dằn vặt trực tiếp trong dòng suy nghĩ của nhân vật Thứ về mục đích sống."
     },
     {
       "id": 11,
-      "question": "Ai là 'Ông hoàng thơ tình' trong phong trào Thơ mới?",
-      "options": ["Hàn Mặc Tử", "Xuân Diệu", "Chế Lan Viên", "Huy Cận"],
+      "question": "Trong đoạn trích 'Hương cuội', cụm từ “người tài tử” có nghĩa là gì?",
+      "options": [
+        "Người nổi tiếng trong lĩnh vực điện ảnh, nghệ thuật.",
+        "Người biết thưởng lãm và trân quý cái đẹp.",
+        "Người không quan tâm thế sự, chỉ chú tâm tới cái đẹp.",
+        "Người có tài năng đặc biệt và thú chơi cầu kỳ."
+      ],
       "correct_index": 1,
-      "explanation": "Xuân Diệu mang đến nguồn cảm xúc nồng nàn, mãnh liệt về tình yêu."
+      "explanation": "Trong quan niệm của Nguyễn Tuân, tài tử là những người có tâm hồn nghệ sĩ, tinh tế và biết trân trọng cái đẹp thực thụ."
     },
     {
       "id": 12,
-      "question": "Tiếng đàn bọt nước trong 'Đàn ghi ta của Lor-ca' tượng trưng cho?",
-      "options": ["Sự hủy diệt", "Vẻ đẹp mong manh nhưng bất tử", "Tiếng khóc", "Sự phẫn nộ"],
-      "correct_index": 1,
-      "explanation": "Tiếng đàn 'li-la-li-la' gợi vẻ đẹp mong manh nhưng có sức sống dai dẳng của nghệ thuật."
+      "question": "Phép liệt kê được sử dụng trong câu văn 'Chứ còn cứ gây được lên một khoảnh vườn... đày chúng ra mưa nắng với thờ ơ...' có ý nghĩa gì?",
+      "options": [
+        "Tạo tiết tấu dồn dập, khắc khoải.",
+        "Giúp cho cách diễn đạt đa nghĩa.",
+        "Nhấn mạnh những cách chơi hoa chưa đúng đắn.",
+        "Bày tỏ thái độ phẫn nộ của tác giả với cách chơi hoa tùy tiện."
+      ],
+      "correct_index": 2,
+      "explanation": "Liệt kê một chuỗi các hành động bỏ bê hoa nhằm phê phán thái độ chơi hoa hời hợt, thiếu tâm hồn."
     },
     {
       "id": 13,
-      "question": "Thể loại của 'Ai đã đặt tên cho dòng sông?'?",
-      "options": ["Truyện ngắn", "Tiểu thuyết", "Bút ký", "Hồi ký"],
-      "correct_index": 2,
-      "explanation": "Đây là bài bút ký xuất sắc của Hoàng Phủ Ngọc Tường viết về sông Hương."
+      "question": "Ý nào sau đây diễn tả đúng nhất nội dung của đoạn trích 'Hương cuội'?",
+      "options": [
+        "Ca ngợi thú chơi hoa tao nhã của người xưa.",
+        "Thể hiện sự nuối tiếc trước vẻ đẹp một thời vang bóng.",
+        "Thể hiện sự quan tâm tới vẻ đẹp một thời vang bóng.",
+        "Phê phán xã hội nhố nhăng làm lạc mất cả quan niệm cũ."
+      ],
+      "correct_index": 0,
+      "explanation": "Đoạn trích tập trung miêu tả và tôn vinh phong thái, đạo lý chơi hoa tỉ mỉ, thành tâm của cụ Kép."
     },
     {
       "id": 14,
-      "question": "'Dốc lên khúc khuỷu dốc thăm thẳm' dùng biện pháp gì?",
-      "options": ["Ẩn dụ", "Điệp từ và từ láy", "Nhân hóa", "So sánh"],
-      "correct_index": 1,
-      "explanation": "Điệp từ 'dốc' và từ láy tạo hình gợi tả địa hình hiểm trở."
+      "question": "Thái độ của cụ Kép đối với hoa trong 'Hương cuội' là gì?",
+      "options": [
+        "Say mê",
+        "Đồng cảm",
+        "Yêu thương",
+        "Trân trọng"
+      ],
+      "correct_index": 3,
+      "explanation": "Cụ Kép coi hoa là giống vật có linh hồn, cần đối đãi 'chí thiện chí thành', thể hiện sự trân trọng tuyệt đối."
     },
     {
       "id": 15,
-      "question": "Trong 'Vợ nhặt', Tràng đã đãi người đàn bà món gì?",
-      "options": ["Cơm trắng", "Phở", "Bốn bát bánh đúc", "Bánh chưng"],
-      "correct_index": 2,
-      "explanation": "Tràng hào phóng đãi người đàn bà xa lạ 4 bát bánh đúc."
+      "question": "Nghệ thuật nổi bật của đoạn trích 'Hương cuội' là gì?",
+      "options": [
+        "Cách kể linh hoạt.",
+        "Ngôn từ sắc sảo.",
+        "Miêu tả nội tâm tinh tế",
+        "Dựng cảnh tài hoa."
+      ],
+      "correct_index": 1,
+      "explanation": "Nguyễn Tuân nổi tiếng với lối dùng từ điêu luyện, uốn nắn ngôn từ sắc sảo để khắc họa vẻ đẹp."
     },
     {
       "id": 16,
-      "question": "Tư tưởng cốt lõi trong 'Tuyên ngôn độc lập'?",
-      "options": ["Kêu gọi viện trợ", "Quyền bình đẳng và dân tộc tự quyết", "Lên án tội ác", "Ca ngợi truyền thống"],
+      "question": "Thành ngữ nào sau đây viết sai chính tả?",
+      "options": [
+        "Ắng cổ, ắng họng.",
+        "Ba que xõ lá.",
+        "Dai như giẻ rách.",
+        "Cơ cầu ác nghiệt."
+      ],
       "correct_index": 1,
-      "explanation": "Khẳng định quyền con người và quyền dân tộc là lẽ phải không ai chối cãi được."
+      "explanation": "Từ đúng là 'Ba que xỏ lá' (dấu hỏi), không phải xõ lá."
     },
     {
       "id": 17,
-      "question": "Hình tượng 'Sóng' của Xuân Quỳnh là ẩn dụ cho?",
-      "options": ["Thiên nhiên", "Em - cái tôi trữ tình", "Thời gian", "Khó khăn"],
-      "correct_index": 1,
-      "explanation": "Sóng là hình tượng ẩn dụ cho 'Em' với những cung bậc cảm xúc trong tình yêu."
+      "question": "“Nhằm nâng cao chất lượng dịch vụ chăm sóc khách hàng và tăng sự hài lòng của khách hàng.” Câu trên bị thiếu thành phần nào sau đây?",
+      "options": [
+        "Thiếu chủ ngữ và vị ngữ.",
+        "Thiếu trạng ngữ.",
+        "Thiếu bổ ngữ.",
+        "Câu đã hoàn chỉnh."
+      ],
+      "correct_index": 0,
+      "explanation": "Đây mới chỉ là một cụm trạng ngữ chỉ mục đích, câu hoàn toàn chưa có chủ ngữ và vị ngữ."
     },
     {
       "id": 18,
-      "question": "Tác giả bài thơ 'Việt Bắc'?",
-      "options": ["Chính Hữu", "Phạm Tiến Duật", "Tố Hữu", "Nguyễn Khoa Điềm"],
+      "question": "Chỉ ra câu sai trong các câu sau:",
+      "options": [
+        "Bằng lòng quyết tâm cao, Linh đã đạt được kết quả như mong muốn.",
+        "Nhờ có lòng quyết tâm cao, Linh đã đạt được kết quả như mong muốn.",
+        "Tại lòng quyết tâm cao, Linh đã đạt được kết quả như mong muốn.",
+        "Do lòng quyết tâm cao, Linh đã đạt được kết quả như mong muốn."
+      ],
       "correct_index": 2,
-      "explanation": "Tố Hữu là lá cờ đầu của thơ ca cách mạng, tác giả 'Việt Bắc'."
+      "explanation": "Từ 'Tại' thường dùng để chỉ nguyên nhân cho một kết quả tiêu cực. Ở đây kết quả là đạt được mục tiêu nên dùng 'Tại' là sai logic."
     },
     {
       "id": 19,
-      "question": "Mị trong 'Vợ chồng A Phủ' có biệt tài gì?",
-      "options": ["Hát hay", "Thổi sáo", "Múa ô", "Dệt vải"],
-      "correct_index": 1,
-      "explanation": "Mị thổi sáo rất hay, 'thổi lá cũng hay như thổi sáo'."
+      "question": "Câu nào dưới đây là câu đúng?",
+      "options": [
+        "Để duy trì mối quan hệ lâu dài, đôi bên cần có sự tin tưởng và hiểu biết lẫn nhau.",
+        "Chúng tôi đã đạt được nhiều thành tựu, đây là nhờ vào những đóng góp không ngừng nghỉ.",
+        "Tại sự hỗ trợ của công ty, họ đã nhanh chóng thích nghi với môi trường mới của mình.",
+        "Việc có kiến thức chuyên môn gặp hạn chế trong công việc mà bạn không thể ngờ."
+      ],
+      "correct_index": 0,
+      "explanation": "Câu A có cấu trúc mạch lạc, đúng ngữ pháp và diễn đạt trọn vẹn ý nghĩa."
     },
     {
       "id": 20,
-      "question": "Tnu bị đốt cháy bao nhiêu ngón tay?",
-      "options": ["1 ngón", "2 ngón", "10 ngón", "Cả hai bàn tay"],
+      "question": "Dòng nào dưới đây có các từ viết đúng chính tả?",
+      "options": [
+        "Xấc xược, sàng sê, xào xáo.",
+        "Xấc sược, xàng sê, xào sáo.",
+        "Xấc xược, xàng xê, xào sáo.",
+        "Xấc xược, xàng xê, xào sáo."
+      ],
       "correct_index": 2,
-      "explanation": "Tnu bị giặc tẩm nhựa xà nu đốt cháy 10 đầu ngón tay."
+      "explanation": "Các từ đúng chuẩn chính tả là: Xấc xược, xàng xê, xào xáo."
     },
     {
       "id": 21,
-      "question": "Sông Đà được Nguyễn Tuân miêu tả với hai đặc tính nổi bật nào?",
-      "options": ["Hung bạo và trữ tình", "Hiền hòa và thơ mộng", "Dữ dội và ồn ào", "Lặng lẽ và bình yên"],
-      "correct_index": 0,
-      "explanation": "Sông Đà hiện lên vừa hung bạo như 'kẻ thù số một', vừa trữ tình như 'cố nhân'."
+      "question": "Trong bài thơ về Hà Nội, hình ảnh “Cây liễu xưa vẫn đứng bên hồ / Như một bóng người Hy Lạp cổ” mang ý nghĩa gì trong việc khắc họa Hà Nội?",
+      "options": [
+        "Thể hiện nét thanh bình và yên tĩnh, trầm mặc của thành phố.",
+        "Gợi lên sự kiên cường nhưng mỏng manh như người Hy Lạp.",
+        "Tạo liên tưởng về vẻ đẹp cổ kính, trầm tư của thành phố.",
+        "Thể hiện sự gần gũi, thân thuộc của thiên nhiên Hà Nội."
+      ],
+      "correct_index": 2,
+      "explanation": "Phép so sánh với 'người Hy Lạp cổ' mang lại cảm giác về sự cổ kính, chiều sâu văn hóa và vẻ đẹp trầm mặc của Hà Nội."
     },
     {
       "id": 22,
-      "question": "Câu thơ 'Áo bào thay chiếu anh về đất' nói về điều gì?",
-      "options": ["Sự nghèo khó của bộ đội", "Sự hy sinh bi tráng", "Sự trở về quê hương", "Sự thất bại"],
-      "correct_index": 1,
-      "explanation": "Câu thơ sử dụng từ Hán Việt trang trọng để nói về sự hy sinh anh dũng, bi tráng của người lính Tây Tiến."
+      "question": "Đoạn trích bài thơ của Hoàng Phủ Ngọc Tường đã sử dụng thể thơ gì?",
+      "options": [
+        "Thơ năm chữ.",
+        "Thơ bảy chữ.",
+        "Thơ lục bát.",
+        "Thơ tự do."
+      ],
+      "correct_index": 3,
+      "explanation": "Số chữ trong các dòng thơ không đều nhau (4, 5, 6, 7 chữ), vần nhịp linh hoạt nên là thơ tự do."
     },
     {
       "id": 23,
-      "question": "Trong 'Vợ nhặt', chi tiết 'lá cờ đỏ' hiện lên trong óc Tràng báo hiệu điều gì?",
-      "options": ["Sự đổi đời nhờ Cách mạng", "Tràng sắp đi bộ đội", "Nạn đói sắp chấm dứt", "Mùa thu đã tới"],
+      "question": "Đoạn thơ sử dụng biện pháp nghệ thuật nào để làm nổi bật tính chất “trầm tư, mơ mộng nghìn năm” của Hà Nội?",
+      "options": [
+        "Kết hợp so sánh và nhân hóa trong hình ảnh.",
+        "Tạo liên tưởng và sử dụng ẩn dụ độc đáo.",
+        "Đan xen phép đối và điệp ngữ lặp lại.",
+        "Sử dụng biểu tượng và hoán dụ tinh tế."
+      ],
       "correct_index": 0,
-      "explanation": "Hình ảnh lá cờ đỏ sao vàng là tín hiệu của sự đổi đời, niềm tin vào tương lai tươi sáng nhờ Việt Minh."
+      "explanation": "So sánh cây liễu với người Hy Lạp cổ và nhân hóa cây liễu qua trạng thái 'trầm tư', 'nhớ nắng'."
     },
     {
       "id": 24,
-      "question": "Tên thật của nhà thơ Tố Hữu là gì?",
-      "options": ["Nguyễn Sen", "Nguyễn Kim Thành", "Trần Hữu Tri", "Phan Bội Châu"],
+      "question": "Ý nghĩa sâu xa của những hình ảnh như “thành phố biếc xanh”, “thành phố tóc thề áo trắng”, “đôi thông mặc áo sương mù” là gì?",
+      "options": [
+        "Thể hiện sự thay đổi của Hà Nội qua thời gian.",
+        "Khắc họa sự hòa quyện giữa thiên nhiên và con người.",
+        "Tượng trưng cho nét đẹp hiện đại nhưng cổ kính của thành phố.",
+        "Gợi lên cảm giác thanh bình trong lòng người đọc."
+      ],
       "correct_index": 1,
-      "explanation": "Tên thật của Tố Hữu là Nguyễn Kim Thành."
+      "explanation": "Sự đan xen giữa sắc màu thiên nhiên (biếc xanh, sương mù) và hình ảnh con người (áo trắng, tóc thề) tạo nên nét thơ mộng đặc thù."
     },
     {
       "id": 25,
-      "question": "Đoạn trích 'Hạnh phúc của một tang gia' nằm trong tác phẩm nào?",
-      "options": ["Tắt đèn", "Số đỏ", "Dông tố", "Chí Phèo"],
+      "question": "“Hà Nội - phố dài - mái ngói/ Và màu lá xanh như ngọc trên đầu” Hai câu thơ trên đã sử dụng biện pháp tu từ gì?",
+      "options": [
+        "Nhân hóa, so sánh.",
+        "Liệt kê, so sánh, nhân hóa.",
+        "Nhân hóa, ẩn dụ, liệt kê.",
+        "Liệt kê, nhân hóa."
+      ],
       "correct_index": 1,
-      "explanation": "'Hạnh phúc của một tang gia' là chương XV của tiểu thuyết 'Số đỏ' (Vũ Trọng Phụng)."
+      "explanation": "Liệt kê (phố dài, mái ngói), so sánh (xanh như ngọc), nhân hóa (lá trên đầu như một sự hiện diện của con người)."
     },
     {
       "id": 26,
-      "question": "Trong 'Chiếc thuyền ngoài xa', người đàn bà hàng chài xuất hiện với ngoại hình như thế nào?",
-      "options": ["Xinh đẹp, quý phái", "Thô kệch, rỗ mặt, mệt mỏi", "Trẻ trung, năng động", "Nhỏ nhắn, yếu đuối"],
-      "correct_index": 1,
-      "explanation": "Người đàn bà trạc ngoài 40, cao lớn, thô kệch, mặt rỗ, khuôn mặt mệt mỏi sau đêm thức trắng kéo lưới."
+      "question": "Dòng nào sau đây nêu tên những tác phẩm tiêu biểu cho phong cách văn học hiện thực phê phán?",
+      "options": [
+        "Tắt đèn (Ngô Tất Tố), Lão Hạc (Nam Cao), Số đỏ (Vũ Trọng Phụng)",
+        "Vợ chồng A Phủ (Tô Hoài), Chí Phèo (Nam Cao), Lão Hạc (Nam Cao)",
+        "Đời thừa (Nam Cao), Vang bóng một thời (Nguyễn Tuân), Số đỏ (Vũ Trọng Phụng)",
+        "Hai đứa trẻ (Thạch Lam), Làng (Kim Lân), Chí Phèo (Nam Cao)"
+      ],
+      "correct_index": 0,
+      "explanation": "Cả ba tác phẩm ở đáp án A đều là những điển hình của dòng văn học hiện thực trước 1945."
     },
     {
       "id": 27,
-      "question": "Ai là người đã 'cởi trói' cho Mị trong đêm mùa đông?",
-      "options": ["A Phủ", "A Châu", "Chính Mị", "Ông Trời"],
-      "correct_index": 2,
-      "explanation": "Mị đã tự cắt dây cởi trói cho A Phủ, sau đó tự giải thoát cho chính mình (hành động tự phát nhưng quyết liệt)."
+      "question": "“Sẽ rất tai hại nếu chúng ta quên rằng một lời nói tử tế... có thể đánh thức con quỷ ngụy sầu.” Nghệ thuật ẩn dụ trong câu văn trên gửi đi thông điệp nào?",
+      "options": [
+        "Cái ác có sẵn trong mỗi người, cần phải ru ngủ nó, không nên đánh thức nó.",
+        "Cái thiện có sẵn trong mỗi người, cần phải níu giữ nó, không nên xua đuổi nó.",
+        "Cái thiện và cái ác là hai mặt song song tồn tại trong mỗi con người.",
+        "Cái thiện và cái ác đều có thể được đánh thức chỉ vì một lời nói."
+      ],
+      "correct_index": 3,
+      "explanation": "Văn bản nhấn mạnh tác động to lớn của lời nói (tử tế hoặc rẻ rúng) đến việc khơi dậy bản tính thiện hoặc ác của con người."
     },
     {
       "id": 28,
-      "question": "Bài thơ 'Sóng' được in trong tập thơ nào?",
-      "options": ["Tơ tằm - Chồi biếc", "Hoa dọc chiến hào", "Gió Lào cát trắng", "Tự hát"],
+      "question": "“Chà, hôm nay trời đẹp quá!” Từ “Chà” trong câu trên là thành phần gì của câu?",
+      "options": [
+        "Liên từ",
+        "Thán từ",
+        "Trạng ngữ",
+        "Định ngữ"
+      ],
       "correct_index": 1,
-      "explanation": "Bài 'Sóng' sáng tác năm 1967 tại biển Diêm Điền, in trong tập 'Hoa dọc chiến hào'."
+      "explanation": "'Chà' là thán từ dùng để biểu lộ cảm xúc ngạc nhiên, cảm thán."
     },
     {
       "id": 29,
-      "question": "Chất liệu văn hóa dân gian nào KHÔNG được sử dụng trong đoạn trích 'Đất Nước'?",
-      "options": ["Truyện cổ tích", "Ca dao, tục ngữ", "Phong tục tập quán", "Kịch tuồng"],
-      "correct_index": 3,
-      "explanation": "Nguyễn Khoa Điềm sử dụng cổ tích, ca dao, phong tục (trầu cau, tóc bới...) nhưng không nhắc đến kịch tuồng."
+      "question": "Đoạn trích 'Vợ nhặt' (Bà lão khẽ dặng hắng... Nhà ta thì nghèo con ạ...) thể hiện rõ nhất tâm trạng nào của bà cụ Tứ?",
+      "options": [
+        "Nhận thức sâu sắc về hoàn cảnh éo le và nghèo khó trong cuộc hôn nhân của con trai.",
+        "Xót xa, buồn tủi cho số phận cay đắng và cuộc sống vất vả của bản thân mình.",
+        "Lo lắng và thương cảm cho tương lai bấp bênh và cuộc đời con trai trong cảnh ngộ này.",
+        "Hy vọng về một tương lai tốt đẹp hơn dù hiện tại đang là cảnh đói khổ và tuyệt vọng."
+      ],
+      "correct_index": 2,
+      "explanation": "Bà cụ Tứ lo lắng cho tương lai của các con giữa lúc đói khát, vừa thương cho con trai vừa ái ngại cho người dâu mới."
     },
     {
       "id": 30,
-      "question": "Dòng sông Hương khi chảy vào thành phố Huế được so sánh với điệu múa nào?",
-      "options": ["Vũ khúc Tây Ban Nha", "Điệu slow tình cảm", "Điệu valse nhẹ nhàng", "Điệu hò mái nhì"],
-      "correct_index": 1,
-      "explanation": "Sông Hương uốn mình theo đường cong thật mềm, như một tiếng 'vâng' không nói ra của tình yêu, như điệu slow tình cảm."
-    },
-    {
-      "id": 31,
-      "question": "L Lor-ca là nhà thơ lớn của đất nước nào?",
-      "options": ["Pháp", "Ý", "Tây Ban Nha", "Bồ Đào Nha"],
-      "correct_index": 2,
-      "explanation": "Federico García Lorca là nhà thơ, nhà viết kịch vĩ đại của Tây Ban Nha."
-    },
-    {
-      "id": 32,
-      "question": "Trong 'Vợ nhặt', bà cụ Tứ có tâm trạng gì khi thấy con trai đưa người đàn bà lạ về?",
-      "options": ["Vui mừng khôn xiết", "Ngạc nhiên, lo lắng, xót xa, tủi phận", "Tức giận, đuổi đi", "Thờ ơ, không quan tâm"],
-      "correct_index": 1,
-      "explanation": "Bà cụ Tứ vừa ngạc nhiên (không tin con mình có vợ), vừa lo lắng (liệu có nuôi nổi nhau), vừa tủi phận nghèo."
-    },
-    {
-      "id": 33,
-      "question": "Đặc điểm nổi bật nhất của hình tượng người lính Tây Tiến là?",
-      "options": ["Giản dị, mộc mạc", "Hào hoa, lãng mạn, bi tráng", "Khắc khổ, lam lũ", "Vui vẻ, lạc quan"],
-      "correct_index": 1,
-      "explanation": "Người lính Tây Tiến mang vẻ đẹp hào hoa (tâm hồn lãng mạn) và bi tráng (đối diện cái chết đầy khí phách)."
-    },
-    {
-      "id": 34,
-      "question": "Câu nói nổi tiếng của Hồn Trương Ba: 'Không thể bên trong một đằng, bên ngoài một nẻo được. Tôi muốn được là...'",
-      "options": ["tôi toàn vẹn", "người giàu có", "hàng thịt khỏe mạnh", "người bất tử"],
+      "question": "Biện pháp tu từ nghệ thuật nào được sử dụng trong câu văn: “Sự tự tin giống như một tấm khiên vô hình bảo vệ con người trước mọi thử thách và khó khăn.”?",
+      "options": [
+        "So sánh",
+        "Nhân hóa",
+        "Hoán dụ",
+        "Ẩn dụ"
+      ],
       "correct_index": 0,
-      "explanation": "Hồn Trương Ba khao khát sự thống nhất giữa linh hồn và thể xác: 'Tôi muốn được là tôi toàn vẹn'."
-    },
-    {
-      "id": 35,
-      "question": "Hai đứa trẻ (Thạch Lam) chờ đợi điều gì mỗi đêm?",
-      "options": ["Mẹ đi chợ về", "Đoàn tàu đêm từ Hà Nội", "Gánh phở của bác Siêu", "Ánh trăng lên"],
-      "correct_index": 1,
-      "explanation": "Chị em Liên cố thức để đợi chuyến tàu đêm - biểu tượng của một thế giới khác sáng sủa và huyên náo hơn."
-    },
-    {
-      "id": 36,
-      "question": "Chữ 'người' trong 'Chữ người tử tù' dùng để chỉ ai?",
-      "options": ["Viên quản ngục", "Thầy thơ lại", "Huấn Cao", "Người kể chuyện"],
-      "correct_index": 2,
-      "explanation": "Huấn Cao là nguyên mẫu của Cao Bá Quát, người có tài viết chữ đẹp và khí phách hiên ngang."
-    },
-    {
-      "id": 37,
-      "question": "Bài thơ 'Tràng giang' của Huy Cận mang nỗi buồn gì?",
-      "options": ["Nỗi buồn tình yêu", "Nỗi buồn thế hệ, nỗi sầu vạn cổ", "Nỗi buồn mất nước", "Nỗi buồn nhớ nhà"],
-      "correct_index": 1,
-      "explanation": "'Tràng giang' thể hiện nỗi buồn cô đơn, rợn ngợp trước vũ trụ bao la, nỗi sầu nhân thế của thơ mới."
-    },
-    {
-      "id": 38,
-      "question": "Tập 'Nhật ký trong tù' của Hồ Chí Minh được viết bằng chữ gì?",
-      "options": ["Chữ Nôm", "Chữ Quốc ngữ", "Chữ Hán", "Tiếng Pháp"],
-      "correct_index": 2,
-      "explanation": "Bác viết 'Nhật ký trong tù' bằng chữ Hán trong thời gian bị chính quyền Tưởng Giới Thạch bắt giam."
-    },
-    {
-      "id": 39,
-      "question": "Ai là tác giả của 'Một người Hà Nội'?",
-      "options": ["Nguyễn Khải", "Nguyễn Minh Châu", "Bảo Ninh", "Lê Lựu"],
-      "correct_index": 0,
-      "explanation": "Nguyễn Khải là tác giả của truyện ngắn 'Một người Hà Nội', viết về nhân vật cô Hiền."
-    },
-    {
-      "id": 40,
-      "question": "Trong 'Chí Phèo', ai là người duy nhất Chí Phèo muốn làm hòa?",
-      "options": ["Bá Kiến", "Thị Nở", "Bà cô Thị Nở", "Dân làng Vũ Đại"],
-      "correct_index": 1,
-      "explanation": "Chí Phèo khao khát hoàn lương và muốn làm hòa với Thị Nở để được trở lại làm người."
-    },
-    {
-      "id": 41,
-      "question": "Luận điểm chính mở đầu bản Tuyên ngôn Độc lập là gì?",
-      "options": ["Tố cáo tội ác thực dân Pháp", "Cơ sở pháp lý về quyền con người", "Tuyên bố độc lập", "Lời thề giữ nước"],
-      "correct_index": 1,
-      "explanation": "Bác mở đầu bằng việc trích dẫn Tuyên ngôn độc lập Mỹ và Pháp để khẳng định cơ sở pháp lý vững chắc."
-    },
-    {
-      "id": 42,
-      "question": "Hình ảnh 'tiếng hát con tàu' trong bài thơ cùng tên của Chế Lan Viên biểu tượng cho?",
-      "options": ["Con tàu thực tế lên Tây Bắc", "Khát vọng lên đường và tâm hồn lãng mạn", "Nỗi nhớ quê hương", "Sự chia ly"],
-      "correct_index": 1,
-      "explanation": "Tiếng hát con tàu là biểu tượng cho khát vọng lên đường xây dựng đất nước và tìm lại ngọn nguồn cảm hứng."
-    },
-    {
-      "id": 43,
-      "question": "Chi tiết 'hạt ngọc ẩn giấu' trong 'Chiếc thuyền ngoài xa' ám chỉ?",
-      "options": ["Vẻ đẹp thiên nhiên", "Vẻ đẹp khuất lấp trong tâm hồn người đàn bà hàng chài", "Tài năng của nghệ sĩ Phùng", "Giá trị của chiếc thuyền"],
-      "correct_index": 1,
-      "explanation": "Nguyễn Minh Châu muốn tìm hạt ngọc ẩn giấu bên trong con người lam lũ, đó là vẻ đẹp của tình mẫu tử và sự hy sinh."
-    },
-    {
-      "id": 44,
-      "question": "Câu thơ 'Cha mẹ thương nhau bằng gừng cay muối mặn' sử dụng chất liệu gì?",
-      "options": ["Thành ngữ", "Ca dao", "Tục ngữ", "Cả 3 ý trên"],
-      "correct_index": 3,
-      "explanation": "Câu thơ vận dụng sáng tạo thành ngữ, ca dao về nghĩa tình thủy chung ('Tay bưng chén muối chén gừng...')."
-    },
-    {
-      "id": 45,
-      "question": "Trong 'Người lái đò Sông Đà', Nguyễn Tuân gọi con sông là?",
-      "options": ["Cố nhân", "Kẻ thù", "Người tình", "Bà mẹ"],
-      "correct_index": 0,
-      "explanation": "Nguyễn Tuân coi sông Đà như một 'cố nhân' (người bạn cũ) với tính cách vừa hung bạo vừa trữ tình."
-    },
-    {
-      "id": 46,
-      "question": "Kết thúc vở kịch 'Hồn Trương Ba, da hàng thịt', Hồn Trương Ba đã quyết định thế nào?",
-      "options": ["Tiếp tục sống trong xác hàng thịt", "Nhập vào xác cu Tị", "Chết hẳn để trả lại sự bình yên", "Nhập vào xác Đế Thích"],
-      "correct_index": 2,
-      "explanation": "Trương Ba quyết định chết hẳn, không nhập vào ai nữa để bảo toàn nhân cách và trả lại sự sống cho cu Tị."
-    },
-    {
-      "id": 47,
-      "question": "Phong cách nghệ thuật của Tố Hữu?",
-      "options": ["Trữ tình chính trị", "Hiện thực phê phán", "Lãng mạn bay bổng", "Triết lý suy tưởng"],
-      "correct_index": 0,
-      "explanation": "Thơ Tố Hữu là thơ trữ tình chính trị, luôn gắn bó mật thiết với các chặng đường cách mạng."
-    },
-    {
-      "id": 48,
-      "question": "Tác phẩm 'Rừng xà nu' được viết năm nào?",
-      "options": ["1945", "1954", "1965", "1975"],
-      "correct_index": 2,
-      "explanation": "Tác phẩm ra đời năm 1965, khi đế quốc Mỹ đổ quân vào miền Nam, cổ vũ tinh thần đồng khởi."
-    },
-    {
-      "id": 49,
-      "question": "Ai là tác giả của 'Vội vàng'?",
-      "options": ["Xuân Diệu", "Huy Cận", "Thế Lữ", "Lưu Trọng Lư"],
-      "correct_index": 0,
-      "explanation": "'Vội vàng' là thi phẩm xuất sắc nhất của Xuân Diệu trước Cách mạng, thể hiện quan niệm sống tận hiến."
-    },
-    {
-      "id": 50,
-      "question": "Giá trị nhân đạo sâu sắc nhất của 'Vợ nhặt' là gì?",
-      "options": ["Tố cáo tội ác thực dân", "Phản ánh nạn đói", "Khát vọng sống và tình người ngay bên bờ vực cái chết", "Ca ngợi vẻ đẹp thiên nhiên"],
-      "correct_index": 2,
-      "explanation": "Dù trong hoàn cảnh đói khát cùng cực, con người vẫn cưu mang nhau và hướng về sự sống."
+      "explanation": "Câu văn sử dụng từ 'giống như' để đối chiếu sự tự tin với tấm khiên, đây là phép so sánh."
     }
   ]
 }
