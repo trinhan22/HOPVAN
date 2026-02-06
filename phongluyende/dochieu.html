@@ -35,7 +35,19 @@
         .blob-2 { width: 500px; height: 500px; background: #FCD5B5; bottom: -100px; right: -100px; }
         @keyframes floatBlob { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, 60px); } }
 
-        /* --- MAIN LAYOUT --- */
+        /* --- MOBILE HEADER & OVERLAY (MỚI) --- */
+        .mobile-header {
+            display: none; position: fixed; top: 0; left: 0; right: 0;
+            height: 60px; background: white; z-index: 100;
+            align-items: center; padding: 0 20px; border-bottom: 1px solid #eee;
+        }
+        #sidebar-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
+            z-index: 998;
+        }
+
+        /* --- LAYOUT --- */
         .main-content {
             margin-left: var(--sidebar-width);
             width: calc(100% - var(--sidebar-width));
@@ -73,7 +85,7 @@
             font-size: 1.1rem; line-height: 1.9; color: #2D3436; background: transparent;
         }
 
-        /* AI METER & CORRECTION */
+        /* AI Result & Meter */
         .ai-result-view { padding: 30px; font-size: 1.1rem; line-height: 1.9; overflow-y: auto; background-color: #fafafa; }
         
         .ai-meter-box {
@@ -93,15 +105,59 @@
         .loader-robot { font-size: 4rem; color: var(--primary); animation: robotBounce 1s infinite alternate; }
         @keyframes robotBounce { from { transform: translateY(0); } to { transform: translateY(-20px); } }
 
+        /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 1024px) {
-            .main-content { margin-left: 0; width: 100%; padding: 20px; }
+            .mobile-header { display: flex; z-index: 1000; }
+            #sidebar-overlay.active { display: block; }
+
+            /* Sidebar Trượt */
+            aside {
+                position: fixed !important; 
+                left: 0 !important; top: 0 !important; bottom: 0 !important;
+                transform: translateX(-100%); 
+                z-index: 9999 !important; 
+                width: 280px !important; 
+                background: white !important;
+                transition: transform 0.3s ease-in-out !important;
+            }
+            aside.open { 
+                transform: translateX(0) !important;
+                box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important;
+            }
+
+            .main-content { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 80px 20px 40px !important; /* Padding top để tránh header */
+            }
+            
             .workspace-grid { grid-template-columns: 1fr; }
+            
+            /* Điều chỉnh hiển thị đề bài Đọc Hiểu */
+            .grid-cols-1.lg\:grid-cols-2 { grid-template-columns: 1fr !important; gap: 20px; }
+            #prompt-passage { max-height: 250px; }
+            
+            .prompt-card { padding: 20px; }
+            .user-avatar { width: 40px; height: 40px; font-size: 1rem; }
+            #timer { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
 
     <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+
+    <div class="mobile-header lg:hidden">
+        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl mr-4 focus:outline-none">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="flex items-center gap-2">
+            <img src="../LOGO.WEBP" alt="Logo" class="w-8 h-8">
+            <span class="font-black text-orange-500 text-lg">HOPVAN</span>
+        </div>
+    </div>
+
+    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <div class="loading-overlay" id="loading-overlay">
         <div class="loader-robot"><i class="fas fa-robot"></i></div>
@@ -113,19 +169,18 @@
         <div id="menu-placeholder"></div>
 
         <main class="main-content">
-            <div class="flex justify-between items-center mb-8">
+            <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
                 <div class="flex items-center gap-5">
-                    <button class="md:hidden text-2xl" onclick="toggleSidebarGlobal()"><i class="fas fa-bars"></i></button>
                     <div>
-                        <h2 class="text-3xl font-black text-gray-800 tracking-tight">Luyện Đề Đọc Hiểu</h2>
+                        <h2 class="text-2xl md:text-3xl font-black text-gray-800 tracking-tight">Luyện Đề Đọc Hiểu</h2>
                         <div class="flex items-center gap-2 mt-1">
                             <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                             <p class="text-sm text-gray-500 font-bold uppercase tracking-widest">Trạng thái: Sẵn sàng</p>
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center gap-4">
-                    <button onclick="randomizeQuestion()" class="bg-white px-5 py-3 rounded-2xl font-bold text-gray-500 hover:text-orange-500 hover:bg-orange-50 transition-all shadow-sm border border-gray-100 flex items-center gap-2">
+                <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                    <button onclick="randomizeQuestion()" class="bg-white px-5 py-3 rounded-2xl font-bold text-gray-500 hover:text-orange-500 hover:bg-orange-50 transition-all shadow-sm border border-gray-100 flex items-center gap-2 text-sm md:text-base">
                         <i class="fas fa-sync-alt text-orange-400"></i> Đổi đề khác
                     </button>
                     <div class="bg-black text-white px-6 py-3 rounded-2xl font-black flex items-center gap-3 shadow-xl">
@@ -216,7 +271,24 @@
     let questionsData = [];
     window.currentExamData = null;
 
-    // --- TIMER (20 Phút cho Đọc Hiểu) ---
+    // --- SIDEBAR TOGGLE LOGIC ---
+    window.toggleSidebar = () => {
+        const sidebar = document.querySelector('aside') || document.getElementById('main-sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        if (sidebar && overlay) {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+            
+            if (sidebar.classList.contains('open')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        }
+    };
+
+    // --- TIMER (20 Phút) ---
     let timeLeft = 1200; 
     const timerElement = document.getElementById('timer');
     function startTimer() {
@@ -242,10 +314,9 @@
         } else { window.location.href = "../log.html"; }
     });
 
-    // --- TẢI ĐỀ TỪ questions-dochieu.json ---
+    // --- TẢI ĐỀ ---
     async function loadQuestions() {
         try {
-            // Fallback: Nếu không có file riêng, thử lấy từ questions.json và lọc loại 'dochieu'
             const r = await fetch('questions.json');
             const data = await r.json();
             questionsData = data.dochieu || [];
@@ -276,11 +347,7 @@
         
         const aiBox = document.getElementById('ai-correction-box');
         aiBox.className = "ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400";
-        aiBox.innerHTML = `
-            <div>
-                <i class="fas fa-robot text-5xl mb-4 opacity-20"></i>
-                <p class="font-bold">Sẵn sàng chấm bài</p>
-            </div>`;
+        aiBox.innerHTML = `<div><i class="fas fa-robot text-5xl mb-4 opacity-20"></i><p class="font-bold">Sẵn sàng chấm bài</p></div>`;
             
         document.getElementById('overall-feedback-box').classList.add('hidden');
     };
@@ -308,7 +375,7 @@
         }
     });
 
-    // --- CHẤM BÀI (PROMPT MỚI) ---
+    // --- CHẤM BÀI ---
     document.getElementById('submit-btn').onclick = async () => {
         const content = document.getElementById('student-essay').value.trim();
         if (content.split(/\s+/).length < 10) return alert("Bài làm quá ngắn!");
@@ -318,7 +385,6 @@
 
         const q = window.currentExamData;
         
-        // SYSTEM PROMPT (TEACHER K12 + READING COMPREHENSION + AI CHECK)
         const systemPrompt = `
             BẠN LÀ: Giáo viên Ngữ văn lớp 12 uy tín, chuyên gia luyện thi THPT (GDPT 2018).
             THÁI ĐỘ: Nghiêm túc, tỉ mỉ, ngôn ngữ phê bình văn học mang tính học thuật (hàn lâm), khích lệ nhưng thẳng thắn.
@@ -353,61 +419,25 @@
             --- BÀI LÀM HỌC SINH ---
             ${content}
         `;
-
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
             });
-
-            // ĐOẠN MỚI (AN TOÀN HƠN)
             const data = await response.json();
+            if (data.error) throw new Error(data.error.message || "Lỗi từ phía Google AI");
+            if (!data.candidates || data.candidates.length === 0) throw new Error("AI không trả về kết quả.");
 
-            // 1. In lỗi ra màn hình Console để kiểm tra (Bấm F12 -> Console để xem)
-            console.log("Dữ liệu AI trả về:", data); 
-
-            // 2. Kiểm tra xem có lỗi từ Google không
-            if (data.error) {
-                throw new Error(data.error.message || "Lỗi từ phía Google AI");
-            }
-
-            // 3. Kiểm tra xem có câu trả lời không
-            if (!data.candidates || data.candidates.length === 0) {
-                throw new Error("AI không trả về kết quả nào. Có thể do bộ lọc nội dung.");
-            }
-
-            // 4. Nếu ngon lành thì mới đọc kết quả
             const rawText = data.candidates[0].content.parts[0].text;
             const res = JSON.parse(rawText.replace(/```json|```/g, "").trim());
 
-            // --- RENDER KẾT QUẢ ---
-            let barColor = '#22c55e'; // Green
-            let verdictText = "Tự nhiên";
-            if (res.human_score < 50) { barColor = '#ef4444'; verdictText = "Nghi vấn AI"; }
-            else if (res.human_score < 75) { barColor = '#f59e0b'; verdictText = "Hơi giống máy"; }
+            let barColor = res.human_score < 50 ? '#ef4444' : (res.human_score < 75 ? '#f59e0b' : '#22c55e');
+            let verdictText = res.human_score < 50 ? "Nghi vấn AI" : (res.human_score < 75 ? "Hơi giống máy" : "Tự nhiên");
 
-            const aiMeterHTML = `
-                <div class="ai-meter-box">
-                    <div>
-                        <div class="meter-label">Độ Chân Thực</div>
-                        <div style="font-size: 0.8rem; color: #888;">${res.ai_comment}</div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div class="meter-score" style="color: ${barColor}">${res.human_score}%</div>
-                        <div style="font-size: 0.7rem; font-weight: 700; color: ${barColor}">${verdictText}</div>
-                    </div>
-                </div>
-                <div style="width: 100%; height: 6px; background: #eee; border-radius: 10px; margin-bottom: 20px; overflow: hidden;">
-                    <div style="width: ${res.human_score}%; height: 100%; background: ${barColor}; border-radius: 10px;"></div>
-                </div>
-                <div style="margin-bottom: 20px; font-weight: 800; font-size: 1.2rem; color: var(--primary);">
-                    ĐIỂM SỐ: ${res.score}/10
-                </div>
-            `;
+            const aiMeterHTML = `<div class="ai-meter-box"><div><div class="meter-label">Độ Chân Thực</div><div style="font-size: 0.8rem; color: #888;">${res.ai_comment}</div></div><div style="text-align: right;"><div class="meter-score" style="color: ${barColor}">${res.human_score}%</div><div style="font-size: 0.7rem; font-weight: 700; color: ${barColor}">${verdictText}</div></div></div><div style="width: 100%; height: 6px; background: #eee; border-radius: 10px; margin-bottom: 20px; overflow: hidden;"><div style="width: ${res.human_score}%; height: 100%; background: ${barColor}; border-radius: 10px;"></div></div><div style="margin-bottom: 20px; font-weight: 800; font-size: 1.2rem; color: var(--primary);">ĐIỂM SỐ: ${res.score}/10</div>`;
 
             const box = document.getElementById('ai-correction-box');
-            // Xóa class căn giữa, thêm class căn trái
             box.className = "ai-result-view h-full text-left text-gray-800 overflow-y-auto";
             box.innerHTML = aiMeterHTML + res.correction_html;
 
@@ -419,16 +449,14 @@
                 await addDoc(collection(db, "activities"), {
                     uid: auth.currentUser.uid,
                     action: `Đọc hiểu: ${q.title.substring(0, 30)}... (${res.score} điểm)`,
-                    type: "reading", // Loại bài riêng cho Đọc hiểu
+                    type: "reading",
                     human_score: res.human_score,
-                    score: res.score, // Lưu điểm
+                    score: res.score,
                     timestamp: serverTimestamp()
                 });
             }
 
-        } catch (e) {
-            alert("Lỗi xử lý AI: " + e.message);
-        } finally { loading.style.display = 'none'; }
+        } catch (e) { alert("Lỗi xử lý AI: " + e.message); } finally { loading.style.display = 'none'; }
     };
 
     document.getElementById('student-essay').oninput = function() {
@@ -436,9 +464,9 @@
         document.getElementById('word-count').innerText = `${c} TỪ`;
     };
 
-    fetch('menu.html').then(r => r.text()).then(html => {
-        const ph = document.getElementById('menu-placeholder'); ph.innerHTML = html;
-        ph.querySelectorAll('script').forEach(old => { const ns = document.createElement('script'); ns.text = old.text; document.body.appendChild(ns); });
+    fetch('menu.html').then(r => r.text()).then(h => {
+        const p = document.getElementById('menu-placeholder'); p.innerHTML = h;
+        p.querySelectorAll('script').forEach(s => { const ns = document.createElement('script'); ns.text = s.text; document.body.appendChild(ns); });
     });
 </script>
 </body>
