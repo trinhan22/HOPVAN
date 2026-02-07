@@ -5,277 +5,294 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hopvan - Bản Tin Văn Học</title>
     <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
-    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
     <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
-    <meta property="og:url" content="https://hopvan.netlify.app" />
-    <meta property="og:type" content="article" />
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
     
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
 
     <style>
         :root {
             --primary: #FF8F50;
-            --primary-dark: #FF5E62;
+            --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
+            --text-heading: #2D3436;
+            --text-body: #4a4a4a;
             --sidebar-width: 280px;
-            --glass-border: rgba(255, 255, 255, 0.5);
         }
 
-        * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+        /* Reset & Base */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #FFF5EC; min-height: 100vh; overflow-x: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* Font riêng cho nội dung đọc */
+        .reading-font { font-family: 'Merriweather', serif; }
+
+        /* --- BACKGROUND BLOBS --- */
+        .background-blobs { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatBlob 10s infinite alternate; }
+        .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
+        .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; }
+        @keyframes floatBlob { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 40px); } }
+
+        /* --- HEADER MOBILE --- */
+        .mobile-header {
+            display: none; position: fixed; top: 0; left: 0; right: 0;
+            height: 60px; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); z-index: 1000;
+            align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
         
-        /* --- SCROLLBAR ĐẸP --- */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #ffd1b3; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-
-        /* --- LAYOUT FIX --- */
-        body { 
-            background: #FFF5EC; 
-            height: 100vh; display: flex; overflow: hidden; 
-        }
-        #menu-placeholder { 
-            width: var(--sidebar-width); flex-shrink: 0; height: 100vh; z-index: 50; 
-        }
-        .main-content {
-            flex: 1; height: 100vh; overflow-y: auto; overflow-x: hidden;
-            padding: 40px 60px; position: relative; scroll-behavior: smooth;
+        /* --- SIDEBAR OVERLAY --- */
+        #sidebar-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+            z-index: 9998;
         }
 
-        /* --- ANIMATED BACKGROUND --- */
-        .bg-orb { position: fixed; border-radius: 50%; filter: blur(90px); z-index: -1; opacity: 0.6; pointer-events: none; }
-        .orb-1 { width: 600px; height: 600px; background: #ffdec7; top: -150px; left: 100px; animation: orbFloat 8s infinite alternate; }
-        .orb-2 { width: 500px; height: 500px; background: #ffcfcf; bottom: -100px; right: -50px; animation: orbFloat 10s infinite alternate-reverse; }
-        @keyframes orbFloat { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 40px); } }
-
-        /* --- TITLE WOW EFFECT --- */
-        .text-gradient-anim {
-            background: linear-gradient(to right, #FF8F50, #FF5E62, #FF8F50);
-            background-size: 200% auto;
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: gradientMove 3s linear infinite;
+        /* --- LAYOUT CHÍNH --- */
+        @media (min-width: 1024px) {
+            #menu-placeholder { display: block; position: fixed; top: 0; left: 0; height: 100vh; width: var(--sidebar-width); z-index: 900; }
+            .main-content { margin-left: var(--sidebar-width); padding: 50px 60px; }
+            .mobile-header { display: none; }
         }
-        @keyframes gradientMove { to { background-position: 200% center; } }
 
-        /* --- SEARCH BAR NEON GLOW --- */
-        .search-container { position: sticky; top: 0; z-index: 40; margin-bottom: 40px; }
+        @media (max-width: 1023px) {
+            .mobile-header { display: flex; }
+            #sidebar-overlay.active { display: block; }
+            #menu-placeholder { display: block; width: 0; height: 0; overflow: visible; }
+            
+            aside {
+                position: fixed !important; left: 0 !important; top: 0 !important; bottom: 0 !important;
+                transform: translateX(-100%); z-index: 9999 !important; width: 280px !important; 
+                background: white !important; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                display: flex !important; flex-direction: column !important;
+                box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important;
+            }
+            aside.open { transform: translateX(0) !important; }
+            .main-content { margin-left: 0 !important; width: 100% !important; padding: 80px 20px 40px !important; }
+        }
+
+        /* --- CONTENT STYLING --- */
+        .page-header { text-align: center; margin-bottom: 40px; }
+        .page-title { font-size: 2.2rem; font-weight: 900; color: var(--text-heading); margin-bottom: 5px; letter-spacing: -1px; }
+        .page-subtitle { color: #666; font-size: 1rem; font-weight: 500; }
+        .text-highlight { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* Search Bar */
+        .search-container { position: relative; max-width: 600px; margin: 0 auto 30px; z-index: 10; }
         .search-box {
-            background: rgba(255,255,255,0.7); backdrop-filter: blur(25px);
-            border-radius: 25px; padding: 12px 30px;
-            display: flex; align-items: center; gap: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(255,255,255,0.8);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            max-width: 700px; margin: 0 auto;
+            width: 100%; padding: 16px 25px 16px 55px; border-radius: 25px;
+            border: 2px solid white; background: white;
+            font-size: 1rem; font-weight: 600; color: #444;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.3s; outline: none;
         }
-        .search-box:focus-within {
-            transform: scale(1.02);
-            background: rgba(255,255,255,0.95);
-            box-shadow: 0 20px 50px rgba(255, 143, 80, 0.25), 0 0 0 2px var(--primary);
-        }
-        .search-input {
-            width: 100%; border: none; outline: none; background: transparent;
-            font-size: 1.1rem; font-weight: 600; color: #444;
-        }
+        .search-box:focus { border-color: #FF8F50; box-shadow: 0 15px 40px rgba(255, 143, 80, 0.2); transform: translateY(-2px); }
+        .search-icon { position: absolute; left: 22px; top: 50%; transform: translateY(-50%); color: #bbb; font-size: 1.2rem; transition: 0.3s; }
+        .search-box:focus + .search-icon { color: #FF8F50; }
 
-        /* --- FILTER TABS --- */
-        .tabs-wrap { display: flex; justify-content: center; gap: 12px; margin-bottom: 50px; flex-wrap: wrap; }
-        .f-btn {
-            padding: 10px 24px; border-radius: 50px; font-weight: 700; font-size: 0.9rem;
-            background: rgba(255,255,255,0.6); color: #666; cursor: pointer; transition: 0.3s;
-            border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(5px);
+        /* Tabs Filter - Tăng khoảng cách margin-bottom để giãn dòng */
+        .tabs-container { 
+            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; 
+            margin-bottom: 40px; /* GIÃN CÁCH VỚI PHẦN DƯỚI */
+            justify-content: flex-start; -webkit-overflow-scrolling: touch; scrollbar-width: none;
         }
-        .f-btn:hover { background: white; transform: translateY(-3px); color: var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        .f-btn.active {
-            background: linear-gradient(135deg, #FF8F50, #FF5E62); color: white;
-            box-shadow: 0 10px 25px rgba(255, 94, 98, 0.3); border-color: transparent;
-        }
-
-        /* --- GRID LAYOUT (3x3) --- */
-        .grid-layout { 
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-        }
+        .tabs-container::-webkit-scrollbar { display: none; }
+        @media (min-width: 768px) { .tabs-container { justify-content: center; } }
         
-        /* --- CARD STYLING --- */
-        .article-card {
-            background: rgba(255,255,255,0.9); border-radius: 20px; overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.8);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer; transform-style: preserve-3d;
-            position: relative;
-            /* Hiệu ứng xuất hiện */
-            opacity: 0; animation: fadeInUp 0.6s ease forwards;
+        .tab-btn {
+            padding: 10px 24px; border-radius: 50px; background: rgba(255,255,255,0.6);
+            border: 1px solid white; color: #666; font-weight: 700; font-size: 0.9rem;
+            cursor: pointer; transition: 0.3s; white-space: nowrap; flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
         }
+        .tab-btn:hover { background: white; transform: translateY(-2px); color: var(--primary); }
+        .tab-btn.active {
+            background: var(--primary-gradient); color: white; border-color: transparent;
+            box-shadow: 0 8px 20px rgba(255, 94, 98, 0.4); transform: translateY(-2px);
+        }
+
+        /* --- CARD DESIGN (REMASTERED) --- */
+        .news-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 25px; }
+        @media (min-width: 640px) { .news-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .news-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        .card {
+            background: white; border-radius: 24px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.8); position: relative;
+            transition: all 0.4s ease; opacity: 0; animation: fadeUp 0.6s forwards; cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03); display: flex; flex-direction: column;
+        }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
         
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Modern Academic Hover Effect */
-        .article-card:hover { 
-            transform: translateY(-8px) scale(1.02); 
-            box-shadow: 0 20px 40px rgba(255, 143, 80, 0.15); 
-            border-color: var(--primary);
-            z-index: 10; 
-        }
-
-        .article-card::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0%;
-            height: 3px;
-            background: linear-gradient(to right, #FF8F50, #FF5E62);
-            transition: width 0.4s ease;
-        }
-
-        .article-card:hover::after {
-            width: 100%;
-        }
-
-        .card-img-wrap { position: relative; height: 200px; overflow: hidden; }
-        .card-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
-        .article-card:hover .card-img { transform: scale(1.1); }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(255, 143, 80, 0.15); border-color: rgba(255, 143, 80, 0.3); }
         
+        .card-img-box { height: 190px; overflow: hidden; position: relative; }
+        .card-img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
+        .card:hover .card-img { transform: scale(1.08); }
+        
+        /* Badge chủ đề (Cục chỉ Topic) - LÀM ĐẸP */
         .card-badge {
             position: absolute; top: 15px; left: 15px;
-            background: rgba(255,255,255,0.95); padding: 6px 14px; border-radius: 8px;
-            font-size: 0.75rem; font-weight: 900; color: var(--primary); text-transform: uppercase;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); backdrop-filter: blur(4px);
+            background: rgba(255, 255, 255, 0.8); /* Nền trong suốt hơn */
+            backdrop-filter: blur(12px); /* Hiệu ứng kính mờ mạnh hơn */
+            -webkit-backdrop-filter: blur(12px);
+            padding: 6px 16px; 
+            border-radius: 50px; /* Bo tròn kiểu viên thuốc */
+            font-size: 0.7rem; font-weight: 800; 
+            color: var(--primary); 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.6); /* Viền mỏng tinh tế */
+            transition: 0.3s;
         }
-
-        .card-body { padding: 25px; position: relative; }
-        .card-topic { color: #888; font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 8px; letter-spacing: 0.5px; text-transform: uppercase; }
-        .card-title { font-size: 1.25rem; font-weight: 800; color: #2D3436; line-height: 1.4; margin-bottom: 12px; transition: color 0.3s; font-family: 'Plus Jakarta Sans', serif; }
-        .article-card:hover .card-title { color: var(--primary); }
-        .card-summary { font-size: 0.95rem; color: #666; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        
-        .highlight { background: #fff3cd; color: #d97706; padding: 0 3px; border-radius: 4px; }
-
-        /* Hiệu ứng Highlight chữ Gradient */
-        .highlight-text {
-            background: linear-gradient(90deg, #FF8F50, #FF5E62);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
-            display: inline-block; /* Để gradient hoạt động tốt */
-        }
-
-        /* Hiệu ứng Nền mờ (Dùng cho các cụm từ quan trọng) */
-        .highlight-bg {
-            background: rgba(255, 143, 80, 0.15); /* Màu cam nhạt */
+        /* Hover vào card thì badge sáng lên */
+        .card:hover .card-badge {
+            background: white;
             color: #FF5E62;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 6px;
-            border-bottom: 2px solid #FF8F50;
+            transform: scale(1.05);
         }
 
-        /* Hiệu ứng Gạch chân Gradient */
-        .highlight-line {
-            text-decoration: none;
-            background-image: linear-gradient(90deg, #FF8F50, #FF5E62);
-            background-position: bottom left;
-            background-size: 100% 3px;
-            background-repeat: no-repeat;
-            color: #333; /* Màu chữ đậm để dễ đọc */
-            font-weight: 700;
-            padding-bottom: 2px;
-        }
-
-        /* --- MODAL --- */
-        .modal-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(255, 245, 236, 0.9);
-            z-index: 200; backdrop-filter: blur(20px);
-            justify-content: center; align-items: center; padding: 20px;
-            animation: fadeIn 0.3s;
-        }
-        .modal-content {
-            background: white; width: 100%; max-width: 900px; max-height: 85vh;
-            border-radius: 30px; overflow: hidden; display: flex; flex-direction: column;
-            box-shadow: 0 50px 100px rgba(255, 143, 80, 0.25);
-            border: 1px solid white; position: relative;
-            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes modalPop { from { transform: scale(0.9) translateY(50px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+        .card-content { padding: 24px; flex-grow: 1; display: flex; flex-direction: column; }
         
-        .modal-header { height: 350px; position: relative; overflow: hidden; }
+        /* Meta Topic bên dưới ảnh (nếu có) hoặc hashtag */
+        .card-meta { 
+            font-size: 0.75rem; font-weight: 700; color: #999; 
+            margin-bottom: 12px; /* Giãn cách với tiêu đề */
+            text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;
+        }
+        
+        .card-title { 
+            font-size: 1.25rem; font-weight: 800; color: var(--text-heading); 
+            line-height: 1.4; margin-bottom: 10px; transition: color 0.3s;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .card:hover .card-title { color: var(--primary); }
+        
+        /* Mô tả dùng font có chân, màu nhạt, thoáng */
+        .card-desc { 
+            font-family: 'Merriweather', serif; font-size: 0.9rem; color: #666; 
+            line-height: 1.6; margin-bottom: 20px; flex-grow: 1;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        .read-more {
+            font-size: 0.85rem; font-weight: 700; color: var(--primary);
+            display: flex; align-items: center; gap: 5px; opacity: 0.8; transition: 0.3s;
+        }
+        .card:hover .read-more { opacity: 1; gap: 8px; }
+
+        /* --- MODAL POPUP (MAGAZINE STYLE) --- */
+        .modal-wrap {
+            position: fixed; inset: 0; z-index: 10000;
+            background: rgba(255, 245, 236, 0.92); backdrop-filter: blur(15px);
+            display: none; align-items: center; justify-content: center; padding: 15px;
+        }
+        .modal-box {
+            background: white; width: 100%; max-width: 850px; max-height: 90vh;
+            border-radius: 30px; box-shadow: 0 30px 80px rgba(255, 143, 80, 0.25);
+            display: flex; flex-direction: column; overflow: hidden;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid white;
+        }
+        @keyframes popIn { from { transform: scale(0.95) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+
+        .modal-header { height: 280px; position: relative; flex-shrink: 0; }
         .modal-img { width: 100%; height: 100%; object-fit: cover; }
         .close-modal {
-            position: absolute; top: 25px; right: 25px; width: 45px; height: 45px; 
+            position: absolute; top: 20px; right: 20px; width: 45px; height: 45px;
             background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transition: 0.3s; color: var(--primary); z-index: 10;
+            font-size: 1.2rem; color: #FF8F50; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 10;
         }
         .close-modal:hover { transform: rotate(90deg) scale(1.1); background: var(--primary); color: white; }
-        
-        .modal-body { padding: 50px; overflow-y: auto; }
-        .dt-tag { display: inline-block; background: #FFF5EC; color: var(--primary); padding: 8px 18px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; margin-bottom: 20px; }
-        .dt-title { font-size: 2.5rem; font-weight: 900; color: #2D3436; margin-bottom: 30px; line-height: 1.2; letter-spacing: -0.5px; }
-        .dt-content { font-size: 1.15rem; line-height: 1.9; color: #444; }
-        .quote-box {
-            border-left: 5px solid var(--primary); background: linear-gradient(to right, #fffbf7, #ffffff);
-            padding: 30px; border-radius: 0 20px 20px 0; margin: 30px 0;
-            font-size: 1.25rem; font-style: italic; color: #555; font-weight: 600;
-        }
 
-        @media (max-width: 1024px) {
-            #menu-placeholder { display: none; width: 0; }
-            .main-content { padding: 25px; }
-            .grid-layout { grid-template-columns: repeat(2, 1fr); }
+        .modal-body { padding: 40px 50px; overflow-y: auto; -webkit-overflow-scrolling: touch; background: #fffdfa; }
+        
+        .dt-tag { 
+            background: #FFF0E5; color: var(--primary); padding: 8px 16px; 
+            border-radius: 50px; font-weight: 800; font-size: 0.8rem; 
+            display: inline-block; margin-bottom: 20px; letter-spacing: 0.5px;
         }
-        @media (max-width: 640px) {
-            .grid-layout { grid-template-columns: 1fr; }
-            .dt-title { font-size: 1.8rem; }
-            .modal-content { max-height: 90vh; }
+        .dt-title { 
+            font-size: 2.2rem; font-weight: 900; color: var(--text-heading); 
+            margin-bottom: 30px; line-height: 1.25; letter-spacing: -0.5px;
+        }
+        
+        /* Nội dung bài viết được format đẹp */
+        .dt-content { 
+            font-family: 'Merriweather', serif; font-size: 1.15rem; line-height: 1.9; 
+            color: #2d3436; 
+        }
+        .dt-content p { margin-bottom: 20px; text-align: justify; }
+        .dt-content strong { color: #000; font-weight: 900; }
+        
+        /* Highlight đẹp */
+        .highlight { background: linear-gradient(120deg, #ffeebb 0%, #ffeebb 100%); background-repeat: no-repeat; background-size: 100% 40%; background-position: 0 88%; padding: 0 2px; }
+
+        @media (max-width: 768px) {
+            .page-title { font-size: 1.8rem; }
+            .modal-header { height: 200px; }
+            .modal-body { padding: 25px 20px; }
+            .dt-title { font-size: 1.6rem; }
+            .dt-content { font-size: 1.05rem; line-height: 1.7; }
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-orb orb-1"></div>
-    <div class="bg-orb orb-2"></div>
-    
+    <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+
+    <div class="mobile-header lg:hidden">
+        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl mr-4 focus:outline-none w-10 h-10 flex items-center justify-center rounded-full active:bg-orange-50 transition">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="flex items-center gap-2">
+            <img src="../LOGO.WEBP" alt="Logo" class="w-8 h-8">
+            <span class="font-black text-orange-500 text-lg">HOPVAN</span>
+        </div>
+    </div>
+
+    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
     <div id="menu-placeholder"></div>
 
     <main class="main-content">
-        <div class="text-center mb-12 mt-10"> <h1 class="text-5xl md:text-6xl font-black text-gray-800 mb-4 tracking-tighter">
-                Bản Tin <span class="text-gradient-anim">Văn Học</span>
-            </h1>
-            <p class="text-gray-500 text-xl font-medium">Kho tàng tư liệu "đắt giá" cho bài văn điểm 9+</p>
+        <div class="page-header">
+            <h1 class="page-title">Bản Tin <span class="text-highlight">Văn Học</span></h1>
+            <p class="page-subtitle">Kho tàng tư liệu "đắt giá" cho bài văn điểm 9+</p>
         </div>
 
         <div class="search-container">
-            <div class="search-box">
-                <i class="fas fa-search text-orange-500 text-xl"></i>
-                <input type="text" id="search-input" class="search-input" placeholder="Tìm chủ đề, dẫn chứng, tác giả...">
+            <input type="text" id="search-input" class="search-box" placeholder="Tìm kiếm cảm hứng...">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+
+        <div class="tabs-container">
+            <div class="tab-btn active" onclick="filterData('all', this)"><i class="fas fa-layer-group"></i> Tất cả</div>
+            <div class="tab-btn" onclick="filterData('NLXH', this)"><i class="fas fa-fire"></i> Dẫn chứng NLXH</div>
+            <div class="tab-btn" onclick="filterData('LyLuan', this)"><i class="fas fa-book-open"></i> Lý luận văn học</div>
+            <div class="tab-btn" onclick="filterData('KyNang', this)"><i class="fas fa-pen-nib"></i> Văn hay chữ tốt</div>
+        </div>
+
+        <div class="news-grid" id="news-grid">
+            <div class="text-center w-full col-span-full py-20 font-bold text-gray-400 flex flex-col items-center">
+                <i class="fas fa-spinner fa-spin text-3xl mb-4 text-orange-300"></i>
+                Đang tải thư viện tri thức...
             </div>
-        </div>
-
-        <div class="tabs-wrap">
-            <button class="f-btn active" onclick="filterData('all')"><i class="fas fa-layer-group"></i> Tất cả</button>
-            <button class="f-btn" onclick="filterData('NLXH')"><i class="fas fa-fire"></i> Dẫn chứng NLXH</button>
-            <button class="f-btn" onclick="filterData('LyLuan')"><i class="fas fa-book-open"></i> Lý luận văn học</button>
-            <button class="f-btn" onclick="filterData('KyNang')"><i class="fas fa-pen-nib"></i> Văn hay chữ tốt</button>
-        </div>
-
-        <div class="grid-layout" id="news-grid">
-            <div class="text-center w-full col-span-3 py-10 font-bold text-gray-400">Đang tải dữ liệu...</div>
         </div>
     </main>
 
-    <div id="detail-modal" class="modal-overlay">
-        <div class="modal-content">
+    <div id="detail-modal" class="modal-wrap">
+        <div class="modal-box">
             <div class="modal-header">
                 <img id="m-img" class="modal-img" src="" alt="">
-                <div class="close-modal" onclick="closeModal()"><i class="fas fa-times text-xl"></i></div>
+                <div class="close-modal" onclick="closeModal()"><i class="fas fa-times"></i></div>
             </div>
             <div class="modal-body">
                 <span id="m-topic" class="dt-tag">CHỦ ĐỀ</span>
-                <h2 id="m-title" class="dt-title">Tiêu đề bài viết</h2>
+                <h2 id="m-title" class="dt-title">Tiêu đề</h2>
                 <div id="m-body" class="dt-content"></div>
             </div>
         </div>
@@ -294,7 +311,21 @@
     let allNews = [];
     let currentFilter = 'all';
 
-    // 1. TẢI DỮ LIỆU JSON
+    // --- SIDEBAR TOGGLE LOGIC ---
+    window.toggleSidebar = () => {
+        const sidebar = document.querySelector('aside') || document.getElementById('main-sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        if (sidebar && overlay) {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : 'auto';
+        } else {
+            console.log("Đang tải menu...");
+        }
+    };
+
+    // --- LOAD DATA ---
     async function loadData() {
         try {
             const [nlxh, lyluan, kynang] = await Promise.all([
@@ -305,102 +336,85 @@
             
             allNews = [...nlxh, ...lyluan, ...kynang];
             
-            // DỮ LIỆU FALLBACK (Phòng khi chưa có file JSON)
             if(allNews.length === 0) {
                 allNews = [
-                    {id: 1, category: "Đang tải...", topic: "Đang tải...", title: "Đang tải...", img: "../panel.webp", content: "<p>Đang tải...</p>"},
-                    {id: 2, category: "Đang tải...", topic: "Đang tải...", title: "Đang tải...", img: "../panel.webp", content: "<p>Đang tải...</p>"},
-                    {id: 3, category: "Đang tải...", topic: "Đang tải...", title: "Đang tải...", img: "../panel.webp", content: "<p>Đang tải...</p>"},
-                    {id: 4, category: "Đang tải...", topic: "Đang tải...", title: "Đang tải...", img: "../panel.webp", content: "<p>Đang tải...</p>"}
+                    {id: 1, category: "NLXH", topic: "Nghị lực", title: "Ánh sáng nơi cuối đường hầm: Câu chuyện Nick Vujicic", img: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=800", content: "<p>Nội dung mẫu...</p>"},
+                    {id: 2, category: "LyLuan", topic: "Thơ Mới", title: "Cái tôi trữ tình trong thơ Xuân Diệu", img: "https://images.unsplash.com/photo-1478641300939-0ec5188d3163?w=800", content: "<p>Nội dung mẫu...</p>"},
+                    {id: 3, category: "KyNang", topic: "Mở bài", title: "Công thức mở bài gián tiếp 9+", img: "https://images.unsplash.com/photo-1519682337058-a5ca05e24b06?w=800", content: "<p>Nội dung mẫu...</p>"}
                 ];
             }
             allNews.sort(() => Math.random() - 0.5);
             renderGrid(allNews);
         } catch (e) {
-            document.getElementById('news-grid').innerHTML = '<p class="text-center font-bold text-gray-400">Đang cập nhật...</p>';
+            document.getElementById('news-grid').innerHTML = '<p class="text-center font-bold text-gray-400">Đang cập nhật dữ liệu...</p>';
         }
     }
 
-    // --- HÀM TẠO SUMMARY TỰ ĐỘNG ---
-    function getSummary(htmlString, limit = 120) {
-        // 1. Tạo một thẻ div ảo để chứa HTML và lấy ra text thuần
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = htmlString;
-        
-        // 2. Lấy nội dung text (loại bỏ các thẻ <p>, <span>...)
-        let plainText = tempDiv.textContent || tempDiv.innerText || "";
-        
-        // 3. Xử lý chuỗi
-        plainText = plainText.trim(); // Xóa khoảng trắng thừa đầu đuôi
-        
-        // 4. Cắt chuỗi và thêm dấu ...
-        if (plainText.length <= limit) return plainText;
-        return plainText.substring(0, limit).trim() + "...";
+    function getSummary(html, limit = 90) {
+        const div = document.createElement("div"); div.innerHTML = html;
+        let text = (div.textContent || "").trim();
+        return text.length > limit ? text.substring(0, limit) + "..." : text;
     }
 
-    // 2. RENDER GRID (ANIMATION STAGGERED)
     function renderGrid(data, keyword = "") {
         const grid = document.getElementById('news-grid');
         if(data.length === 0) {
-            grid.innerHTML = '<div class="text-center py-20 text-gray-400 font-bold w-full col-span-full">Không tìm thấy bài viết nào.</div>';
+            grid.innerHTML = '<div class="text-center py-20 text-gray-400 font-bold col-span-full">Không tìm thấy bài viết nào.</div>';
             return;
         }
 
         grid.innerHTML = data.map((item, index) => {
-            let titleHtml = item.title;
+            let title = item.title;
             if(keyword) {
                 const regex = new RegExp(`(${keyword})`, 'gi');
-                titleHtml = item.title.replace(regex, '<span class="highlight">$1</span>');
+                title = item.title.replace(regex, '<span class="highlight">$1</span>');
             }
-
-            const summary = getSummary(item.content); // Tự động tạo summary
-
-            // Thêm animation-delay để thẻ bay lên lần lượt
+            
             return `
-            <div class="article-card" style="animation-delay: ${index * 0.1}s" onclick="window.openDetail('${item.id}')">
-                <div class="card-img-wrap">
-                    <img src="${item.img}" class="card-img" loading="lazy">
-                    <span class="card-badge">${getCatName(item.category)}</span>
+            <div class="card" style="animation-delay: ${index * 0.05}s" onclick="openDetail('${item.id}')">
+                <div class="card-img-box">
+                    <img src="${item.img}" class="card-img" loading="lazy" onerror="this.src='../panel.webp'">
+                    <div class="card-badge">${getCatName(item.category)}</div>
                 </div>
-                <div class="card-body">
-                    <span class="card-topic"><i class="fas fa-hashtag text-orange-400"></i> ${item.topic}</span>
-                    <h3 class="card-title">${titleHtml}</h3>
-                    <p class="card-summary">${summary}</p>
+                <div class="card-content">
+                    <div class="card-meta">
+                        <i class="fas fa-hashtag text-orange-400"></i> ${item.topic}
+                    </div>
+                    <h3 class="card-title">${title}</h3>
+                    <p class="card-desc">${getSummary(item.content)}</p>
+                    <div class="read-more">Đọc tiếp <i class="fas fa-arrow-right"></i></div>
                 </div>
-            </div>
-            `;
+            </div>`;
         }).join('');
     }
 
     function getCatName(cat) {
         if(cat === 'NLXH') return 'Dẫn chứng';
         if(cat === 'LyLuan') return 'Lý luận';
-        return 'Văn hay chữ tốt';
+        return 'Kỹ năng';
     }
 
-    // 3. SEARCH & FILTER
-    function removeAccents(str) { return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
-
+    // SEARCH & FILTER
     document.getElementById('search-input').addEventListener('input', (e) => {
-        const rawKeyword = e.target.value;
-        const keyword = removeAccents(rawKeyword);
-        const filtered = allNews.filter(item => {
-            const matchCat = currentFilter === 'all' || item.category === currentFilter;
-            const matchSearch = removeAccents(item.title).includes(keyword) || removeAccents(item.topic).includes(keyword);
-            return matchCat && matchSearch;
+        const rawKey = e.target.value;
+        const key = rawKey.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const filtered = allNews.filter(i => {
+            const matchCat = currentFilter === 'all' || i.category === currentFilter;
+            const matchKey = i.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(key);
+            return matchCat && matchKey;
         });
-        renderGrid(filtered, rawKeyword);
+        renderGrid(filtered, rawKey);
     });
 
-    window.filterData = (cat) => {
+    window.filterData = (cat, el) => {
         currentFilter = cat;
-        document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        if(el) el.classList.add('active');
         document.getElementById('search-input').value = "";
         renderGrid(cat === 'all' ? allNews : allNews.filter(i => i.category === cat));
     };
 
-    // 4. MODAL
+    // MODAL
     window.openDetail = (id) => {
         const item = allNews.find(i => i.id == id);
         if(!item) return;
@@ -408,7 +422,9 @@
         document.getElementById('m-topic').innerText = item.topic;
         document.getElementById('m-title').innerText = item.title;
         document.getElementById('m-body').innerHTML = item.content;
-        document.getElementById('detail-modal').style.display = 'flex';
+        
+        const modal = document.getElementById('detail-modal');
+        modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     };
 
@@ -417,28 +433,22 @@
         document.body.style.overflow = 'auto';
     };
 
-    window.addEventListener('click', (e) => {
-        if(e.target === document.getElementById('detail-modal')) window.closeModal();
-    });
+    window.onclick = (e) => {
+        if(e.target == document.getElementById('detail-modal')) window.closeModal();
+    }
 
     // INIT
-    loadData();
     onAuthStateChanged(auth, (u) => { if(!u) window.location.href="../log.html"; });
-    
-    // FETCH MENU & RESTORE ICONS
-    fetch('menu.html')
-        .then(res => res.text())
-        .then(html => {
-            const placeholder = document.getElementById('menu-placeholder');
-            placeholder.innerHTML = html;
-            const scripts = placeholder.querySelectorAll('script');
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement('script');
-                newScript.text = oldScript.text;
-                document.body.appendChild(newScript);
-            });
-        })
-        .catch(err => console.error("Lỗi tải menu:", err));
+    loadData();
+
+    // LOAD MENU
+    fetch('menu.html').then(r => r.text()).then(html => {
+        const ph = document.getElementById('menu-placeholder');
+        ph.innerHTML = html;
+        ph.querySelectorAll('script').forEach(s => {
+            const ns = document.createElement('script'); ns.text = s.text; document.body.appendChild(ns);
+        });
+    });
 
     window.addEventListener('trigger-firebase-signout', async () => { await signOut(auth); window.location.href = "../index.html"; });
 </script>

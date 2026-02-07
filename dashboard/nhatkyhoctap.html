@@ -15,20 +15,43 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <style>
+<style>
         :root { --primary: #FF8F50; --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62); --sidebar-width: 280px; }
-        * { font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+        
         body { background-color: #FFF5EC; min-height: 100vh; display: flex; overflow-x: hidden; }
 
-        #menu-placeholder { width: var(--sidebar-width); flex-shrink: 0; z-index: 100; }
-        .main-content { flex-grow: 1; padding: 40px; position: relative; min-height: 100vh; }
+        /* --- LAYOUT CƠ BẢN --- */
+        #menu-placeholder { 
+            width: var(--sidebar-width); 
+            flex-shrink: 0; 
+            z-index: 10001; 
+            position: relative;
+        }
+        .main-content { flex-grow: 1; padding: 40px; position: relative; min-height: 100vh; transition: all 0.4s ease; }
 
-        /* --- HEADER --- */
+        /* --- MOBILE HEADER & OVERLAY --- */
+        .mobile-header {
+            display: none; position: fixed; top: 0; left: 0; right: 0;
+            height: 60px; background: white; 
+            z-index: 1000; 
+            align-items: center; padding: 0 20px; border-bottom: 1px solid #eee;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        #sidebar-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); 
+            backdrop-filter: blur(4px);
+            z-index: 9999; 
+        }
+
+        /* --- HEADER CARD --- */
         .welcome-card {
             background: linear-gradient(135deg, #FF9F68 0%, #FF5E62 100%);
             border-radius: 35px; padding: 40px; color: #ffffff;
             box-shadow: 0 20px 40px rgba(255, 94, 98, 0.3); 
-            position: relative; overflow: hidden; margin-bottom: 80px; /* Tăng khoảng cách dưới header */
+            position: relative; overflow: hidden; margin-bottom: 80px; 
             border: 1px solid rgba(255, 255, 255, 0.2);
             animation: slideDown 0.8s ease;
         }
@@ -36,26 +59,13 @@
 
         /* --- PATH SYSTEM --- */
         .path-wrapper { 
-            position: relative; 
-            width: 100%; 
-            max-width: 450px; /* Nới rộng container một chút */
-            margin: 0 auto; 
-            padding-top: 20px;
-            padding-bottom: 100px; 
-            min-height: 1500px; 
-            display: flex;
-            justify-content: center;
+            position: relative; width: 100%; max-width: 450px; margin: 0 auto; 
+            padding-top: 20px; padding-bottom: 100px; min-height: 1500px; 
+            display: flex; justify-content: center;
         }
-        
         .path-container { 
-            position: relative; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            /* --- TĂNG KHOẢNG CÁCH DỌC Ở ĐÂY (80px -> 140px) --- */
-            gap: 140px; 
-            z-index: 10; 
-            width: 100%;
+            position: relative; display: flex; flex-direction: column; 
+            align-items: center; gap: 140px; z-index: 10; width: 100%;
         }
         
         .level-node {
@@ -64,23 +74,20 @@
             background: white; z-index: 20;
             box-shadow: 0 10px 0 #eee, 0 15px 30px rgba(0,0,0,0.05);
             opacity: 0; transform: scale(0.3) translateY(50px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         
-        /* --- TĂNG ĐỘ UỐN LƯỢN (60px -> 80px) --- */
         .node-left { transform: translateX(-80px); }
         .node-right { transform: translateX(80px); }
 
-        /* Animation xuất hiện (cần khớp với transform vị trí) */
         .level-node.node-appear { opacity: 1; transform: scale(1) translateY(0); }
         .level-node.node-left.node-appear { transform: translateX(-80px) scale(1) translateY(0); }
         .level-node.node-right.node-appear { transform: translateX(80px) scale(1) translateY(0); }
 
-        /* Hover Effect */
         .level-node:hover { transform: translateY(-12px) scale(1.1); box-shadow: 0 15px 0 #eee, 0 25px 40px rgba(255, 143, 80, 0.2); }
         .level-node.node-left:hover { transform: translateX(-80px) translateY(-12px) scale(1.1); }
         .level-node.node-right:hover { transform: translateX(80px) translateY(-12px) scale(1.1); }
 
-        /* Trạng thái Level */
         .level-passed { background: linear-gradient(135deg, #58cc02, #46a302); color: white; border-bottom: 8px solid #3b8a02; box-shadow: 0 10px 20px rgba(88, 204, 2, 0.3); }
         .level-current { 
             background: white; color: var(--primary); border: 6px solid var(--primary); 
@@ -89,9 +96,7 @@
         }
         .level-locked { background: #e5e5e5; color: #afafaf; cursor: not-allowed; pointer-events: none; border-bottom: 8px solid #ccc; }
         
-        /* Bounce Animation */
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-        /* Override bounce cho các node lệch */
         .node-left.level-current { animation: bounceLeft 2s infinite; }
         .node-right.level-current { animation: bounceRight 2s infinite; }
         @keyframes bounceLeft { 0%, 100% { transform: translateX(-80px) translateY(0); } 50% { transform: translateX(-80px) translateY(-15px); } }
@@ -100,55 +105,80 @@
         .completed-medal { font-size: 1.8rem; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2)); animation: medalPop 0.5s ease; }
         @keyframes medalPop { from { transform: scale(0) rotate(-45deg); } to { transform: scale(1) rotate(0); } }
 
-        /* --- NHÃN TIÊU ĐỀ --- */
         .node-label {
-            position: absolute; 
-            top: 105px; 
-            left: 50%;
-            transform: translateX(-50%); 
+            position: absolute; top: 105px; left: 50%; transform: translateX(-50%); 
             background: white; padding: 8px 18px; border-radius: 14px;
             box-shadow: 0 6px 15px rgba(0,0,0,0.06); font-size: 13px; font-weight: 800; color: #5d4037;
             white-space: nowrap; border: 2px solid #fff; pointer-events: none; z-index: 30;
         }
         .level-node:hover .node-label { background: var(--primary); color: white; transform: translate(-50%, 8px); }
 
-        /* --- SVG PATH --- */
         #path-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
         
-        .path-line {
-            stroke: #e5e7eb; 
-            stroke-width: 12;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            fill: none;
-        }
+        .path-line { stroke: #e5e7eb; stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; fill: none; }
 
         .path-draw-anim {
-            stroke: #FF8F50;
-            stroke-width: 12;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            fill: none;
-            stroke-dasharray: 3000;
-            stroke-dashoffset: 3000;
-            animation: drawLine 2.5s ease-out forwards;
+            stroke: #FF8F50; stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; fill: none;
+            stroke-dasharray: 3000; stroke-dashoffset: 3000; animation: drawLine 2.5s ease-out forwards;
         }
         @keyframes drawLine { to { stroke-dashoffset: 0; } }
 
+        /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 768px) { 
-            #menu-placeholder { width: 0; display: none; }
+            .mobile-header { display: flex; }
+            #sidebar-overlay.active { display: block; }
+
+            #menu-placeholder { 
+                width: 0; display: block; 
+                position: static; 
+            }
+            
+            aside {
+                position: fixed !important; 
+                left: 0 !important; top: 0 !important; bottom: 0 !important;
+                transform: translateX(-100%); 
+                z-index: 10002 !important; 
+                width: 280px !important; 
+                background: white !important; 
+                transition: transform 0.3s ease-in-out !important;
+                box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important;
+                opacity: 1 !important; 
+            }
+            aside.open { transform: translateX(0) !important; }
+
+            .main-content { padding: 90px 20px 40px !important; width: 100%; }
+
+            /* MỚI THÊM: Ẩn Avatar ở Mobile */
+            #avatar-initial { display: none !important; }
+
+            .welcome-card { padding: 30px 20px; margin-bottom: 50px; }
             .node-label { font-size: 11px; padding: 6px 12px; }
             .path-wrapper { max-width: 100%; }
-            /* Mobile giảm độ lệch */
+            
             .node-left { transform: translateX(-50px); }
             .node-right { transform: translateX(50px); }
             
             .level-node.node-left.node-appear { transform: translateX(-50px) scale(1) translateY(0); }
             .level-node.node-right.node-appear { transform: translateX(50px) scale(1) translateY(0); }
+            
+            @keyframes bounceLeft { 0%, 100% { transform: translateX(-50px) translateY(0); } 50% { transform: translateX(-50px) translateY(-15px); } }
+            @keyframes bounceRight { 0%, 100% { transform: translateX(50px) translateY(0); } 50% { transform: translateX(50px) translateY(-15px); } }
         }
     </style>
 </head>
 <body>
+
+    <div class="mobile-header lg:hidden">
+        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl mr-4 focus:outline-none">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="flex items-center gap-2">
+            <img src="../LOGO.WEBP" alt="Logo" class="w-8 h-8">
+            <span class="font-black text-orange-500 text-lg">HOPVAN</span>
+        </div>
+    </div>
+
+    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <div id="menu-placeholder"></div>
 
@@ -196,6 +226,23 @@
         { id: 5, title: 'Trắc Nghiệm' }, { id: 6, title: 'Đọc Hiểu' },
         { id: 7, title: 'NLXH' }, { id: 8   , title: 'NLVH' }
     ];
+
+    // --- LOGIC SIDEBAR TOGGLE (MỚI) ---
+    window.toggleSidebar = () => {
+        const sidebar = document.querySelector('aside');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        if (sidebar && overlay) {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+            
+            if (sidebar.classList.contains('open')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        }
+    };
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -275,6 +322,7 @@
             setTimeout(() => node.classList.add('node-appear'), index * 150);
         });
         
+        // Đợi 1 chút để DOM render xong rồi vẽ đường cong
         setTimeout(drawCurvedPath, 800);
     }
 
@@ -342,6 +390,15 @@
                 newScript.text = oldScript.text; 
                 document.body.appendChild(newScript); 
             });
+            
+            // Highlight menu item
+            setTimeout(() => {
+                const links = placeholder.querySelectorAll('.sb-link');
+                links.forEach(l => {
+                    if(l.getAttribute('href') && l.getAttribute('href').includes('nhatkyhoctap')) l.classList.add('active');
+                    else l.classList.remove('active');
+                });
+            }, 100);
         })
         .catch(err => console.error("Lỗi tải menu:", err));
 

@@ -13,6 +13,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         /* --- CORE STYLES --- */
@@ -39,6 +40,18 @@
         .blob-2 { width: 450px; height: 450px; background: #FCD5B5; bottom: -80px; right: -80px; }
         @keyframes floatBlob { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 40px); } }
 
+        /* --- MOBILE HEADER & OVERLAY (MỚI THÊM TỪ TRANG MẪU) --- */
+        .mobile-header {
+            display: none; position: fixed; top: 0; left: 0; right: 0;
+            height: 60px; background: white; z-index: 100;
+            align-items: center; padding: 0 20px; border-bottom: 1px solid #eee;
+        }
+        #sidebar-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
+            z-index: 998;
+        }
+
         .dashboard-container { width: 100%; height: 100%; position: relative; }
 
         .main-content {
@@ -48,6 +61,7 @@
             background: var(--glass-bg); backdrop-filter: blur(var(--blur));
             border-left: 1px solid var(--glass-border); padding: 40px 50px;
             overflow-y: auto; display: flex; flex-direction: column; position: relative;
+            -webkit-overflow-scrolling: touch; /* Mượt hơn trên iOS */
         }
 
         /* --- HEADER --- */
@@ -59,38 +73,25 @@
         /* --- DISCORD CARD (Balanced Size) --- */
         .community-center { 
             flex: 1; display: flex; justify-content: center; align-items: center; padding-bottom: 50px;
-            perspective: 1200px; /* Không gian 3D */
+            perspective: 1200px;
         }
 
         .discord-card-compact {
-            /* 1. KÍCH THƯỚC CÂN ĐỐI */
-            width: 100%;
-            max-width: 850px; /* Nhỏ lại từ 1100px */
-            padding: 50px 60px; /* Nhỏ lại từ 70px 80px */
-            border-radius: 45px;
-            
+            width: 100%; max-width: 850px; padding: 50px 60px; border-radius: 45px;
             display: flex; align-items: center; gap: 45px; position: relative; overflow: hidden;
-            border: 2px solid white;
-            box-shadow: 0 30px 80px rgba(88, 101, 242, 0.12);
-
-            /* 2. NỀN AURORA NHẸ NHÀNG */
+            border: 2px solid white; box-shadow: 0 30px 80px rgba(88, 101, 242, 0.12);
             background: linear-gradient(120deg, #ffffff 0%, #f4f7ff 50%, #ffffff 100%);
-            background-size: 200% 200%;
-            animation: auroraMove 12s ease infinite;
-            
-            transform-style: preserve-3d;
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+            background-size: 200% 200%; animation: auroraMove 12s ease infinite;
+            transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
         }
         
         @keyframes auroraMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* Hover Effect */
         .discord-card-compact:hover {
             transform: translateY(-10px) rotateX(3deg) rotateY(-3deg);
             box-shadow: 0 45px 100px rgba(88, 101, 242, 0.18);
         }
 
-        /* Shine quét sáng */
         .discord-card-compact::before {
             content: ''; position: absolute; top: 0; left: -150%; width: 50%; height: 100%;
             background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
@@ -98,10 +99,8 @@
         }
         .discord-card-compact:hover::before { left: 150%; }
 
-        /* Left Side: Logo */
         .dc-logo-side {
-            width: 120px; height: 120px;
-            background: var(--discord-gradient);
+            width: 120px; height: 120px; background: var(--discord-gradient);
             border-radius: 35px; display: flex; justify-content: center; align-items: center;
             font-size: 4.5rem; color: white; flex-shrink: 0;
             box-shadow: 0 15px 35px rgba(88, 101, 242, 0.3);
@@ -111,17 +110,13 @@
 
         @keyframes breathe { 0%, 100% { transform: scale(1) translateZ(40px); } 50% { transform: scale(1.05) translateZ(40px); } }
 
-        /* Right Side: Content */
         .dc-content-side { flex: 1; text-align: left; position: relative; z-index: 2; transform: translateZ(25px); }
-        
         .dc-title { font-size: 2.2rem; font-weight: 900; color: var(--text-main); margin-bottom: 12px; letter-spacing: -1px; line-height: 1.1; }
         .dc-desc { font-size: 1.05rem; color: var(--text-light); line-height: 1.6; margin-bottom: 28px; }
         .dc-desc strong { color: var(--discord-color); font-weight: 800; }
 
-        /* Button */
         .btn-join-discord {
-            background: var(--discord-color); color: white; 
-            padding: 16px 45px;
+            background: var(--discord-color); color: white; padding: 16px 45px;
             border-radius: 100px; font-weight: 800; font-size: 1.15rem;
             text-decoration: none; display: inline-flex; align-items: center; gap: 12px;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
@@ -133,7 +128,6 @@
             box-shadow: 0 15px 35px rgba(88, 101, 242, 0.4);
         }
 
-        /* Floating Decor */
         .dc-float { position: absolute; font-size: 2.5rem; opacity: 0.08; animation: floatIcon 6s infinite ease-in-out; pointer-events: none; z-index: 0; color: var(--discord-color); }
         .df-1 { top: 10%; right: 10%; } 
         .df-2 { bottom: 15%; right: 25%; font-size: 4rem; color: var(--primary); animation-delay: -2s; } 
@@ -143,19 +137,50 @@
             50% { transform: translateY(-20px) rotate(10deg); } 
         }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- MOBILE OPTIMIZATION (CẬP NHẬT MỚI) --- */
+        /* Ẩn nút toggle cũ vì đã có header mới */
+        .menu-toggle { display: none; }
 
-        /* Responsive Mobile */
-        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-main); }
         @media (max-width: 768px) {
-            .main-content { margin-left: 0; width: 100%; padding: 25px 20px; }
-            .menu-toggle { display: block; }
-            .discord-card-compact { flex-direction: column; text-align: center; padding: 45px 30px; gap: 35px; }
-            .dc-content-side { text-align: center; }
-            .dc-logo-side { width: 100px; height: 100px; font-size: 3.5rem; }
-            .dc-title { font-size: 1.8rem; }
-            .btn-join-discord { width: 100%; justify-content: center; }
+            /* Hiển thị Header Mobile & Overlay logic */
+            .mobile-header { display: flex; z-index: 1000; }
+            #sidebar-overlay.active { display: block; }
+
+            /* Fix Sidebar - Ép menu về trái và ẩn đi */
+            aside {
+                position: fixed !important; 
+                left: 0 !important; top: 0 !important; bottom: 0 !important;
+                transform: translateX(-100%); 
+                z-index: 9999 !important; 
+                width: 280px !important; 
+                background: white !important;
+                transition: transform 0.3s ease-in-out !important;
+            }
+            aside.open { 
+                transform: translateX(0) !important;
+                box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important;
+            }
+
+            /* Main Content Adjustments */
+            .main-content { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 80px 20px 30px !important; /* Padding top 80px để tránh header đè */
+            }
+
+            /* Responsive Discord Card */
+            .community-center { padding-bottom: 20px; align-items: flex-start; }
+            .discord-card-compact { flex-direction: column; text-align: center; padding: 40px 25px; gap: 30px; }
+            .dc-content-side { text-align: center; width: 100%; }
+            .dc-logo-side { width: 90px; height: 90px; font-size: 3rem; }
+            .dc-title { font-size: 1.6rem; }
+            .dc-desc { font-size: 0.95rem; }
+            .btn-join-discord { width: 100%; justify-content: center; font-size: 1rem; padding: 14px 20px; }
             .dc-float { display: none; }
+            
+            /* Typography Mobile */
+            .user-header { margin-bottom: 20px; }
+            .welcome-text h2 { font-size: 1.6rem; }
         }
     </style>
 </head>
@@ -163,12 +188,23 @@
 
     <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
 
+    <div class="mobile-header lg:hidden">
+        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl mr-4 focus:outline-none">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="flex items-center gap-2">
+            <img src="../LOGO.WEBP" alt="Logo" class="w-8 h-8">
+            <span class="font-black text-orange-500 text-lg">HOPVAN</span>
+        </div>
+    </div>
+
+    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
     <div class="dashboard-container">
         <div id="menu-placeholder"></div>
 
         <main class="main-content">
             <div class="user-header">
-                <div class="menu-toggle" onclick="toggleSidebarGlobal()"><i class="fas fa-bars"></i></div>
                 <div class="welcome-text">
                     <h2 id="welcome-name">Xin chào,</h2>
                     <p>Hãy cùng bắt đầu học tập cùng với Hopvan nhé!</p>
@@ -202,6 +238,25 @@
 <script src="../chatbot.js"></script>
 
     <script>
+        // --- LOGIC SIDEBAR TOGGLE (MỚI) ---
+        window.toggleSidebar = () => {
+            // Lấy sidebar (vì sidebar được load động từ menu.html nên dùng querySelector 'aside')
+            const sidebar = document.querySelector('aside');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+                
+                // Khóa cuộn body khi mở menu
+                if (sidebar.classList.contains('open')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        };
+
         fetch('menu.html')
             .then(res => res.text())
             .then(html => {
