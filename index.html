@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hopvan - Nền Tảng Học & Luyện Thi Ngữ Văn</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF8F50">
+    <link rel="apple-touch-icon" href="LOGO.WEBP">
+
     <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
     <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
     <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
@@ -82,7 +87,7 @@
         .btn-logout { background: none; border: none; cursor: pointer; color: var(--text-light); font-size: 1.2rem; transition: 0.3s; }
         .btn-logout:hover { color: #FF5E62; }
 
-        /* --- HERO SECTION (Giữ nguyên bản cũ) --- */
+        /* --- HERO SECTION --- */
         .hero { padding-top: 180px; padding-bottom: 100px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 50px; }
         .hero-text h1 { font-size: 4rem; line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px; font-weight: 800; color: var(--text-main); }
         
@@ -104,7 +109,7 @@
         .badge-2 { bottom: 40px; left: -40px; animation-delay: 2s; }
         @keyframes floatBadge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        /* --- FEATURES (BENTO GRID - Đã chỉnh sửa dãn chữ) --- */
+        /* --- FEATURES (BENTO GRID) --- */
         .section-header { text-align: center; margin-bottom: 60px; }
         .section-header h2 { font-size: 2.5rem; margin-bottom: 10px; font-weight: 800; color: var(--text-main); }
         
@@ -143,27 +148,10 @@
             box-shadow: 0 8px 16px rgba(0,0,0,0.05); 
         }
         
-        /* Chỉnh sửa Typography cho Bento thoáng hơn */
-        .bento-item h3 { 
-            font-size: 1.5rem; 
-            margin-bottom: 15px; 
-            font-weight: 800; 
-            color: var(--text-main);
-        }
-        .bento-item p { 
-            color: var(--text-light); 
-            font-size: 1.05rem; 
-            line-height: 1.8; /* Dãn dòng */
-            margin-bottom: 0;
-        }
+        .bento-item h3 { font-size: 1.5rem; margin-bottom: 15px; font-weight: 800; color: var(--text-main); }
+        .bento-item p { color: var(--text-light); font-size: 1.05rem; line-height: 1.8; margin-bottom: 0; }
         
-        .bento-decoration { 
-            position: absolute; right: -10px; bottom: -10px; 
-            font-size: 8rem; opacity: 0.05; 
-            color: var(--text-main); 
-            transform: rotate(-15deg); 
-            pointer-events: none; 
-        }
+        .bento-decoration { position: absolute; right: -10px; bottom: -10px; font-size: 8rem; opacity: 0.05; color: var(--text-main); transform: rotate(-15deg); pointer-events: none; }
 
         /* --- REVIEWS SECTION --- */
         .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
@@ -188,44 +176,21 @@
         .check-list li { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-size: 1.1rem; color: var(--text-main); }
         .check-list i { color: white; background: var(--primary); padding: 5px; border-radius: 50%; box-shadow: 0 5px 10px rgba(255, 143, 80, 0.3); font-size: 0.8rem; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
 
-        /* --- CTA SECTION (Khôi phục) --- */
+        /* --- CTA SECTION --- */
         .cta-section { 
-            margin: 100px 0; 
-            padding: 80px; 
-            border-radius: 40px; 
+            margin: 100px 0; padding: 80px; border-radius: 40px; 
             background: linear-gradient(135deg, var(--primary), #FF5E62); 
-            text-align: center; 
-            color: white; 
-            position: relative; 
-            overflow: hidden; 
+            text-align: center; color: white; position: relative; overflow: hidden; 
             box-shadow: 0 30px 60px rgba(255, 94, 98, 0.3);
         }
-        .cta-section h2 { 
-            font-size: 3rem; 
-            margin-bottom: 20px; 
-            position: relative; 
-            z-index: 2; 
-            font-weight: 800;
-        }
+        .cta-section h2 { font-size: 3rem; margin-bottom: 20px; position: relative; z-index: 2; font-weight: 800; }
         .cta-btn-white { 
-            background: white; 
-            color: var(--primary); 
-            padding: 18px 45px; 
-            border-radius: 50px; 
-            font-weight: 800; 
-            font-size: 1.1rem;
-            text-decoration: none; 
-            display: inline-block; 
-            margin-top: 30px; 
-            position: relative; 
-            z-index: 2; 
-            transition: transform 0.3s, box-shadow 0.3s; 
+            background: white; color: var(--primary); padding: 18px 45px; border-radius: 50px; 
+            font-weight: 800; font-size: 1.1rem; text-decoration: none; display: inline-block; 
+            margin-top: 30px; position: relative; z-index: 2; transition: transform 0.3s, box-shadow 0.3s; 
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
-        .cta-btn-white:hover { 
-            transform: scale(1.05); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
+        .cta-btn-white:hover { transform: scale(1.05); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
 
         /* --- FOOTER --- */
         footer { background: rgba(255,255,255,0.8); border-top: 1px solid rgba(255,255,255,0.5); padding: 80px 0 30px; margin-top: 80px; }
@@ -239,6 +204,58 @@
         .footer-col a:hover { color: var(--primary); padding-left: 5px; }
         .footer-bottom { text-align: center; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 30px; font-size: 0.95rem; color: #888; }
 
+        /* --- PWA INSTALL BANNER STYLES --- */
+        .install-banner {
+            display: none; /* Mặc định ẩn, hiện bằng JS */
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            z-index: 9999;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideUp 0.5s ease;
+            border: 1px solid rgba(255, 143, 80, 0.2);
+        }
+        
+        .ib-content { display: flex; align-items: center; gap: 15px; }
+        .ib-icon { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; }
+        .ib-text h4 { font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+        .ib-text p { font-size: 0.8rem; color: var(--text-light); }
+        
+        .ib-actions { display: flex; gap: 10px; align-items: center; }
+        .btn-install { 
+            background: var(--primary); color: white; border: none; 
+            padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; 
+            cursor: pointer; white-space: nowrap;
+        }
+        .btn-close-banner { background: none; border: none; color: #999; font-size: 1.2rem; cursor: pointer; }
+
+        @keyframes slideUp { from { transform: translate(-50%, 100px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+
+        /* --- iOS INSTRUCTION MODAL --- */
+        .ios-modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10000;
+            justify-content: center; align-items: flex-end; padding-bottom: 30px;
+        }
+        .ios-box {
+            background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 25px;
+            text-align: center; position: relative; animation: popUp 0.3s;
+        }
+        .ios-box img { width: 60px; height: 60px; border-radius: 15px; margin-bottom: 15px; }
+        .ios-steps { margin: 20px 0; text-align: left; background: #f9f9f9; padding: 15px; border-radius: 15px; }
+        .ios-step { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.95rem; color: #555; }
+        .ios-icon { font-size: 1.2rem; color: #007AFF; }
+        .btn-ios-close { width: 100%; padding: 12px; background: #eee; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; color: #333; }
+        
+        @keyframes popUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
         /* --- MOBILE --- */
         .mobile-menu-btn { display: none; font-size: 1.5rem; color: var(--primary); cursor: pointer; }
         @media (max-width: 992px) {
@@ -251,57 +268,38 @@
             .footer-brand p { margin: 15px auto; }
             .footer-brand div { justify-content: center; }
         }
-/* --- CHỈ CĂN GIỮA LOGO FOOTER TRÊN MOBILE --- */
-@media (max-width: 768px) {
-    footer .footer-brand {
-        display: flex;
-        flex-direction: column;
-        align-items: center; /* Căn giữa logo và các nội dung trong brand */
-        text-align: center;
-    }
+        
+        @media (max-width: 768px) {
+            footer .footer-brand { display: flex; flex-direction: column; align-items: center; text-align: center; }
+            footer .logo { justify-content: center; margin-bottom: 10px; }
+            footer .footer-brand p { margin-left: auto; margin-right: auto; }
+            footer .footer-brand div { justify-content: center; }
+            
+            .mobile-menu-btn { display: block; order: -1; }
+            .nav-links { 
+                display: none; flex-direction: column; position: absolute; 
+                top: 70px; left: 0; right: 0; background: white; 
+                padding: 25px; border-radius: 25px; gap: 15px; 
+                box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #eee;
+            }
+            .nav-links.active { display: flex; }
 
-    footer .logo {
-        justify-content: center; /* Căn giữa icon và chữ HOPVAN bên trong link */
-        margin-bottom: 10px;
-    }
+            .hero { grid-template-columns: 1fr; padding-top: 130px; text-align: center; gap: 30px; }
+            .hero-text h1 { font-size: 2.2rem; }
+            .hero-text p { margin: 0 auto 30px; font-size: 1rem; }
+            .stat-row { justify-content: center; gap: 20px; }
+            
+            .main-card { transform: rotate(0); padding: 10px; }
+            .floating-badge { display: none; } 
 
-    footer .footer-brand p {
-        margin-left: auto;
-        margin-right: auto;
-    }
+            .bento-grid, .reviews-grid, .about-wrap, .footer-grid { grid-template-columns: 1fr !important; gap: 20px; }
+            .bento-item.large { grid-column: span 1 !important; }
+            .about-wrap { flex-direction: column-reverse; display: flex; }
+            .about-img { transform: rotate(0); }
 
-    footer .footer-brand div {
-        justify-content: center; /* Căn giữa các icon mạng xã hội */
-    }
-    .mobile-menu-btn { display: block; order: -1; }
-    .nav-links { 
-        display: none; flex-direction: column; position: absolute; 
-        top: 70px; left: 0; right: 0; background: white; 
-        padding: 25px; border-radius: 25px; gap: 15px; 
-        box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #eee;
-    }
-    .nav-links.active { display: flex; }
-
-    /* 2. Hero Section (Chuyển 2 cột thành 1 cột) */
-    .hero { grid-template-columns: 1fr; padding-top: 130px; text-align: center; gap: 30px; }
-    .hero-text h1 { font-size: 2.2rem; }
-    .hero-text p { margin: 0 auto 30px; font-size: 1rem; }
-    .stat-row { justify-content: center; gap: 20px; }
-    
-    /* 3. Hình ảnh & Badge (Chỉnh cho nhỏ gọn) */
-    .main-card { transform: rotate(0); padding: 10px; }
-    .floating-badge { display: none; } /* Tạm ẩn badge trên mobile để tránh đè chữ */
-
-    /* 4. Toàn bộ các Grid (Bento, Reviews, Footer) - Ép về 1 cột */
-    .bento-grid, .reviews-grid, .about-wrap, .footer-grid { grid-template-columns: 1fr !important; gap: 20px; }
-    .bento-item.large { grid-column: span 1 !important; }
-    .about-wrap { flex-direction: column-reverse; display: flex; }
-    .about-img { transform: rotate(0); }
-
-    /* 5. Tăng kích thước nút cho dễ bấm */
-    .btn-primary { width: 100%; text-align: center; padding: 15px; }
-    .section-padding { padding: 50px 0; }
-}
+            .btn-primary { width: 100%; text-align: center; padding: 15px; }
+            .section-padding { padding: 50px 0; }
+        }
     </style>
 </head>
 <body>
@@ -345,99 +343,39 @@
             <div class="hero-text">
                 <h1>Nền tảng học tập môn Ngữ văn <br><span class="highlight-text">Thông minh với AI</span></h1>
                 <p>Nền tảng luyện đề thông minh giúp bạn phân tích đề, sửa lỗi diễn đạt và mở rộng ý tưởng chỉ trong vài giây.</p>
-                
                 <div class="stat-row">
-                    <div class="stat-item">
-                        <h3>10k+</h3>
-                        <p>Học viên</p>
-                    </div>
-                    <div class="stat-item">
-                        <h3>24/24</h3>
-                        <p>AI Chấm bài</p>
-                    </div>
+                    <div class="stat-item"><h3>10k+</h3><p>Học viên</p></div>
+                    <div class="stat-item"><h3>24/24</h3><p>AI Chấm bài</p></div>
                 </div>
-
                 <a href="log.html" class="btn-primary" style="padding: 18px 45px; font-size: 1.1rem;">Bắt đầu miễn phí <i class="fas fa-arrow-right" style="margin-left: 10px;"></i></a>
             </div>
-
             <div class="hero-card-wrapper">
-                <div class="main-card">
-                    <img src="IMG/Hero.png" alt="App Interface">
-                </div>
-
+                <div class="main-card"><img src="IMG/Hero.png" alt="App Interface"></div>
                 <div class="floating-badge badge-1 glass">
                     <div style="background: #e1f5fe; padding: 10px; border-radius: 50%; color: #29b6f6;"><i class="fas fa-check"></i></div>
-                    <div>
-                        <div style="font-weight: 700; font-size: 0.9rem;">Đúng trọng tâm</div>
-                        <div style="font-size: 0.8rem; color: #666;">AI phân tích đề</div>
-                    </div>
+                    <div><div style="font-weight: 700; font-size: 0.9rem;">Đúng trọng tâm</div><div style="font-size: 0.8rem; color: #666;">AI phân tích đề</div></div>
                 </div>
-
                 <div class="floating-badge badge-2 glass">
                     <div style="background: #e8f5e9; padding: 10px; border-radius: 50%; color: #66bb6a;"><i class="fas fa-chart-line"></i></div>
-                    <div>
-                        <div style="font-weight: 700; font-size: 0.9rem;">Lộ trình hiệu quả</div>
-                        <div style="font-size: 0.8rem; color: #666;">Tiến bộ rõ rệt</div>
-                    </div>
+                    <div><div style="font-weight: 700; font-size: 0.9rem;">Lộ trình hiệu quả</div><div style="font-size: 0.8rem; color: #666;">Tiến bộ rõ rệt</div></div>
                 </div>
             </div>
         </section>
-
+        
         <section id="features" class="section-padding">
-            <div class="section-header">
-                <h2>Hệ sinh thái học tập</h2>
-                <p style="color: var(--text-light)">Tất cả công cụ bạn cần để đạt 9+ môn Văn</p>
-            </div>
-
+            <div class="section-header"><h2>Hệ sinh thái học tập</h2><p style="color: var(--text-light)">Tất cả công cụ bạn cần để đạt 9+ môn Văn</p></div>
             <div class="bento-grid">
                 <div class="bento-item large">
                     <div class="bento-icon"><i class="fas fa-pen-fancy"></i></div>
-                    <div>
-                        <h3>Phòng luyện đề</h3>
-                        <p>Hệ thống tự động random đề, tính giờ và chấm điểm chi tiết từng câu chữ ngay sau khi nộp. Nhận xét lỗi dùng từ, lỗi ngữ pháp và gợi ý sửa.</p>
-                    </div>
+                    <div><h3>Phòng luyện đề</h3><p>Hệ thống tự động random đề, tính giờ và chấm điểm chi tiết từng câu chữ ngay sau khi nộp. Nhận xét lỗi dùng từ, lỗi ngữ pháp và gợi ý sửa.</p></div>
                     <i class="fas fa-robot bento-decoration"></i>
                 </div>
-
-                <div class="bento-item">
-                    <div class="bento-icon"><i class="fas fa-book-reader"></i></div>
-                    <h3>Bản tin Văn học</h3>
-                    <p>Gồm kho tài liệu học tập & những dẫn chứng "đắt giá".</p>
-                </div>
-
-                <div class="bento-item">
-                    <div class="bento-icon"><i class="fas fa-users"></i></div>
-                    <h3>Cộng đồng</h3>
-                    <p>Thảo luận, chia sẻ bí kíp cùng các bạn học sinh trên cả nước.</p>
-                </div>
-
+                <div class="bento-item"><div class="bento-icon"><i class="fas fa-book-reader"></i></div><h3>Bản tin Văn học</h3><p>Gồm kho tài liệu học tập & những dẫn chứng "đắt giá".</p></div>
+                <div class="bento-item"><div class="bento-icon"><i class="fas fa-users"></i></div><h3>Cộng đồng</h3><p>Thảo luận, chia sẻ bí kíp cùng các bạn học sinh trên cả nước.</p></div>
                 <div class="bento-item large">
                     <div class="bento-icon"><i class="fas fa-route"></i></div>
-                    <div>
-                        <h3>Nhật ký học tập (Gamification)</h3>
-                        <p>Biến việc học thành trò chơi. Hoàn thành bài học để mở khóa cấp độ mới, tích lũy streak và nhận huy hiệu vinh danh.</p>
-                    </div>
+                    <div><h3>Nhật ký học tập (Gamification)</h3><p>Biến việc học thành trò chơi. Hoàn thành bài học để mở khóa cấp độ mới, tích lũy streak và nhận huy hiệu vinh danh.</p></div>
                     <i class="fas fa-flag-checkered bento-decoration"></i>
-                </div>
-            </div>
-        </section>
-
-        <section id="about" class="section-padding">
-            <div class="about-wrap">
-                <div>
-                    <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 20px;">Về chúng tôi</h2>
-                    <p style="font-size: 1.1rem; color: var(--text-light); line-height: 1.8; margin-bottom: 25px;">
-                        Hopvan được xây dựng bởi đội ngũ đam mê văn học và công nghệ, với sứ mệnh xóa bỏ nỗi sợ môn Văn của học sinh Việt Nam. Chúng tôi tin rằng, với phương pháp đúng đắn và sự hỗ trợ của AI, ai cũng có thể viết hay.
-                    </p>
-                    <ul class="check-list">
-                        <li><i class="fas fa-check"></i> <span>Nội dung bám sát chương trình GDPT 2018</span></li>
-                        <li><i class="fas fa-check"></i> <span>Công nghệ AI chữa bài tiên tiến</span></li>
-                        <li><i class="fas fa-check"></i> <span>Giao diện thân thiện, dễ sử dụng</span></li>
-                        <li><i class="fas fa-check"></i> <span>Tiến trình học tập tối ưu theo cá nhân</span></li>
-                    </ul>
-                </div>
-                <div>
-                    <img src="IMG/About.png" alt="About Team" class="about-img">
                 </div>
             </div>
         </section>
@@ -477,6 +415,26 @@
                         </div>
                     </div>
                     <p class="review-text">"Hệ thống Nhật ký học tập giúp mình có động lực học mỗi ngày để giữ streak. Cảm giác như đang chơi game vậy, rất cuốn!"</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="section-padding">
+            <div class="about-wrap">
+                <div>
+                    <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 20px;">Về chúng tôi</h2>
+                    <p style="font-size: 1.1rem; color: var(--text-light); line-height: 1.8; margin-bottom: 25px;">
+                        Hopvan được xây dựng bởi đội ngũ đam mê văn học và công nghệ, với sứ mệnh xóa bỏ nỗi sợ môn Văn của học sinh Việt Nam. Chúng tôi tin rằng, với phương pháp đúng đắn và sự hỗ trợ của AI, ai cũng có thể viết hay.
+                    </p>
+                    <ul class="check-list">
+                        <li><i class="fas fa-check"></i> <span>Nội dung bám sát chương trình GDPT 2018</span></li>
+                        <li><i class="fas fa-check"></i> <span>Công nghệ AI chữa bài tiên tiến</span></li>
+                        <li><i class="fas fa-check"></i> <span>Giao diện thân thiện, dễ sử dụng</span></li>
+                        <li><i class="fas fa-check"></i> <span>Tiến trình học tập tối ưu theo cá nhân</span></li>
+                    </ul>
+                </div>
+                <div>
+                    <img src="IMG/About.png" alt="About Team" class="about-img">
                 </div>
             </div>
         </section>
@@ -531,7 +489,110 @@
         </div>
     </footer>
 
+    <div id="install-banner" class="install-banner">
+        <div class="ib-content">
+            <img src="LOGO.WEBP" alt="Hopvan Logo" class="ib-icon">
+            <div class="ib-text">
+                <h4>Tải ứng dụng Hopvan</h4>
+                <p>Thêm vào màn hình chính để học nhanh hơn</p>
+            </div>
+        </div>
+        <div class="ib-actions">
+            <button id="btn-install-app" class="btn-install">Cài đặt</button>
+            <button id="btn-close-banner" class="btn-close-banner">&times;</button>
+        </div>
+    </div>
+
+    <div id="ios-modal" class="ios-modal">
+        <div class="ios-box">
+            <img src="LOGO.WEBP" alt="Hopvan">
+            <h3 style="font-weight: 800; color: #333;">Cài đặt Hopvan cho iPhone</h3>
+            <p style="color: #666; font-size: 0.9rem;">Ứng dụng sẽ hoạt động mượt mà hơn khi được thêm vào màn hình chính.</p>
+            
+            <div class="ios-steps">
+                <div class="ios-step">
+                    <i class="fas fa-share-square ios-icon"></i>
+                    <span>1. Nhấn vào nút <b>Chia sẻ</b> ở dưới cùng trình duyệt.</span>
+                </div>
+                <div class="ios-step">
+                    <i class="far fa-plus-square ios-icon"></i>
+                    <span>2. Chọn <b>"Thêm vào MH chính"</b> (Add to Home Screen).</span>
+                </div>
+            </div>
+
+            <button onclick="document.getElementById('ios-modal').style.display='none'" class="btn-ios-close">Đã hiểu</button>
+        </div>
+    </div>
+
     <script src="chatbot.js"></script>
+
+    <script>
+        // Đăng ký Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(reg => {
+                    console.log('SW registered:', reg);
+                }).catch(err => console.log('SW registration failed:', err));
+            });
+        }
+
+        let deferredPrompt;
+        const installBanner = document.getElementById('install-banner');
+        const btnInstall = document.getElementById('btn-install-app');
+        const btnCloseBanner = document.getElementById('btn-close-banner');
+        const iosModal = document.getElementById('ios-modal');
+
+        // Kiểm tra thiết bị iOS
+        const isIos = () => {
+            const userAgent = window.navigator.userAgent.toLowerCase();
+            return /iphone|ipad|ipod/.test(userAgent);
+        };
+
+        // Kiểm tra xem đã cài đặt chưa (Standalone mode)
+        const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
+
+        // Xử lý sự kiện beforeinstallprompt (Android/Chrome)
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // Chỉ hiện banner nếu màn hình nhỏ (mobile)
+            if (window.innerWidth < 768) {
+                installBanner.style.display = 'flex';
+            }
+        });
+
+        // Xử lý logic hiển thị cho iOS
+        // Vì iOS không có beforeinstallprompt, ta hiện banner thủ công nếu chưa ở chế độ standalone
+        if (isIos() && !isInStandaloneMode() && window.innerWidth < 768) {
+            setTimeout(() => {
+                installBanner.style.display = 'flex';
+            }, 2000); // Hiện sau 2 giây
+        }
+
+        // Click nút Cài đặt
+        btnInstall.addEventListener('click', () => {
+            if (isIos()) {
+                // Nếu là iOS, hiện hướng dẫn
+                installBanner.style.display = 'none';
+                iosModal.style.display = 'flex';
+            } else if (deferredPrompt) {
+                // Nếu là Android, hiện prompt cài đặt native
+                installBanner.style.display = 'none';
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        });
+
+        // Click nút Đóng
+        btnCloseBanner.addEventListener('click', () => {
+            installBanner.style.display = 'none';
+        });
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -574,11 +635,9 @@
             }
         });
 
-        // Mobile Menu Toggle
         const menuBtn = document.querySelector('.mobile-menu-btn');
         const navLinks = document.querySelector('.nav-links');
         
-        // Logic mobile menu đơn giản
         if(menuBtn) {
             menuBtn.addEventListener('click', () => {
                 const isHidden = window.getComputedStyle(navLinks).display === 'none';
@@ -593,8 +652,10 @@
                     navLinks.style.padding = '20px';
                     navLinks.style.borderRadius = '20px';
                     navLinks.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+                    navLinks.classList.add('active');
                 } else {
                     navLinks.style.display = 'none';
+                    navLinks.classList.remove('active');
                 }
             });
         }

@@ -1,0 +1,20 @@
+{
+  "name": "Hopvan",
+  "short_name": "Hopvan",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#FFF5EC",
+  "theme_color": "#FF8F50",
+  "icons": [
+    {
+      "src": "LOGO.WEBP",
+      "sizes": "192x192",
+      "type": "image/webp"
+    },
+    {
+      "src": "LOGO.WEBP",
+      "sizes": "512x512",
+      "type": "image/webp"
+    }
+  ]
+}
