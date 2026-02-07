@@ -20,7 +20,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-<style>
+    <style>
         :root {
             --primary: #FF8F50;
             --primary-dark: #E67E22;
@@ -81,11 +81,26 @@
         }
         .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(255, 143, 80, 0.4); }
 
-        /* User Profile */
+        /* USER PROFILE TRÊN PC */
         .user-profile { display: none; align-items: center; gap: 15px; }
         .user-name { font-weight: 700; color: var(--primary); }
         .btn-logout { background: none; border: none; cursor: pointer; color: var(--text-light); font-size: 1.2rem; transition: 0.3s; }
         .btn-logout:hover { color: #FF5E62; }
+
+        /* USER INFO TRÊN MOBILE (Mặc định ẩn trên PC) */
+        .mobile-user-container { display: none; padding-bottom: 15px; border-bottom: 1px solid #eee; margin-bottom: 15px; }
+        .mobile-user-info { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .mobile-avatar { 
+            width: 45px; height: 45px; background: #FFF5EC; 
+            border: 2px solid var(--primary); border-radius: 50%; 
+            color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; 
+        }
+        .mobile-logout {
+            width: 100%; padding: 10px; border-radius: 10px;
+            border: 1px solid #FF5E62; background: white; color: #FF5E62;
+            font-weight: 700; cursor: pointer; transition: 0.3s;
+        }
+        .mobile-logout:active { background: #FF5E62; color: white; }
 
         /* --- HERO SECTION --- */
         .hero { padding-top: 180px; padding-bottom: 100px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 50px; }
@@ -194,18 +209,19 @@
         }
         
         @media (max-width: 768px) {
-            /* 1. ẨN AVATAR Ở MOBILE */
+            /* 1. HIỆN USER INFO TRONG MENU MOBILE */
+            .mobile-user-container { display: block; }
+
+            /* 2. ẨN USER PROFILE GỐC TRÊN HEADER */
             #user-profile { display: none !important; }
 
-            /* 2. ẨN HOÀN TOÀN CHATBOT (Dự phòng CSS nếu script load chậm) */
+            /* 3. ẨN HOÀN TOÀN CHATBOT (Dự phòng CSS nếu script load chậm) */
             .chatbot-toggler, .chatbot, #chatbot-container, #bp-web-widget { display: none !important; }
 
-            /* 3. ẨN CHỮ 'HOPVAN' Ở HEADER MOBILE */
-            header .logo span { display: none; }
-
-            /* 4. CĂN LOGO SANG TRÁI, ĐẨY NÚT SANG PHẢI */
-            .mobile-menu-btn { display: block; order: -1; margin-right: 10px; } /* Menu sát trái */
-            header .logo { margin-right: auto; margin-left: 0; } /* Logo kế bên Menu, đẩy phần còn lại sang phải */
+            /* 4. CHỈNH LOGO & MENU MOBILE (Giữ nguyên text HOPVAN) */
+            .mobile-menu-btn { display: block; order: -1; margin-right: 15px; } /* Nút Menu bên trái */
+            header .logo { margin-right: auto; margin-left: 0; } /* Logo sát bên Menu, đẩy phần còn lại sang phải */
+            /* Đã xóa dòng ẩn chữ Hopvan để nó hiện lại */
             
             /* Sửa lại Header cho Mobile */
             header { padding: 10px 20px; width: 95%; top: 15px; }
@@ -231,7 +247,7 @@
             .about-wrap { flex-direction: column-reverse; display: flex; }
             .about-img { transform: rotate(0); }
 
-            .btn-primary { width: auto; font-size: 0.9rem; padding: 10px 20px; } /* Nút gọn hơn trên mobile */
+            .btn-primary { width: auto; font-size: 0.9rem; padding: 10px 20px; }
             .section-padding { padding: 50px 0; }
         }
     </style>
@@ -427,7 +443,8 @@
         <div class="ib-content">
             <img src="LOGO.WEBP" alt="Hopvan Logo" class="ib-icon">
             <div class="ib-text">
-                <h4>Cài đặt Hopvan cho Android</h4>
+                <h4>Tải ứng dụng Hopvan</h4>
+                <p>Thêm vào màn hình chính để học nhanh hơn</p>
             </div>
         </div>
         <div class="ib-actions">
@@ -457,7 +474,7 @@
         </div>
     </div>
 
-<script>
+    <script>
         if (window.innerWidth > 768) {
             const script = document.createElement('script');
             script.src = 'chatbot.js';
@@ -481,53 +498,36 @@
         const btnCloseBanner = document.getElementById('btn-close-banner');
         const iosModal = document.getElementById('ios-modal');
 
-        // Kiểm tra thiết bị iOS
-        const isIos = () => {
-            const userAgent = window.navigator.userAgent.toLowerCase();
-            return /iphone|ipad|ipod/.test(userAgent);
-        };
-
-        // Kiểm tra xem đã cài đặt chưa (Standalone mode)
+        const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
         const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
 
-        // Xử lý sự kiện beforeinstallprompt (Android/Chrome)
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            // Chỉ hiện banner nếu màn hình nhỏ (mobile)
             if (window.innerWidth < 768) {
                 installBanner.style.display = 'flex';
             }
         });
 
-        // Xử lý logic hiển thị cho iOS
-        // Vì iOS không có beforeinstallprompt, ta hiện banner thủ công nếu chưa ở chế độ standalone
         if (isIos() && !isInStandaloneMode() && window.innerWidth < 768) {
             setTimeout(() => {
                 installBanner.style.display = 'flex';
-            }, 2000); // Hiện sau 2 giây
+            }, 2000);
         }
 
-        // Click nút Cài đặt
         btnInstall.addEventListener('click', () => {
             if (isIos()) {
-                // Nếu là iOS, hiện hướng dẫn
                 installBanner.style.display = 'none';
                 iosModal.style.display = 'flex';
             } else if (deferredPrompt) {
-                // Nếu là Android, hiện prompt cài đặt native
                 installBanner.style.display = 'none';
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    }
                     deferredPrompt = null;
                 });
             }
         });
 
-        // Click nút Đóng
         btnCloseBanner.addEventListener('click', () => {
             installBanner.style.display = 'none';
         });
@@ -551,28 +551,56 @@
         const auth = getAuth(app);
 
         const btnHocNgay = document.getElementById('btn-hoc-ngay');
+        
+        // PC Elements
         const userProfile = document.getElementById('user-profile');
         const displayName = document.getElementById('display-name');
         const logoutBtn = document.getElementById('logout-btn');
 
+        // Mobile Elements (Mới)
+        const mobileUserBlock = document.getElementById('mobile-user-block');
+        const mobileDisplayName = document.getElementById('mobile-display-name');
+        const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                btnHocNgay.style.display = 'none';
-                userProfile.style.display = 'flex';
-                displayName.textContent = user.displayName || "Bạn mình";
+                // Đã đăng nhập
+                const name = user.displayName || "Bạn mình";
+                
+                // 1. Ẩn nút học ngay
+                if(btnHocNgay) btnHocNgay.style.display = 'none';
+
+                // 2. Hiển thị trên PC
+                if(userProfile) {
+                    userProfile.style.display = 'flex';
+                    if(displayName) displayName.textContent = name;
+                }
+
+                // 3. Hiển thị trên Mobile Menu
+                if(mobileUserBlock) {
+                    // Logic: CSS sẽ tự lo việc ẩn trên PC, ta chỉ cần display block để nó 'sẵn sàng' hiện trên mobile
+                    mobileUserBlock.style.display = 'block'; 
+                    if(mobileDisplayName) mobileDisplayName.textContent = name;
+                }
+
             } else {
-                btnHocNgay.style.display = 'inline-block';
-                userProfile.style.display = 'none';
+                // Chưa đăng nhập
+                if(btnHocNgay) btnHocNgay.style.display = 'inline-block';
+                if(userProfile) userProfile.style.display = 'none';
+                if(mobileUserBlock) mobileUserBlock.style.display = 'none';
             }
         });
 
-        logoutBtn.addEventListener('click', () => {
+        const handleLogout = () => {
             if(confirm("Bạn muốn đăng xuất?")) {
                 signOut(auth).then(() => {
                     window.location.reload();
                 });
             }
-        });
+        };
+
+        if(logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+        if(mobileLogoutBtn) mobileLogoutBtn.addEventListener('click', handleLogout);
 
         const menuBtn = document.querySelector('.mobile-menu-btn');
         const navLinks = document.querySelector('.nav-links');
@@ -588,9 +616,10 @@
                     navLinks.style.left = '20px';
                     navLinks.style.right = '20px';
                     navLinks.style.background = 'white';
-                    navLinks.style.padding = '20px';
-                    navLinks.style.borderRadius = '20px';
-                    navLinks.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+                    navLinks.style.padding = '25px';
+                    navLinks.style.borderRadius = '25px';
+                    navLinks.style.boxShadow = '0 15px 40px rgba(0,0,0,0.15)';
+                    navLinks.style.zIndex = '10000';
                     navLinks.classList.add('active');
                 } else {
                     navLinks.style.display = 'none';
