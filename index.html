@@ -194,18 +194,27 @@
         }
         
         @media (max-width: 768px) {
-            /* ẨN AVATAR Ở MOBILE */
+            /* 1. ẨN AVATAR Ở MOBILE */
             #user-profile { display: none !important; }
 
-            /* ẨN HOÀN TOÀN CHATBOT Ở MOBILE */
-            .chatbot-toggler, .chatbot { display: none !important; }
+            /* 2. ẨN HOÀN TOÀN CHATBOT (Dự phòng CSS nếu script load chậm) */
+            .chatbot-toggler, .chatbot, #chatbot-container, #bp-web-widget { display: none !important; }
+
+            /* 3. ẨN CHỮ 'HOPVAN' Ở HEADER MOBILE */
+            header .logo span { display: none; }
+
+            /* 4. CĂN LOGO SANG TRÁI, ĐẨY NÚT SANG PHẢI */
+            .mobile-menu-btn { display: block; order: -1; margin-right: 10px; } /* Menu sát trái */
+            header .logo { margin-right: auto; margin-left: 0; } /* Logo kế bên Menu, đẩy phần còn lại sang phải */
+            
+            /* Sửa lại Header cho Mobile */
+            header { padding: 10px 20px; width: 95%; top: 15px; }
 
             footer .footer-brand { display: flex; flex-direction: column; align-items: center; text-align: center; }
-            footer .logo { justify-content: center; margin-bottom: 10px; }
+            footer .logo { justify-content: center; margin-bottom: 10px; margin-left: auto; margin-right: auto; } /* Reset margin logo footer */
             footer .footer-brand p { margin-left: auto; margin-right: auto; }
             footer .footer-brand div { justify-content: center; }
             
-            .mobile-menu-btn { display: block; order: -1; }
             .nav-links { display: none; flex-direction: column; position: absolute; top: 70px; left: 0; right: 0; background: white; padding: 25px; border-radius: 25px; gap: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #eee; }
             .nav-links.active { display: flex; }
 
@@ -222,7 +231,7 @@
             .about-wrap { flex-direction: column-reverse; display: flex; }
             .about-img { transform: rotate(0); }
 
-            .btn-primary { width: 100%; text-align: center; padding: 15px; }
+            .btn-primary { width: auto; font-size: 0.9rem; padding: 10px 20px; } /* Nút gọn hơn trên mobile */
             .section-padding { padding: 50px 0; }
         }
     </style>
@@ -418,8 +427,7 @@
         <div class="ib-content">
             <img src="LOGO.WEBP" alt="Hopvan Logo" class="ib-icon">
             <div class="ib-text">
-                <h4>Tải ứng dụng Hopvan</h4>
-                <p>Thêm vào màn hình chính để học nhanh hơn</p>
+                <h4>Cài đặt Hopvan cho Android</h4>
             </div>
         </div>
         <div class="ib-actions">
@@ -449,7 +457,13 @@
         </div>
     </div>
 
-    <script src="chatbot.js"></script>
+<script>
+        if (window.innerWidth > 768) {
+            const script = document.createElement('script');
+            script.src = 'chatbot.js';
+            document.body.appendChild(script);
+        }
+    </script>
 
     <script>
         // Đăng ký Service Worker
