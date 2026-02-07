@@ -299,6 +299,17 @@
 
             .btn-primary { width: 100%; text-align: center; padding: 15px; }
             .section-padding { padding: 50px 0; }
+
+            #chatbot-container, 
+            .chatbot-toggler { 
+                display: none !important; 
+            }
+            
+            /* Class này sẽ được thêm vào body bằng JS khi tắt banner để hiện lại chatbot */
+            body.show-chatbot #chatbot-container,
+            body.show-chatbot .chatbot-toggler {
+                display: flex !important;
+            }
         }
     </style>
 </head>
@@ -493,7 +504,7 @@
         <div class="ib-content">
             <img src="LOGO.WEBP" alt="Hopvan Logo" class="ib-icon">
             <div class="ib-text">
-                <h4>Tải ứng dụng Hopvan</h4>
+                <h4>Tải ứng dụng Hopvan ngay</h4>
             </div>
         </div>
         <div class="ib-actions">
@@ -505,7 +516,8 @@
     <div id="ios-modal" class="ios-modal">
         <div class="ios-box">
             <img src="LOGO.WEBP" alt="Hopvan">
-            <h3 style="font-weight: 800; color: #333;">Cài đặt Hopvan cho iPhone</h3>            
+            <h3 style="font-weight: 800; color: #333;">Cài đặt Hopvan cho iPhone</h3>
+            
             <div class="ios-steps">
                 <div class="ios-step">
                     <i class="fas fa-share-square ios-icon"></i>
@@ -521,7 +533,14 @@
         </div>
     </div>
 
-    <script>
+    <script src="chatbot.js"></script>
+
+<script>
+        // Hàm hiển thị chatbot (gọi khi tắt banner hoặc không cần hiện banner)
+        const showChatbot = () => {
+            document.body.classList.add('show-chatbot');
+        };
+
         // Đăng ký Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -537,55 +556,66 @@
         const btnCloseBanner = document.getElementById('btn-close-banner');
         const iosModal = document.getElementById('ios-modal');
 
-        // Kiểm tra thiết bị iOS
-        const isIos = () => {
-            const userAgent = window.navigator.userAgent.toLowerCase();
-            return /iphone|ipad|ipod/.test(userAgent);
-        };
-
-        // Kiểm tra xem đã cài đặt chưa (Standalone mode)
+        // Kiểm tra thiết bị
+        const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
         const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
 
         // Xử lý sự kiện beforeinstallprompt (Android/Chrome)
+        let bannerShown = false;
+        
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             // Chỉ hiện banner nếu màn hình nhỏ (mobile)
             if (window.innerWidth < 768) {
                 installBanner.style.display = 'flex';
+                bannerShown = true;
+            } else {
+                showChatbot(); // PC thì hiện chatbot luôn
             }
         });
 
         // Xử lý logic hiển thị cho iOS
-        // Vì iOS không có beforeinstallprompt, ta hiện banner thủ công nếu chưa ở chế độ standalone
         if (isIos() && !isInStandaloneMode() && window.innerWidth < 768) {
             setTimeout(() => {
                 installBanner.style.display = 'flex';
-            }, 2000); // Hiện sau 2 giây
+                bannerShown = true;
+            }, 2000);
+        } else {
+            // Nếu không phải trường hợp cần hiện banner (ví dụ đã cài rồi hoặc là PC), hiện chatbot
+            if (!bannerShown) {
+                setTimeout(() => {
+                    if(installBanner.style.display !== 'flex') showChatbot();
+                }, 2500); // Đợi xíu để chắc chắn không có event nào hiện banner
+            }
         }
 
         // Click nút Cài đặt
         btnInstall.addEventListener('click', () => {
             if (isIos()) {
-                // Nếu là iOS, hiện hướng dẫn
                 installBanner.style.display = 'none';
                 iosModal.style.display = 'flex';
+                // iOS: Vẫn chưa hiện chatbot vội, đợi tắt modal hướng dẫn
             } else if (deferredPrompt) {
-                // Nếu là Android, hiện prompt cài đặt native
                 installBanner.style.display = 'none';
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    }
                     deferredPrompt = null;
+                    showChatbot(); // Cài xong (hoặc hủy) thì hiện chatbot
                 });
             }
         });
 
-        // Click nút Đóng
+        // Click nút Đóng Banner (X) -> Hiện Chatbot
         btnCloseBanner.addEventListener('click', () => {
             installBanner.style.display = 'none';
+            showChatbot();
+        });
+
+        // Click nút Đóng Modal iOS -> Hiện Chatbot
+        document.querySelector('.btn-ios-close').addEventListener('click', () => {
+            document.getElementById('ios-modal').style.display = 'none';
+            showChatbot();
         });
     </script>
 
