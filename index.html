@@ -20,7 +20,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <style>
+<style>
         :root {
             --primary: #FF8F50;
             --primary-dark: #E67E22;
@@ -44,7 +44,7 @@
             line-height: 1.6;
         }
 
-        /* --- BACKGROUND (Hiệu ứng nền loang màu) --- */
+        /* --- BACKGROUND --- */
         .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
         .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatBlob 10s infinite alternate; }
         .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
@@ -109,66 +109,29 @@
         .badge-2 { bottom: 40px; left: -40px; animation-delay: 2s; }
         @keyframes floatBadge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        /* --- FEATURES (BENTO GRID) --- */
+        /* --- FEATURES --- */
         .section-header { text-align: center; margin-bottom: 60px; }
         .section-header h2 { font-size: 2.5rem; margin-bottom: 10px; font-weight: 800; color: var(--text-main); }
         
         .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-        
-        .bento-item { 
-            border-radius: 30px; 
-            padding: 40px; 
-            transition: 0.3s; 
-            position: relative; 
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100%; 
-            min-height: 280px; 
-            background: rgba(255,255,255,0.6); 
-            border: 1px solid white; 
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
-        }
-        
-        .bento-item:hover { 
-            transform: translateY(-5px); 
-            background: rgba(255,255,255,0.95); 
-            box-shadow: 0 20px 40px -10px rgba(255, 143, 80, 0.15);
-        }
-        
+        .bento-item { border-radius: 30px; padding: 40px; transition: 0.3s; position: relative; overflow: hidden; display: flex; flex-direction: column; height: 100%; min-height: 280px; background: rgba(255,255,255,0.6); border: 1px solid white; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); }
+        .bento-item:hover { transform: translateY(-5px); background: rgba(255,255,255,0.95); box-shadow: 0 20px 40px -10px rgba(255, 143, 80, 0.15); }
         .bento-item.large { grid-column: span 2; }
-        
-        .bento-icon { 
-            width: 56px; height: 56px; 
-            background: white; 
-            border-radius: 16px; 
-            display: flex; justify-content: center; align-items: center; 
-            font-size: 1.6rem; color: var(--primary); 
-            margin-bottom: 25px; 
-            box-shadow: 0 8px 16px rgba(0,0,0,0.05); 
-        }
-        
+        .bento-icon { width: 56px; height: 56px; background: white; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 1.6rem; color: var(--primary); margin-bottom: 25px; box-shadow: 0 8px 16px rgba(0,0,0,0.05); }
         .bento-item h3 { font-size: 1.5rem; margin-bottom: 15px; font-weight: 800; color: var(--text-main); }
         .bento-item p { color: var(--text-light); font-size: 1.05rem; line-height: 1.8; margin-bottom: 0; }
-        
         .bento-decoration { position: absolute; right: -10px; bottom: -10px; font-size: 8rem; opacity: 0.05; color: var(--text-main); transform: rotate(-15deg); pointer-events: none; }
 
-        /* --- REVIEWS SECTION --- */
+        /* --- REVIEWS --- */
         .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
-        .review-card { 
-            background: rgba(255,255,255,0.7); 
-            border-radius: 25px; padding: 35px; 
-            border: 1px solid white; 
-            transition: 0.3s; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.03); 
-        }
+        .review-card { background: rgba(255,255,255,0.7); border-radius: 25px; padding: 35px; border: 1px solid white; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.03); }
         .review-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); background: white; }
         .user-info { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
         .user-avatar { width: 50px; height: 50px; border-radius: 50%; background: #eee; object-fit: cover; border: 2px solid white; box-shadow: 0 5px 10px rgba(0,0,0,0.1); }
         .stars { color: #FFC107; font-size: 0.9rem; margin-bottom: 5px; }
         .review-text { font-style: italic; color: var(--text-light); line-height: 1.7; font-size: 1rem; }
 
-        /* --- ABOUT US SECTION --- */
+        /* --- ABOUT US --- */
         .about-wrap { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 60px; align-items: center; }
         .about-img { width: 100%; border-radius: 30px; transform: rotate(2deg); border: 8px solid white; box-shadow: 0 20px 40px rgba(0,0,0,0.1); transition: 0.3s; }
         .about-img:hover { transform: rotate(0deg) scale(1.02); }
@@ -176,20 +139,10 @@
         .check-list li { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-size: 1.1rem; color: var(--text-main); }
         .check-list i { color: white; background: var(--primary); padding: 5px; border-radius: 50%; box-shadow: 0 5px 10px rgba(255, 143, 80, 0.3); font-size: 0.8rem; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
 
-        /* --- CTA SECTION --- */
-        .cta-section { 
-            margin: 100px 0; padding: 80px; border-radius: 40px; 
-            background: linear-gradient(135deg, var(--primary), #FF5E62); 
-            text-align: center; color: white; position: relative; overflow: hidden; 
-            box-shadow: 0 30px 60px rgba(255, 94, 98, 0.3);
-        }
+        /* --- CTA --- */
+        .cta-section { margin: 100px 0; padding: 80px; border-radius: 40px; background: linear-gradient(135deg, var(--primary), #FF5E62); text-align: center; color: white; position: relative; overflow: hidden; box-shadow: 0 30px 60px rgba(255, 94, 98, 0.3); }
         .cta-section h2 { font-size: 3rem; margin-bottom: 20px; position: relative; z-index: 2; font-weight: 800; }
-        .cta-btn-white { 
-            background: white; color: var(--primary); padding: 18px 45px; border-radius: 50px; 
-            font-weight: 800; font-size: 1.1rem; text-decoration: none; display: inline-block; 
-            margin-top: 30px; position: relative; z-index: 2; transition: transform 0.3s, box-shadow 0.3s; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
+        .cta-btn-white { background: white; color: var(--primary); padding: 18px 45px; border-radius: 50px; font-weight: 800; font-size: 1.1rem; text-decoration: none; display: inline-block; margin-top: 30px; position: relative; z-index: 2; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
         .cta-btn-white:hover { transform: scale(1.05); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
 
         /* --- FOOTER --- */
@@ -204,56 +157,27 @@
         .footer-col a:hover { color: var(--primary); padding-left: 5px; }
         .footer-bottom { text-align: center; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 30px; font-size: 0.95rem; color: #888; }
 
-        /* --- PWA INSTALL BANNER STYLES --- */
+        /* --- PWA INSTALL BANNER --- */
         .install-banner {
-            display: none; /* Mặc định ẩn, hiện bằng JS */
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 400px;
-            background: white;
-            padding: 15px 20px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            z-index: 9999;
-            align-items: center;
-            justify-content: space-between;
-            animation: slideUp 0.5s ease;
-            border: 1px solid rgba(255, 143, 80, 0.2);
+            display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: white; padding: 15px 20px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 9999; align-items: center; justify-content: space-between; animation: slideUp 0.5s ease; border: 1px solid rgba(255, 143, 80, 0.2);
         }
-        
         .ib-content { display: flex; align-items: center; gap: 15px; }
         .ib-icon { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; }
         .ib-text h4 { font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
         .ib-text p { font-size: 0.8rem; color: var(--text-light); }
-        
         .ib-actions { display: flex; gap: 10px; align-items: center; }
-        .btn-install { 
-            background: var(--primary); color: white; border: none; 
-            padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; 
-            cursor: pointer; white-space: nowrap;
-        }
+        .btn-install { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
         .btn-close-banner { background: none; border: none; color: #999; font-size: 1.2rem; cursor: pointer; }
-
         @keyframes slideUp { from { transform: translate(-50%, 100px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
 
-        /* --- iOS INSTRUCTION MODAL --- */
-        .ios-modal {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10000;
-            justify-content: center; align-items: flex-end; padding-bottom: 30px;
-        }
-        .ios-box {
-            background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 25px;
-            text-align: center; position: relative; animation: popUp 0.3s;
-        }
+        /* --- iOS MODAL --- */
+        .ios-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: flex-end; padding-bottom: 30px; }
+        .ios-box { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 25px; text-align: center; position: relative; animation: popUp 0.3s; }
         .ios-box img { width: 60px; height: 60px; border-radius: 15px; margin-bottom: 15px; }
         .ios-steps { margin: 20px 0; text-align: left; background: #f9f9f9; padding: 15px; border-radius: 15px; }
         .ios-step { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.95rem; color: #555; }
         .ios-icon { font-size: 1.2rem; color: #007AFF; }
         .btn-ios-close { width: 100%; padding: 12px; background: #eee; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; color: #333; }
-        
         @keyframes popUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
         /* --- MOBILE --- */
@@ -270,18 +194,19 @@
         }
         
         @media (max-width: 768px) {
+            /* ẨN AVATAR Ở MOBILE */
+            #user-profile { display: none !important; }
+
+            /* ẨN HOÀN TOÀN CHATBOT Ở MOBILE */
+            .chatbot-toggler, .chatbot { display: none !important; }
+
             footer .footer-brand { display: flex; flex-direction: column; align-items: center; text-align: center; }
             footer .logo { justify-content: center; margin-bottom: 10px; }
             footer .footer-brand p { margin-left: auto; margin-right: auto; }
             footer .footer-brand div { justify-content: center; }
             
             .mobile-menu-btn { display: block; order: -1; }
-            .nav-links { 
-                display: none; flex-direction: column; position: absolute; 
-                top: 70px; left: 0; right: 0; background: white; 
-                padding: 25px; border-radius: 25px; gap: 15px; 
-                box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #eee;
-            }
+            .nav-links { display: none; flex-direction: column; position: absolute; top: 70px; left: 0; right: 0; background: white; padding: 25px; border-radius: 25px; gap: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #eee; }
             .nav-links.active { display: flex; }
 
             .hero { grid-template-columns: 1fr; padding-top: 130px; text-align: center; gap: 30px; }
@@ -299,17 +224,6 @@
 
             .btn-primary { width: 100%; text-align: center; padding: 15px; }
             .section-padding { padding: 50px 0; }
-
-            #chatbot-container, 
-            .chatbot-toggler { 
-                display: none !important; 
-            }
-            
-            /* Class này sẽ được thêm vào body bằng JS khi tắt banner để hiện lại chatbot */
-            body.show-chatbot #chatbot-container,
-            body.show-chatbot .chatbot-toggler {
-                display: flex !important;
-            }
         }
     </style>
 </head>
@@ -504,7 +418,8 @@
         <div class="ib-content">
             <img src="LOGO.WEBP" alt="Hopvan Logo" class="ib-icon">
             <div class="ib-text">
-                <h4>Tải ứng dụng Hopvan ngay</h4>
+                <h4>Tải ứng dụng Hopvan</h4>
+                <p>Thêm vào màn hình chính để học nhanh hơn</p>
             </div>
         </div>
         <div class="ib-actions">
@@ -517,6 +432,7 @@
         <div class="ios-box">
             <img src="LOGO.WEBP" alt="Hopvan">
             <h3 style="font-weight: 800; color: #333;">Cài đặt Hopvan cho iPhone</h3>
+            <p style="color: #666; font-size: 0.9rem;">Ứng dụng sẽ hoạt động mượt mà hơn khi được thêm vào màn hình chính.</p>
             
             <div class="ios-steps">
                 <div class="ios-step">
@@ -535,12 +451,7 @@
 
     <script src="chatbot.js"></script>
 
-<script>
-        // Hàm hiển thị chatbot (gọi khi tắt banner hoặc không cần hiện banner)
-        const showChatbot = () => {
-            document.body.classList.add('show-chatbot');
-        };
-
+    <script>
         // Đăng ký Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -556,66 +467,55 @@
         const btnCloseBanner = document.getElementById('btn-close-banner');
         const iosModal = document.getElementById('ios-modal');
 
-        // Kiểm tra thiết bị
-        const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+        // Kiểm tra thiết bị iOS
+        const isIos = () => {
+            const userAgent = window.navigator.userAgent.toLowerCase();
+            return /iphone|ipad|ipod/.test(userAgent);
+        };
+
+        // Kiểm tra xem đã cài đặt chưa (Standalone mode)
         const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
 
         // Xử lý sự kiện beforeinstallprompt (Android/Chrome)
-        let bannerShown = false;
-        
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             // Chỉ hiện banner nếu màn hình nhỏ (mobile)
             if (window.innerWidth < 768) {
                 installBanner.style.display = 'flex';
-                bannerShown = true;
-            } else {
-                showChatbot(); // PC thì hiện chatbot luôn
             }
         });
 
         // Xử lý logic hiển thị cho iOS
+        // Vì iOS không có beforeinstallprompt, ta hiện banner thủ công nếu chưa ở chế độ standalone
         if (isIos() && !isInStandaloneMode() && window.innerWidth < 768) {
             setTimeout(() => {
                 installBanner.style.display = 'flex';
-                bannerShown = true;
-            }, 2000);
-        } else {
-            // Nếu không phải trường hợp cần hiện banner (ví dụ đã cài rồi hoặc là PC), hiện chatbot
-            if (!bannerShown) {
-                setTimeout(() => {
-                    if(installBanner.style.display !== 'flex') showChatbot();
-                }, 2500); // Đợi xíu để chắc chắn không có event nào hiện banner
-            }
+            }, 2000); // Hiện sau 2 giây
         }
 
         // Click nút Cài đặt
         btnInstall.addEventListener('click', () => {
             if (isIos()) {
+                // Nếu là iOS, hiện hướng dẫn
                 installBanner.style.display = 'none';
                 iosModal.style.display = 'flex';
-                // iOS: Vẫn chưa hiện chatbot vội, đợi tắt modal hướng dẫn
             } else if (deferredPrompt) {
+                // Nếu là Android, hiện prompt cài đặt native
                 installBanner.style.display = 'none';
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
                     deferredPrompt = null;
-                    showChatbot(); // Cài xong (hoặc hủy) thì hiện chatbot
                 });
             }
         });
 
-        // Click nút Đóng Banner (X) -> Hiện Chatbot
+        // Click nút Đóng
         btnCloseBanner.addEventListener('click', () => {
             installBanner.style.display = 'none';
-            showChatbot();
-        });
-
-        // Click nút Đóng Modal iOS -> Hiện Chatbot
-        document.querySelector('.btn-ios-close').addEventListener('click', () => {
-            document.getElementById('ios-modal').style.display = 'none';
-            showChatbot();
         });
     </script>
 
