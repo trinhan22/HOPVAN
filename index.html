@@ -87,8 +87,14 @@
         .btn-logout { background: none; border: none; cursor: pointer; color: var(--text-light); font-size: 1.2rem; transition: 0.3s; }
         .btn-logout:hover { color: #FF5E62; }
 
-        /* USER INFO TRÊN MOBILE (Mặc định ẩn trên PC) */
+        /* USER INFO TRÊN MOBILE */
         .mobile-user-container { display: none; padding-bottom: 15px; border-bottom: 1px solid #eee; margin-bottom: 15px; }
+        
+        /* Ẩn User Mobile trên PC */
+        @media (min-width: 769px) {
+            #mobile-user-block, .mobile-user-container { display: none !important; }
+        }
+
         .mobile-user-info { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
         .mobile-avatar { 
             width: 45px; height: 45px; background: #FFF5EC; 
@@ -195,6 +201,20 @@
         .btn-ios-close { width: 100%; padding: 12px; background: #eee; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; color: #333; }
         @keyframes popUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
+        /* --- MODAL ĐĂNG XUẤT ĐẸP --- */
+        .logout-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 20000; justify-content: center; align-items: center; animation: fadeIn 0.2s ease; }
+        .logout-box { background: white; padding: 30px; border-radius: 25px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: scale(0.9); animation: zoomIn 0.2s ease forwards; border: 1px solid rgba(255,255,255,0.8); }
+        .logout-icon { width: 60px; height: 60px; background: #FFEBEE; color: #FF5E62; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 15px; }
+        .logout-box h3 { margin-bottom: 10px; color: var(--text-main); font-weight: 800; font-size: 1.4rem; }
+        .logout-box p { color: var(--text-light); margin-bottom: 25px; font-size: 0.95rem; }
+        .logout-actions { display: flex; gap: 10px; }
+        .btn-cancel { flex: 1; padding: 12px; border-radius: 12px; border: none; background: #f5f5f5; color: #666; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-confirm-logout { flex: 1; padding: 12px; border-radius: 12px; border: none; background: #FF5E62; color: white; font-weight: 700; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(255, 94, 98, 0.3); }
+        .btn-cancel:hover { background: #eee; }
+        .btn-confirm-logout:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 94, 98, 0.4); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
         /* --- MOBILE --- */
         .mobile-menu-btn { display: none; font-size: 1.5rem; color: var(--primary); cursor: pointer; }
         @media (max-width: 992px) {
@@ -215,19 +235,23 @@
             /* 2. ẨN USER PROFILE GỐC TRÊN HEADER */
             #user-profile { display: none !important; }
 
-            /* 3. ẨN HOÀN TOÀN CHATBOT (Dự phòng CSS nếu script load chậm) */
-            .chatbot-toggler, .chatbot, #chatbot-container, #bp-web-widget { display: none !important; }
+            /* 3. ẨN HOÀN TOÀN CHATBOT (CSS MẠNH) */
+            .chatbot-toggler, .chatbot, #chatbot-container, #bp-web-widget, .chatbot-container, [id^="bp-"] { 
+                display: none !important; 
+                visibility: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+                width: 0 !important; height: 0 !important;
+            }
 
-            /* 4. CHỈNH LOGO & MENU MOBILE (Giữ nguyên text HOPVAN) */
-            .mobile-menu-btn { display: block; order: -1; margin-right: 15px; } /* Nút Menu bên trái */
-            header .logo { margin-right: auto; margin-left: 0; } /* Logo sát bên Menu, đẩy phần còn lại sang phải */
-            /* Đã xóa dòng ẩn chữ Hopvan để nó hiện lại */
+            /* 4. CHỈNH LOGO & MENU MOBILE */
+            .mobile-menu-btn { display: block; order: -1; margin-right: 15px; }
+            header .logo { margin-right: auto; margin-left: 0; }
             
-            /* Sửa lại Header cho Mobile */
             header { padding: 10px 20px; width: 95%; top: 15px; }
 
             footer .footer-brand { display: flex; flex-direction: column; align-items: center; text-align: center; }
-            footer .logo { justify-content: center; margin-bottom: 10px; margin-left: auto; margin-right: auto; } /* Reset margin logo footer */
+            footer .logo { justify-content: center; margin-bottom: 10px; margin-left: auto; margin-right: auto; }
             footer .footer-brand p { margin-left: auto; margin-right: auto; }
             footer .footer-brand div { justify-content: center; }
             
@@ -271,6 +295,18 @@
         </a>
 
         <nav class="nav-links">
+            <div id="mobile-user-block" class="mobile-user-container">
+                <div class="mobile-user-info">
+                    <div class="mobile-avatar"><i class="fas fa-user"></i></div>
+                    <div>
+                        <span style="font-size: 0.9rem; color: #666;">Xin chào,</span><br>
+                        <b id="mobile-display-name" style="color: var(--primary); font-size: 1.1rem;">Bạn mình</b>
+                    </div>
+                </div>
+                <button id="mobile-logout-btn" class="mobile-logout">
+                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </button>
+            </div>
             <a href="#features">Tính năng</a>
             <a href="#reviews">Đánh giá</a>
             <a href="#about">Về chúng tôi</a>
@@ -438,6 +474,18 @@
         </div>
     </footer>
 
+    <div id="logout-modal" class="logout-modal">
+        <div class="logout-box">
+            <div class="logout-icon"><i class="fas fa-sign-out-alt"></i></div>
+            <h3>Đăng xuất?</h3>
+            <p>Bạn có chắc chắn muốn đăng xuất khỏi tài khoản không?</p>
+            <div class="logout-actions">
+                <button id="btn-cancel-logout" class="btn-cancel">Hủy</button>
+                <button id="btn-confirm-logout" class="btn-confirm-logout">Đăng xuất</button>
+            </div>
+        </div>
+    </div>
+
     <div id="install-banner" class="install-banner">
         <div class="ib-content">
             <img src="LOGO.WEBP" alt="Hopvan Logo" class="ib-icon">
@@ -473,9 +521,10 @@
     </div>
 
     <script>
-        if (window.innerWidth > 768) {
-            const script = document.createElement('script');
-            script.src = 'chatbot.js';
+        // Điều kiện tuyệt đối: Chỉ tải nếu chiều rộng > 768px
+        if (window.matchMedia("(min-width: 769px)").matches) {
+            var script = document.createElement('script');
+            script.src = "chatbot.js";
             document.body.appendChild(script);
         }
     </script>
@@ -548,57 +597,70 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        // Elements
         const btnHocNgay = document.getElementById('btn-hoc-ngay');
-        
-        // PC Elements
         const userProfile = document.getElementById('user-profile');
         const displayName = document.getElementById('display-name');
-        const logoutBtn = document.getElementById('logout-btn');
-
-        // Mobile Elements (Mới)
         const mobileUserBlock = document.getElementById('mobile-user-block');
         const mobileDisplayName = document.getElementById('mobile-display-name');
+        
+        // Modal Logout Elements
+        const logoutBtn = document.getElementById('logout-btn');
         const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+        const logoutModal = document.getElementById('logout-modal');
+        const btnCancelLogout = document.getElementById('btn-cancel-logout');
+        const btnConfirmLogout = document.getElementById('btn-confirm-logout');
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Đã đăng nhập
                 const name = user.displayName || "Bạn mình";
-                
-                // 1. Ẩn nút học ngay
                 if(btnHocNgay) btnHocNgay.style.display = 'none';
-
-                // 2. Hiển thị trên PC
                 if(userProfile) {
                     userProfile.style.display = 'flex';
                     if(displayName) displayName.textContent = name;
                 }
-
-                // 3. Hiển thị trên Mobile Menu
                 if(mobileUserBlock) {
-                    // Logic: CSS sẽ tự lo việc ẩn trên PC, ta chỉ cần display block để nó 'sẵn sàng' hiện trên mobile
                     mobileUserBlock.style.display = 'block'; 
                     if(mobileDisplayName) mobileDisplayName.textContent = name;
                 }
-
             } else {
-                // Chưa đăng nhập
                 if(btnHocNgay) btnHocNgay.style.display = 'inline-block';
                 if(userProfile) userProfile.style.display = 'none';
                 if(mobileUserBlock) mobileUserBlock.style.display = 'none';
             }
         });
 
-        const handleLogout = () => {
-            if(confirm("Bạn muốn đăng xuất?")) {
+        // Xử lý Popup Đăng xuất
+        const showLogoutModal = () => {
+            logoutModal.style.display = 'flex';
+        };
+
+        const hideLogoutModal = () => {
+            logoutModal.style.display = 'none';
+        };
+
+        // Gán sự kiện mở modal cho cả 2 nút
+        if(logoutBtn) logoutBtn.addEventListener('click', showLogoutModal);
+        if(mobileLogoutBtn) mobileLogoutBtn.addEventListener('click', showLogoutModal);
+
+        // Nút hủy
+        if(btnCancelLogout) btnCancelLogout.addEventListener('click', hideLogoutModal);
+
+        // Nút xác nhận đăng xuất
+        if(btnConfirmLogout) {
+            btnConfirmLogout.addEventListener('click', () => {
                 signOut(auth).then(() => {
                     window.location.reload();
                 });
-            }
-        };
+            });
+        }
 
-        if(logoutBtn) logoutBtn.addEventListener('click', handleLogout);
-        if(mobileLogoutBtn) mobileLogoutBtn.addEventListener('click', handleLogout);
+        // Đóng modal khi click ra ngoài
+        window.addEventListener('click', (e) => {
+            if (e.target === logoutModal) {
+                hideLogoutModal();
+            }
+        });
 
         const menuBtn = document.querySelector('.mobile-menu-btn');
         const navLinks = document.querySelector('.nav-links');
