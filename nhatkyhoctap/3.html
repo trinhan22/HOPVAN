@@ -34,8 +34,6 @@
             border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 10px 30px rgba(255, 143, 80, 0.15);
             border-radius: 9999px; transition: all 0.3s;
         }
-        .glass-header:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.9); }
-
         .liquid-glass {
             background: rgba(255, 255, 255, 0.45);
             box-shadow: 0 15px 40px -5px rgba(255, 130, 60, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
@@ -86,6 +84,36 @@
         .text-bad { background: #fee2e2; color: #991b1b; text-decoration: line-through; padding: 2px 4px; border-radius: 4px; }
         .text-fix { color: #2563eb; font-weight: 700; font-style: italic; margin-left: 4px; }
 
+        /* --- POPUP MODAL --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(8px);
+            z-index: 9999; display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.open { display: flex; opacity: 1; }
+        
+        .modal-box {
+            background: white; width: 90%; max-width: 480px; border-radius: 35px;
+            padding: 40px; text-align: center; position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+        .modal-overlay.open .modal-box { transform: scale(1); }
+
+        .icon-box {
+            width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 20px;
+            display: flex; align-items: center; justify-content: center; font-size: 2.5rem;
+        }
+        .icon-warning { background: #FFF7ED; color: #EA580C; }
+        .icon-error { background: #FEF2F2; color: #EF4444; }
+        .icon-info { background: #EFF6FF; color: #3B82F6; }
+
+        /* --- LOADING OVERLAY --- */
+        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .loader-robot { font-size: 4rem; color: var(--primary); animation: robotBounce 1s infinite alternate; }
+        @keyframes robotBounce { from { transform: translateY(0); } to { transform: translateY(-20px); } }
+
         @media (max-width: 1024px) { #menu-placeholder { display: none; } .main-content { padding: 20px; } }
     </style>
 </head>
@@ -93,6 +121,25 @@
 
     <div class="bg-blob blob-1"></div>
     <div class="bg-blob blob-2"></div>
+
+    <div id="alert-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div id="alert-icon-box" class="icon-box icon-warning">
+                <i id="alert-icon" class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 id="alert-title" class="text-2xl font-black text-gray-800 mb-2">Thông báo</h3>
+            <p id="alert-msg" class="text-gray-500 mb-8">Nội dung thông báo...</p>
+            
+            <div id="alert-actions" class="flex gap-3 justify-center">
+                </div>
+        </div>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loader-robot"><i class="fas fa-robot"></i></div>
+        <h3 class="font-black text-2xl mt-6 text-gray-800">AI ĐANG CHẤM BÀI...</h3>
+        <p class="text-gray-500 mt-2 font-medium">Đang phân tích ý tưởng và diễn đạt</p>
+    </div>
 
     <div id="menu-placeholder"></div>
 
@@ -146,14 +193,14 @@
                 </p>
 
                 <div class="relative">
-                    <textarea id="student-essay" class="glass-textarea" placeholder="Bắt đầu viết bài làm của bạn tại đây... (Tối thiểu 100 từ)"></textarea>
+                    <textarea id="student-essay" class="glass-textarea" placeholder="Bắt đầu viết bài làm của bạn tại đây... (Tối thiểu 50 từ)"></textarea>
                     <div class="absolute bottom-4 right-6 text-xs font-bold text-gray-400 bg-white/50 px-2 py-1 rounded-lg backdrop-blur-sm">
                         <span id="word-count">0</span> TỪ
                     </div>
                 </div>
 
                 <div class="mt-8 text-center" id="submit-area">
-                    <button onclick="submitEssay()" class="group relative inline-flex items-center justify-center px-12 py-5 font-black text-white transition-all duration-300 bg-gray-900 rounded-3xl hover:shadow-2xl hover:shadow-orange-500/30 hover:scale-105 active:scale-95 overflow-hidden">
+                    <button onclick="confirmSubmission()" class="group relative inline-flex items-center justify-center px-12 py-5 font-black text-white transition-all duration-300 bg-gray-900 rounded-3xl hover:shadow-2xl hover:shadow-orange-500/30 hover:scale-105 active:scale-95 overflow-hidden">
                         <span class="text-xl relative z-10">NỘP BÀI & CHẤM ĐIỂM</span>
                         <div class="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </button>
@@ -203,19 +250,8 @@
                     </button>
                 </div>
             </div>
-
         </div>
     </main>
-
-    <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-md z-[2000] hidden flex-col items-center justify-center transition-all">
-        <div class="relative w-24 h-24">
-            <div class="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
-            <div class="absolute inset-0 border-4 border-orange-500 rounded-full border-t-transparent animate-spin"></div>
-            <div class="absolute inset-0 flex items-center justify-center text-3xl"></div>
-        </div>
-        <h3 class="font-black text-2xl mt-6 text-gray-800">AI ĐANG CHẤM BÀI...</h3>
-        <p class="text-gray-500 mt-2 font-medium">Đang phân tích ý tưởng và diễn đạt</p>
-    </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -230,23 +266,93 @@
     const API_URL = `../.netlify/functions/gemini-proxy`;
     let userUid = null;
 
+    // --- HÀM POPUP ĐA NĂNG ---
+    window.showPopup = (type, title, msg, confirmCallback = null) => {
+        const modal = document.getElementById('alert-modal');
+        const iconBox = document.getElementById('alert-icon-box');
+        const icon = document.getElementById('alert-icon');
+        const titleEl = document.getElementById('alert-title');
+        const msgEl = document.getElementById('alert-msg');
+        const actions = document.getElementById('alert-actions');
+
+        titleEl.innerText = title;
+        msgEl.innerText = msg;
+
+        // Reset Styles
+        iconBox.className = "icon-box";
+        actions.innerHTML = "";
+
+        if (type === 'warning') {
+            iconBox.classList.add('icon-warning');
+            icon.className = "fas fa-exclamation-triangle";
+            
+            if (confirmCallback) {
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = "px-6 py-3 rounded-xl font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition";
+                cancelBtn.innerText = "Kiểm tra lại";
+                cancelBtn.onclick = () => modal.classList.remove('open');
+
+                const confirmBtn = document.createElement('button');
+                confirmBtn.className = "px-6 py-3 rounded-xl font-bold bg-orange-500 text-white hover:bg-orange-600 shadow-lg shadow-orange-200 transition";
+                confirmBtn.innerText = "Nộp bài ngay";
+                confirmBtn.onclick = () => { modal.classList.remove('open'); confirmCallback(); };
+
+                actions.appendChild(cancelBtn);
+                actions.appendChild(confirmBtn);
+            } else {
+                const closeBtn = document.createElement('button');
+                closeBtn.className = "px-8 py-3 rounded-xl font-bold bg-orange-500 text-white hover:bg-orange-600 transition";
+                closeBtn.innerText = "Đã hiểu";
+                closeBtn.onclick = () => modal.classList.remove('open');
+                actions.appendChild(closeBtn);
+            }
+        } else if (type === 'error') {
+            iconBox.classList.add('icon-error');
+            icon.className = "fas fa-times-circle";
+            const closeBtn = document.createElement('button');
+            closeBtn.className = "px-8 py-3 rounded-xl font-bold bg-red-500 text-white hover:bg-red-600 transition";
+            closeBtn.innerText = "Thử lại";
+            closeBtn.onclick = () => { modal.classList.remove('open'); if(confirmCallback) confirmCallback(); };
+            actions.appendChild(closeBtn);
+        } else if (type === 'info') {
+            iconBox.classList.add('icon-info');
+            icon.className = "fas fa-info-circle";
+            const closeBtn = document.createElement('button');
+            closeBtn.className = "px-8 py-3 rounded-xl font-bold bg-blue-500 text-white hover:bg-blue-600 transition";
+            closeBtn.innerText = "Đăng nhập ngay";
+            closeBtn.onclick = () => { window.location.href = "../log.html"; };
+            actions.appendChild(closeBtn);
+        }
+
+        modal.classList.add('open');
+    };
+
     onAuthStateChanged(auth, (u) => {
         if (u) userUid = u.uid;
-        else window.location.href = "../log.html";
+        else showPopup('info', 'Yêu cầu đăng nhập', 'Bạn cần đăng nhập để lưu kết quả và mở khóa màn tiếp theo.');
     });
 
-    // Fetch Menu
     fetch('menu.html').then(r=>r.text()).then(h=>{
         const p = document.getElementById('menu-placeholder'); p.innerHTML=h;
         p.querySelectorAll('script').forEach(s=>{const n=document.createElement('script');n.text=s.text;document.body.appendChild(n)});
     });
 
-    window.submitEssay = async () => {
+    // Hàm gọi khi bấm Nộp bài
+    window.confirmSubmission = () => {
         const content = document.getElementById('student-essay').value.trim();
         const wordCount = content.split(/\s+/).filter(x => x).length;
 
-        if (wordCount < 50) return alert("Bài viết quá ngắn! Hãy viết ít nhất 50 từ.");
+        if (wordCount < 50) {
+            showPopup('warning', 'Bài viết quá ngắn', 'Bài làm NLXH cần ít nhất 100 từ để AI có thể chấm điểm chính xác.');
+            return;
+        }
 
+        showPopup('warning', 'Xác nhận nộp bài', 'Bạn có chắc chắn muốn nộp bài? Hệ thống sẽ chấm điểm ngay lập tức.', handleRealSubmit);
+    };
+
+    // Hàm chấm điểm thật (gọi sau khi confirm)
+    const handleRealSubmit = async () => {
+        const content = document.getElementById('student-essay').value.trim();
         document.getElementById('loading-overlay').style.display = 'flex';
 
         // Prompt chấm NLXH
@@ -303,7 +409,6 @@
             document.getElementById('pros-list').innerHTML = res.pros.map(i => `<li>${i}</li>`).join('');
             document.getElementById('cons-list').innerHTML = res.cons.map(i => `<li>${i}</li>`).join('');
 
-            // Màu sắc & Unlock
             const titleEl = document.getElementById('result-title');
             const ringEl = document.getElementById('score-ring');
 
@@ -339,12 +444,13 @@
 
         } catch (e) {
             console.error(e);
-            alert("Lỗi: " + e.message);
+            showPopup('error', 'Lỗi hệ thống', 'Không thể kết nối với giáo viên AI. Vui lòng kiểm tra mạng và thử lại.', handleRealSubmit);
         } finally {
             document.getElementById('loading-overlay').style.display = 'none';
         }
     };
 
+    window.submitEssay = confirmSubmission;
     window.nextLevel = () => window.location.href = "../dashboard/nhatkyhoctap.html";
 
     // Word Count
@@ -364,16 +470,13 @@
             totalSeconds--;
             const m = Math.floor(totalSeconds / 60);
             const s = totalSeconds % 60;
-            
             timerText.innerText = `${m} phút ${s < 10 ? '0'+s : s} giây`;
             timerMini.innerText = m;
-
             const percent = (totalSeconds / 2700) * 100;
             timerCircle.setAttribute('stroke-dasharray', `${percent}, 100`);
-            
             if(totalSeconds < 300) timerCircle.classList.replace('text-orange-500', 'text-red-500');
         } else {
-            submitEssay();
+            handleRealSubmit(); // Hết giờ tự nộp
         }
     }, 1000);
 </script>

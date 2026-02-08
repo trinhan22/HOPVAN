@@ -19,6 +19,7 @@
                         #fff9f5;
         }
 
+        /* --- BACKGROUND --- */
         .bg-blob { position: fixed; filter: blur(80px); z-index: -1; opacity: 0.6; animation: float 25s infinite alternate ease-in-out; }
         .blob-1 { top: -5%; left: -5%; width: 500px; height: 500px; background: #ffe4d3; animation-delay: -5s; }
         .blob-2 { bottom: 5%; right: -5%; width: 400px; height: 400px; background: #ffdec2; }
@@ -27,7 +28,7 @@
         #menu-placeholder { width: 280px; flex-shrink: 0; }
         .main-content { flex-grow: 1; padding: 40px; overflow-y: auto; height: 100vh; position: relative; scroll-behavior: smooth; }
 
-        /* Glass Styles */
+        /* --- GLASS STYLES --- */
         .glass-header {
             background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 10px 30px rgba(255, 143, 80, 0.15);
@@ -40,7 +41,7 @@
             border-radius: 24px; transition: transform 0.3s; margin-bottom: 2rem;
         }
 
-        /* Question Styles */
+        /* --- QUESTION STYLES --- */
         .option-box {
             display: flex; align-items: center; gap: 12px; padding: 16px;
             border: 2px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.4);
@@ -68,33 +69,36 @@
         .option-box.correct { background-color: #d1fae5; border-color: #10b981; color: #065f46; }
         .option-box.wrong { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; opacity: 0.8; }
 
-        /* Modal */
+        /* --- POPUP MODAL --- */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px);
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(8px);
             z-index: 1000; display: none; align-items: center; justify-content: center;
             opacity: 0; transition: opacity 0.3s ease;
         }
         .modal-overlay.open { display: flex; opacity: 1; }
         
         .modal-box {
-            background: white; width: 90%; max-width: 480px; border-radius: 40px;
+            background: white; width: 90%; max-width: 480px; border-radius: 35px;
             padding: 40px; text-align: center; position: relative;
-            box-shadow: 0 30px 60px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0,0,0,0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid rgba(255,255,255,0.8);
         }
         .modal-overlay.open .modal-box { transform: scale(1); }
 
-        /* === HIỆU ỨNG LOADING === */
-        .btn-loading { 
-            opacity: 0.8; 
-            pointer-events: none; /* Khóa không cho bấm tiếp */
-            cursor: wait;
-            background: #cbd5e1 !important; /* Màu xám khi đang load */
-            color: #475569 !important;
-            box-shadow: none !important;
-            transform: none !important;
+        .icon-box {
+            width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 20px;
+            display: flex; align-items: center; justify-content: center; font-size: 2.5rem;
         }
-        /* Icon xoay */
+        .icon-warning { background: #FFF7ED; color: #EA580C; }
+        .icon-error { background: #FEF2F2; color: #EF4444; }
+        .icon-info { background: #EFF6FF; color: #3B82F6; }
+
+        /* --- LOADING --- */
+        .btn-loading { 
+            opacity: 0.8; pointer-events: none; cursor: wait;
+            background: #cbd5e1 !important; color: #475569 !important; box-shadow: none !important;
+        }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .fa-circle-notch { animation: spin 1s linear infinite; margin-right: 8px; }
 
@@ -108,7 +112,7 @@
 
     <div id="result-modal" class="modal-overlay">
         <div class="modal-box">
-            <div id="modal-icon" class="text-8xl mb-6"></div>
+            <div id="modal-icon" class="text-8xl mb-6 modal-icon drop-shadow-lg"></div>
             
             <h2 id="modal-title" class="text-4xl font-black mb-3 uppercase tracking-tighter"></h2>
             <p id="modal-message" class="text-gray-500 font-medium mb-8 leading-relaxed"></p>
@@ -126,6 +130,17 @@
 
             <button id="modal-btn" class="w-full py-4 rounded-2xl font-bold text-white text-lg shadow-xl shadow-orange-200 transition-all transform active:scale-95 flex items-center justify-center">
             </button>
+        </div>
+    </div>
+
+    <div id="alert-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div id="alert-icon-box" class="icon-box icon-warning">
+                <i id="alert-icon" class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 id="alert-title" class="text-2xl font-black text-gray-800 mb-2">Thông báo</h3>
+            <p id="alert-msg" class="text-gray-500 mb-8">Nội dung thông báo...</p>
+            <div id="alert-actions" class="flex gap-3 justify-center"></div>
         </div>
     </div>
 
@@ -170,7 +185,7 @@
             <form id="quiz-form" class="space-y-8"></form>
 
             <div class="mt-12 text-center">
-                <button type="button" onclick="submitQuiz()" class="group relative inline-flex items-center justify-center px-12 py-5 font-black text-white transition-all duration-300 bg-gray-900 rounded-3xl hover:shadow-2xl hover:shadow-orange-500/20 hover:scale-105 active:scale-95 overflow-hidden">
+                <button type="button" onclick="confirmSubmission()" class="group relative inline-flex items-center justify-center px-12 py-5 font-black text-white transition-all duration-300 bg-gray-900 rounded-3xl hover:shadow-2xl hover:shadow-orange-500/20 hover:scale-105 active:scale-95 overflow-hidden">
                     <span class="text-xl relative z-10">NỘP BÀI & CHẤM ĐIỂM</span>
                     <div class="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </button>
@@ -190,7 +205,7 @@
 
     let userUid = null;
     
-    // 20 Câu hỏi Tổng hợp Nâng cao (Level 5)
+    // 20 Câu hỏi Level 5
     const quizData = [
         { q: "Chi tiết 'bát cháo hành' trong 'Chí Phèo' thể hiện tư tưởng gì của Nam Cao?", a: ["Phê phán xã hội", "Niềm tin vào bản chất lương thiện", "Thương cảm cho số phận nông dân", "Tố cáo chế độ nhà tù"], correct: 1 },
         { q: "Cảm hứng chủ đạo trong bài thơ 'Đất Nước' của Nguyễn Khoa Điềm là gì?", a: ["Đất nước của nhân dân", "Đất nước của các triều đại", "Đất nước của những anh hùng", "Đất nước tươi đẹp"], correct: 0 },
@@ -214,9 +229,70 @@
         { q: "Hai câu thơ: 'Cha mẹ thương nhau bằng gừng cay muối mặn' sử dụng chất liệu gì?", a: ["Thành ngữ dân gian", "Ca dao", "Tục ngữ", "Truyền thuyết"], correct: 0 }
     ];
 
+    // --- HÀM POPUP ĐA NĂNG ---
+    window.showPopup = (type, title, msg, confirmCallback = null) => {
+        const modal = document.getElementById('alert-modal');
+        const iconBox = document.getElementById('alert-icon-box');
+        const icon = document.getElementById('alert-icon');
+        const titleEl = document.getElementById('alert-title');
+        const msgEl = document.getElementById('alert-msg');
+        const actions = document.getElementById('alert-actions');
+
+        titleEl.innerText = title;
+        msgEl.innerText = msg;
+
+        // Reset Styles
+        iconBox.className = "icon-box";
+        actions.innerHTML = "";
+
+        if (type === 'warning') {
+            iconBox.classList.add('icon-warning');
+            icon.className = "fas fa-exclamation-triangle";
+            
+            if (confirmCallback) {
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = "px-6 py-3 rounded-xl font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition";
+                cancelBtn.innerText = "Kiểm tra lại";
+                cancelBtn.onclick = () => modal.classList.remove('open');
+
+                const confirmBtn = document.createElement('button');
+                confirmBtn.className = "px-6 py-3 rounded-xl font-bold bg-orange-500 text-white hover:bg-orange-600 shadow-lg shadow-orange-200 transition";
+                confirmBtn.innerText = "Nộp bài ngay";
+                confirmBtn.onclick = () => { modal.classList.remove('open'); confirmCallback(); };
+
+                actions.appendChild(cancelBtn);
+                actions.appendChild(confirmBtn);
+            } else {
+                const closeBtn = document.createElement('button');
+                closeBtn.className = "px-8 py-3 rounded-xl font-bold bg-orange-500 text-white hover:bg-orange-600 transition";
+                closeBtn.innerText = "Đã hiểu";
+                closeBtn.onclick = () => modal.classList.remove('open');
+                actions.appendChild(closeBtn);
+            }
+        } else if (type === 'error') {
+            iconBox.classList.add('icon-error');
+            icon.className = "fas fa-times-circle";
+            const closeBtn = document.createElement('button');
+            closeBtn.className = "px-8 py-3 rounded-xl font-bold bg-red-500 text-white hover:bg-red-600 transition";
+            closeBtn.innerText = "Đã hiểu";
+            closeBtn.onclick = () => modal.classList.remove('open');
+            actions.appendChild(closeBtn);
+        } else if (type === 'info') {
+            iconBox.classList.add('icon-info');
+            icon.className = "fas fa-info-circle";
+            const closeBtn = document.createElement('button');
+            closeBtn.className = "px-8 py-3 rounded-xl font-bold bg-blue-500 text-white hover:bg-blue-600 transition";
+            closeBtn.innerText = "Đăng nhập ngay";
+            closeBtn.onclick = () => { window.location.href = "../log.html"; };
+            actions.appendChild(closeBtn);
+        }
+
+        modal.classList.add('open');
+    };
+
     onAuthStateChanged(auth, (u) => {
         if (u) { userUid = u.uid; initQuiz(); } 
-        else { window.location.href = "../log.html"; }
+        else { showPopup('info', 'Yêu cầu đăng nhập', 'Bạn cần đăng nhập để lưu kết quả và mở khóa màn tiếp theo.'); }
     });
 
     fetch('menu.html').then(r=>r.text()).then(h=>{
@@ -247,20 +323,23 @@
         });
     }
 
-    // --- HÀM CẬP NHẬT TRẠNG THÁI LOADING ---
+    // --- HÀM GỌI KHI BẤM NỘP BÀI ---
+    window.confirmSubmission = () => {
+        showPopup('warning', 'Xác nhận nộp bài', 'Bạn có chắc chắn muốn nộp bài? Hãy kiểm tra kỹ các câu trả lời.', submitQuizProcess);
+    };
+
+    // --- HÀM XỬ LÝ KẾT QUẢ ---
     function updateModalButton(status, pass) {
         const btn = document.getElementById('modal-btn');
-        
         if (status === 'loading') {
             btn.innerHTML = '<i class="fas fa-circle-notch"></i> ĐANG LƯU DỮ LIỆU...';
-            btn.classList.add('btn-loading'); // Thêm class để đổi màu xám & khóa click
+            btn.classList.add('btn-loading'); 
         } else if (status === 'success' && pass) {
             btn.innerHTML = 'MỞ KHÓA LEVEL 6 NGAY <i class="fas fa-unlock ml-2"></i>';
             btn.classList.remove('btn-loading');
             btn.className = "w-full py-4 rounded-2xl font-bold text-white text-lg shadow-xl shadow-green-200 bg-green-500 hover:bg-green-600 transition-all transform active:scale-95 flex items-center justify-center";
             btn.onclick = () => window.location.href = "../dashboard/nhatkyhoctap.html";
         } else {
-            // Trường hợp trượt hoặc lỗi
             btn.innerHTML = 'LÀM LẠI BÀI THI <i class="fas fa-redo ml-2"></i>';
             btn.classList.remove('btn-loading');
             btn.className = "w-full py-4 rounded-2xl font-bold text-white text-lg shadow-xl shadow-red-200 bg-red-500 hover:bg-red-600 transition-all transform active:scale-95 flex items-center justify-center";
@@ -268,7 +347,7 @@
         }
     }
 
-    window.submitQuiz = async () => {
+    const submitQuizProcess = async () => {
         let score = 0;
         let correctCount = 0;
 
@@ -294,7 +373,6 @@
         const totalScore = score;
         const pass = totalScore >= 7.0;
 
-        // Hiện Popup ngay lập tức
         const modal = document.getElementById('result-modal');
         const icon = document.getElementById('modal-icon');
         const title = document.getElementById('modal-title');
@@ -304,13 +382,13 @@
         document.getElementById('modal-correct').innerText = `${correctCount}/20`;
 
         if (pass) {
-            icon.innerText = '';
+            icon.innerHTML = '<i class="fas fa-trophy text-yellow-400"></i>';
             title.innerText = 'XUẤT SẮC!';
             title.className = "text-4xl font-black mb-3 uppercase tracking-tighter text-green-600";
             message.innerText = "Chúc mừng! Bạn đã chinh phục Level 5.";
-            updateModalButton('loading', true); // Chuyển nút sang trạng thái loading
+            updateModalButton('loading', true);
         } else {
-            icon.innerText = '';
+            icon.innerHTML = '<i class="fas fa-sad-tear text-blue-300"></i>';
             title.innerText = 'RẤT TIẾC!';
             title.className = "text-4xl font-black mb-3 uppercase tracking-tighter text-red-500";
             message.innerText = "Cần đạt 7.0 điểm để qua màn. Hãy thử lại!";
@@ -319,7 +397,6 @@
 
         modal.classList.add('open');
 
-        // Lưu Firebase
         if(userUid) {
             try {
                 await addDoc(collection(db, "activities"), {
@@ -338,19 +415,20 @@
                     if(currentLevel < 6) {
                         await setDoc(userRef, { currentLevel: 6, lastPassed: serverTimestamp() }, { merge: true });
                     }
-                    
-                    // Lưu xong -> Đổi nút thành "Mở Khóa"
                     updateModalButton('success', true);
                 }
             } catch (e) { 
                 console.error(e);
-                alert("Lỗi lưu điểm. Vui lòng kiểm tra mạng!");
+                modal.classList.remove('open');
+                showPopup('error', 'Lỗi lưu điểm', 'Không thể lưu kết quả lên hệ thống. Vui lòng kiểm tra mạng.', () => modal.classList.add('open'));
                 updateModalButton('fail', false);
             }
         }
     };
 
-    // Timer (30 minutes)
+    window.submitQuiz = confirmSubmission;
+
+    // Timer
     let totalSeconds = 1800; 
     const timerCircle = document.getElementById('timer-circle');
     const timerText = document.getElementById('timer-text');
@@ -361,15 +439,13 @@
             totalSeconds--;
             const m = Math.floor(totalSeconds / 60);
             const s = totalSeconds % 60;
-            
             timerText.innerText = `${m} phút ${s < 10 ? '0'+s : s} giây`;
             timerMini.innerText = m;
             const percent = (totalSeconds / 1800) * 100;
             timerCircle.setAttribute('stroke-dasharray', `${percent}, 100`);
-            
             if(totalSeconds < 300) timerCircle.classList.replace('text-orange-500', 'text-red-500');
         } else {
-            submitQuiz();
+            submitQuizProcess(); // Hết giờ tự nộp
         }
     }, 1000);
 </script>

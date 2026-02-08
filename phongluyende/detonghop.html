@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hopvan - Luyện Đề Tổng Hợp</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF8F50">
+    <link rel="apple-touch-icon" href="../LOGO.WEBP">
+
     <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
-    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh." />
     <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
     <meta property="og:url" content="https://hopvan.netlify.app" />
     <meta property="og:type" content="article" />
@@ -21,12 +26,18 @@
         :root {
             --primary: #FF8F50;
             --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
-            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-bg: rgba(255, 255, 255, 0.85);
             --sidebar-width: 280px;
         }
 
-        * { font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: #FFF5EC; height: 100vh; overflow: hidden; display: flex; }
+        * { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background-color: #FFF5EC; 
+            height: 100vh; 
+            overflow: hidden; 
+            position: relative;
+        }
 
         /* --- BACKGROUND --- */
         .background-blobs { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
@@ -35,30 +46,53 @@
         .blob-2 { width: 500px; height: 500px; background: #FCD5B5; bottom: -100px; right: -100px; }
         @keyframes floatBlob { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, 60px); } }
 
-        /* --- MOBILE HEADER & OVERLAY (MỚI) --- */
+        /* --- LAYOUT CHÍNH (Đã fix lỗi hở sườn PC) --- */
+        .dashboard-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* PC: Menu cố định bên trái */
+        #menu-placeholder {
+            position: fixed;
+            top: 0; left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            z-index: 50;
+        }
+
+        /* PC: Nội dung tràn màn hình nhưng padding trái để né menu */
+        .main-content {
+            width: 100%;
+            height: 100vh;
+            background: var(--glass-bg);
+            backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
+            
+            margin-left: 0;
+            padding-top: 40px;
+            padding-bottom: 40px;
+            padding-right: 40px;
+            /* Padding này giúp nội dung không bị menu che mất trên PC */
+            padding-left: calc(var(--sidebar-width) + 40px);
+            
+            overflow-y: auto;
+            position: relative;
+            -webkit-overflow-scrolling: touch;
+            border-left: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* --- MOBILE HEADER & OVERLAY --- */
         .mobile-header {
             display: none; position: fixed; top: 0; left: 0; right: 0;
-            height: 60px; background: white; z-index: 100;
-            align-items: center; padding: 0 20px; border-bottom: 1px solid #eee;
+            height: 70px; background: white; z-index: 100;
+            align-items: center; padding: 0 20px; border-bottom: 1px solid #f0f0f0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
         }
         #sidebar-overlay {
             display: none; position: fixed; inset: 0;
             background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
             z-index: 998;
-        }
-
-        /* --- LAYOUT --- */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            width: calc(100% - var(--sidebar-width));
-            height: 100vh;
-            background: var(--glass-bg);
-            backdrop-filter: blur(35px);
-            border-left: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 40px;
-            overflow-y: auto;
-            position: relative;
-            -webkit-overflow-scrolling: touch;
         }
 
         /* --- EXAM STYLES --- */
@@ -96,7 +130,7 @@
             font-size: 1.1rem; line-height: 1.9; color: #2D3436; background: transparent;
         }
 
-        /* AI Result & Meter */
+        /* AI Result */
         .ai-result-view { padding: 30px; font-size: 1.1rem; line-height: 1.9; overflow-y: auto; background-color: #fafafa; }
         
         .ai-meter-box {
@@ -111,17 +145,52 @@
         .text-bad { color: #EF4444; background: #FEF2F2; text-decoration: line-through; padding: 2px 4px; border-radius: 6px; }
         .text-fix { color: #3B82F6; font-weight: 700; font-style: italic; }
 
-        /* Loading */
-        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        /* Loading Overlay */
+        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .loader-robot { font-size: 4rem; color: var(--primary); animation: robotBounce 1s infinite alternate; }
         @keyframes robotBounce { from { transform: translateY(0); } to { transform: translateY(-20px); } }
 
-        /* --- MOBILE OPTIMIZATION --- */
+        /* --- POPUP MODAL CHUNG --- */
+        .custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 20001; justify-content: center; align-items: center; animation: fadeIn 0.2s ease; }
+        .modal-box { background: white; padding: 35px; border-radius: 30px; text-align: center; width: 90%; max-width: 400px; box-shadow: 0 25px 60px rgba(0,0,0,0.2); transform: scale(0.9); animation: zoomIn 0.2s ease forwards; border: 1px solid rgba(255,255,255,0.9); }
+        .modal-icon { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 20px; }
+        
+        .modal-box h3 { margin-bottom: 10px; font-weight: 800; font-size: 1.5rem; }
+        .modal-box p { margin-bottom: 25px; font-size: 1rem; line-height: 1.6; color: #666; }
+        .modal-actions { display: flex; gap: 12px; }
+        .modal-btn { flex: 1; padding: 14px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; transition: 0.2s; font-size: 0.95rem; }
+        
+        /* Styles */
+        .error-style .modal-icon { background: #FEF2F2; color: #EF4444; }
+        .error-style h3 { color: #DC2626; }
+        .btn-cancel { background: #F3F4F6; color: #4B5563; }
+        .btn-action-red { background: #EF4444; color: white; box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3); }
+        
+        .warning-style .modal-icon { background: #FFFBEB; color: #F59E0B; }
+        .warning-style h3 { color: #D97706; }
+        .btn-action-yellow { background: #F59E0B; color: white; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* --- MOBILE RESPONSIVE (ĐÃ FIX LỖI MENU) --- */
         @media (max-width: 1024px) {
-            .mobile-header { display: flex; z-index: 1000; }
+            .mobile-header { display: flex; }
             #sidebar-overlay.active { display: block; }
 
-            /* Sidebar trượt */
+            /* QUAN TRỌNG: Không ẩn #menu-placeholder hoàn toàn */
+            /* Ta dùng visibility hidden hoặc size 0 để nó vẫn render trong DOM */
+            #menu-placeholder { 
+                display: block !important; 
+                position: absolute; /* Thoát khỏi dòng chảy layout */
+                width: 0; 
+                height: 0;
+                overflow: visible; /* Để menu con trượt ra ngoài được */
+                z-index: 9999;
+            }
+            
+            /* Sidebar thật (được load vào placeholder) */
+            /* Chúng ta cần CSS này để ghi đè style mặc định nếu cần */
             aside {
                 position: fixed !important; 
                 left: 0 !important; top: 0 !important; bottom: 0 !important;
@@ -130,37 +199,36 @@
                 width: 280px !important; 
                 background: white !important;
                 transition: transform 0.3s ease-in-out !important;
+                box-shadow: none;
+                height: 100vh !important;
             }
             aside.open { 
                 transform: translateX(0) !important;
-                box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important;
+                box-shadow: 10px 0 50px rgba(0,0,0,0.15) !important;
             }
 
             .main-content { 
                 margin-left: 0 !important; 
                 width: 100% !important; 
-                padding: 80px 20px 40px !important; /* Padding top để tránh header */
-                height: auto;
+                padding: 90px 20px 40px !important; 
+                padding-left: 20px !important; /* Reset padding trái về chuẩn mobile */
+                height: auto; 
+                border-left: none;
             }
             
-            /* Chuyển grid thành 1 cột */
             .workspace-grid { 
                 grid-template-columns: 1fr; 
                 height: auto; 
                 display: flex;
                 flex-direction: column;
+                gap: 30px;
             }
 
-            /* Giới hạn chiều cao đề bài để không chiếm hết màn hình */
             .prompt-card { height: 500px; min-height: 400px; }
-            
-            /* Khu vực nhập liệu */
             .editor-container { height: 500px; }
             #output-section { height: auto; }
 
-            /* Ẩn các nút không cần thiết */
-            .user-avatar { width: 40px; height: 40px; font-size: 1rem; }
-            #timer { font-size: 1rem; }
+            .user-avatar, #timer { display: none; }
         }
     </style>
 </head>
@@ -176,6 +244,9 @@
             <img src="../LOGO.WEBP" alt="Logo" class="w-8 h-8">
             <span class="font-black text-orange-500 text-lg">HOPVAN</span>
         </div>
+        <div class="ml-auto bg-black text-white px-4 py-1.5 rounded-lg font-bold text-sm">
+            <span id="timer-mobile">120:00</span>
+        </div>
     </div>
 
     <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
@@ -186,11 +257,34 @@
         <p class="text-gray-500 mt-2 font-medium">Chờ chút nhé, giáo viên AI đang đọc bài văn của bạn</p>
     </div>
 
+    <div id="ai-error-popup" class="custom-modal">
+        <div class="modal-box error-style">
+            <div class="modal-icon"><i class="fas fa-exclamation-circle"></i></div>
+            <h3>AI Hiện Đang Quá Tải</h3>
+            <p>Hệ thống đang tiếp nhận quá nhiều yêu cầu cùng lúc. Vui lòng thử lại sau giây lát.</p>
+            <div class="modal-actions">
+                <button id="btn-ai-cancel" class="modal-btn btn-cancel">Hủy bỏ</button>
+                <button id="btn-ai-retry" class="modal-btn btn-action-red">Thử lại ngay</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="short-essay-popup" class="custom-modal">
+        <div class="modal-box warning-style">
+            <div class="modal-icon"><i class="fas fa-pen-nib"></i></div>
+            <h3>Bài Viết Quá Ngắn</h3>
+            <p>Bài thi tổng hợp cần ít nhất <strong>100 từ</strong> để AI có thể phân tích chính xác. Hãy viết thêm chút nữa nhé!</p>
+            <div class="modal-actions">
+                <button id="btn-short-close" class="modal-btn btn-action-yellow w-full">Đã hiểu, viết tiếp</button>
+            </div>
+        </div>
+    </div>
+
     <div class="dashboard-container">
         <div id="menu-placeholder"></div>
 
         <main class="main-content">
-            <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
+            <div class="flex justify-between items-center mb-8 flex-wrap gap-4 hidden lg:flex">
                 <div class="flex items-center gap-5">
                     <div>
                         <h2 class="text-2xl md:text-3xl font-black text-gray-800 tracking-tight">Luyện Đề Tổng Hợp</h2>
@@ -243,7 +337,7 @@
 
                     <div id="output-section" class="editor-container h-auto min-h-[100px] transition-all duration-500">
                         <div class="px-8 py-4 bg-gray-50/50 border-b flex justify-between items-center">
-                            <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Phản hồi từ giáo viên AI</span>
+                            <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Phản hồi từ AI</span>
                             <button id="submit-btn" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-2.5 rounded-xl font-black text-sm hover:scale-105 transition shadow-lg active:scale-95">NỘP BÀI</button>
                         </div>
                         
@@ -291,7 +385,7 @@
     let questionsData = [];
     window.currentExamData = null;
 
-    // --- SIDEBAR TOGGLE LOGIC ---
+    // --- SIDEBAR TOGGLE ---
     window.toggleSidebar = () => {
         const sidebar = document.querySelector('aside') || document.getElementById('main-sidebar');
         const overlay = document.getElementById('sidebar-overlay');
@@ -311,18 +405,23 @@
     // --- TIMER 120 PHÚT ---
     let timeLeft = 7200; 
     const timerElement = document.getElementById('timer');
+    const timerMobile = document.getElementById('timer-mobile');
+
     function startTimer() {
         const countdown = setInterval(() => {
             if (timeLeft <= 0) {
                 clearInterval(countdown);
-                timerElement.innerText = "00:00:00";
+                if(timerElement) timerElement.innerText = "00:00:00";
+                if(timerMobile) timerMobile.innerText = "00:00:00";
                 alert("Hết giờ làm bài!");
             } else {
                 timeLeft--;
                 let h = Math.floor(timeLeft / 3600);
                 let m = Math.floor((timeLeft % 3600) / 60);
                 let s = timeLeft % 60;
-                timerElement.innerText = `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                const timeString = `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                if(timerElement) timerElement.innerText = timeString;
+                if(timerMobile) timerMobile.innerText = timeString;
             }
         }, 1000);
     }
@@ -330,12 +429,13 @@
     onAuthStateChanged(auth, (u) => {
         if (u) {
             const n = u.displayName || u.email;
-            document.getElementById('avatar-initial').innerText = n.charAt(0).toUpperCase();
+            const avatar = document.getElementById('avatar-initial');
+            if(avatar) avatar.innerText = n.charAt(0).toUpperCase();
             startTimer();
         } else { window.location.href = "../log.html"; }
     });
 
-    // --- TẢI ĐỀ FULL ---
+    // --- TẢI ĐỀ ---
     async function loadQuestions() {
         try {
             const r = await fetch('questions-full.json');
@@ -354,7 +454,6 @@
 
         document.getElementById('exam-code').innerText = `Mã đề: ${q.id}`;
         
-        // Render Đề bài
         const htmlContent = `
             <div class="exam-section">
                 <span class="section-label">I. ĐỌC HIỂU (3.0 điểm)</span>
@@ -378,28 +477,20 @@
         `;
         document.getElementById('prompt-content').innerHTML = htmlContent;
 
-        // Reset UI khi đổi đề
+        // Reset UI
         document.getElementById('student-essay').value = "";
         document.getElementById('overall-feedback-box').classList.add('hidden');
-        
-        // Hiện lại khung nhập liệu và thu nhỏ khung kết quả
         document.getElementById('input-section').classList.remove('hidden');
         document.getElementById('output-section').classList.remove('h-full');
         document.getElementById('output-section').classList.add('h-auto', 'min-h-[100px]');
         
-        // Căn giữa Box AI
         const aiBox = document.getElementById('ai-correction-box');
         aiBox.className = "ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400";
-        aiBox.innerHTML = `
-            <div>
-                <i class="fas fa-robot text-5xl mb-4 opacity-20"></i>
-                <p class="font-bold">Sẵn sàng chấm bài</p>
-            </div>`;
+        aiBox.innerHTML = `<div><i class="fas fa-robot text-5xl mb-4 opacity-20"></i><p class="font-bold">Sẵn sàng chấm bài</p></div>`;
     };
 
     loadQuestions();
 
-    // --- UPLOAD FILE ---
     document.getElementById('file-upload').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -419,10 +510,31 @@
         }
     });
 
-    // --- CHẤM BÀI FULL ---
-    document.getElementById('submit-btn').onclick = async () => {
+    // --- POPUP HANDLERS ---
+    const errorPopup = document.getElementById('ai-error-popup');
+    const shortEssayPopup = document.getElementById('short-essay-popup');
+    
+    function showAiError() {
+        document.getElementById('loading-overlay').style.display = 'none';
+        errorPopup.style.display = 'flex';
+    }
+    function hideAiError() { errorPopup.style.display = 'none'; }
+
+    function showShortEssay() { shortEssayPopup.style.display = 'flex'; }
+    function hideShortEssay() { shortEssayPopup.style.display = 'none'; }
+
+    document.getElementById('btn-ai-cancel').addEventListener('click', hideAiError);
+    document.getElementById('btn-ai-retry').addEventListener('click', () => { hideAiError(); handleAISubmission(); });
+    document.getElementById('btn-short-close').addEventListener('click', hideShortEssay);
+
+    // --- MAIN AI LOGIC ---
+    async function handleAISubmission() {
         const content = document.getElementById('student-essay').value.trim();
-        if (content.split(/\s+/).length < 50) return alert("Bài làm quá ngắn để chấm tổng hợp!");
+        // Kiểm tra bài ngắn (dưới 50 từ)
+        if (content.split(/\s+/).length < 50) {
+            showShortEssay();
+            return;
+        }
 
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex';
@@ -493,8 +605,15 @@
                     timestamp: serverTimestamp()
                 });
             }
-        } catch (e) { console.error("AI Error:", e); alert("Lỗi xử lý AI. Vui lòng thử lại!"); } finally { loading.style.display = 'none'; }
+            loading.style.display = 'none';
+
+        } catch (e) { 
+            console.error("AI Error:", e); 
+            showAiError(); // GỌI POPUP LỖI
+        } 
     };
+
+    document.getElementById('submit-btn').onclick = handleAISubmission;
 
     document.getElementById('student-essay').oninput = function() {
         const c = this.value.trim().split(/\s+/).filter(x => x).length;
