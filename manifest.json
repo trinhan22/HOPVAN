@@ -1,6 +1,6 @@
 {
-  "name": "Hopvan",
-  "short_name": "Hopvan",
+  "name": "HopVan",
+  "short_name": "HopVan",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#FFF5EC",
