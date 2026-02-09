@@ -196,7 +196,7 @@ function initChatbot() {
                         <div class="online-dot"></div>
                     </div>
                     <div>
-                        <h3 class="font-bold text-lg m-0 leading-tight">Hopvan AI</h3>
+                        <h3 class="font-bold text-lg m-0 leading-tight">HopVan AI</h3>
                         <p class="text-xs opacity-90 m-0 font-medium">Gia sư văn học</p>
                     </div>
                 </div>
