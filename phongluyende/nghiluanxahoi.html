@@ -117,8 +117,10 @@
         .writing-area { 
             flex: 1; width: 100%; padding: 30px; border: none; outline: none; resize: none; 
             font-size: 1.1rem; line-height: 1.9; color: #1E293B; 
-            background: #F8FAFC !important; /* Màu nền xám nhẹ để phân biệt với Glass-card */
+            /* Thay đổi: Nền trắng đặc và bo góc chuẩn */
+            background: #FFFFFF !important; 
             border-radius: 0 0 30px 30px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
         }
 
         #prompt-passage {
@@ -321,9 +323,8 @@
                     
                     <div id="ai-correction-box" class="ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400">
                         <div>
-                            <i class="fas fa-magic text-5xl mb-4 opacity-20"></i>
+                            <i class="fas fa-robot text-5xl mb-4 opacity-20"></i>
                             <p class="font-bold text-lg">Sẵn sàng chấm bài</p>
-                            <p class="text-xs font-medium opacity-60 mt-1">Hoàn thành bài viết và nhấn "Nộp bài"<br>để AI chấm điểm</p>
                         </div>
                     </div>
                 </div>
@@ -349,7 +350,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
@@ -411,12 +412,11 @@
         } else { window.location.href = "../log.html"; }
     });
 
-    // --- TẢI ĐỀ ---
-    // --- THAY THẾ: HÀM TẢI ĐỀ TỪ FIREBASE ---
+    // --- CẬP NHẬT: TẢI ĐỀ TỪ FIREBASE ---
     async function loadQuestions() {
         const promptTextUI = document.getElementById('prompt-text');
         try {
-            // Tạo truy vấn lấy các đề NLXH từ essay_bank
+            // Truy vấn kho essay_bank lọc theo loại 'nlxh'
             const q = query(collection(db, "essay_bank"), where("type", "==", "nlxh"));
             const querySnapshot = await getDocs(q);
             
@@ -426,30 +426,29 @@
             });
 
             if (questionsData.length === 0) {
-                promptTextUI.innerText = "Kho đề NLXH đang trống. Vui lòng thêm đề ở trang Quản trị.";
+                promptTextUI.innerText = "Kho đề NLXH đang trống. Bạn hãy thêm đề ở trang Admin nhé!";
                 return;
             }
 
-            randomizeQuestion(); // Hiển thị đề ngẫu nhiên ngay khi tải xong
+            randomizeQuestion(); // Hiện đề ngẫu nhiên
         } catch (e) {
-            console.error("Lỗi trích xuất Firebase:", e);
-            promptTextUI.innerText = "Lỗi kết nối kho đề: " + e.message;
+            console.error("Lỗi:", e);
+            promptTextUI.innerText = "Lỗi kết nối kho đề Firebase.";
         }
     }
 
-    // --- THAY THẾ: HÀM HIỂN THỊ ĐỀ ---
+    // --- CẬP NHẬT: HIỂN THỊ ĐỀ ĐỘNG ---
     window.randomizeQuestion = () => {
         if (questionsData.length === 0) return;
         
-        // Chọn ngẫu nhiên 1 đề từ mảng đã tải
         const q = questionsData[Math.floor(Math.random() * questionsData.length)];
-        window.currentExamData = { ...q, type: 'nlxh' };
+        window.currentExamData = q;
 
-        // Đổ dữ liệu ra UI
+        // Đổ dữ liệu đề bài
         document.getElementById('prompt-text').innerText = q.topic;
-        document.getElementById('hint-content').innerText = q.hint || "Hãy đảm bảo bài viết có đủ: Mở bài (dẫn dắt), Thân bài (Giải thích, Bàn luận, Chứng minh, Phản đề) và Kết bài.";
+        document.getElementById('hint-content').innerText = q.hint || "Phân tích các khía cạnh: Biểu hiện, Nguyên nhân, Ý nghĩa, Phản đề và Bài học.";
 
-        // Xử lý Ngữ liệu (nếu đề bài có kèm văn bản trích dẫn)
+        // Hiển thị ngữ liệu nếu có
         const passageUI = document.getElementById('prompt-passage');
         if (q.text && q.text.trim() !== "") {
             passageUI.innerText = q.text;
@@ -458,14 +457,11 @@
             passageUI.parentElement.classList.add('hidden');
         }
 
-        // Reset giao diện làm bài
+        // Reset giao diện bài làm
         document.getElementById('student-essay').value = "";
         document.getElementById('word-count').innerText = "0 TỪ";
         document.getElementById('overall-feedback-box').classList.add('hidden');
-        
-        const aiBox = document.getElementById('ai-correction-box');
-        aiBox.className = "ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400";
-        aiBox.innerHTML = `<div><i class="fas fa-magic text-5xl mb-4 opacity-20"></i><p class="font-bold">Sẵn sàng chấm bài</p></div>`;
+        document.getElementById('ai-correction-box').innerHTML = `<div><i class="fas fa-magic text-5xl mb-4 opacity-20"></i><p class="font-bold text-lg">Sẵn sàng chấm bài</p></div>`;
     };
 
     loadQuestions();
@@ -517,41 +513,31 @@
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex';
 
-        const q = window.currentExamData;
-        
+        // Tìm bên trong hàm handleAISubmission và thay đổi đoạn systemPrompt:
+        const q = window.currentExamData; // Lấy dữ liệu đề đang hiện trên màn hình
+
         const systemPrompt = `
-            BẠN LÀ: Giáo viên Ngữ văn lớp 12 uy tín, chuyên chấm thi Nghị luận Xã hội.
-            THÁI ĐỘ: Nghiêm túc, công tâm, ngôn ngữ phê bình sắc sảo, hàn lâm.
+            VAI TRÒ: Giáo viên Ngữ văn lớp 12 chuyên chấm thi Nghị luận xã hội.
+            ĐỀ BÀI: "${q.topic}" 
+            GỢI Ý Ý CHÍNH: "${q.hint || ''}"
 
             NHIỆM VỤ:
-            1. KIỂM TRA ĐỘ TRUNG THỰC (AI DETECTION):
-               - Phân tích văn phong để tìm dấu hiệu AI (văn mẫu, sáo rỗng, cấu trúc lặp).
-               - Đánh giá 'human_score' (0-100).
-            
-            2. CHẤM ĐIỂM CHUYÊN MÔN (NLXH 200 CHỮ):
-               - Kiểm tra cấu trúc đoạn văn: Giải thích -> Phân tích/Bàn luận -> Chứng minh -> Phản đề -> Bài học.
-               - Đánh giá dẫn chứng: Có tính thời sự, tiêu biểu không?
-               - Chấm điểm trên thang 10 (NLXH thường tối đa 2.0 điểm trong bài thi, nhưng ở đây chấm thang 10 cho dễ hình dung chất lượng).
-            
-            3. SỬA BÀI CHI TIẾT:
-               - Tạo HTML, tô đỏ lỗi (<span class="text-bad">), tô xanh ý hay (<span class="text-good">), gợi ý sửa (<span class="text-fix">).
+            1. Chấm điểm thang 10 dựa trên: Cấu trúc đoạn văn, tính thời sự của dẫn chứng, và sức thuyết phục của lập luận.
+            2. Phát hiện văn mẫu hoặc văn do AI viết (human_score).
+            3. Trả về bài sửa HTML chi tiết.
 
-            TRẢ VỀ JSON DUY NHẤT:
+            YÊU CẦU JSON DUY NHẤT:
             {
-              "human_score": (0-100),
-              "ai_comment": "Nhận xét ngắn về độ tự nhiên.",
-              "score": (Điểm số thang 10, ví dụ 8.0),
-              "correction_html": "HTML bài làm đã sửa...",
-              "idea_feedback": ["Ưu điểm 1", "Ưu điểm 2"],
-              "missing_points": ["Hạn chế 1", "Hạn chế 2"]
+            "human_score": (0-100),
+            "ai_comment": "...",
+            "score": (Điểm số),
+            "correction_html": "HTML bài sửa với thẻ <span class='text-bad'>lỗi</span> <span class='text-fix'>sửa</span> và <span class='text-good'>ý hay</span>",
+            "idea_feedback": ["Ưu điểm 1", "Ưu điểm 2"],
+            "missing_points": ["Hạn chế 1", "Hạn chế 2"]
             }
 
-            --- ĐỀ BÀI ---
-            CHỦ ĐỀ: ${q.topic}
-            GỢI Ý: ${q.hint}
-            
-            --- BÀI LÀM HỌC SINH ---
-            ${content}
+            BÀI LÀM CỦA HỌC SINH:
+            "${content}"
         `;
 
         try {
