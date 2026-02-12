@@ -116,8 +116,14 @@
 
         .writing-area { 
             flex: 1; width: 100%; padding: 30px; border: none; outline: none; resize: none; 
-            font-size: 1.1rem; line-height: 1.9; color: #2D3436; background: transparent;
-            min-height: 400px;
+            font-size: 1.1rem; line-height: 1.9; color: #1E293B; 
+            background: #F8FAFC !important; /* Nền xám nhẹ nổi bật trên nền trắng */
+            border-radius: 0 0 30px 30px;
+        }
+
+        #prompt-passage {
+            white-space: pre-wrap; /* Giữ định dạng thơ/xuống dòng */
+            line-height: 1.8;
         }
 
         .ai-result-view { padding: 30px; font-size: 1.1rem; line-height: 1.9; overflow-y: auto; background-color: #fafafa; height: 100%; }
@@ -370,7 +376,8 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    // THÊM CÁC HÀM TRUY VẤN FIRESTORE
+    import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
@@ -378,10 +385,10 @@
     const db = getFirestore(app);
 
     const API_URL = `/.netlify/functions/gemini-proxy`;
-    let questionsData = {};
+    // Biến lưu đề thi hiện tại (sẽ được đổ data từ Firebase vào)
     window.currentExamData = null;
 
-    // --- SIDEBAR TOGGLE ---
+    // --- SIDEBAR TOGGLE (GIỮ NGUYÊN) ---
     window.toggleSidebar = () => {
         const sidebar = document.querySelector('aside') || document.getElementById('main-sidebar');
         const overlay = document.getElementById('sidebar-overlay');
@@ -398,7 +405,7 @@
         }
     };
 
-    // --- TIMER LOGIC ---
+    // --- TIMER LOGIC (GIỮ NGUYÊN) ---
     let timeLeft = 1800; 
     const timerElement = document.getElementById('timer');
     const timerMobileElement = document.getElementById('timer-mobile');
@@ -427,67 +434,91 @@
             const avatar = document.getElementById('avatar-initial');
             if(avatar) avatar.innerText = n.charAt(0).toUpperCase();
             startTimer();
+            // THÊM DÒNG NÀY:
+            randomizeQuestion(); 
         } else { window.location.href = "../log.html"; }
     });
 
-    async function loadQuestions() {
-        try {
-            const r = await fetch('questions.json');
-            questionsData = await r.json();
-            randomizeQuestion();
-        } catch (e) {
-            document.getElementById('prompt-text').innerText = "Lỗi tải đề bài";
-        }
-    }
-
-    window.randomizeQuestion = () => {
-        const type = document.getElementById('topic-select').value;
-        const list = questionsData[type];
-        if (!list || list.length === 0) return;
-
-        const q = list[Math.floor(Math.random() * list.length)];
-        window.currentExamData = { ...q, type: type };
-
-        const passageBox = document.getElementById('passage-container');
-        const questionsBox = document.getElementById('questions-list-container');
-        const hintBox = document.getElementById('prompt-hint');
+    // --- HÀM LẤY ĐỀ TỪ DATABASE (THAY THẾ LOAD JSON) ---
+    window.randomizeQuestion = async () => {
+        const type = document.getElementById('topic-select').value; // 'nlxh', 'nlvh', 'dochieu'
         const textUI = document.getElementById('prompt-text');
         const labelUI = document.getElementById('prompt-type-label');
         const titleUI = document.getElementById('prompt-title');
+        const passageBox = document.getElementById('passage-container');
+        const questionsBox = document.getElementById('questions-list-container');
+        const hintBox = document.getElementById('prompt-hint');
 
-        passageBox.classList.add('hidden');
-        questionsBox.classList.add('hidden');
-        hintBox.classList.add('hidden');
+        // Hiệu ứng chờ
+        textUI.innerText = "Đang lấy đề ngẫu nhiên từ hệ thống...";
+        [passageBox, questionsBox, hintBox].forEach(el => el.classList.add('hidden'));
 
-        if (type === 'dochieu') {
-            labelUI.innerText = "Đọc hiểu";
-            titleUI.innerText = q.title || "";
-            textUI.innerText = "Dựa vào văn bản để trả lời các câu hỏi:";
-            passageBox.classList.remove('hidden');
-            questionsBox.classList.remove('hidden');
-            document.getElementById('prompt-passage').innerText = q.text;
-            document.getElementById('questions-container').innerHTML = q.questions.map(item => `
-                <div class="p-3 bg-white border border-gray-100 rounded-xl shadow-sm mb-2"><p>${item.q}</p></div>
-            `).join('');
-        } else {
-            labelUI.innerText = type === 'nlvh' ? "Nghị luận văn học" : "Nghị luận xã hội";
-            titleUI.innerText = q.title || "";
-            textUI.innerText = q.topic;
-            if(q.text) { passageBox.classList.remove('hidden'); document.getElementById('prompt-passage').innerText = q.text; }
-            hintBox.classList.remove('hidden');
-            hintBox.querySelector('span').innerText = "Gợi ý: " + q.hint;
+        try {
+            let qQuery;
+            // 1. Phân loại Collection để truy vấn
+            if (type === 'dochieu') {
+                qQuery = collection(db, "reading_bank");
+            } else {
+                // Lọc đề NLXH hoặc NLVH từ collection essay_bank
+                qQuery = query(collection(db, "essay_bank"), where("type", "==", type));
+            }
+
+            const snapshot = await getDocs(qQuery);
+            if (snapshot.empty) {
+                textUI.innerText = "Hiện chưa có đề nào trong mục này.";
+                return;
+            }
+
+            // 2. Chọn 1 đề ngẫu nhiên từ kết quả trả về
+            const docs = snapshot.docs;
+            const randomDoc = docs[Math.floor(Math.random() * docs.length)];
+            const data = randomDoc.data();
+            window.currentExamData = { ...data, id: randomDoc.id, type: type };
+
+            // 3. Hiển thị nội dung dựa trên loại đề
+            if (type === 'dochieu') {
+                labelUI.innerText = "Đọc Hiểu";
+                titleUI.innerText = data.title || "";
+                textUI.innerText = "Đọc văn bản và trả lời các câu hỏi sau:";
+                document.getElementById('prompt-passage').innerText = data.text;
+                passageBox.classList.remove('hidden');
+
+                if (data.questions) {
+                    document.getElementById('questions-container').innerHTML = data.questions.map((q, i) => 
+                        `<div class="p-3 bg-gray-50 rounded-xl mb-2 text-sm">Câu ${i+1}: ${q.q}</div>`
+                    ).join('');
+                    questionsBox.classList.remove('hidden');
+                }
+            } else {
+                labelUI.innerText = type === 'nlxh' ? "Nghị Luận Xã Hội" : "Nghị Luận Văn Học";
+                titleUI.innerText = data.workName || "";
+                textUI.innerText = data.topic; // Đề bài chính
+                
+                // Nếu đề có kèm ngữ liệu/văn bản
+                if (data.text) {
+                    document.getElementById('prompt-passage').innerText = data.text;
+                    passageBox.classList.remove('hidden');
+                }
+                // Gợi ý làm bài
+                if (data.hint) {
+                    hintBox.classList.remove('hidden');
+                    hintBox.querySelector('span').innerText = "Gợi ý: " + data.hint;
+                }
+            }
+            
+            // Reset bài làm cũ
+            document.getElementById('student-essay').value = "";
+            document.getElementById('word-count').innerText = "0 TỪ";
+
+        } catch (error) {
+            console.error("Lỗi:", error);
+            textUI.innerText = "Không thể tải đề. Kiểm tra kết nối Internet.";
         }
-        
-        document.getElementById('student-essay').value = "";
-        const aiBox = document.getElementById('ai-correction-box');
-        aiBox.className = "ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400";
-        aiBox.innerHTML = `<div><i class="fas fa-robot text-5xl mb-4 opacity-20"></i><p class="font-bold">Sẵn sàng chấm bài</p></div>`;
-        document.getElementById('overall-feedback-box').style.display = 'none';
     };
 
     document.getElementById('topic-select').onchange = randomizeQuestion;
-    loadQuestions();
 
+    // --- UPLOAD FILE (GIỮ NGUYÊN) ---
     document.getElementById('file-upload').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -513,7 +544,7 @@
         } else { alert("Vui lòng chọn file .docx hoặc .txt"); }
     });
 
-    // --- POPUP HANDLERS ---
+    // --- POPUP HANDLERS (GIỮ NGUYÊN) ---
     const errorPopup = document.getElementById('ai-error-popup');
     const shortEssayPopup = document.getElementById('short-essay-popup');
     
@@ -530,7 +561,7 @@
     document.getElementById('btn-ai-retry').addEventListener('click', () => { hideAiError(); handleAISubmission(); });
     document.getElementById('btn-short-close').addEventListener('click', hideShortEssay);
 
-    // --- MAIN AI LOGIC ---
+    // --- MAIN AI LOGIC (GIỮ NGUYÊN) ---
     async function handleAISubmission() {
         const content = document.getElementById('student-essay').value.trim();
         // TRIGGER POPUP NẾU NGẮN
@@ -542,7 +573,26 @@
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex';
 
+        // Lấy dữ liệu đề hiện tại (đã được fetch từ Firebase)
         const exam = window.currentExamData;
+
+        // Xây dựng Context cho AI dựa trên loại đề
+        let examContext = "";
+        if (exam.type === 'dochieu') {
+            examContext = `
+                LOẠI ĐỀ: Đọc hiểu
+                VĂN BẢN: ${exam.text}
+                CÂU HỎI: ${exam.questions.map(q => q.q).join('; ')}
+            `;
+        } else {
+            examContext = `
+                LOẠI ĐỀ: ${exam.type === 'nlvh' ? 'Nghị luận Văn học' : 'Nghị luận Xã hội'}
+                YÊU CẦU: ${exam.topic}
+                VĂN BẢN TRÍCH DẪN (nếu có): ${exam.text || "Không có"}
+                GỢI Ý CHẤM (nếu có): ${exam.hint || "Không có"}
+            `;
+        }
+
         const systemPrompt = `
             BẠN LÀ: Một giáo viên Ngữ văn lớp 12 uy tín, chuyên gia luyện thi Tốt nghiệp THPT theo chương trình GDPT 2018.
             THÁI ĐỘ: Nghiêm túc, tỉ mỉ, ngôn ngữ phê bình văn học mang tính học thuật cao (hàn lâm), khích lệ nhưng thẳng thắn chỉ ra lỗi sai.
@@ -576,9 +626,7 @@
             }
 
             --- THÔNG TIN ĐỀ BÀI ---
-            LOẠI ĐỀ: ${exam.type === 'nlvh' ? 'Nghị luận Văn học' : (exam.type === 'dochieu' ? 'Đọc hiểu' : 'Nghị luận Xã hội')}
-            YÊU CẦU ĐỀ: ${exam.topic || exam.title}
-            VĂN BẢN TRÍCH DẪN (nếu có): ${exam.text || "Không có"}
+            ${examContext}
             
             --- BÀI LÀM CỦA HỌC SINH ---
             ${content}
@@ -610,9 +658,13 @@
             document.getElementById('overall-feedback-box').style.display = 'block';
 
             if (auth.currentUser) {
+                let actionTitle = exam.type === 'dochieu' ? exam.title : exam.topic;
+                // Nếu tiêu đề quá dài thì cắt bớt
+                if (actionTitle && actionTitle.length > 30) actionTitle = actionTitle.substring(0, 30) + "...";
+                
                 await addDoc(collection(db, "activities"), {
                     uid: auth.currentUser.uid,
-                    action: `Hoàn thành đề: ${(exam.title || exam.topic).substring(0, 30)}... (${res.score} điểm)`,
+                    action: `Làm đề: ${actionTitle} (${res.score} điểm)`,
                     type: "essay",
                     human_score: res.human_score,
                     score: res.score,

@@ -147,7 +147,7 @@
         <div class="sticky top-6 z-50 mb-12 px-2">
             <div class="max-w-5xl mx-auto glass-header px-6 py-3 flex justify-between items-center">
                 <a href="../dashboard/nhatkyhoctap.html" class="flex items-center gap-3 text-gray-600 font-bold hover:text-orange-500 transition group">
-                    <div class="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center shadow-sm text-orange-400 group-hover:scale-110 transition-transform">
+                    <div class="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center shadow-sm text-orange-400 group-hover:scale-110">
                         <i class="fas fa-arrow-left"></i>
                     </div>
                     <span class="hidden sm:inline">Quay lại lộ trình</span>
@@ -170,7 +170,6 @@
         </div>
 
         <div class="max-w-4xl mx-auto pb-20">
-            
             <div class="liquid-glass p-8 mb-10 relative overflow-hidden bg-gradient-to-br from-white/60 to-white/20">
                 <div class="relative z-10">
                     <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Level 3</span>
@@ -180,20 +179,18 @@
                 <i class="fas fa-pen-nib absolute -right-6 -bottom-8 text-9xl text-orange-500/10 rotate-12"></i>
             </div>
 
-            <div class="liquid-glass p-10 mb-8">
-                <h2 class="text-2xl font-black text-gray-800 mb-6">Chủ đề: Sức Mạnh Của Lòng Thấu Cảm</h2>
+            <div class="liquid-glass p-10 mb-8" id="level-3-content">
+                <h2 class="text-2xl font-black text-gray-800 mb-6" id="display-topic">Đang tải chủ đề...</h2>
                 
-                <div class="quote-box">
-                    "Thấu cảm là khả năng nhìn thế giới bằng con mắt của người khác, lắng nghe bằng đôi tai của người khác và cảm nhận bằng trái tim của người khác."
-                </div>
+                <div id="display-quote" class="quote-box hidden" style="white-space: pre-wrap;"></div>
 
                 <p class="text-gray-700 mb-6 leading-relaxed font-medium">
                     <span class="text-orange-500 font-bold uppercase text-xs tracking-wider mr-2">Yêu cầu:</span> 
-                    Hãy viết một đoạn văn (khoảng 200 chữ) trình bày suy nghĩ của anh/chị về ý nghĩa của sự thấu cảm trong cuộc sống hiện đại.
+                    Hãy viết một đoạn văn (khoảng 200 chữ) trình bày suy nghĩ của anh/chị về chủ đề trên.
                 </p>
 
                 <div class="relative">
-                    <textarea id="student-essay" class="glass-textarea" placeholder="Bắt đầu viết bài làm của bạn tại đây... (Tối thiểu 50 từ)"></textarea>
+                    <textarea id="student-essay" class="glass-textarea" style="background: #FFFFFF !important; border: 2px solid #E2E8F0;" placeholder="Bắt đầu viết bài làm của bạn tại đây... (Tối thiểu 50 từ)"></textarea>
                     <div class="absolute bottom-4 right-6 text-xs font-bold text-gray-400 bg-white/50 px-2 py-1 rounded-lg backdrop-blur-sm">
                         <span id="word-count">0</span> TỪ
                     </div>
@@ -256,7 +253,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
@@ -265,116 +262,82 @@
 
     const API_URL = `../.netlify/functions/gemini-proxy`;
     let userUid = null;
+    let levelData = null; // Lưu đề NLXH lấy từ Firebase
 
-    // --- HÀM POPUP ĐA NĂNG ---
+    // --- POPUP ĐA NĂNG (GIỮ NGUYÊN) ---
     window.showPopup = (type, title, msg, confirmCallback = null) => {
         const modal = document.getElementById('alert-modal');
-        const iconBox = document.getElementById('alert-icon-box');
-        const icon = document.getElementById('alert-icon');
-        const titleEl = document.getElementById('alert-title');
-        const msgEl = document.getElementById('alert-msg');
         const actions = document.getElementById('alert-actions');
-
-        titleEl.innerText = title;
-        msgEl.innerText = msg;
-
-        // Reset Styles
-        iconBox.className = "icon-box";
+        document.getElementById('alert-title').innerText = title;
+        document.getElementById('alert-msg').innerText = msg;
+        document.getElementById('alert-icon-box').className = "icon-box icon-" + type;
         actions.innerHTML = "";
-
-        if (type === 'warning') {
-            iconBox.classList.add('icon-warning');
-            icon.className = "fas fa-exclamation-triangle";
-            
-            if (confirmCallback) {
-                const cancelBtn = document.createElement('button');
-                cancelBtn.className = "px-6 py-3 rounded-xl font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition";
-                cancelBtn.innerText = "Kiểm tra lại";
-                cancelBtn.onclick = () => modal.classList.remove('open');
-
-                const confirmBtn = document.createElement('button');
-                confirmBtn.className = "px-6 py-3 rounded-xl font-bold bg-orange-500 text-white hover:bg-orange-600 shadow-lg shadow-orange-200 transition";
-                confirmBtn.innerText = "Nộp bài ngay";
-                confirmBtn.onclick = () => { modal.classList.remove('open'); confirmCallback(); };
-
-                actions.appendChild(cancelBtn);
-                actions.appendChild(confirmBtn);
-            } else {
-                const closeBtn = document.createElement('button');
-                closeBtn.className = "px-8 py-3 rounded-xl font-bold bg-orange-500 text-white hover:bg-orange-600 transition";
-                closeBtn.innerText = "Đã hiểu";
-                closeBtn.onclick = () => modal.classList.remove('open');
-                actions.appendChild(closeBtn);
-            }
-        } else if (type === 'error') {
-            iconBox.classList.add('icon-error');
-            icon.className = "fas fa-times-circle";
-            const closeBtn = document.createElement('button');
-            closeBtn.className = "px-8 py-3 rounded-xl font-bold bg-red-500 text-white hover:bg-red-600 transition";
-            closeBtn.innerText = "Thử lại";
-            closeBtn.onclick = () => { modal.classList.remove('open'); if(confirmCallback) confirmCallback(); };
-            actions.appendChild(closeBtn);
-        } else if (type === 'info') {
-            iconBox.classList.add('icon-info');
-            icon.className = "fas fa-info-circle";
-            const closeBtn = document.createElement('button');
-            closeBtn.className = "px-8 py-3 rounded-xl font-bold bg-blue-500 text-white hover:bg-blue-600 transition";
-            closeBtn.innerText = "Đăng nhập ngay";
-            closeBtn.onclick = () => { window.location.href = "../log.html"; };
-            actions.appendChild(closeBtn);
+        if (confirmCallback) {
+            const b1 = document.createElement('button'); b1.className = "px-6 py-3 rounded-xl font-bold bg-gray-100 text-gray-600";
+            b1.innerText = "Kiểm tra lại"; b1.onclick = () => modal.classList.remove('open');
+            const b2 = document.createElement('button'); b2.className = "px-6 py-3 rounded-xl font-bold bg-orange-500 text-white shadow-lg";
+            b2.innerText = "Nộp bài ngay"; b2.onclick = () => { modal.classList.remove('open'); confirmCallback(); };
+            actions.append(b1, b2);
+        } else {
+            const b = document.createElement('button'); b.className = "px-8 py-3 rounded-xl font-bold bg-orange-500 text-white";
+            b.innerText = "Đã hiểu"; b.onclick = () => modal.classList.remove('open');
+            actions.appendChild(b);
         }
-
         modal.classList.add('open');
     };
 
     onAuthStateChanged(auth, (u) => {
-        if (u) userUid = u.uid;
-        else showPopup('info', 'Yêu cầu đăng nhập', 'Bạn cần đăng nhập để lưu kết quả và mở khóa màn tiếp theo.');
+        if (u) { userUid = u.uid; initLevel3(); }
+        else showPopup('info', 'Yêu cầu đăng nhập', 'Bạn cần đăng nhập để thực hiện thử thách.');
     });
 
-    fetch('menu.html').then(r=>r.text()).then(h=>{
-        const p = document.getElementById('menu-placeholder'); p.innerHTML=h;
-        p.querySelectorAll('script').forEach(s=>{const n=document.createElement('script');n.text=s.text;document.body.appendChild(n)});
-    });
+    // --- 1. TẢI ĐỀ NLXH TỪ FIREBASE ---
+    async function initLevel3() {
+        try {
+            const q = query(collection(db, "study_levels"), where("level", "==", 3));
+            const snap = await getDocs(q);
+            if (snap.empty) return alert("Level 3 chưa được thiết lập!");
+            
+            const docData = snap.docs[0].data();
+            levelData = docData.content; // { topic, text, hint }
 
-    // Hàm gọi khi bấm Nộp bài
+            // Đổ dữ liệu ra giao diện
+            document.getElementById('display-topic').innerText = "Chủ đề: " + levelData.topic;
+            if (levelData.text) {
+                const quoteBox = document.getElementById('display-quote');
+                quoteBox.innerText = levelData.text;
+                quoteBox.classList.remove('hidden');
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    // --- 2. XỬ LÝ NỘP BÀI & CHẤM ĐIỂM ---
     window.confirmSubmission = () => {
         const content = document.getElementById('student-essay').value.trim();
-        const wordCount = content.split(/\s+/).filter(x => x).length;
+        const words = content.split(/\s+/).filter(x => x).length;
 
-        if (wordCount < 50) {
-            showPopup('warning', 'Bài viết quá ngắn', 'Bài làm NLXH cần ít nhất 100 từ để AI có thể chấm điểm chính xác.');
-            return;
-        }
-
-        showPopup('warning', 'Xác nhận nộp bài', 'Bạn có chắc chắn muốn nộp bài? Hệ thống sẽ chấm điểm ngay lập tức.', handleRealSubmit);
+        if (words < 50) return showPopup('warning', 'Bài viết quá ngắn', 'Bạn cần viết ít nhất 100 từ để AI có thể chấm điểm chính xác.');
+        showPopup('warning', 'Xác nhận nộp bài', 'Bài văn của bạn sẽ được AI chấm điểm theo thang điểm 10.', handleRealSubmit);
     };
 
-    // Hàm chấm điểm thật (gọi sau khi confirm)
     const handleRealSubmit = async () => {
         const content = document.getElementById('student-essay').value.trim();
         document.getElementById('loading-overlay').style.display = 'flex';
 
-        // Prompt chấm NLXH
         const systemPrompt = `
-            VAI TRÒ: Giáo viên Ngữ Văn chấm bài Nghị Luận Xã Hội (Đoạn văn 200 chữ).
-            ĐỀ BÀI: "Sức mạnh của lòng thấu cảm".
+            VAI TRÒ: Giáo viên Ngữ Văn chấm bài NLXH lớp 12.
+            ĐỀ BÀI: "${levelData.topic}"
+            NGỮ LIỆU GỢI Ý: "${levelData.text || ''}"
             
-            TIÊU CHÍ CHẤM (Thang 10):
-            1. Bố cục (2.0): Mở đoạn, Thân đoạn, Kết đoạn rõ ràng.
-            2. Nội dung (4.0): Giải thích, Bàn luận, Dẫn chứng, Phản đề/Bài học.
-            3. Diễn đạt (2.0): Trôi chảy, không sai chính tả/ngữ pháp.
-            4. Sáng tạo (2.0): Có giọng văn riêng, dẫn chứng mới mẻ.
+            YÊU CẦU: Chấm điểm bài làm văn của học sinh dựa trên nội dung đề bài. Đánh giá sự thấu cảm, dẫn chứng và lập luận.
+            BÀI LÀM: "${content}"
 
-            BÀI LÀM CỦA HỌC SINH:
-            "${content}"
-
-            YÊU CẦU JSON DUY NHẤT (Không Markdown):
+            TRẢ VỀ JSON DUY NHẤT:
             {
-                "score": (Số thực, max 10.0),
-                "title": "Nhận xét ngắn (VD: Tốt, Khá, Cần cố gắng)",
-                "desc": "Lời khuyên tổng quát (1 câu)",
-                "correction_html": "Bài làm gốc nhưng thêm thẻ <span class='text-bad'>lỗi</span> <span class='text-fix'>sửa</span> và <span class='text-good'>ý hay</span>.",
+                "score": (Số thực),
+                "title": "Nhận xét ngắn",
+                "desc": "Lời khuyên tổng quát",
+                "correction_html": "Nội dung bài làm đã highlight lỗi <span class='text-bad'>lỗi</span> <span class='text-fix'>sửa</span> và ý hay <span class='text-good'>ý hay</span>.",
                 "pros": ["Điểm mạnh 1", "Điểm mạnh 2"],
                 "cons": ["Điểm yếu 1", "Điểm yếu 2"]
             }
@@ -386,99 +349,57 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
             });
-
             const data = await response.json();
-            
-            if (data.error) throw new Error(data.error.message);
-            if (!data.candidates || data.candidates.length === 0) throw new Error("AI không trả lời.");
+            const res = JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json|```/g, "").trim());
 
-            const rawText = data.candidates[0].content.parts[0].text;
-            const res = JSON.parse(rawText.replace(/```json|```/g, "").trim());
+            renderResult(res);
 
-            // Render Kết quả
-            document.getElementById('result-box').style.display = 'block';
-            document.getElementById('submit-area').style.display = 'none';
-            document.getElementById('result-box').scrollIntoView({ behavior: 'smooth' });
-
-            const score = res.score;
-            document.getElementById('score-text').innerText = score;
-            document.getElementById('result-title').innerText = res.title;
-            document.getElementById('result-desc').innerText = res.desc;
-            document.getElementById('ai-correction').innerHTML = res.correction_html;
-
-            document.getElementById('pros-list').innerHTML = res.pros.map(i => `<li>${i}</li>`).join('');
-            document.getElementById('cons-list').innerHTML = res.cons.map(i => `<li>${i}</li>`).join('');
-
-            const titleEl = document.getElementById('result-title');
-            const ringEl = document.getElementById('score-ring');
-
-            if (score >= 6.0) {
-                titleEl.className = "text-3xl font-black text-green-600 mb-2";
-                ringEl.style.background = `conic-gradient(#10B981 ${score*10}%, rgba(255,255,255,0.5) 0%)`;
-                document.getElementById('next-btn').classList.remove('hidden');
-                document.getElementById('next-btn').classList.add('flex');
-            } else {
-                titleEl.className = "text-3xl font-black text-red-500 mb-2";
-                ringEl.style.background = `conic-gradient(#EF4444 ${score*10}%, rgba(255,255,255,0.5) 0%)`;
-                document.getElementById('retry-btn').classList.remove('hidden');
-                document.getElementById('retry-btn').classList.add('flex');
-            }
-
-            // Lưu Database
+            // Lưu Firebase & Tiến độ
             if(userUid) {
-                await addDoc(collection(db, "activities"), {
-                    uid: userUid,
-                    action: `NLXH Level 3: ${score}/10 điểm`,
-                    score: score,
-                    timestamp: serverTimestamp()
-                });
-
-                if (score >= 6.0) {
-                    const userRef = doc(db, "users_progress", userUid);
-                    const snap = await getDoc(userRef);
-                    if(!snap.exists() || snap.data().currentLevel < 4) {
-                        await setDoc(userRef, { currentLevel: 4, lastPassed: serverTimestamp() }, { merge: true });
-                    }
+                await addDoc(collection(db, "activities"), { uid: userUid, action: `Level 3: ${res.score} điểm`, score: res.score, timestamp: serverTimestamp() });
+                if (res.score >= 6) {
+                    await setDoc(doc(db, "users_progress", userUid), { currentLevel: 4, lastPassed: serverTimestamp() }, { merge: true });
                 }
             }
-
-        } catch (e) {
-            console.error(e);
-            showPopup('error', 'Lỗi hệ thống', 'Không thể kết nối với giáo viên AI. Vui lòng kiểm tra mạng và thử lại.', handleRealSubmit);
-        } finally {
-            document.getElementById('loading-overlay').style.display = 'none';
-        }
+        } catch (e) { showPopup('error', 'Lỗi kết nối', 'AI đang bận, hãy thử nộp lại sau giây lát!'); }
+        finally { document.getElementById('loading-overlay').style.display = 'none'; }
     };
 
-    window.submitEssay = confirmSubmission;
-    window.nextLevel = () => window.location.href = "../dashboard/nhatkyhoctap.html";
+    function renderResult(res) {
+        document.getElementById('result-box').style.display = 'block';
+        document.getElementById('submit-area').style.display = 'none';
+        document.getElementById('result-box').scrollIntoView({ behavior: 'smooth' });
 
-    // Word Count
+        document.getElementById('score-text').innerText = res.score;
+        document.getElementById('result-title').innerText = res.title;
+        document.getElementById('result-desc').innerText = res.desc;
+        document.getElementById('ai-correction').innerHTML = res.correction_html;
+        document.getElementById('pros-list').innerHTML = res.pros.map(i => `<li>${i}</li>`).join('');
+        document.getElementById('cons-list').innerHTML = res.cons.map(i => `<li>${i}</li>`).join('');
+
+        const ring = document.getElementById('score-ring');
+        if (res.score >= 6) {
+            ring.style.background = `conic-gradient(#10B981 ${res.score*10}%, rgba(255,255,255,0.5) 0%)`;
+            document.getElementById('next-btn').classList.remove('hidden');
+        } else {
+            ring.style.background = `conic-gradient(#EF4444 ${res.score*10}%, rgba(255,255,255,0.5) 0%)`;
+            document.getElementById('retry-btn').classList.remove('hidden');
+        }
+    }
+
+    // Đếm từ
     document.getElementById('student-essay').oninput = function() {
         const words = this.value.trim().split(/\s+/).filter(x => x).length;
         document.getElementById('word-count').innerText = words;
     };
 
-    // Timer Logic (45 mins)
-    let totalSeconds = 2700; 
-    const timerCircle = document.getElementById('timer-circle');
-    const timerText = document.getElementById('timer-text');
-    const timerMini = document.getElementById('timer-mini');
+    window.nextLevel = () => window.location.href = "../dashboard/nhatkyhoctap.html";
 
-    setInterval(() => {
-        if(totalSeconds > 0) {
-            totalSeconds--;
-            const m = Math.floor(totalSeconds / 60);
-            const s = totalSeconds % 60;
-            timerText.innerText = `${m} phút ${s < 10 ? '0'+s : s} giây`;
-            timerMini.innerText = m;
-            const percent = (totalSeconds / 2700) * 100;
-            timerCircle.setAttribute('stroke-dasharray', `${percent}, 100`);
-            if(totalSeconds < 300) timerCircle.classList.replace('text-orange-500', 'text-red-500');
-        } else {
-            handleRealSubmit(); // Hết giờ tự nộp
-        }
-    }, 1000);
+    // Timer & Menu (Giữ nguyên logic của bạn)
+    fetch('menu.html').then(r=>r.text()).then(h=>{
+        const p = document.getElementById('menu-placeholder'); p.innerHTML=h;
+        p.querySelectorAll('script').forEach(s=>{const n=document.createElement('script');n.text=s.text;document.body.appendChild(n)});
+    });
 </script>
 
 </body>

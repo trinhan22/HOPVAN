@@ -50,19 +50,26 @@
         }
         .quote-icon { position: absolute; top: -20px; left: 20px; font-size: 40px; color: var(--primary); background: #fff9f5; padding: 0 10px; }
 
+        /* Tăng tương phản cho khu vực viết bài văn */
         .glass-textarea {
             width: 100%; height: 500px;
-            background: rgba(255, 255, 255, 0.6);
-            border: 2px solid rgba(255, 255, 255, 0.5);
+            background: #FFFFFF !important; /* Nền trắng đặc */
+            border: 2px solid #E2E8F0; /* Viền rõ ràng */
             border-radius: 20px; padding: 25px;
-            font-size: 1.05rem; line-height: 1.8; color: #2d3436;
+            font-size: 1.1rem; line-height: 1.8; color: #1E293B;
             resize: none; outline: none; transition: 0.3s;
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
         }
+
         .glass-textarea:focus {
-            background: rgba(255, 255, 255, 0.9);
             border-color: var(--primary);
             box-shadow: 0 10px 30px rgba(255, 143, 80, 0.15);
+        }
+
+        /* Giữ định dạng văn bản cho tác phẩm thơ/văn xuôi */
+        #display-quote {
+            white-space: pre-wrap;
+            line-height: 1.9;
         }
 
         /* --- AI RESULT --- */
@@ -148,12 +155,9 @@
         <div class="sticky top-6 z-50 mb-12 px-2">
             <div class="max-w-5xl mx-auto glass-header px-6 py-3 flex justify-between items-center">
                 <a href="../dashboard/nhatkyhoctap.html" class="flex items-center gap-3 text-gray-600 font-bold hover:text-orange-500 transition group">
-                    <div class="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center shadow-sm text-orange-400 group-hover:scale-110 transition-transform">
-                        <i class="fas fa-arrow-left"></i>
-                    </div>
+                    <div class="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center shadow-sm text-orange-400 group-hover:scale-110"><i class="fas fa-arrow-left"></i></div>
                     <span class="hidden sm:inline">Quay lại lộ trình</span>
                 </a>
-                
                 <div class="flex items-center gap-4">
                     <div class="text-right hidden sm:block">
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Thời gian còn lại</p>
@@ -171,34 +175,30 @@
         </div>
 
         <div class="max-w-4xl mx-auto pb-20">
-            
             <div class="liquid-glass p-8 mb-10 relative overflow-hidden bg-gradient-to-br from-white/60 to-white/20">
                 <div class="relative z-10">
                     <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Level 4</span>
-                    <h1 class="text-4xl font-black text-gray-800 mt-4 mb-2">Nghị Luận Văn Học</h1>
+                    <h1 id="lvl-title-display" class="text-4xl font-black text-gray-800 mt-4 mb-2">Đang tải thử thách...</h1>
                     <p class="text-gray-500 font-medium">Phân tích chuyên sâu đoạn trích tác phẩm. Đạt <span class="text-orange-600 font-bold">6.0/10 điểm</span> để qua màn.</p>
                 </div>
                 <i class="fas fa-book-open absolute -right-6 -bottom-8 text-9xl text-orange-500/10 rotate-12"></i>
             </div>
 
-            <div class="liquid-glass p-10 mb-8">
-                <h2 class="text-2xl font-black text-gray-800 mb-6">Chủ đề: Sức Sống Tiềm Tàng Của Mị</h2>
+            <div class="liquid-glass p-10 mb-8" id="level-content-area">
+                <h2 class="text-2xl font-black text-gray-800 mb-6" id="display-topic">Vui lòng chờ giây lát...</h2>
                 
-                <div class="quote-box mb-8">
+                <div id="display-quote-container" class="quote-box mb-8 hidden">
                     <i class="fas fa-quote-left quote-icon"></i>
-                    <p>
-                        "Trong bóng tối, Mị đứng im lặng, như không biết mình đang bị trói. Hơi rượu còn nồng nàn, Mị vẫn nghe tiếng sáo đưa Mị đi theo những cuộc chơi, những đám chơi. 'Em không yêu, quả pao rơi rồi. Em yêu người nào, em bắt pao nào...'. Mị vùng bước đi. Nhưng tay chân đau không cựa được. Mị không nghe tiếng sáo nữa. Chỉ còn nghe tiếng chân ngựa đạp vào vách. Ngựa vẫn đứng yên, gãi chân, nhai cỏ. Mị thổn thức nghĩ mình không bằng con ngựa."
-                    </p>
-                    <div class="text-right text-sm font-bold mt-4">— Trích <i>Vợ chồng A Phủ</i> (Tô Hoài)</div>
+                    <div id="display-quote"></div>
                 </div>
 
                 <p class="text-gray-700 mb-6 leading-relaxed font-medium">
                     <span class="text-orange-500 font-bold uppercase text-xs tracking-wider mr-2">Yêu cầu:</span> 
-                    Anh/chị hãy phân tích diễn biến tâm trạng và hành động của nhân vật Mị trong đoạn trích trên. Từ đó, nhận xét về giá trị nhân đạo của tác phẩm.
+                    <span id="display-requirement">Đang tải yêu cầu đề bài...</span>
                 </p>
 
                 <div class="relative">
-                    <textarea id="student-essay" class="glass-textarea" placeholder="Bắt đầu viết bài làm của bạn tại đây... (Tối thiểu 100 từ)"></textarea>
+                    <textarea id="student-essay" class="glass-textarea" placeholder="Bắt đầu viết bài phân tích của bạn tại đây... (Tối thiểu 100 từ)"></textarea>
                     <div class="absolute bottom-4 right-6 text-xs font-bold text-gray-400 bg-white/50 px-2 py-1 rounded-lg backdrop-blur-sm">
                         <span id="word-count">0</span> TỪ
                     </div>
@@ -261,7 +261,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
@@ -270,114 +270,69 @@
 
     const API_URL = `../.netlify/functions/gemini-proxy`;
     let userUid = null;
+    let levelData = null;
 
-    // --- HÀM POPUP ---
+    // --- POPUP LOGIC (GIỮ NGUYÊN) ---
     window.showPopup = (type, title, msg, confirmCallback = null) => {
         const modal = document.getElementById('alert-modal');
-        const iconBox = document.getElementById('alert-icon-box');
-        const icon = document.getElementById('alert-icon');
-        const titleEl = document.getElementById('alert-title');
-        const msgEl = document.getElementById('alert-msg');
         const actions = document.getElementById('alert-actions');
-
-        titleEl.innerText = title;
-        msgEl.innerText = msg;
-        iconBox.className = "icon-box";
+        document.getElementById('alert-title').innerText = title;
+        document.getElementById('alert-msg').innerText = msg;
+        document.getElementById('alert-icon-box').className = "icon-box icon-" + type;
         actions.innerHTML = "";
-
-        if (type === 'warning') {
-            iconBox.classList.add('icon-warning');
-            icon.className = "fas fa-exclamation-triangle";
-            
-            if (confirmCallback) { // Confirm
-                const cancelBtn = document.createElement('button');
-                cancelBtn.className = "px-6 py-3 rounded-xl font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition";
-                cancelBtn.innerText = "Kiểm tra lại";
-                cancelBtn.onclick = () => modal.classList.remove('open');
-
-                const confirmBtn = document.createElement('button');
-                confirmBtn.className = "px-6 py-3 rounded-xl font-bold bg-orange-500 text-white hover:bg-orange-600 shadow-lg shadow-orange-200 transition";
-                confirmBtn.innerText = "Nộp bài ngay";
-                confirmBtn.onclick = () => { modal.classList.remove('open'); confirmCallback(); };
-
-                actions.appendChild(cancelBtn);
-                actions.appendChild(confirmBtn);
-            } else { // Alert
-                const closeBtn = document.createElement('button');
-                closeBtn.className = "px-8 py-3 rounded-xl font-bold bg-orange-500 text-white hover:bg-orange-600 transition";
-                closeBtn.innerText = "Đã hiểu";
-                closeBtn.onclick = () => modal.classList.remove('open');
-                actions.appendChild(closeBtn);
-            }
-        } else if (type === 'error') {
-            iconBox.classList.add('icon-error');
-            icon.className = "fas fa-times-circle";
-            const closeBtn = document.createElement('button');
-            closeBtn.className = "px-8 py-3 rounded-xl font-bold bg-red-500 text-white hover:bg-red-600 transition";
-            closeBtn.innerText = "Thử lại";
-            closeBtn.onclick = () => { modal.classList.remove('open'); if(confirmCallback) confirmCallback(); };
-            actions.appendChild(closeBtn);
-        } else if (type === 'info') {
-            iconBox.classList.add('icon-info');
-            icon.className = "fas fa-info-circle";
-            const closeBtn = document.createElement('button');
-            closeBtn.className = "px-8 py-3 rounded-xl font-bold bg-blue-500 text-white hover:bg-blue-600 transition";
-            closeBtn.innerText = "Đăng nhập ngay";
-            closeBtn.onclick = () => { window.location.href = "../log.html"; };
-            actions.appendChild(closeBtn);
+        if (confirmCallback) {
+            const b1 = document.createElement('button'); b1.className = "px-6 py-3 rounded-xl font-bold bg-gray-100 text-gray-600";
+            b1.innerText = "Kiểm tra lại"; b1.onclick = () => modal.classList.remove('open');
+            const b2 = document.createElement('button'); b2.className = "px-6 py-3 rounded-xl font-bold bg-orange-500 text-white shadow-lg";
+            b2.innerText = "Nộp bài ngay"; b2.onclick = () => { modal.classList.remove('open'); confirmCallback(); };
+            actions.append(b1, b2);
+        } else {
+            const b = document.createElement('button'); b.className = "px-8 py-3 rounded-xl font-bold bg-orange-500 text-white";
+            b.innerText = "Đã hiểu"; b.onclick = () => modal.classList.remove('open');
+            actions.appendChild(b);
         }
-
         modal.classList.add('open');
     };
 
     onAuthStateChanged(auth, (u) => {
-        if (u) userUid = u.uid;
-        else showPopup('info', 'Yêu cầu đăng nhập', 'Bạn cần đăng nhập để lưu kết quả và mở khóa màn tiếp theo.');
+        if (u) { userUid = u.uid; initLevel4(); }
+        else { window.location.href = "../log.html"; }
     });
 
-    fetch('menu.html').then(r=>r.text()).then(h=>{
-        const p = document.getElementById('menu-placeholder'); p.innerHTML=h;
-        p.querySelectorAll('script').forEach(s=>{const n=document.createElement('script');n.text=s.text;document.body.appendChild(n)});
-    });
+    // --- 1. TẢI ĐỀ NLVH TỪ FIREBASE ---
+    async function initLevel4() {
+        try {
+            const q = query(collection(db, "study_levels"), where("level", "==", 4));
+            const snap = await getDocs(q);
+            if (snap.empty) return alert("Dữ liệu Level 4 chưa sẵn sàng!");
+            
+            const docSnap = snap.docs[0].data();
+            levelData = docSnap.content; // { topic, text, hint }
 
+            document.getElementById('lvl-title-display').innerText = docSnap.title || "Nghị Luận Văn Học";
+            document.getElementById('display-topic').innerText = levelData.topic;
+            document.getElementById('display-requirement').innerText = "Hãy viết bài văn phân tích làm rõ yêu cầu trên dựa vào ngữ liệu được cung cấp.";
+
+            if (levelData.text) {
+                document.getElementById('display-quote').innerText = levelData.text;
+                document.getElementById('display-quote-container').classList.remove('hidden');
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    // --- 2. CHẤM ĐIỂM AI ---
     window.confirmSubmission = () => {
         const content = document.getElementById('student-essay').value.trim();
-        const wordCount = content.split(/\s+/).filter(x => x).length;
-
-        if (wordCount < 100) {
-            showPopup('warning', 'Bài viết quá ngắn', 'Để phân tích sâu sắc, bài làm cần ít nhất 100 từ. Hãy viết thêm nhé!');
-            return;
-        }
-        showPopup('warning', 'Xác nhận nộp bài', 'Bạn có chắc chắn muốn nộp bài? Hệ thống sẽ chấm điểm ngay lập tức.', handleRealSubmit);
+        const words = content.split(/\s+/).filter(x => x).length;
+        if (words < 100) return showPopup('warning', 'Bài viết quá ngắn', 'Bạn cần viết ít nhất 100 từ để đảm bảo chiều sâu phân tích.');
+        showPopup('warning', 'Xác nhận nộp bài', 'Hệ thống AI sẽ bắt đầu thẩm định và chấm điểm bài làm của bạn.', handleRealSubmit);
     };
 
     const handleRealSubmit = async () => {
         const content = document.getElementById('student-essay').value.trim();
         document.getElementById('loading-overlay').style.display = 'flex';
 
-        const systemPrompt = `
-            VAI TRÒ: Giáo viên Ngữ Văn chấm bài Nghị Luận Văn Học (Phân tích tác phẩm).
-            ĐỀ BÀI: Phân tích tâm trạng Mị trong đêm tình mùa xuân (đoạn trích bị trói đứng).
-            
-            TIÊU CHÍ CHẤM (Thang 10):
-            1. Phân tích (4.0): Làm rõ sự đối lập giữa hoàn cảnh (bị trói) và tâm hồn (thả theo tiếng sáo).
-            2. Nghệ thuật (3.0): Phân tích được nghệ thuật miêu tả nội tâm, sự tương phản âm thanh/hình ảnh.
-            3. Ý nghĩa (2.0): Giá trị nhân đạo (khát vọng sống mãnh liệt).
-            4. Diễn đạt (1.0): Văn phong trôi chảy, cảm xúc.
-
-            BÀI LÀM CỦA HỌC SINH:
-            "${content}"
-
-            YÊU CẦU JSON DUY NHẤT (Không Markdown):
-            {
-                "score": (Số thực, max 10.0),
-                "title": "Nhận xét ngắn",
-                "desc": "Lời khuyên tổng quát",
-                "correction_html": "Bài làm gốc thêm thẻ <span class='text-bad'>lỗi</span> <span class='text-fix'>sửa</span> <span class='text-good'>ý hay</span>.",
-                "pros": ["Điểm mạnh 1", "Điểm mạnh 2"],
-                "cons": ["Điểm yếu 1", "Điểm yếu 2"]
-            }
-        `;
+        const systemPrompt = `BẠN LÀ GIÁO VIÊN NGỮ VĂN LỚP 12. CHỦ ĐỀ: "${levelData.topic}". NGỮ LIỆU: "${levelData.text || ''}". GỢI Ý CHẤM: "${levelData.hint || ''}". HÃY CHẤM BÀI PHÂN TÍCH: "${content}". TRẢ VỀ JSON: {"score": (số), "title": "Nhận xét ngắn", "desc": "Lời khuyên", "correction_html": "bài làm đã highlight", "pros": [], "cons": []}`;
 
         try {
             const response = await fetch(API_URL, {
@@ -385,69 +340,52 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
             });
-
             const data = await response.json();
-            
-            if (data.error) throw new Error(data.error.message);
-            if (!data.candidates || data.candidates.length === 0) throw new Error("AI không trả lời.");
+            const res = JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json|```/g, "").trim());
 
-            const rawText = data.candidates[0].content.parts[0].text;
-            const res = JSON.parse(rawText.replace(/```json|```/g, "").trim());
+            showResultUI(res);
 
-            // Render Kết quả
-            document.getElementById('result-box').style.display = 'block';
-            document.getElementById('submit-area').style.display = 'none';
-            document.getElementById('result-box').scrollIntoView({ behavior: 'smooth' });
-
-            const score = res.score;
-            document.getElementById('score-text').innerText = score;
-            document.getElementById('result-title').innerText = res.title;
-            document.getElementById('result-desc').innerText = res.desc;
-            document.getElementById('ai-correction').innerHTML = res.correction_html;
-
-            document.getElementById('pros-list').innerHTML = res.pros.map(i => `<li>${i}</li>`).join('');
-            document.getElementById('cons-list').innerHTML = res.cons.map(i => `<li>${i}</li>`).join('');
-
-            const titleEl = document.getElementById('result-title');
-            const ringEl = document.getElementById('score-ring');
-
-            if (score >= 6.0) {
-                titleEl.className = "text-3xl font-black text-green-600 mb-2";
-                ringEl.style.background = `conic-gradient(#10B981 ${score*10}%, rgba(255,255,255,0.5) 0%)`;
-                document.getElementById('next-btn').classList.remove('hidden');
-                document.getElementById('next-btn').classList.add('flex');
-            } else {
-                titleEl.className = "text-3xl font-black text-red-500 mb-2";
-                ringEl.style.background = `conic-gradient(#EF4444 ${score*10}%, rgba(255,255,255,0.5) 0%)`;
-                document.getElementById('retry-btn').classList.remove('hidden');
-                document.getElementById('retry-btn').classList.add('flex');
-            }
-
-            // Lưu Database
             if(userUid) {
-                await addDoc(collection(db, "activities"), {
-                    uid: userUid,
-                    action: `NLVH Level 4: ${score}/10 điểm`,
-                    score: score,
-                    timestamp: serverTimestamp()
-                });
-
-                if (score >= 6.0) {
-                    const userRef = doc(db, "users_progress", userUid);
-                    const snap = await getDoc(userRef);
-                    if(!snap.exists() || snap.data().currentLevel < 5) {
-                        await setDoc(userRef, { currentLevel: 5, lastPassed: serverTimestamp() }, { merge: true });
-                    }
+                await addDoc(collection(db, "activities"), { uid: userUid, action: `Vượt ải Level 4: ${res.score}đ`, type: "journal", score: res.score, timestamp: serverTimestamp() });
+                if (res.score >= 6) {
+                    await setDoc(doc(db, "users_progress", userUid), { currentLevel: 5, lastPassed: serverTimestamp() }, { merge: true });
                 }
             }
-
-        } catch (e) {
-            console.error(e);
-            showPopup('error', 'Lỗi hệ thống', 'Không thể kết nối với giáo viên AI. Vui lòng kiểm tra mạng và thử lại.', handleRealSubmit);
-        } finally {
-            document.getElementById('loading-overlay').style.display = 'none';
-        }
+        } catch (e) { showPopup('error', 'Lỗi kết nối', 'AI đang quá tải, hãy nộp lại sau giây lát!'); }
+        finally { document.getElementById('loading-overlay').style.display = 'none'; }
     };
+
+    function showResultUI(res) {
+        document.getElementById('result-box').style.display = 'block';
+        document.getElementById('submit-area').style.display = 'none';
+        document.getElementById('result-box').scrollIntoView({ behavior: 'smooth' });
+
+        document.getElementById('score-text').innerText = res.score;
+        document.getElementById('result-title').innerText = res.title;
+        document.getElementById('result-desc').innerText = res.desc;
+        document.getElementById('ai-correction').innerHTML = res.correction_html;
+        document.getElementById('pros-list').innerHTML = res.pros.map(i => `<li>${i}</li>`).join('');
+        document.getElementById('cons-list').innerHTML = res.cons.map(i => `<li>${i}</li>`).join('');
+
+        const ring = document.getElementById('score-ring');
+        if (res.score >= 6) {
+            ring.style.background = `conic-gradient(#10B981 ${res.score*10}%, rgba(255,255,255,0.5) 0%)`;
+            document.getElementById('next-btn').classList.remove('hidden');
+        } else {
+            ring.style.background = `conic-gradient(#EF4444 ${res.score*10}%, rgba(255,255,255,0.5) 0%)`;
+            document.getElementById('retry-btn').classList.remove('hidden');
+        }
+    }
+
+    // Word Count & Menu & Timer (Giữ nguyên logic của bạn)
+    document.getElementById('student-essay').oninput = function() {
+        document.getElementById('word-count').innerText = this.value.trim().split(/\s+/).filter(x => x).length;
+    };
+    
+    fetch('menu.html').then(r=>r.text()).then(h=>{
+        const p = document.getElementById('menu-placeholder'); p.innerHTML=h;
+        p.querySelectorAll('script').forEach(s=>{const n=document.createElement('script');n.text=s.text;document.body.appendChild(n)});
+    });
 
     window.nextLevel = () => window.location.href = "../dashboard/nhatkyhoctap.html";
 

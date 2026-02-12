@@ -267,7 +267,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     
     // --- FIREBASE CONFIG ---
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
@@ -290,13 +290,27 @@
 
     // 2. Load Data
     async function loadQuizData() {
+        const qContainer = document.getElementById('quiz-container');
         try {
-            const res = await fetch('questions-quiz.json');
-            const data = await res.json();
-            allQuestions = data.quiz.sort(() => 0.5 - Math.random()).slice(0, 20); 
+            // Trích xuất dữ liệu từ collection quiz_bank
+            const querySnapshot = await getDocs(collection(db, "quiz_bank"));
+            const rawData = [];
+            
+            querySnapshot.forEach((doc) => {
+                rawData.push({ id: doc.id, ...doc.data() });
+            });
+
+            if (rawData.length === 0) {
+                qContainer.innerHTML = `<p class="text-center py-10 text-gray-400 font-bold">Kho đề trắc nghiệm đang trống. Hãy thêm câu hỏi ở trang Admin.</p>`;
+                return;
+            }
+
+            // Trộn ngẫu nhiên và lấy tối đa 20 câu
+            allQuestions = rawData.sort(() => 0.5 - Math.random()).slice(0, 20); 
             renderQuiz();
         } catch (error) {
-            document.getElementById('quiz-container').innerHTML = `<p class="text-red-500 text-center font-bold">Lỗi tải dữ liệu: ${error.message}</p>`;
+            console.error("Lỗi tải đề:", error);
+            qContainer.innerHTML = `<p class="text-red-500 text-center font-bold">Lỗi kết nối Firebase: ${error.message}</p>`;
         }
     }
 
@@ -400,16 +414,18 @@
         let score = 0;
 
         // Grading Logic
+        // Tìm đoạn này trong hàm submitQuiz và sửa lại keys:
         allQuestions.forEach((q, index) => {
             const selected = userAnswers[index];
-            const correct = q.correct_index;
+            const correct = q.correct; // Sửa từ correct_index thành correct (theo data Admin)
             const dot = document.getElementById(`dot-${index}`);
             const explain = document.getElementById(`explain-${index}`);
 
             const radios = document.querySelectorAll(`input[name="q${index}"]`);
             radios.forEach(r => r.disabled = true);
 
-            if(explain) explain.style.display = 'block';
+            // Hiển thị giải thích nếu có
+            if(q.explanation && explain) explain.style.display = 'block'; 
 
             if (selected === correct) {
                 score++;
@@ -420,6 +436,7 @@
                 if (selected !== undefined) {
                     document.getElementById(`lbl-${index}-${selected}`).classList.add('wrong');
                 }
+                // Luôn hiển thị đáp án đúng để học sinh đối chiếu
                 document.getElementById(`lbl-${index}-${correct}`).classList.add('correct');
             }
         });

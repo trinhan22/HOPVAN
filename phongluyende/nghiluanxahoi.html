@@ -116,8 +116,14 @@
 
         .writing-area { 
             flex: 1; width: 100%; padding: 30px; border: none; outline: none; resize: none; 
-            font-size: 1.1rem; line-height: 1.9; color: #2D3436; background: transparent;
-            min-height: 400px;
+            font-size: 1.1rem; line-height: 1.9; color: #1E293B; 
+            background: #F8FAFC !important; /* Màu nền xám nhẹ để phân biệt với Glass-card */
+            border-radius: 0 0 30px 30px;
+        }
+
+        #prompt-passage {
+            white-space: pre-wrap; /* Giữ định dạng xuống dòng nếu đề có ngữ liệu thơ/văn */
+            line-height: 1.8;
         }
 
         .ai-result-view { padding: 30px; font-size: 1.1rem; line-height: 1.9; overflow-y: auto; background-color: #fafafa; height: 100%; }
@@ -400,43 +406,66 @@
             const avatar = document.getElementById('avatar-initial');
             if(avatar) avatar.innerText = n.charAt(0).toUpperCase();
             startTimer();
+            // GỌI HÀM NÀY ĐỂ TỰ ĐỘNG HIỆN ĐỀ
+            loadQuestions(); 
         } else { window.location.href = "../log.html"; }
     });
 
     // --- TẢI ĐỀ ---
+    // --- THAY THẾ: HÀM TẢI ĐỀ TỪ FIREBASE ---
     async function loadQuestions() {
+        const promptTextUI = document.getElementById('prompt-text');
         try {
-            const r = await fetch('questions-nlxh.json');
-            const data = await r.json();
-            questionsData = data.nlxh || [];
-            if(questionsData.length === 0) throw new Error("No data");
-            randomizeQuestion();
-        } catch (e) {
-            try {
-                const r2 = await fetch('questions.json');
-                const d2 = await r2.json();
-                questionsData = d2.nlxh || [];
-                randomizeQuestion();
-            } catch(ex) {
-                document.getElementById('prompt-text').innerText = "Lỗi tải đề bài. Vui lòng kiểm tra lại.";
+            // Tạo truy vấn lấy các đề NLXH từ essay_bank
+            const q = query(collection(db, "essay_bank"), where("type", "==", "nlxh"));
+            const querySnapshot = await getDocs(q);
+            
+            questionsData = [];
+            querySnapshot.forEach((doc) => {
+                questionsData.push({ id: doc.id, ...doc.data() });
+            });
+
+            if (questionsData.length === 0) {
+                promptTextUI.innerText = "Kho đề NLXH đang trống. Vui lòng thêm đề ở trang Quản trị.";
+                return;
             }
+
+            randomizeQuestion(); // Hiển thị đề ngẫu nhiên ngay khi tải xong
+        } catch (e) {
+            console.error("Lỗi trích xuất Firebase:", e);
+            promptTextUI.innerText = "Lỗi kết nối kho đề: " + e.message;
         }
     }
 
+    // --- THAY THẾ: HÀM HIỂN THỊ ĐỀ ---
     window.randomizeQuestion = () => {
         if (questionsData.length === 0) return;
+        
+        // Chọn ngẫu nhiên 1 đề từ mảng đã tải
         const q = questionsData[Math.floor(Math.random() * questionsData.length)];
         window.currentExamData = { ...q, type: 'nlxh' };
 
+        // Đổ dữ liệu ra UI
         document.getElementById('prompt-text').innerText = q.topic;
-        document.getElementById('hint-content').innerText = q.hint || "Phân tích các khía cạnh Biểu hiện, Nguyên nhân, Ý nghĩa, Hậu quả, Giải pháp.";
+        document.getElementById('hint-content').innerText = q.hint || "Hãy đảm bảo bài viết có đủ: Mở bài (dẫn dắt), Thân bài (Giải thích, Bàn luận, Chứng minh, Phản đề) và Kết bài.";
 
-        // Reset UI
+        // Xử lý Ngữ liệu (nếu đề bài có kèm văn bản trích dẫn)
+        const passageUI = document.getElementById('prompt-passage');
+        if (q.text && q.text.trim() !== "") {
+            passageUI.innerText = q.text;
+            passageUI.parentElement.classList.remove('hidden');
+        } else {
+            passageUI.parentElement.classList.add('hidden');
+        }
+
+        // Reset giao diện làm bài
         document.getElementById('student-essay').value = "";
+        document.getElementById('word-count').innerText = "0 TỪ";
+        document.getElementById('overall-feedback-box').classList.add('hidden');
+        
         const aiBox = document.getElementById('ai-correction-box');
         aiBox.className = "ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400";
-        aiBox.innerHTML = `<div><i class="fas fa-robot text-5xl mb-4 opacity-20"></i><p class="font-bold">Sẵn sàng chấm bài</p></div>`;
-        document.getElementById('overall-feedback-box').classList.add('hidden');
+        aiBox.innerHTML = `<div><i class="fas fa-magic text-5xl mb-4 opacity-20"></i><p class="font-bold">Sẵn sàng chấm bài</p></div>`;
     };
 
     loadQuestions();

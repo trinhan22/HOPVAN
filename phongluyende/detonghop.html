@@ -114,7 +114,7 @@
         .exam-section:last-child { border-bottom: none; }
         .section-label { font-weight: 900; color: #ea580c; text-transform: uppercase; margin-bottom: 10px; display: block; font-size: 1.1rem; }
         .question-text { color: #374151; line-height: 1.8; font-size: 0.95rem; }
-        .highlight-text { background: #fff7ed; padding: 15px; border-left: 4px solid #FF8F50; border-radius: 8px; margin: 10px 0; font-style: italic; color: #431407; }
+        .highlight-text { background: #fff7ed; padding: 15px; border-left: 4px solid #FF8F50; border-radius: 8px; margin: 10px 0; font-style: italic; color: #431407; white-space: pre-wrap; line-height: 1.8;}
 
         .workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; height: calc(100vh - 140px); margin-top: 20px; }
 
@@ -374,7 +374,8 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    // THÊM: getDocs, collection để lấy dữ liệu Full Test
+    import { getFirestore, collection, addDoc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
@@ -382,27 +383,22 @@
     const db = getFirestore(app);
 
     const API_URL = `/.netlify/functions/gemini-proxy`;
-    let questionsData = [];
-    window.currentExamData = null;
+    let questionsData = []; // Lưu danh sách các đề full
+    window.currentExamData = null; // Đề đang làm
 
-    // --- SIDEBAR TOGGLE ---
+    // --- SIDEBAR TOGGLE (GIỮ NGUYÊN) ---
     window.toggleSidebar = () => {
         const sidebar = document.querySelector('aside') || document.getElementById('main-sidebar');
         const overlay = document.getElementById('sidebar-overlay');
-        
         if (sidebar && overlay) {
             sidebar.classList.toggle('open');
             overlay.classList.toggle('active');
-            
-            if (sidebar.classList.contains('open')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = 'auto';
-            }
+            if (sidebar.classList.contains('open')) document.body.style.overflow = 'hidden';
+            else document.body.style.overflow = 'auto';
         }
     };
 
-    // --- TIMER 120 PHÚT ---
+    // --- TIMER 120 PHÚT (GIỮ NGUYÊN) ---
     let timeLeft = 7200; 
     const timerElement = document.getElementById('timer');
     const timerMobile = document.getElementById('timer-mobile');
@@ -435,62 +431,68 @@
         } else { window.location.href = "../log.html"; }
     });
 
-    // --- TẢI ĐỀ ---
+    // --- THAY ĐỔI: TẢI ĐỀ TỪ FIREBASE (FULLTEST_BANK) ---
     async function loadQuestions() {
+        const promptBox = document.getElementById('prompt-content');
         try {
-            const r = await fetch('questions-full.json');
-            const data = await r.json();
-            questionsData = data.fulltest;
-            randomizeQuestion();
+            // Trích xuất toàn bộ đề từ collection fulltest_bank
+            const querySnapshot = await getDocs(collection(db, "fulltest_bank"));
+            questionsData = [];
+            querySnapshot.forEach((doc) => {
+                questionsData.push({ id: doc.id, ...doc.data() });
+            });
+
+            if (questionsData.length === 0) {
+                promptBox.innerHTML = `<p class="text-center py-10 text-gray-400">Kho đề trống. Vui lòng thêm đề ở trang Admin.</p>`;
+                return;
+            }
+            randomizeQuestion(); // Hiển thị đề đầu tiên sau khi tải xong
         } catch (e) {
-            document.getElementById('prompt-content').innerHTML = `<p class="text-red-500 font-bold p-4">Lỗi tải đề. Vui lòng kiểm tra file data.</p>`;
+            console.error("Lỗi trích xuất Firebase:", e);
+            promptBox.innerHTML = `<p class="text-red-500 text-center">Không thể kết nối kho đề: ${e.message}</p>`;
         }
     }
 
     window.randomizeQuestion = () => {
         if (!questionsData || questionsData.length === 0) return;
+        
+        // Lấy ngẫu nhiên 1 đề trong mảng đã tải về
         const q = questionsData[Math.floor(Math.random() * questionsData.length)];
         window.currentExamData = q;
 
-        document.getElementById('exam-code').innerText = `Mã đề: ${q.id}`;
+        document.getElementById('exam-code').innerText = `Mã đề: ${q.id.slice(0, 6).toUpperCase()}`;
         
+        // Xử lý mảng câu hỏi đọc hiểu
+        const qArray = Array.isArray(q.reading_questions) ? q.reading_questions : (q.reading_questions ? q.reading_questions.split('\n') : []);
+
         const htmlContent = `
-            <div class="exam-section">
+            <div class="exam-section animate-fade-in">
                 <span class="section-label">I. ĐỌC HIỂU (3.0 điểm)</span>
-                <div class="highlight-text text-sm">${q.reading_text}</div>
-                <div class="question-text font-bold mt-2 text-sm">Yêu cầu:</div>
-                <ul class="list-decimal pl-5 question-text space-y-2 mt-2 text-sm">
-                    ${q.reading_questions.map(quest => `<li>${quest}</li>`).join('')}
+                <div class="highlight-text text-sm whitespace-pre-wrap">${q.reading_text}</div>
+                <ul class="list-decimal pl-5 space-y-2 mt-4 text-sm font-medium text-gray-700">
+                    ${qArray.map(txt => `<li>${txt}</li>`).join('')}
                 </ul>
             </div>
             <div class="exam-section">
                 <span class="section-label">II. LÀM VĂN (7.0 điểm)</span>
-                <div class="mb-4">
-                    <p class="font-bold text-gray-800 text-sm">Câu 1 (2.0 điểm):</p>
-                    <p class="question-text text-sm">${q.nlxh_topic}</p>
+                <div class="mb-6 p-4 bg-gray-50 rounded-2xl border-l-4 border-orange-400">
+                    <p class="font-black text-gray-800 text-xs mb-2">CÂU 1 (2.0đ): NGHỊ LUẬN XÃ HỘI</p>
+                    <p class="text-sm italic">"${q.nlxh_topic}"</p>
                 </div>
-                <div>
-                    <p class="font-bold text-gray-800 text-sm">Câu 2 (5.0 điểm):</p>
-                    <p class="question-text text-sm">${q.nlvh_topic}</p>
+                <div class="p-4 bg-gray-50 rounded-2xl border-l-4 border-red-400">
+                    <p class="font-black text-gray-800 text-xs mb-2">CÂU 2 (5.0đ): NGHỊ LUẬN VĂN HỌC</p>
+                    <p class="text-sm italic whitespace-pre-wrap">${q.nlvh_topic}</p>
                 </div>
             </div>
         `;
         document.getElementById('prompt-content').innerHTML = htmlContent;
-
-        // Reset UI
-        document.getElementById('student-essay').value = "";
-        document.getElementById('overall-feedback-box').classList.add('hidden');
-        document.getElementById('input-section').classList.remove('hidden');
-        document.getElementById('output-section').classList.remove('h-full');
-        document.getElementById('output-section').classList.add('h-auto', 'min-h-[100px]');
-        
-        const aiBox = document.getElementById('ai-correction-box');
-        aiBox.className = "ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400";
-        aiBox.innerHTML = `<div><i class="fas fa-robot text-5xl mb-4 opacity-20"></i><p class="font-bold">Sẵn sàng chấm bài</p></div>`;
+        document.getElementById('student-essay').value = ""; // Reset khung làm bài
     };
 
+    // Tải đề ngay khi load trang
     loadQuestions();
 
+    // --- UPLOAD FILE (GIỮ NGUYÊN) ---
     document.getElementById('file-upload').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -498,8 +500,7 @@
         const textarea = document.getElementById('student-essay');
         if (file.name.endsWith('.docx')) {
             reader.onload = function(event) {
-                const arrayBuffer = event.target.result;
-                mammoth.extractRawText({arrayBuffer: arrayBuffer})
+                mammoth.extractRawText({arrayBuffer: event.target.result})
                     .then(result => { textarea.value = result.value; textarea.dispatchEvent(new Event('input')); })
                     .catch(err => alert("Lỗi đọc file: " + err.message));
             };
@@ -510,7 +511,7 @@
         }
     });
 
-    // --- POPUP HANDLERS ---
+    // --- POPUP HANDLERS (GIỮ NGUYÊN) ---
     const errorPopup = document.getElementById('ai-error-popup');
     const shortEssayPopup = document.getElementById('short-essay-popup');
     
@@ -527,7 +528,7 @@
     document.getElementById('btn-ai-retry').addEventListener('click', () => { hideAiError(); handleAISubmission(); });
     document.getElementById('btn-short-close').addEventListener('click', hideShortEssay);
 
-    // --- MAIN AI LOGIC ---
+    // --- MAIN AI LOGIC (GIỮ NGUYÊN PROMPT & CẤU TRÚC) ---
     async function handleAISubmission() {
         const content = document.getElementById('student-essay').value.trim();
         // Kiểm tra bài ngắn (dưới 50 từ)
@@ -540,23 +541,39 @@
         loading.style.display = 'flex';
 
         const q = window.currentExamData;
-        const systemPrompt = `
-            BẠN LÀ: Giám khảo chấm thi Tốt nghiệp THPT môn Ngữ Văn uy tín.
-            NHIỆM VỤ: Chấm bài làm của học sinh cho đề thi gồm 3 phần (Đọc hiểu, NLXH, NLVH).
+        
+        // Xử lý danh sách câu hỏi đọc hiểu cho Prompt
+        const readingQsText = Array.isArray(q.reading_questions) ? q.reading_questions.join('; ') : q.reading_questions;
 
-            YÊU CẦU TRẢ VỀ:
-            Bạn hãy trả về duy nhất một object JSON (không thêm bất kỳ văn bản nào khác ngoài JSON) với cấu trúc sau:
+    const systemPrompt = `
+            BẠN LÀ: Giám khảo chấm thi Tốt nghiệp THPT Quốc gia môn Ngữ Văn (có chuyên môn sâu về thẩm định văn phong).
+            
+            NHIỆM VỤ CỦA BẠN GỒM 2 BƯỚC:
+
+            === BƯỚC 1: THẨM ĐỊNH ĐỘ TRUNG THỰC (AI DETECTION) ===
+            Hãy phân tích kỹ văn phong của học sinh để phát hiện dấu hiệu của văn bản do AI tạo ra (như ChatGPT/Gemini):
+            - Dấu hiệu AI: Cấu trúc câu quá hoàn hảo nhưng vô hồn, lặp lại các từ nối máy móc ("Tóm lại", "Hơn nữa", "Bên cạnh đó"), nội dung sáo rỗng, thiếu cảm xúc cá nhân và trải nghiệm thực tế.
+            - Dấu hiệu Người thật: Có giọng văn riêng, có thể mắc lỗi diễn đạt nhỏ nhưng ý tứ sáng tạo, dẫn chứng đời sống phong phú, cảm xúc chân thật.
+            => Đánh giá 'human_score' từ 0 (giống máy 100%) đến 100 (người thật 100%).
+
+            === BƯỚC 2: CHẤM ĐIỂM CHUYÊN MÔN (THANG 10) ===
+            Chấm chi tiết 3 phần dựa trên đề bài:
+            1. Đọc hiểu (3.0đ): Kiểm tra độ chính xác của kiến thức tiếng Việt, khả năng thông hiểu văn bản.
+            2. NLXH (2.0đ): Đánh giá lập luận, dẫn chứng thực tế và tư duy phản biện.
+            3. NLVH (5.0đ): Đánh giá cảm thụ văn học, kỹ năng phân tích nghệ thuật và kiến thức tác phẩm.
+
+            YÊU CẦU TRẢ VỀ JSON DUY NHẤT (Không thêm lời dẫn):
             {
-              "human_score": (Số nguyên 0-100 đánh giá độ tự nhiên, không phải AI viết),
-              "ai_comment": "Nhận xét ngắn về độ chân thực của văn phong.",
-              "score": (Tổng điểm trên thang 10, ví dụ 7.5),
-              "correction_html": "Chuỗi HTML chi tiết kết quả chấm. Trong HTML này, hãy dùng thẻ <span class='text-bad'>lỗi sai</span>, <span class='text-good'>ý hay</span> để highlight.",
-              "idea_feedback": ["Điểm mạnh 1", "Điểm mạnh 2"],
-              "missing_points": ["Điểm yếu 1", "Điểm yếu 2"]
+              "human_score": (Số nguyên 0-100),
+              "ai_comment": "Nhận xét ngắn gọn về độ tự nhiên của văn phong (VD: 'Văn phong quá máy móc, nghi vấn dùng AI' hoặc 'Giọng văn tự nhiên, giàu cảm xúc').",
+              "score": (Tổng điểm trên thang 10, làm tròn 1 chữ số thập phân),
+              "correction_html": "Tạo nội dung HTML sửa bài chi tiết. Sử dụng thẻ <span class='text-bad'>lỗi sai/diễn đạt kém</span> (kèm gợi ý sửa ngắn gọn trong ngoặc đơn), và thẻ <span class='text-good'>ý hay/sáng tạo</span> để làm nổi bật.",
+              "idea_feedback": ["Điểm mạnh nổi bật 1", "Điểm mạnh nổi bật 2"],
+              "missing_points": ["Hạn chế cần khắc phục 1", "Hạn chế cần khắc phục 2"]
             }
 
-            --- ĐỀ BÀI ---
-            1. Đọc hiểu: ${q.reading_text} - Câu hỏi: ${q.reading_questions.join('; ')}
+            --- THÔNG TIN ĐỀ BÀI ---
+            1. Đọc hiểu: ${q.reading_text} - Câu hỏi: ${readingQsText}
             2. NLXH: ${q.nlxh_topic}
             3. NLVH: ${q.nlvh_topic}
             
@@ -577,6 +594,7 @@
             const rawText = data.candidates[0].content.parts[0].text;
             const res = JSON.parse(rawText.replace(/```json|```/g, "").trim());
 
+            // Ẩn Input, Hiện Output Full màn hình
             document.getElementById('input-section').classList.add('hidden');
             const outputSec = document.getElementById('output-section');
             outputSec.classList.remove('h-auto', 'min-h-[100px]');
@@ -598,7 +616,7 @@
             if (auth.currentUser) {
                 await addDoc(collection(db, "activities"), {
                     uid: auth.currentUser.uid,
-                    action: `Hoàn thành Full Test (Mã ${q.id}) - ${res.score} điểm`,
+                    action: `Hoàn thành Full Test (Mã ${q.id.slice(0,6)}) - ${res.score} điểm`,
                     type: "fulltest",
                     human_score: res.human_score,
                     score: res.score,

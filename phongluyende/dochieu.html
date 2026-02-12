@@ -116,8 +116,9 @@
 
         .writing-area { 
             flex: 1; width: 100%; padding: 30px; border: none; outline: none; resize: none; 
-            font-size: 1.1rem; line-height: 1.9; color: #2D3436; background: transparent;
-            min-height: 400px;
+            font-size: 1.1rem; line-height: 1.9; color: #1E293B; 
+            background: #F8FAFC; /* Nền xám nhẹ để nổi bật */
+            border-radius: 0 0 30px 30px;
         }
 
         .ai-result-view { padding: 30px; font-size: 1.1rem; line-height: 1.9; overflow-y: auto; background-color: #fafafa; height: 100%; }
@@ -206,7 +207,10 @@
             
             /* Điều chỉnh hiển thị đề bài Đọc Hiểu trên mobile */
             .grid-cols-1.lg\:grid-cols-2 { grid-template-columns: 1fr !important; gap: 20px; }
-            #prompt-passage { max-height: 250px; }
+            #prompt-passage {
+                white-space: pre-wrap; /* Giữ nguyên định dạng thơ/văn bản từ Admin */
+                line-height: 1.8;
+            }
 
             .user-avatar, #timer { display: none; } 
             
@@ -332,9 +336,8 @@
                     
                     <div id="ai-correction-box" class="ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400">
                         <div>
-                            <i class="fas fa-magic text-5xl mb-4 opacity-20"></i>
+                            <i class="fas fa-robot text-5xl mb-4 opacity-20"></i>
                             <p class="font-bold text-lg">Sẵn sàng chấm bài</p>
-                            <p class="text-xs font-medium opacity-60 mt-1">Hoàn thành bài viết và nhấn "Nộp bài"<br>để AI chấm điểm</p>
                         </div>
                     </div>
                 </div>
@@ -361,7 +364,8 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    // THÊM: getDocs, collection để lấy dữ liệu
+    import { getFirestore, collection, addDoc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
@@ -372,7 +376,7 @@
     let questionsData = [];
     window.currentExamData = null;
 
-    // --- SIDEBAR TOGGLE ---
+    // --- SIDEBAR TOGGLE (GIỮ NGUYÊN) ---
     window.toggleSidebar = () => {
         const sidebar = document.querySelector('aside') || document.getElementById('main-sidebar');
         const overlay = document.getElementById('sidebar-overlay');
@@ -389,7 +393,7 @@
         }
     };
 
-    // --- TIMER 20 PHÚT ---
+    // --- TIMER 20 PHÚT (GIỮ NGUYÊN) ---
     let timeLeft = 1200; 
     const timerElement = document.getElementById('timer');
     const timerMobile = document.getElementById('timer-mobile');
@@ -421,44 +425,68 @@
         } else { window.location.href = "../log.html"; }
     });
 
-    // --- TẢI ĐỀ ---
+    // --- THAY ĐỔI: TẢI ĐỀ TỪ FIREBASE (READING_BANK) ---
     async function loadQuestions() {
+        const passageBox = document.getElementById('prompt-passage');
         try {
-            const r = await fetch('questions.json');
-            const data = await r.json();
-            questionsData = data.dochieu || [];
-            if(questionsData.length === 0) throw new Error("No data");
-            randomizeQuestion();
+            // Lấy dữ liệu từ collection reading_bank
+            const querySnapshot = await getDocs(collection(db, "reading_bank"));
+            questionsData = [];
+            
+            querySnapshot.forEach((doc) => {
+                questionsData.push({ id: doc.id, ...doc.data() });
+            });
+
+            if (questionsData.length === 0) {
+                passageBox.innerHTML = `<p class="text-center py-10 text-gray-400 font-bold">Kho đề đọc hiểu đang trống. Hãy thêm đề tại trang Quản trị.</p>`;
+                return;
+            }
+            
+            randomizeQuestion(); // Hiển thị đề ngẫu nhiên đầu tiên
         } catch (e) {
-            document.getElementById('prompt-passage').innerText = "Lỗi tải đề bài. Vui lòng kiểm tra kết nối.";
+            console.error("Lỗi Firebase:", e);
+            passageBox.innerText = "Lỗi kết nối dữ liệu: " + e.message;
         }
     }
 
     window.randomizeQuestion = () => {
         if (questionsData.length === 0) return;
+        
+        // Chọn ngẫu nhiên 1 đề
         const q = questionsData[Math.floor(Math.random() * questionsData.length)];
         window.currentExamData = { ...q, type: 'dochieu' };
 
+        // Hiển thị tiêu đề và nội dung văn bản
         document.getElementById('prompt-title').innerText = q.title || "Văn bản Đọc Hiểu";
         document.getElementById('prompt-passage').innerText = q.text;
         
+        // Hiển thị danh sách câu hỏi
         const qContainer = document.getElementById('questions-container');
-        qContainer.innerHTML = q.questions.map((item, i) => `
-            <div class="p-3 bg-white border border-gray-100 rounded-xl shadow-sm">
-                <p class="font-bold text-gray-800 text-sm"><span class="text-orange-500">Câu ${i+1}:</span> ${item.q}</p>
-            </div>
-        `).join('');
+        if (q.questions && Array.isArray(q.questions)) {
+            qContainer.innerHTML = q.questions.map((item, i) => `
+                <div class="p-4 bg-white border border-orange-100 rounded-2xl shadow-sm hover:shadow-md transition">
+                    <p class="font-bold text-gray-800 text-sm">
+                        <span class="text-orange-500 font-black">Câu ${i+1}:</span> ${item.q}
+                    </p>
+                </div>
+            `).join('');
+        }
 
-        // Reset UI
+        // Reset khu vực làm bài
         document.getElementById('student-essay').value = "";
+        document.getElementById('word-count').innerText = "0 TỪ";
+        
+        // Ẩn bảng kết quả cũ
         const aiBox = document.getElementById('ai-correction-box');
         aiBox.className = "ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400";
-        aiBox.innerHTML = `<div><i class="fas fa-robot text-5xl mb-4 opacity-20"></i><p class="font-bold">Sẵn sàng chấm bài</p></div>`;
+        aiBox.innerHTML = `<div><i class="fas fa-robot text-5xl mb-4 opacity-20"></i><p class="font-bold text-lg">Sẵn sàng chấm bài</p></div>`;
         document.getElementById('overall-feedback-box').style.display = 'none';
     };
 
+    // Gọi hàm tải dữ liệu ngay khi chạy
     loadQuestions();
 
+    // --- UPLOAD FILE (GIỮ NGUYÊN) ---
     document.getElementById('file-upload').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -479,7 +507,7 @@
         }
     });
 
-    // --- POPUP HANDLERS ---
+    // --- POPUP HANDLERS (GIỮ NGUYÊN) ---
     const errorPopup = document.getElementById('ai-error-popup');
     const shortEssayPopup = document.getElementById('short-essay-popup');
     
@@ -496,7 +524,7 @@
     document.getElementById('btn-ai-retry').addEventListener('click', () => { hideAiError(); handleAISubmission(); });
     document.getElementById('btn-short-close').addEventListener('click', hideShortEssay);
 
-    // --- MAIN AI LOGIC ---
+    // --- MAIN AI LOGIC (GIỮ NGUYÊN PROMPT & CẤU TRÚC) ---
     async function handleAISubmission() {
         const content = document.getElementById('student-essay').value.trim();
         // Kiểm tra bài ngắn (dưới 10 từ cho đọc hiểu)

@@ -42,16 +42,24 @@
 
         /* Question Styles */
         .option-box {
-            display: flex; align-items: center; gap: 12px; padding: 16px;
-            border: 2px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.4);
-            border-radius: 16px; cursor: pointer; transition: all 0.2s;
-            position: relative; overflow: hidden;
+            display: flex; align-items: center; gap: 12px; padding: 18px;
+            background: #FFFFFF !important; /* Nền trắng hẳn để nổi bật */
+            border: 1px solid #E2E8F0; /* Viền xám nhẹ rõ ràng */
+            border-radius: 20px; cursor: pointer; transition: all 0.25s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        .option-box:hover { background: rgba(255,255,255,0.8); border-color: #fdba74; transform: translateX(5px); }
+        .option-box:hover { 
+            border-color: var(--primary); 
+            background: #FFF7ED !important; 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 15px -3px rgba(255, 143, 80, 0.1);
+        }
         
         input[type="radio"]:checked + span { color: #c2410c; font-weight: 700; }
         .option-box:has(input:checked) {
-            background: #fff7ed; border-color: var(--primary); box-shadow: 0 4px 15px rgba(255, 143, 80, 0.15);
+            background: #FFF7ED !important;
+            border-color: var(--primary);
+            border-width: 2px;
         }
 
         .option-radio {
@@ -197,7 +205,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
@@ -205,262 +213,201 @@
     const db = getFirestore(app);
 
     let userUid = null;
-    
-    const quizData = [
-        { q: "Câu thơ 'Dốc lên khúc khuỷu dốc thăm thẳm' (Tây Tiến) sử dụng biện pháp tu từ nào nổi bật?", a: ["Nhân hóa", "Điệp từ", "Ẩn dụ", "Hoán dụ"], correct: 1 },
-        { q: "Trong 'Tây Tiến', hình ảnh 'súng ngửi trời' sử dụng biện pháp nghệ thuật gì?", a: ["Nhân hóa", "So sánh", "Nói quá", "Liệt kê"], correct: 0 },
-        { q: "Bài thơ 'Sóng' (Xuân Quỳnh) chủ yếu được ngắt theo nhịp nào?", a: ["2/3", "3/2", "1/4", "Chẵn lẻ linh hoạt"], correct: 0 },
-        { q: "Nghệ thuật đặc sắc nhất trong tùy bút 'Người lái đò Sông Đà' của Nguyễn Tuân là gì?", a: ["Xây dựng nhân vật điển hình", "Vận dụng tri thức đa ngành", "Kết cấu đầu cuối tương ứng", "Miêu tả tâm lý nhân vật"], correct: 1 },
-        { q: "Biện pháp tu từ trong câu: 'Đất là nơi anh đến trường / Nước là nơi em tắm'?", a: ["Hoán dụ", "Chiết tự (Tách từ)", "Ẩn dụ", "Nói giảm nói tránh"], correct: 1 },
-        { q: "Tính dân tộc trong 'Việt Bắc' của Tố Hữu thể hiện đậm nét nhất qua yếu tố nào?", a: ["Thể thơ lục bát", "Đề tài chiến tranh", "Nhân vật lịch sử", "Kết cấu hiện đại"], correct: 0 },
-        { q: "Câu thơ 'Ôi con sóng nhớ bờ / Ngày đêm không ngủ được' sử dụng biện pháp gì?", a: ["Nhân hóa", "So sánh", "Điệp ngữ", "Hoán dụ"], correct: 0 },
-        { q: "Trong 'Vợ chồng A Phủ', bút pháp nghệ thuật nào được Tô Hoài sử dụng để miêu tả sức sống tiềm tàng của Mị?", a: ["Miêu tả ngoại hình", "Miêu tả tâm lý sắc sảo", "Đối thoại", "Trần thuật ngôi thứ nhất"], correct: 1 },
-        { q: "Hình tượng cây xà nu trong 'Rừng xà nu' chủ yếu mang ý nghĩa gì?", a: ["Tả thực thiên nhiên", "Ẩn dụ, biểu tượng", "So sánh", "Hoán dụ"], correct: 1 },
-        { q: "Hai câu thơ: 'Dữ dội và dịu êm / Ồn ào và lặng lẽ' sử dụng biện pháp nghệ thuật gì?", a: ["So sánh", "Đối (Tiểu đối)", "Nhân hóa", "Ẩn dụ"], correct: 1 },
-        { q: "Phong cách nghệ thuật của Nguyễn Tuân thường được gói gọn trong chữ nào?", a: ["Đời", "Ngông", "Thực", "Tình"], correct: 1 },
-        { q: "Trong 'Chiếc thuyền ngoài xa', Nguyễn Minh Châu đã sử dụng điểm nhìn trần thuật của nhân vật nào?", a: ["Người đàn bà", "Đẩu", "Nghệ sĩ Phùng", "Thằng Phác"], correct: 2 },
-        { q: "Biện pháp tu từ trong câu 'Áo bào thay chiếu anh về đất'?", a: ["Nói giảm nói tránh", "Nói quá", "So sánh", "Điệp từ"], correct: 0 },
-        { q: "Tác phẩm 'Ai đã đặt tên cho dòng sông?' mang đậm chất bút pháp gì?", a: ["Hiện thực", "Trữ tình, hướng nội", "Trào phúng", "Sử thi"], correct: 1 },
-        { q: "Nhịp thơ chủ đạo trong bài 'Việt Bắc' (thể lục bát) thường là?", a: ["2/2/2 (câu 6) và 4/4 (câu 8)", "3/3 và 3/5", "1/5 và 2/6", "Tự do"], correct: 0 },
-        { q: "Nghệ thuật xây dựng tình huống truyện trong 'Vợ nhặt' có đặc điểm gì nổi bật?", a: ["Lãng mạn", "Tình huống lạ lùng, nghịch lý", "Hài hước đơn thuần", "Bi kịch bế tắc"], correct: 1 },
-        { q: "Câu thơ 'Cha mẹ thương nhau bằng gừng cay muối mặn' sử dụng chất liệu văn hóa dân gian nào?", a: ["Ca dao, thành ngữ", "Truyện cổ tích", "Truyền thuyết", "Sử thi"], correct: 0 },
-        { q: "Thủ pháp nghệ thuật đối lập trong 'Tây Tiến' thể hiện qua cặp hình ảnh nào?", a: ["Núi cao - Vực sâu", "Bi tráng - Lãng mạn", "Ngày - Đêm", "Mưa - Nắng"], correct: 1 },
-        { q: "Nhịp thơ trong câu 'Mai Châu mùa em thơm nếp xôi' là?", a: ["2/2/3", "4/3", "3/4", "1/6"], correct: 1 },
-        { q: "Biện pháp nghệ thuật nào tạo nên giọng điệu tranh luận trong 'Hồn Trương Ba, da hàng thịt'?", a: ["Độc thoại nội tâm", "Đối thoại, xung đột kịch", "Trần thuật", "Miêu tả"], correct: 1 }
-    ];
+    let currentQuestions = []; 
 
-    // --- HÀM HIỂN THỊ POPUP ĐA NĂNG ---
+    // --- POPUP ĐA NĂNG ---
     window.showPopup = (type, title, msg, confirmCallback = null) => {
         const modal = document.getElementById('alert-modal');
         const iconBox = document.getElementById('alert-icon-box');
         const icon = document.getElementById('alert-icon');
-        const titleEl = document.getElementById('alert-title');
-        const msgEl = document.getElementById('alert-msg');
         const actions = document.getElementById('alert-actions');
-
-        titleEl.innerText = title;
-        msgEl.innerText = msg;
-
-        // Reset Styles
+        
+        document.getElementById('alert-title').innerText = title;
+        document.getElementById('alert-msg').innerText = msg;
         iconBox.className = "icon-box";
         actions.innerHTML = "";
 
         if (type === 'warning') {
             iconBox.classList.add('icon-warning');
             icon.className = "fas fa-exclamation-triangle";
-            // Nút cho Warning (Ví dụ: Xác nhận nộp bài)
             if (confirmCallback) {
-                const cancelBtn = document.createElement('button');
-                cancelBtn.className = "px-6 py-3 rounded-xl font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition";
-                cancelBtn.innerText = "Kiểm tra lại";
-                cancelBtn.onclick = () => modal.classList.remove('open');
-
-                const confirmBtn = document.createElement('button');
-                confirmBtn.className = "px-6 py-3 rounded-xl font-bold bg-orange-500 text-white hover:bg-orange-600 shadow-lg shadow-orange-200 transition";
-                confirmBtn.innerText = "Nộp bài luôn";
-                confirmBtn.onclick = () => { modal.classList.remove('open'); confirmCallback(); };
-
-                actions.appendChild(cancelBtn);
-                actions.appendChild(confirmBtn);
-            } else {
-                // Warning đơn giản (chỉ có nút đóng)
-                const closeBtn = document.createElement('button');
-                closeBtn.className = "px-8 py-3 rounded-xl font-bold bg-orange-500 text-white hover:bg-orange-600 transition";
-                closeBtn.innerText = "Đã hiểu";
-                closeBtn.onclick = () => modal.classList.remove('open');
-                actions.appendChild(closeBtn);
+                const cnlBtn = document.createElement('button');
+                cnlBtn.className = "px-6 py-3 rounded-xl font-bold bg-gray-100 text-gray-600";
+                cnlBtn.innerText = "Kiểm tra lại";
+                cnlBtn.onclick = () => modal.classList.remove('open');
+                const cfBtn = document.createElement('button');
+                cfBtn.className = "px-6 py-3 rounded-xl font-bold bg-orange-500 text-white shadow-lg";
+                cfBtn.innerText = "Nộp ngay";
+                cfBtn.onclick = () => { modal.classList.remove('open'); confirmCallback(); };
+                actions.append(cnlBtn, cfBtn);
             }
         } else if (type === 'error') {
             iconBox.classList.add('icon-error');
             icon.className = "fas fa-times-circle";
-            const closeBtn = document.createElement('button');
-            closeBtn.className = "px-8 py-3 rounded-xl font-bold bg-red-500 text-white hover:bg-red-600 transition";
-            closeBtn.innerText = "Thử lại";
-            closeBtn.onclick = () => { modal.classList.remove('open'); if(confirmCallback) confirmCallback(); };
-            actions.appendChild(closeBtn);
-        } else if (type === 'info') {
+            const btn = document.createElement('button');
+            btn.className = "px-8 py-3 rounded-xl font-bold bg-red-500 text-white";
+            btn.innerText = "Đóng";
+            btn.onclick = () => modal.classList.remove('open');
+            actions.appendChild(btn);
+        } else {
             iconBox.classList.add('icon-info');
             icon.className = "fas fa-info-circle";
-            const closeBtn = document.createElement('button');
-            closeBtn.className = "px-8 py-3 rounded-xl font-bold bg-blue-500 text-white hover:bg-blue-600 transition";
-            closeBtn.innerText = "Đăng nhập ngay";
-            closeBtn.onclick = () => { window.location.href = "../log.html"; };
-            actions.appendChild(closeBtn);
+            const btn = document.createElement('button');
+            btn.className = "px-8 py-3 rounded-xl font-bold bg-blue-500 text-white";
+            btn.innerText = "Đăng nhập";
+            btn.onclick = () => window.location.href = "../log.html";
+            actions.appendChild(btn);
         }
-
         modal.classList.add('open');
     };
 
     onAuthStateChanged(auth, (u) => {
         if (u) { userUid = u.uid; initQuiz(); } 
-        else { 
-            // Thay thế alert cũ bằng Popup
-            showPopup('info', 'Yêu cầu đăng nhập', 'Bạn cần đăng nhập để lưu kết quả và mở khóa màn chơi.');
-        }
+        else { showPopup('info', 'Yêu cầu đăng nhập', 'Bạn cần đăng nhập để làm bài và lưu tiến độ.'); }
     });
 
-    fetch('menu.html').then(r=>r.text()).then(h=>{
-        const p = document.getElementById('menu-placeholder'); p.innerHTML=h;
-        p.querySelectorAll('script').forEach(s=>{const n=document.createElement('script');n.text=s.text;document.body.appendChild(n)});
-    });
-
-    function initQuiz() {
+    // --- TẢI CÂU HỎI TỪ FIREBASE ---
+    async function initQuiz() {
         const form = document.getElementById('quiz-form');
-        quizData.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = "liquid-glass p-8 relative overflow-hidden"; 
-            div.innerHTML = `
-                <div class="flex items-center gap-3 mb-5 relative z-10">
-                    <span class="bg-orange-100 text-orange-600 font-black w-8 h-8 flex items-center justify-center rounded-lg text-sm border border-orange-200 shadow-sm">${index + 1}</span>
-                    <h3 class="font-bold text-gray-800 text-lg">${item.q}</h3>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 relative z-10">
-                    ${item.a.map((opt, i) => `
-                        <label class="option-box" id="lbl-${index}-${i}">
-                            <input type="radio" name="q${index}" value="${i}" class="option-radio">
-                            <span class="text-gray-700 font-medium">${opt}</span>
-                        </label>
-                    `).join('')}
-                </div>
-            `;
-            form.appendChild(div);
-        });
+        form.innerHTML = '<div class="text-center py-20"><i class="fas fa-circle-notch fa-spin text-orange-500 text-4xl"></i></div>';
+        try {
+            const q = query(collection(db, "study_levels"), where("level", "==", 1));
+            const snap = await getDocs(q);
+            if (snap.empty) {
+                form.innerHTML = '<p class="text-center text-red-500 font-black py-20 bg-white rounded-3xl">LEVEL 1 CHƯA CÓ DỮ LIỆU TRÊN ADMIN!</p>';
+                return;
+            }
+            currentQuestions = snap.docs[0].data().content;
+            form.innerHTML = ''; 
+            currentQuestions.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = "liquid-glass p-8 relative overflow-hidden mb-8 border border-white/50"; 
+                div.innerHTML = `
+                    <div class="flex items-center gap-3 mb-6 relative z-10">
+                        <span class="bg-orange-500 text-white font-black w-8 h-8 flex items-center justify-center rounded-lg text-sm">${index + 1}</span>
+                        <h3 class="font-bold text-gray-800 text-lg leading-snug">${item.question}</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+                        ${item.options.map((opt, i) => `
+                            <label class="option-box" id="lbl-${index}-${i}">
+                                <input type="radio" name="q${index}" value="${i}" class="option-radio">
+                                <span class="text-gray-600 font-semibold text-sm">${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                form.appendChild(div);
+            });
+        } catch (e) { form.innerHTML = `<p class="text-center text-red-500 font-bold">${e.message}</p>`; }
     }
 
-    // Hàm gọi khi bấm nút "Nộp bài" - Sẽ hiện Popup xác nhận trước
+    // --- CHẤM ĐIỂM & LƯU TIẾN ĐỘ ---
+    const submitQuizProcess = async () => {
+        if (currentQuestions.length === 0) return;
+        
+        let correctCount = 0;
+        currentQuestions.forEach((item, index) => {
+            const radios = document.getElementsByName(`q${index}`);
+            let selected = -1;
+            for(let r of radios) { if(r.checked) selected = parseInt(r.value); r.disabled = true; }
+            
+            const correctIdx = item.correct; 
+            document.getElementById(`lbl-${index}-${correctIdx}`).classList.add('correct');
+            if(selected === correctIdx) correctCount++;
+            else if (selected !== -1) document.getElementById(`lbl-${index}-${selected}`).classList.add('wrong');
+        });
+
+        const totalScore = parseFloat(((correctCount / currentQuestions.length) * 10).toFixed(1));
+        const pass = totalScore >= 6.0;
+
+        // UI Modal Result
+        document.getElementById('modal-score').innerText = `${totalScore}/10`;
+        document.getElementById('modal-correct').innerText = `${correctCount}/${currentQuestions.length}`;
+        const modal = document.getElementById('result-modal');
+        
+        if (pass) {
+            document.getElementById('modal-icon').innerHTML = '<i class="fas fa-trophy text-yellow-400"></i>';
+            document.getElementById('modal-title').innerText = 'XUẤT SẮC!';
+            document.getElementById('modal-title').className = "text-4xl font-black mb-3 text-green-600";
+            document.getElementById('modal-message').innerText = "Chúc mừng! Bạn đã mở khóa Level 2.";
+            updateModalButton('loading', true);
+        } else {
+            document.getElementById('modal-icon').innerHTML = '<i class="fas fa-sad-tear text-blue-300"></i>';
+            document.getElementById('modal-title').innerText = 'RẤT TIẾC!';
+            document.getElementById('modal-title').className = "text-4xl font-black mb-3 text-red-500";
+            document.getElementById('modal-message').innerText = "Bạn cần 6.0 điểm để vượt qua thử thách này.";
+            updateModalButton('fail', false);
+        }
+        modal.classList.add('open');
+
+        // Firestore Update
+        if(userUid) {
+            try {
+                await addDoc(collection(db, "activities"), {
+                    uid: userUid,
+                    action: `Vượt ải Level 1: ${totalScore} điểm`,
+                    type: "journal",
+                    score: totalScore,
+                    timestamp: serverTimestamp()
+                });
+                if(pass) {
+                    const userRef = doc(db, "users_progress", userUid);
+                    await setDoc(userRef, { currentLevel: 2, lastPassed: serverTimestamp() }, { merge: true });
+                    updateModalButton('success', true);
+                }
+            } catch (e) { console.error("Firebase Error:", e); }
+        }
+    };
+
     window.confirmSubmission = () => {
-        showPopup('warning', 'Xác nhận nộp bài', 'Bạn có chắc chắn muốn nộp bài? Hãy kiểm tra kỹ các câu trả lời nhé.', submitQuizProcess);
+        const done = document.querySelectorAll('input[type="radio"]:checked').length;
+        const msg = done < currentQuestions.length 
+            ? `Bạn mới hoàn thành ${done}/${currentQuestions.length} câu. Vẫn muốn nộp chứ?` 
+            : 'Bạn đã hoàn thành bài thi. Bạn có chắc muốn nộp bài không?';
+        showPopup('warning', 'Xác nhận nộp bài', msg, submitQuizProcess);
     };
 
     function updateModalButton(status, pass) {
         const btn = document.getElementById('modal-btn');
         if (status === 'loading') {
-            btn.innerHTML = '<i class="fas fa-circle-notch"></i> ĐANG LƯU DỮ LIỆU...';
-            btn.classList.add('btn-loading'); 
-        } else if (status === 'success' && pass) {
-            btn.innerHTML = 'MỞ KHÓA LEVEL 2 NGAY <i class="fas fa-unlock ml-2"></i>';
-            btn.classList.remove('btn-loading');
-            btn.className = "w-full py-4 rounded-2xl font-bold text-white text-lg shadow-xl shadow-green-200 bg-green-500 hover:bg-green-600 transition-all transform active:scale-95 flex items-center justify-center";
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> ĐANG LƯU...';
+            btn.className = "w-full py-4 rounded-2xl font-bold text-white bg-gray-400 pointer-events-none";
+        } else if (status === 'success') {
+            btn.innerHTML = 'TIẾP TỤC LỘ TRÌNH <i class="fas fa-arrow-right ml-2"></i>';
+            btn.className = "w-full py-4 rounded-2xl font-bold text-white bg-green-500 shadow-xl shadow-green-200 hover:scale-[1.02] transition";
             btn.onclick = () => window.location.href = "../dashboard/nhatkyhoctap.html";
         } else {
-            btn.innerHTML = 'LÀM LẠI BÀI THI <i class="fas fa-redo ml-2"></i>';
-            btn.classList.remove('btn-loading');
-            btn.className = "w-full py-4 rounded-2xl font-bold text-white text-lg shadow-xl shadow-red-200 bg-red-500 hover:bg-red-600 transition-all transform active:scale-95 flex items-center justify-center";
+            btn.innerHTML = 'THỬ LẠI NGAY <i class="fas fa-redo ml-2"></i>';
+            btn.className = "w-full py-4 rounded-2xl font-bold text-white bg-orange-500 shadow-xl hover:scale-[1.02] transition";
             btn.onclick = () => location.reload();
         }
     }
 
-    // Logic chấm điểm chính (đã tách ra để gọi lại từ popup)
-    const submitQuizProcess = async () => {
-        let score = 0;
-        let correctCount = 0;
-
-        quizData.forEach((item, index) => {
-            const radios = document.getElementsByName(`q${index}`);
-            let selected = -1;
-            for(let r of radios) {
-                if(r.checked) selected = parseInt(r.value);
-                r.disabled = true;
-            }
-
-            const correctLbl = document.getElementById(`lbl-${index}-${item.correct}`);
-            if(correctLbl) correctLbl.classList.add('correct');
-
-            if(selected === item.correct) {
-                score += 0.5; 
-                correctCount++;
-            } else if (selected !== -1) {
-                document.getElementById(`lbl-${index}-${selected}`).classList.add('wrong');
-            }
-        });
-
-        const totalScore = score;
-        const pass = totalScore >= 6.0;
-
-        // Hiện Popup Kết Quả
-        const modal = document.getElementById('result-modal');
-        const icon = document.getElementById('modal-icon');
-        const title = document.getElementById('modal-title');
-        const message = document.getElementById('modal-message');
-
-        document.getElementById('modal-score').innerText = `${totalScore}/10`;
-        document.getElementById('modal-correct').innerText = `${correctCount}/20`;
-
-        if (pass) {
-            icon.innerHTML = '<i class="fas fa-trophy text-yellow-400"></i>';
-            title.innerText = 'XUẤT SẮC!';
-            title.className = "text-4xl font-black mb-3 uppercase tracking-tighter text-green-600";
-            message.innerText = "Chúc mừng! Bạn đã chinh phục Level 1.";
-            updateModalButton('loading', true); // Hiện loading trước khi lưu
-        } else {
-            icon.innerHTML = '<i class="fas fa-sad-tear text-blue-300"></i>';
-            title.innerText = 'RẤT TIẾC!';
-            title.className = "text-4xl font-black mb-3 uppercase tracking-tighter text-red-500";
-            message.innerText = "Cần đạt 6.0 điểm để qua màn. Hãy thử lại!";
-            updateModalButton('fail', false);
-        }
-
-        modal.classList.add('open');
-
-        // Lưu Firebase
-        if(userUid) {
-            try {
-                await addDoc(collection(db, "activities"), {
-                    uid: userUid,
-                    action: `Làm trắc nghiệm Level 1: ${totalScore}/10 điểm`,
-                    score: totalScore,
-                    timestamp: serverTimestamp()
-                });
-
-                if(pass) {
-                    const userRef = doc(db, "users_progress", userUid);
-                    const userSnap = await getDoc(userRef);
-                    let currentLevel = 1;
-                    if(userSnap.exists()) currentLevel = userSnap.data().currentLevel || 1;
-
-                    // Mở khóa Level 2
-                    if(currentLevel < 2) {
-                        await setDoc(userRef, { currentLevel: 2, lastPassed: serverTimestamp() }, { merge: true });
-                    }
-                    
-                    updateModalButton('success', true);
-                }
-            } catch (e) { 
-                console.error(e);
-                // Thay alert bằng popup lỗi
-                modal.classList.remove('open'); // Tạm ẩn popup kết quả
-                showPopup('error', 'Lỗi lưu điểm', 'Không thể lưu kết quả lên hệ thống. Vui lòng kiểm tra mạng.', () => modal.classList.add('open'));
-                updateModalButton('fail', false);
-            }
-        }
-    };
-
-    // Hàm global để gọi từ nút HTML (nhưng giờ đã chuyển qua confirmSubmission)
-    window.submitQuiz = confirmSubmission;
-
-    // Timer
+    // --- TIMER 30 PHÚT ---
     let totalSeconds = 1800; 
     const timerCircle = document.getElementById('timer-circle');
     const timerText = document.getElementById('timer-text');
-    const timerMini = document.getElementById('timer-mini');
-
-    setInterval(() => {
+    
+    const interval = setInterval(() => {
         if(totalSeconds > 0) {
             totalSeconds--;
             const m = Math.floor(totalSeconds / 60);
             const s = totalSeconds % 60;
-            
             timerText.innerText = `${m} phút ${s < 10 ? '0'+s : s} giây`;
-            timerMini.innerText = m;
+            document.getElementById('timer-mini').innerText = m;
             const percent = (totalSeconds / 1800) * 100;
             timerCircle.setAttribute('stroke-dasharray', `${percent}, 100`);
             if(totalSeconds < 300) timerCircle.classList.replace('text-orange-500', 'text-red-500');
         } else {
-            // Hết giờ -> Tự nộp bài (không cần confirm)
+            clearInterval(interval);
             submitQuizProcess();
         }
     }, 1000);
-</script>
 
+    fetch('menu.html').then(r=>r.text()).then(h=>{
+        const p = document.getElementById('menu-placeholder'); p.innerHTML=h;
+        p.querySelectorAll('script').forEach(s=>{const n=document.createElement('script');n.text=s.text;document.body.appendChild(n)});
+    });
+</script>
 </body>
 </html>
