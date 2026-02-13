@@ -440,9 +440,9 @@
     window.removeHighlight = () => { document.execCommand('removeFormat'); document.getElementById('highlight-menu').style.display = 'none'; };
 
 // --- 5. AI CHẤM ĐIỂM (BẢN CHI TIẾT: CHECK AI + FIX FONT + NHẬN XÉT) ---
-    window.handleAISubmission = async () => {
+window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
-        if(content.length < 20) { 
+        if(content.split(/\s+/).filter(x => x).length < 20) { 
             showPopup("Chú ý", "Câu trả lời quá ngắn, vui lòng viết chi tiết hơn để AI có thể chấm điểm chính xác!", "warning"); 
             return; 
         }
@@ -451,9 +451,8 @@
         loading.style.display = 'flex';
 
         const q = window.currentExamData;
-        const qList = (q.questions || []).map(i => i.q).join("\n");
         
-const systemPrompt = `
+        const systemPrompt = `
 BẠN LÀ: Thành viên Hội đồng ra đề và chấm thi tốt nghiệp THPT Quốc gia - Chuyên gia cao cấp về kĩ năng giải mã ngữ liệu Đọc hiểu.
 THÁI ĐỘ: Khắt khe, tỉ mỉ. Bạn coi trọng sự chính xác tuyệt đối trong thuật ngữ và kĩ năng suy luận logic.
 NHIỆM VỤ: Chấm điểm ĐỌC HIỂU (Thang 4.0):
@@ -481,45 +480,40 @@ VĂN BẢN: ${q.text}
 CÂU HỎI: ${JSON.stringify(q.questions)}
 BÀI LÀM: ${content}
 `;
-        try {
+try {
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] }) 
             });
+
+            if (!res.ok) throw new Error("Server 504/Timeout");
+
             const data = await res.json();
             const rawText = data.candidates[0].content.parts[0].text;
-            
-            // Dùng Regex lấy JSON để tránh lỗi ký tự dư thừa
             const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+            
             if (!jsonMatch) {
-                // Nếu AI trả về HTML (Lỗi 504) thay vì JSON
-                showPopup("Máy chủ bận", "Bài làm đang được xử lý quá lâu. Nhân hãy thử bấm 'Nộp bài' lại một lần nữa nhé!", "error");
+                showPopup("Máy chủ bận", "Bài làm dài khiến AI xử lý quá lâu. Nhân hãy bấm 'Nộp bài' lại lần nữa nhé!", "error");
                 loading.style.display = 'none';
                 return;
             }
 
-            try {
-                const result = JSON.parse(jsonMatch[0]);
-                // Tiếp tục phần render kết quả như cũ...
-            } catch (e) {
-                console.error("Lỗi Parse JSON:", e);
-                showPopup("Lỗi AI", "Dữ liệu trả về bị lỗi, vui lòng thử lại.", "error");
-            }
+            // Parse dữ liệu
+            const result = JSON.parse(jsonMatch[0]);
 
+            // Hiển thị khung kết quả
             document.getElementById('input-section').classList.add('hidden');
             const out = document.getElementById('output-section');
             out.style.display = 'flex';
             out.classList.remove('hidden');
-            out.classList.add('flex-col', 'h-full'); // Ép lấy toàn bộ chiều cao của card
+            out.classList.add('flex-col', 'h-full');
 
             const barColor = result.human_score > 75 ? '#22c55e' : (result.human_score > 50 ? '#f59e0b' : '#ef4444');
 
-            // Render kết quả với Font Merriweather mảnh
+            // Render kết quả với Font Merriweather mảnh (Fix lỗi không cuộn được và sai font)
             document.getElementById('ai-correction-box').innerHTML = `
-                <div class="max-w-2xl mx-auto pb-10 custom-scrollbar" 
-                    style="font-family: 'Merriweather', serif; font-weight: 300; font-size: 1rem; line-height: 1.8;">
-                    </div>
+                <div class="max-w-2xl mx-auto pb-10 custom-scrollbar" style="font-family: 'Merriweather', serif; font-weight: 300;">
                     
                     <div class="text-center mb-8">
                         <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Kết quả đọc hiểu</div>
@@ -570,7 +564,6 @@ BÀI LÀM: ${content}
                 </div>
             `;
 
-            // Lưu Firebase (sử dụng score thang 10 để đồng bộ Dashboard)
             if (auth.currentUser) { 
                 await addDoc(collection(db, "activities"), { 
                     uid: auth.currentUser.uid, 
@@ -583,7 +576,7 @@ BÀI LÀM: ${content}
 
         } catch(e) { 
             console.error(e); 
-            showPopup("Lỗi AI", "Hệ thống đang bận xử lý dữ liệu, Nhân vui lòng thử nộp lại sau giây lát nhe!", "error"); 
+            showPopup("Lỗi AI", "Hệ thống đang quá tải hoặc bài làm quá dài. Nhân hãy thử bấm nộp lại nhé!", "error"); 
         } finally { 
             loading.style.display = 'none'; 
         }
