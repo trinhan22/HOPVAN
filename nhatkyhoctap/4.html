@@ -51,7 +51,7 @@
         }
 
         /* --- CONTENT STYLES --- */
-        /* Quote Box: Hiển thị ngữ liệu văn học */
+        /* Quote Box: Hiển thị ngữ liệu văn học -> Căn đều (Justify) */
         .quote-box {
             font-family: 'Merriweather', serif; 
             color: #374151;
@@ -63,19 +63,20 @@
             position: relative;
             border: 1px solid #fed7aa;
             margin-bottom: 24px;
+            text-align: justify; /* Căn đều ngữ liệu */
         }
-        /* Định dạng các thẻ HTML bên trong */
         .quote-box p { margin-bottom: 0.5rem; }
         .quote-box strong, .quote-box b { font-weight: 700; color: #1f2937; }
         .quote-box em, .quote-box i { font-style: italic; }
 
-        /* Topic Display */
+        /* Topic Display -> Căn đều */
         #display-topic {
             font-family: 'Plus Jakarta Sans', sans-serif;
             font-weight: 500; 
             color: #1e293b;
             font-size: 1.1rem;
             line-height: 1.6;
+            text-align: justify; /* Căn đều đề bài */
         }
         #display-topic strong { font-weight: 600; }
 
@@ -87,6 +88,7 @@
             font-size: 1rem; line-height: 1.7; color: #334155;
             resize: none; outline: none; transition: 0.3s;
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+            text-align: justify; /* Căn đều bài làm của học sinh luôn cho đẹp */
         }
         .glass-textarea:focus {
             border-color: var(--primary);
@@ -110,7 +112,7 @@
         }
 
         /* Highlight classes */
-        #ai-correction { white-space: pre-wrap; font-family: 'Merriweather', serif; font-size: 1rem; line-height: 1.8; }
+        #ai-correction { white-space: pre-wrap; font-family: 'Merriweather', serif; font-size: 1rem; line-height: 1.8; text-align: justify; }
         .text-good { background: #dcfce7; color: #166534; padding: 1px 4px; border-radius: 4px; font-weight: 600; }
         .text-bad { background: #fee2e2; color: #991b1b; text-decoration: line-through; padding: 1px 4px; border-radius: 4px; opacity: 0.8; }
         .text-fix { color: #2563eb; font-weight: 600; font-style: normal; margin-left: 4px; background: #eff6ff; padding: 1px 4px; border-radius: 4px; font-size: 0.9em; }
@@ -145,42 +147,6 @@
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         @media (max-width: 1024px) { .main-content { padding: 16px; } }
-
-/* --- GLOBAL SCROLLBAR STYLE --- */
-
-/* 1. Thiết lập độ rộng/cao của thanh trượt */
-::-webkit-scrollbar {
-    width: 10px;  /* Độ rộng cho thanh dọc */
-    height: 10px; /* Độ cao cho thanh ngang */
-}
-
-/* 2. Thiết lập rãnh trượt (Track) - Nền chìm */
-::-webkit-scrollbar-track {
-    background: rgba(255, 143, 80, 0.05); /* Màu cam cực nhạt, gần như trong suốt */
-    border-radius: 10px;
-}
-
-/* 3. Thiết lập tay nắm (Thumb) - Phần di chuyển */
-::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 143, 80, 0.3); /* Mặc định là cam nhạt */
-    border-radius: 10px; /* Bo tròn mềm mại */
-    
-    /* Mẹo: Tạo viền trong suốt để thanh trượt trông nhỏ hơn và "lơ lửng" */
-    border: 2px solid transparent;
-    background-clip: content-box;
-    transition: background-color 0.3s ease;
-}
-
-/* 4. Hiệu ứng khi di chuột vào (Hover) */
-::-webkit-scrollbar-thumb:hover {
-    background-color: #FF8F50; /* Đổi sang màu cam chính thương hiệu */
-    border: 1px solid transparent; /* Làm thanh trượt to ra một chút khi hover */
-}
-
-/* 5. (Tùy chọn) Ẩn nút mũi tên 2 đầu (nếu trình duyệt hiển thị) */
-::-webkit-scrollbar-button {
-    display: none;
-}
     </style>
 </head>
 <body>
@@ -201,6 +167,8 @@
 
     <div id="loading-overlay" class="loading-overlay">
         <div class="loader-robot"><i class="fas fa-robot"></i></div>
+        <h3 class="font-bold text-xl mt-6 text-gray-800">AI ĐANG CHẤM BÀI...</h3>
+        <p class="text-gray-500 mt-2 text-sm">Đang phân tích sâu sắc nội dung và nghệ thuật</p>
     </div>
 
     <main class="main-content">
@@ -216,14 +184,14 @@
                 <div class="flex items-center gap-4">
                     <div class="text-right hidden sm:block">
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Thời gian còn lại</p>
-                        <p class="text-base font-black text-gray-800" id="timer-text">60 phút 00 giây</p>
+                        <p class="text-base font-black text-gray-800" id="timer-text">90 phút 00 giây</p>
                     </div>
                     <div class="w-12 h-12 rounded-full flex items-center justify-center shadow-lg relative overflow-hidden bg-white">
                         <svg class="w-10 h-10 absolute" viewBox="0 0 36 36">
                             <path class="text-gray-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" />
                             <path class="text-orange-500 transition-all duration-1000 ease-linear" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" id="timer-circle" />
                         </svg>
-                        <span class="text-xs font-black relative z-10 text-gray-700" id="timer-mini">60</span>
+                        <span class="text-xs font-black relative z-10 text-gray-700" id="timer-mini">90</span>
                     </div>
                 </div>
             </div>
@@ -233,8 +201,8 @@
             <div class="liquid-glass p-8 mb-8 relative overflow-hidden bg-gradient-to-br from-white/80 to-white/40">
                 <div class="relative z-10">
                     <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Level 4</span>
-                    <h1 class="text-3xl font-bold text-gray-800 mt-4 mb-2">Nghị Luận Văn Học</h1>
-                    <p class="text-gray-500 font-medium text-sm">Phân tích tác phẩm văn học. Đạt <span class="text-orange-600 font-bold">6.0/10 điểm</span> để hoàn thành.</p>
+                    <h1 class="text-3xl font-bold text-gray-800 mt-3 mb-2">Nghị Luận Văn Học</h1>
+                    <p class="text-gray-500 font-medium text-sm">Phân tích tác phẩm. Đạt <span class="text-orange-600 font-bold">6.0 điểm</span> để hoàn thành.</p>
                 </div>
                 <i class="fas fa-book-reader absolute -right-6 -bottom-8 text-8xl text-orange-500/10 rotate-12"></i>
             </div>
@@ -248,7 +216,7 @@
                 <div id="display-quote-container" class="quote-box hidden">
                     <div class="flex items-center gap-2 mb-3">
                         <i class="fas fa-feather-alt text-orange-400"></i>
-                        <span class="text-xs font-bold text-orange-400 uppercase">Ngữ liệu / Đoạn trích</span>
+                        <span class="text-xs font-bold text-orange-400 uppercase">Ngữ liệu tham khảo</span>
                     </div>
                     <div id="display-quote"></div>
                 </div>
@@ -306,9 +274,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onclick="nextLevel()" id="next-btn" class="hidden w-full sm:w-auto bg-green-500 text-white px-8 py-4 rounded-2xl font-black hover:bg-green-600 transition shadow-lg shadow-green-200">Mở Khóa Level 5 <i class="fas fa-lock-open ml-2"></i></button>
-                    <button onclick="location.reload()" id="retry-btn" class="hidden w-full sm:w-auto bg-gray-100 text-gray-600 px-8 py-4 rounded-2xl font-black hover:bg-gray-200 transition">Làm Lại Bài <i class="fas fa-redo ml-2"></i></button>
+
+                <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="nextLevel()" id="next-btn" class="hidden w-full sm:w-auto bg-green-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-600 transition shadow-lg shadow-green-500/30 hover:-translate-y-1">
+                        HOÀN THÀNH KHÓA HỌC <i class="fas fa-flag-checkered ml-2"></i>
+                    </button>
+                    <button onclick="location.reload()" id="retry-btn" class="hidden w-full sm:w-auto bg-white text-gray-600 px-8 py-3 rounded-xl font-bold hover:bg-gray-50 transition shadow-sm border border-gray-200">
+                        LÀM LẠI BÀI <i class="fas fa-redo ml-2"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -317,7 +290,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
@@ -394,7 +367,7 @@
         const content = document.getElementById('student-essay').value.trim();
         const words = content.split(/\s+/).filter(x => x).length;
 
-        if (words < 100) return showPopup('warning', 'Bài viết quá ngắn', 'Bạn cần viết ít nhất 100 từ để AI có thể phân tích nội dung.');
+        if (words < 100) return showPopup('warning', 'Bài viết quá ngắn', 'Bạn cần viết ít nhất 100 từ để đảm bảo chiều sâu phân tích.');
         showPopup('warning', 'Xác nhận nộp bài', 'Bài làm sẽ được AI chấm điểm chi tiết.', handleRealSubmit);
     };
 
@@ -402,7 +375,7 @@
         const content = document.getElementById('student-essay').value.trim();
         document.getElementById('loading-overlay').style.display = 'flex';
 
-        // Prompt chuyên dụng cho Nghị Luận Văn Học
+        // PROMPT DÀNH CHO GROQ/LLAMA-3
         const systemPrompt = `
         VAI TRÒ: Giáo viên Ngữ Văn chuyên chấm thi THPT Quốc Gia.
         NHIỆM VỤ: Chấm bài NGHỊ LUẬN VĂN HỌC (Phân tích tác phẩm/nhân vật/tình huống).
@@ -418,28 +391,41 @@
         3. Dẫn chứng phù hợp.
         4. Diễn đạt mạch lạc, cảm xúc.
 
-        YÊU CẦU OUTPUT JSON (KHÔNG MARKDOWN):
+        YÊU CẦU OUTPUT JSON DUY NHẤT (KHÔNG CÓ MARKDOWN, KHÔNG CÓ LỜI DẪN):
         {
             "score": (số thực 0-10, lẻ 0.5),
-            "title": "Nhận xét ngắn gọn (vd: Phân tích sắc sảo, Còn sơ sài...)",
+            "title": "Nhận xét ngắn gọn",
             "desc": "Lời khuyên tổng quát",
-            "correction_html": "Trả lại bài làm gốc, nhưng chèn thêm thẻ: <span class='text-bad'>lỗi sai</span><span class='text-fix'>(gợi ý sửa)</span> và <span class='text-good'>ý hay/từ đắt</span>.",
+            "correction_html": "Trả lại bài làm gốc, nhưng chèn thêm thẻ: <span class='text-bad'>lỗi sai</span><span class='text-fix'>(gợi ý sửa)</span> và <span class='text-good'>ý hay</span>.",
             "pros": ["Ưu điểm 1", "Ưu điểm 2"],
             "cons": ["Hạn chế 1", "Hạn chế 2"]
         }
         `;
 
         try {
+            // GỌI API THEO CẤU TRÚC GROQ
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
+                body: JSON.stringify({ 
+                    messages: [
+                        { role: "system", content: "Bạn là trợ lý chấm thi văn học trả về định dạng JSON." },
+                        { role: "user", content: systemPrompt }
+                    ]
+                })
             });
+            
             const data = await response.json();
-            const res = JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json|```/g, "").trim());
+            // Parse kết quả từ Groq
+            let rawText = data.choices[0].message.content;
+            
+            // Clean JSON string
+            rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+            const res = JSON.parse(rawText);
 
             renderResult(res);
 
+            // Lưu Firebase
             if(userUid) {
                 await addDoc(collection(db, "activities"), { 
                     uid: userUid, 
@@ -451,7 +437,7 @@
                     timestamp: serverTimestamp() 
                 });
                 
-                // Score >= 6 coi như hoàn thành level này
+                // Score >= 6 coi như hoàn thành
                 if (res.score >= 6) {
                     await setDoc(doc(db, "users_progress", userUid), { currentLevel: 5, lastPassed: serverTimestamp() }, { merge: true });
                 }
@@ -493,8 +479,8 @@
 
     window.nextLevel = () => window.location.href = "../dashboard/nhatkyhoctap.html";
 
-    // Timer (60 mins)
-    let totalSeconds = 3600; 
+    // Timer (90 mins)
+    let totalSeconds = 5400; 
     const timerText = document.getElementById('timer-text');
     const timerMini = document.getElementById('timer-mini');
     const timerCircle = document.getElementById('timer-circle');
