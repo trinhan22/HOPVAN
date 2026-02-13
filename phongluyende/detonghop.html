@@ -502,9 +502,78 @@
     };
 
     // --- 5. AI CHẤM ĐIỂM (THANG 4-6) ---
-async function handleAISubmission() {
+// --- 1. HÀM HIỂN THỊ KẾT QUẢ (TÁCH RIÊNG ĐỂ FIX FONT & THANH CUỘN) ---
+function renderAIResult(result) {
+    document.getElementById('input-section').classList.add('hidden');
+    const out = document.getElementById('output-section');
+    out.style.display = 'flex';
+    out.classList.remove('hidden');
+    out.classList.add('flex-col', 'h-full'); // Đảm bảo chiếm trọn khung để cuộn được
+
+    const barColor = result.human_score > 75 ? '#22c55e' : (result.human_score > 50 ? '#f59e0b' : '#ef4444');
+
+    document.getElementById('ai-correction-box').innerHTML = `
+        <div class="max-w-3xl mx-auto pb-10 custom-scrollbar" style="font-family: 'Merriweather', serif; font-weight: 300;">
+            
+            <div class="text-center mb-8">
+                <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Kết quả Giám khảo cấp Quốc gia</div>
+                <div class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2">${result.score}</div>
+                <div class="grid grid-cols-3 gap-2 max-w-sm mx-auto mt-4">
+                    <div class="bg-blue-50 py-2 rounded-lg text-[10px] font-bold text-blue-600">Đọc hiểu: ${result.detailed_scores.reading}</div>
+                    <div class="bg-green-50 py-2 rounded-lg text-[10px] font-bold text-green-600">Câu 1: ${result.detailed_scores.writing_c1}</div>
+                    <div class="bg-purple-50 py-2 rounded-lg text-[10px] font-bold text-purple-600">Câu 2: ${result.detailed_scores.writing_c2}</div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Độ chân thực (AI Detection)</span>
+                    <span class="font-bold text-sm" style="color:${barColor}">${result.human_score}%</span>
+                </div>
+                <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div style="width:${result.human_score}%; background:${barColor}" class="h-full"></div>
+                </div>
+                <p class="text-[11px] text-gray-400 mt-2 italic font-light">"${result.ai_comment}"</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div class="bg-green-50/50 p-5 rounded-2xl border border-green-100">
+                    <h4 class="text-green-700 font-bold text-[10px] uppercase mb-3"><i class="fas fa-check-circle mr-1"></i> Điểm tích cực</h4>
+                    <ul class="text-xs text-green-800 space-y-2 font-medium">
+                        ${result.strengths.map(s => `<li>• ${s}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="bg-red-50/50 p-5 rounded-2xl border border-red-100">
+                    <h4 class="text-red-700 font-bold text-[10px] uppercase mb-3"><i class="fas fa-exclamation-triangle mr-1"></i> Cần lưu ý</h4>
+                    <ul class="text-xs text-red-800 space-y-2 font-medium">
+                        ${result.weaknesses.map(w => `<li>• ${w}</li>`).join('')}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm mb-8">
+                <h4 class="font-black text-gray-800 border-b pb-4 mb-6 text-xs uppercase tracking-widest">Chi tiết sửa bài & Phân tích thuật ngữ</h4>
+                <div class="leading-loose text-gray-700 text-lg space-y-4 text-justify font-light">
+                    ${result.correction_html}
+                </div>
+                <div class="mt-6 pt-4 border-t text-sm italic text-gray-500 text-center font-light">"${result.general_comment}"</div>
+            </div>
+
+            <div class="bg-gray-900 text-white p-6 rounded-2xl shadow-xl">
+                <div class="flex items-center gap-2 mb-2 text-orange-400">
+                    <i class="fas fa-compass"></i>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Định hướng tư duy văn chương</span>
+                </div>
+                <p class="text-sm text-gray-300 leading-relaxed font-light italic">"${result.orientation}"</p>
+            </div>
+        </div>
+    `;
+}
+
+// --- 2. HÀM XỬ LÝ NỘP BÀI (GIỮ NGUYÊN PROMPT KHẮT KHE) ---
+window.handleAISubmission = async () => {
     const content = document.getElementById('student-essay').value.trim();
-    if(content.length < 50) { 
+    if(content.split(/\s+/).filter(x => x).length < 50) { 
         document.getElementById('short-essay-popup').style.display = 'flex'; 
         return; 
     }
@@ -514,8 +583,8 @@ async function handleAISubmission() {
 
     const q = window.currentExamData;
     
-    // Prompt tối ưu: Ép AI trả về đúng cấu trúc và bắt văn AI gắt hơn
-const systemPrompt = `
+    // GIỮ NGUYÊN PROMPT GIÁM KHẢO KHẮT KHE CỦA NHÂN
+    const systemPrompt = `
 BẠN LÀ: Giám khảo Hội đồng chấm thi tốt nghiệp THPT Quốc gia - Chuyên gia cao cấp về kiểm định chất lượng Ngữ văn (Chương trình GDPT 2018).
 THÁI ĐỘ: Khắt khe, sắc sảo, hàn lâm và tuyệt đối công tâm. Bạn có "nhãn quan" cực nhạy để phát hiện mọi hành vi dùng văn mẫu hoặc AI.
 NGÔN NGỮ: Sử dụng thuật ngữ văn học chuyên sâu (tư duy biện chứng, điểm nhìn nghệ thuật, diễn ngôn, tính đa thanh, thao tác lập luận...). Không nhận xét chung chung - phải chỉ rõ "tốt ở đâu, yếu chỗ nào".
@@ -568,89 +637,41 @@ ${content}
             body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
         });
         
-        if (!res.ok) throw new Error("Server trả về lỗi " + res.status);
+        if (!res.ok) throw new Error("SERVER_TIMEOUT");
 
         const data = await res.json();
         const rawText = data.candidates[0].content.parts[0].text;
         
-        // Dùng Regex để lấy phần JSON bên trong cặp ngoặc nhọn, tránh lỗi văn bản dư thừa
+        // Regex bóc tách JSON chuẩn (tránh AI nói dư thừa bên ngoài)
         const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) throw new Error("Dữ liệu AI trả về không hợp lệ.");
+        if (!jsonMatch) throw new Error("INVALID_FORMAT");
         
         const result = JSON.parse(jsonMatch[0]);
 
-        // CHUYỂN SANG PHẦN HIỂN THỊ KẾT QUẢ (Xem đoạn 2 bên dưới)
-        function renderAIResult(result) {
-    document.getElementById('input-section').classList.add('hidden');
-    const out = document.getElementById('output-section');
-    out.classList.remove('hidden', 'h-0');
-    out.classList.add('h-full');
+        // GỌI HÀM HIỂN THỊ KẾT QUẢ
+        renderAIResult(result);
 
-    const barColor = result.human_score > 75 ? '#22c55e' : (result.human_score > 50 ? '#f59e0b' : '#ef4444');
-
-    document.getElementById('ai-correction-box').innerHTML = `
-        <div class="max-w-3xl mx-auto pb-10" style="font-family: 'Merriweather', serif; font-weight: 300;">
-            <div class="text-center mb-8">
-                <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Tổng điểm bài thi</div>
-                <div class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2">${result.score}</div>
-                <div class="grid grid-cols-3 gap-2 max-w-sm mx-auto mt-4">
-                    <div class="bg-blue-50 py-2 rounded-lg text-[10px] font-bold text-blue-600">Đọc hiểu: ${result.detailed_scores.reading}</div>
-                    <div class="bg-green-50 py-2 rounded-lg text-[10px] font-bold text-green-600">NLXH: ${result.detailed_scores.nlxh}</div>
-                    <div class="bg-purple-50 py-2 rounded-lg text-[10px] font-bold text-purple-600">NLVH: ${result.detailed_scores.nlvh}</div>
-                </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm mb-6">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Độ chân thực (AI Check)</span>
-                    <span class="font-bold text-sm" style="color:${barColor}">${result.human_score}%</span>
-                </div>
-                <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div style="width:${result.human_score}%; background:${barColor}" class="h-full"></div>
-                </div>
-                <p class="text-[11px] text-gray-400 mt-2 italic">"${result.ai_comment}"</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                <div class="bg-green-50/50 p-5 rounded-2xl border border-green-100">
-                    <h4 class="text-green-700 font-bold text-[10px] uppercase mb-3"><i class="fas fa-check-circle mr-1"></i> Điểm tích cực</h4>
-                    <ul class="text-xs text-green-800 space-y-2">
-                        ${result.strengths.map(s => `<li>• ${s}</li>`).join('')}
-                    </ul>
-                </div>
-                <div class="bg-red-50/50 p-5 rounded-2xl border border-red-100">
-                    <h4 class="text-red-700 font-bold text-[10px] uppercase mb-3"><i class="fas fa-exclamation-triangle mr-1"></i> Cần lưu ý</h4>
-                    <ul class="text-xs text-red-800 space-y-2">
-                        ${result.weaknesses.map(w => `<li>• ${w}</li>`).join('')}
-                    </ul>
-                </div>
-            </div>
-
-            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm mb-8">
-                <h4 class="font-black text-gray-800 border-b pb-4 mb-6 text-xs uppercase tracking-widest">Chi tiết sửa bài</h4>
-                <div class="leading-loose text-gray-700 text-lg space-y-4 text-justify" style="font-family: 'Merriweather', serif; font-weight: 300;">
-                    ${result.correction_html}
-                </div>
-            </div>
-
-            <div class="bg-gray-900 text-white p-6 rounded-2xl shadow-xl">
-                <div class="flex items-center gap-2 mb-2 text-orange-400">
-                    <i class="fas fa-compass"></i>
-                    <span class="text-[10px] font-black uppercase tracking-widest">Định hướng học tập</span>
-                </div>
-                <p class="text-sm text-gray-300 leading-relaxed italic">"${result.orientation}"</p>
-            </div>
-        </div>
-    `;
-}
+        // Lưu Firebase
+        if (auth.currentUser) {
+            await addDoc(collection(db, "activities"), {
+                uid: auth.currentUser.uid,
+                type: "fulltest",
+                score: result.score,
+                timestamp: serverTimestamp(),
+                examId: q.id
+            });
+        }
 
     } catch(e) {
-        console.error("Lỗi AI:", e);
-        showPopup("Hệ thống đang bận xử lý dữ liệu, Vui lòng thử nộp lại sau giây lát nhe!", "error");
+        console.error("Lỗi:", e);
+        const msg = e.message === "SERVER_TIMEOUT" 
+            ? "Ngữ liệu dài khiến AI phản hồi hơi chậm. Hãy bấm nộp bài lại 1-2 lần nữa nhé!" 
+            : "Hệ thống đang bận xử lý dữ liệu, Vui lòng thử nộp lại sau giây lát nhe!";
+        showPopup("Thông báo", msg, "error");
     } finally {
         loading.style.display = 'none';
     }
-}
+};
 
     window.resetExam = () => {
         document.getElementById('input-section').classList.remove('hidden');

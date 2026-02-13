@@ -584,9 +584,9 @@ window.handleAISubmission = async () => {
     } catch(e) { 
         console.error(e);
         if (e.message === "TIMEOUT_504") {
-            showPopup("Máy chủ bận", "Ngữ liệu dài khiến AI phản hồi hơi chậm. Nhân hãy bấm nộp bài lại 1-2 lần nữa nhé!", "error");
+            showPopup("Máy chủ bận", "Ngữ liệu dài khiến AI phản hồi hơi chậm. Hãy bấm nộp bài lại 1-2 lần nữa nhé!", "error");
         } else {
-            showPopup("Lỗi hệ thống", "Có chút trục trặc nhỏ, Nhân vui lòng thử lại sau giây lát nhe!", "error");
+            showPopup("Lỗi hệ thống", "Hệ thống đang bận xử lý dữ liệu, Vui lòng thử nộp lại sau giây lát nhe!", "error");
         }
     } finally { 
         loading.style.display = 'none'; 
