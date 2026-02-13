@@ -238,6 +238,13 @@
             .dt-title { font-size: 1.6rem; }
             .dt-content { font-size: 1.05rem; line-height: 1.7; }
         }
+
+/* --- GLOBAL SCROLLBAR STYLE --- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
+::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
+::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
+::-webkit-scrollbar-button { display: none; }
     </style>
 </head>
 <body>
@@ -271,9 +278,9 @@
 
         <div class="tabs-container">
             <div class="tab-btn active" onclick="filterData('all', this)"><i class="fas fa-layer-group"></i> Tất cả</div>
-            <div class="tab-btn" onclick="filterData('NLXH', this)"><i class="fas fa-fire"></i> Dẫn chứng NLXH</div>
-            <div class="tab-btn" onclick="filterData('LyLuan', this)"><i class="fas fa-book-open"></i> Lý luận văn học</div>
-            <div class="tab-btn" onclick="filterData('KyNang', this)"><i class="fas fa-pen-nib"></i> Văn hay chữ tốt</div>
+            <div class="tab-btn" onclick="filterData('danchung', this)"><i class="fas fa-fire"></i> Dẫn chứng NLXH</div>
+            <div class="tab-btn" onclick="filterData('lyluan', this)"><i class="fas fa-book-open"></i> Lý luận văn học</div>
+            <div class="tab-btn" onclick="filterData('vanhay', this)"><i class="fas fa-pen-nib"></i> Văn hay chữ tốt</div>
         </div>
 
         <div class="news-grid" id="news-grid">
@@ -303,10 +310,12 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
     let allNews = [];
     let currentFilter = 'all';
@@ -325,32 +334,69 @@
         }
     };
 
-    // --- LOAD DATA ---
+    // --- HELPER: Random Image Generator ---
+    function getRandomImage(type) {
+        const images = {
+            'danchung': [
+                "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=800",
+                "https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?w=800",
+                "https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?w=800"
+            ],
+            'lyluan': [
+                "https://images.unsplash.com/photo-1478641300939-0ec5188d3163?w=800",
+                "https://images.unsplash.com/photo-1516414447565-b14be0adf13e?w=800",
+                "https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=800"
+            ],
+            'vanhay': [
+                "https://images.unsplash.com/photo-1519682337058-a5ca05e24b06?w=800",
+                "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800",
+                "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800"
+            ]
+        };
+        const list = images[type] || images['danchung'];
+        return list[Math.floor(Math.random() * list.length)];
+    }
+
+    // --- HELPER: Topic Name ---
+    function getCatName(cat) {
+        if(cat === 'danchung') return 'Dẫn chứng';
+        if(cat === 'lyluan') return 'Lý luận';
+        if(cat === 'vanhay') return 'Văn hay';
+        return 'Kiến thức';
+    }
+
+    // --- LOAD DATA FROM FIREBASE ---
     async function loadData() {
         try {
-            const [nlxh, lyluan, kynang] = await Promise.all([
-                fetch('../bantinvanhoc/data-nlxh.json').then(r => r.ok ? r.json() : []).catch(() => []),
-                fetch('../bantinvanhoc/data-lyluan.json').then(r => r.ok ? r.json() : []).catch(() => []),
-                fetch('../bantinvanhoc/data-kynang.json').then(r => r.ok ? r.json() : []).catch(() => [])
-            ]);
-            
-            allNews = [...nlxh, ...lyluan, ...kynang];
-            
+            const q = query(collection(db, "literary_news"), orderBy("createdAt", "desc"));
+            const snapshot = await getDocs(q);
+            allNews = [];
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                allNews.push({
+                    id: doc.id,
+                    title: data.title || "Không có tiêu đề",
+                    category: data.type || "danchung", // Mặc định nếu thiếu
+                    topic: getCatName(data.type),
+                    summary: data.summary || "",
+                    content: data.content || "",
+                    img: data.img || getRandomImage(data.type) // Ưu tiên ảnh nhập, nếu không thì random
+                });
+            });
+
             if(allNews.length === 0) {
-                allNews = [
-                    {id: 1, category: "NLXH", topic: "Nghị lực", title: "Ánh sáng nơi cuối đường hầm: Câu chuyện Nick Vujicic", img: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=800", content: "<p>Nội dung mẫu...</p>"},
-                    {id: 2, category: "LyLuan", topic: "Thơ Mới", title: "Cái tôi trữ tình trong thơ Xuân Diệu", img: "https://images.unsplash.com/photo-1478641300939-0ec5188d3163?w=800", content: "<p>Nội dung mẫu...</p>"},
-                    {id: 3, category: "KyNang", topic: "Mở bài", title: "Công thức mở bài gián tiếp 9+", img: "https://images.unsplash.com/photo-1519682337058-a5ca05e24b06?w=800", content: "<p>Nội dung mẫu...</p>"}
-                ];
+                document.getElementById('news-grid').innerHTML = '<div class="text-center py-20 text-gray-400 font-bold col-span-full">Chưa có bài viết nào. Hãy quay lại sau nhé!</div>';
+            } else {
+                renderGrid(allNews);
             }
-            allNews.sort(() => Math.random() - 0.5);
-            renderGrid(allNews);
         } catch (e) {
-            document.getElementById('news-grid').innerHTML = '<p class="text-center font-bold text-gray-400">Đang cập nhật dữ liệu...</p>';
+            console.error(e);
+            document.getElementById('news-grid').innerHTML = '<p class="text-center font-bold text-red-400 col-span-full">Lỗi tải dữ liệu. Vui lòng tải lại trang.</p>';
         }
     }
 
-    function getSummary(html, limit = 90) {
+    function getSummary(html, limit = 100) {
         const div = document.createElement("div"); div.innerHTML = html;
         let text = (div.textContent || "").trim();
         return text.length > limit ? text.substring(0, limit) + "..." : text;
@@ -359,7 +405,7 @@
     function renderGrid(data, keyword = "") {
         const grid = document.getElementById('news-grid');
         if(data.length === 0) {
-            grid.innerHTML = '<div class="text-center py-20 text-gray-400 font-bold col-span-full">Không tìm thấy bài viết nào.</div>';
+            grid.innerHTML = '<div class="text-center py-20 text-gray-400 font-bold col-span-full">Không tìm thấy kết quả phù hợp.</div>';
             return;
         }
 
@@ -374,24 +420,18 @@
             <div class="card" style="animation-delay: ${index * 0.05}s" onclick="openDetail('${item.id}')">
                 <div class="card-img-box">
                     <img src="${item.img}" class="card-img" loading="lazy" onerror="this.src='../panel.webp'">
-                    <div class="card-badge">${getCatName(item.category)}</div>
+                    <div class="card-badge">${item.topic}</div>
                 </div>
                 <div class="card-content">
                     <div class="card-meta">
-                        <i class="fas fa-hashtag text-orange-400"></i> ${item.topic}
+                        <i class="fas fa-feather-alt text-orange-400"></i> ${getCatName(item.category)}
                     </div>
                     <h3 class="card-title">${title}</h3>
-                    <p class="card-desc">${getSummary(item.content)}</p>
+                    <p class="card-desc">${getSummary(item.summary || item.content)}</p>
                     <div class="read-more">Đọc tiếp <i class="fas fa-arrow-right"></i></div>
                 </div>
             </div>`;
         }).join('');
-    }
-
-    function getCatName(cat) {
-        if(cat === 'NLXH') return 'Dẫn chứng';
-        if(cat === 'LyLuan') return 'Lý luận';
-        return 'Kỹ năng';
     }
 
     // SEARCH & FILTER

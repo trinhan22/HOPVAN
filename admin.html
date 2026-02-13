@@ -159,6 +159,43 @@
     background: white;
 }
 .ql-editor { font-size: 1rem; line-height: 1.6; }
+
+
+/* --- GLOBAL SCROLLBAR STYLE --- */
+
+/* 1. Thiết lập độ rộng/cao của thanh trượt */
+::-webkit-scrollbar {
+    width: 10px;  /* Độ rộng cho thanh dọc */
+    height: 10px; /* Độ cao cho thanh ngang */
+}
+
+/* 2. Thiết lập rãnh trượt (Track) - Nền chìm */
+::-webkit-scrollbar-track {
+    background: rgba(255, 143, 80, 0.05); /* Màu cam cực nhạt, gần như trong suốt */
+    border-radius: 10px;
+}
+
+/* 3. Thiết lập tay nắm (Thumb) - Phần di chuyển */
+::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 143, 80, 0.3); /* Mặc định là cam nhạt */
+    border-radius: 10px; /* Bo tròn mềm mại */
+    
+    /* Mẹo: Tạo viền trong suốt để thanh trượt trông nhỏ hơn và "lơ lửng" */
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: background-color 0.3s ease;
+}
+
+/* 4. Hiệu ứng khi di chuột vào (Hover) */
+::-webkit-scrollbar-thumb:hover {
+    background-color: #FF8F50; /* Đổi sang màu cam chính thương hiệu */
+    border: 1px solid transparent; /* Làm thanh trượt to ra một chút khi hover */
+}
+
+/* 5. (Tùy chọn) Ẩn nút mũi tên 2 đầu (nếu trình duyệt hiển thị) */
+::-webkit-scrollbar-button {
+    display: none;
+}
 </style>
 </head>
 <body class="h-screen flex">
@@ -188,6 +225,10 @@
             <div class="px-6 mt-8 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Quản Lý Ngân Hàng</div>
             <div class="nav-item" onclick="switchView('bank', this)">
                 <i class="fas fa-layer-group w-6"></i> Kho Đề Thi
+            </div>
+            <div class="px-6 mt-8 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Nội Dung</div>
+            <div class="nav-item" onclick="switchView('news', this)">
+                <i class="fas fa-feather-alt w-6"></i> Bản Tin Văn Học
             </div>
             <div class="nav-item" onclick="switchView('journal', this)">
                 <i class="fas fa-road w-6"></i> Nhật Ký Học Tập
@@ -252,10 +293,12 @@
                 </div>
 
                 <div>
-                    <h3 class="text-lg font-black text-gray-700 mb-6 flex items-center gap-2"><i class="fas fa-sparkles text-yellow-500"></i> Creative Studio</h3>
+                    <h3 class="text-lg font-black text-gray-700 mb-6 flex items-center gap-2">
+                        <i class="fas fa-sparkles text-yellow-500"></i> Creative Studio
+                    </h3>
+                    
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
-                        <div onclick="openModal('new', 'fulltest_bank')" class="action-card group md:col-span-2 bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white border-none shadow-xl shadow-violet-500/20">
-                            <div class="relative z-10">
+                            <div onclick="openModal('new', 'fulltest_bank')" class="action-card group md:col-span-2 bg-gradient-to-br from-orange-400 to-red-400 text-white border-none shadow-xl shadow-orange-500/30">                            <div class="relative z-10">
                                 <div class="icon-box bg-white/20 text-white"><i class="fas fa-layer-group"></i></div>
                                 <h4 class="font-black text-2xl">Tạo Full Đề Thi</h4>
                                 <p class="text-white/80 text-sm mt-1 font-medium">Gồm Đọc Hiểu + NLXH + NLVH</p>
@@ -289,11 +332,19 @@
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mt-6">
-                         <div onclick="openModal('new', 'quiz_bank')" class="action-card bg-gray-50 border-dashed border-2 border-gray-300">
+                        <div onclick="openModal('new', 'quiz_bank')" class="action-card">
                             <div class="icon-box bg-gray-200 text-gray-500"><i class="fas fa-check-square"></i></div>
                             <div>
                                 <h4 class="font-bold text-gray-600 text-lg">Trắc Nghiệm</h4>
                                 <p class="text-xs text-gray-400 font-bold mt-1 uppercase">Câu hỏi ngắn 4 đáp án</p>
+                            </div>
+                        </div>
+
+                        <div onclick="openModal('new', 'literary_news')" class="action-card">
+                            <div class="icon-box bg-teal-50 text-teal-600"><i class="fas fa-pen-nib"></i></div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-lg">Bản Tin Văn Học</h4>
+                                <p class="text-xs text-gray-400 font-bold mt-1 uppercase">Dẫn chứng & Lý luận</p>
                             </div>
                         </div>
                     </div>
@@ -302,6 +353,7 @@
             </div>
 
             <div id="view-bank" class="view-section hidden space-y-6">
+                
                 <div class="glass-panel rounded-3xl p-2 flex justify-between items-center sticky top-0 z-20">
                     <div class="flex gap-2">
                         <button onclick="loadBank('fulltest_bank', this)" class="px-5 py-3 rounded-2xl text-xs font-bold text-gray-500 hover:bg-white hover:text-orange-500 transition filter-btn">FULL ĐỀ</button>
@@ -318,6 +370,32 @@
                             <tr><th>Mã ID</th><th>Phân Loại</th><th>Nội dung chính</th><th class="text-right">Tác vụ</th></tr>
                         </thead>
                         <tbody id="bank-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-news" class="view-section hidden space-y-6">
+                <div class="glass-panel rounded-3xl p-2 flex justify-between items-center sticky top-0 z-20">
+                    <div class="flex gap-2">
+                        <button onclick="loadNews('all', this)" class="px-5 py-3 rounded-2xl text-xs font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 shadow-lg shadow-orange-500/30 transition filter-btn-news active">TẤT CẢ</button>
+                        <button onclick="loadNews('danchung', this)" class="px-5 py-3 rounded-2xl text-xs font-bold text-gray-500 hover:bg-white hover:text-orange-500 transition filter-btn-news">DẪN CHỨNG NLXH</button>
+                        <button onclick="loadNews('lyluan', this)" class="px-5 py-3 rounded-2xl text-xs font-bold text-gray-500 hover:bg-white hover:text-orange-500 transition filter-btn-news">LÝ LUẬN VH</button>
+                        <button onclick="loadNews('vanhay', this)" class="px-5 py-3 rounded-2xl text-xs font-bold text-gray-500 hover:bg-white hover:text-orange-500 transition filter-btn-news">VĂN HAY CHỮ TỐT</button>
+                    </div>
+                    <button onclick="openModal('new', 'literary_news')" class="w-10 h-10 rounded-xl bg-gray-900 text-white flex items-center justify-center hover:scale-110 transition"><i class="fas fa-plus"></i></button>
+                </div>
+
+                <div class="glass-panel rounded-3xl overflow-hidden min-h-[500px]">
+                    <table class="w-full text-left table-custom">
+                        <thead class="bg-gray-50/50">
+                            <tr>
+                                <th>Tiêu đề</th>
+                                <th>Thể loại</th>
+                                <th>Mô tả ngắn</th>
+                                <th class="text-right">Tác vụ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="news-table-body"></tbody>
                     </table>
                 </div>
             </div>
@@ -436,397 +514,487 @@
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, getDoc, updateDoc, deleteDoc, doc, query, orderBy, limit, serverTimestamp, getCountFromServer } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, query, where, orderBy, limit, onSnapshot, getDocs, getCountFromServer, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIG
-        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        let currentCollection = 'essay_bank';
-        let quillEditors = {};
+    // --- CONFIG FIREBASE ---
+    const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        // INIT DATE
-        document.getElementById('current-date').innerText = new Date().toLocaleDateString('vi-VN', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
+    const API_URL = `/.netlify/functions/gemini-proxy`;
+    let questionsData = []; 
+    let currentCollection = 'essay_bank';
+    let currentNewsFilter = 'all';
+    let editors = {}; // Biến quan trọng để lưu bộ soạn thảo
 
-        // AUTH
-        // --- BẢO MẬT: CHỈ ADMIN MỚI ĐƯỢC TRUY CẬP ---
-        const ADMIN_EMAIL = "admin@hopvan.com";
+    // INIT DATE
+    document.getElementById('current-date').innerText = new Date().toLocaleDateString('vi-VN', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // Kiểm tra email có đúng là admin không
-                if (user.email === ADMIN_EMAIL) {
-                    // Đúng Admin -> Cho phép ở lại
-                    document.getElementById('admin-email').innerText = user.email.split('@')[0];
-                    loadStats();
-                } else {
-                    // Tài khoản khác -> Thông báo và Kick
-                    alert("CẢNH BÁO: Bạn không có quyền truy cập khu vực này!");
-                    signOut(auth).then(() => {
-                        window.location.href = "admin-login.html"; // Chuyển về trang login của bạn
-                    });
-                }
-            } else {
-                // Chưa đăng nhập -> Chuyển về trang login
-                window.location.href = "admin-login.html";
-            }
-        });
-
-        // Nút đăng xuất thủ công
-        document.getElementById('logout-btn').onclick = () => {
+    // AUTH CHECK
+    const ADMIN_EMAIL = "admin@hopvan.com";
+    onAuthStateChanged(auth, (user) => {
+        if (user && user.email === ADMIN_EMAIL) {
+            document.getElementById('admin-email').innerText = user.email.split('@')[0];
+            loadStats();
+        } else {
             signOut(auth).then(() => window.location.href = "admin-login.html");
-        };
-
-        // UI NAV
-        window.switchView = (viewId, el) => {
-            document.querySelectorAll('.view-section').forEach(e => e.classList.add('hidden'));
-            document.getElementById('view-' + viewId).classList.remove('hidden');
-            if(el) {
-                document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
-                el.classList.add('active');
-            }
-            if(viewId === 'bank') loadBank(currentCollection);
-            if(viewId === 'journal') loadLevelsList();
-            if(viewId === 'history') loadSubmissions();
-        };
-
-        window.closeModal = () => document.querySelector('.modal-overlay').classList.remove('show');
-
-        // 1. STATS
-        async function loadStats() {
-            try {
-                const [u, e1, e2, e3, e4, sub, lvl] = await Promise.all([
-                    getCountFromServer(collection(db, "users")),
-                    getCountFromServer(collection(db, "fulltest_bank")),
-                    getCountFromServer(collection(db, "essay_bank")),
-                    getCountFromServer(collection(db, "reading_bank")),
-                    getCountFromServer(collection(db, "quiz_bank")),
-                    getCountFromServer(collection(db, "activities")),
-                    getCountFromServer(collection(db, "study_levels"))
-                ]);
-                document.getElementById('stat-users').innerText = u.data().count;
-                document.getElementById('stat-exams').innerText = e1.data().count + e2.data().count + e3.data().count + e4.data().count;
-                document.getElementById('stat-subs').innerText = sub.data().count;
-                document.getElementById('stat-levels').innerText = lvl.data().count;
-            } catch(e) {}
         }
+    });
 
-        // 2. BANK
-        window.loadBank = async (colName, btnEl) => {
-            currentCollection = colName;
-            if(btnEl) {
-                document.querySelectorAll('.filter-btn').forEach(b => {
-                    b.classList.remove('active', 'bg-gradient-to-r', 'from-orange-500', 'to-red-500', 'text-white', 'shadow-lg');
-                    b.classList.add('text-gray-500', 'hover:bg-white');
-                });
-                btnEl.classList.remove('text-gray-500', 'hover:bg-white');
-                btnEl.classList.add('active', 'bg-gradient-to-r', 'from-orange-500', 'to-red-500', 'text-white', 'shadow-lg');
-            }
-            const tbody = document.getElementById('bank-table-body');
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-10"><i class="fas fa-spinner fa-spin text-orange-500 text-2xl"></i></td></tr>';
-            
-            try {
-                const q = query(collection(db, colName), orderBy("createdAt", "desc"), limit(20));
-                const snap = await getDocs(q);
-                tbody.innerHTML = "";
-                if(snap.empty) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-400 font-bold">Trống rỗng.</td></tr>'; return; }
+    document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href = "admin-login.html");
 
-                snap.forEach(d => {
-                    const data = d.data();
-
-                    // 1. XÁC ĐỊNH MÀU SẮC (Badge Color)
-                    let badgeColor = "bg-gray-100 text-gray-500"; // Mặc định cho các loại khác
-                    if (data.type === 'nlvh') badgeColor = "bg-orange-100 text-orange-600";
-                    if (data.type === 'nlxh') badgeColor = "bg-green-100 text-green-600";
-                    if (data.type === 'dochieu') badgeColor = "bg-blue-100 text-blue-600";
-                    if (data.type === 'tracnghiem') badgeColor = "bg-purple-100 text-purple-600";
-                    if (data.type === 'fulltest') badgeColor = "bg-violet-100 text-violet-600";
-
-                    // 2. XÁC ĐỊNH NHÃN HIỂN THỊ (Label)
-                    // Nếu là NLVH thì hiện kèm Thể loại, NLXH hiện tên đầy đủ, còn lại hiện type gốc
-                    let label = data.type === 'nlvh' 
-                        ? `NLVH (${data.genre || 'Chưa chọn'})` 
-                        : (data.type === 'nlxh' ? 'NL Xã Hội' : data.type.toUpperCase());
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="font-mono text-xs text-gray-400">#${d.id.slice(0,5)}</td>
-                        
-                        <td>
-                            <span class="px-2 py-1 rounded-md text-[10px] font-black uppercase ${badgeColor}">
-                                ${label}
-                            </span>
-                        </td>
-                        
-                        <td class="font-bold text-gray-700 truncate max-w-xs">
-                            ${data.title || data.topic || data.question || 'Đề thi tổng hợp'}
-                        </td>
-                        
-                        <td class="text-right">
-                            <button onclick="openModal('${d.id}', '${colName}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors">
-                                <i class="fas fa-pen"></i>
-                            </button>
-                            <button onclick="deleteItem('${colName}', '${d.id}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg ml-1 transition-colors">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } catch(e) { console.error(e); }
-        };
-
-        // 3. MODAL LOGIC (UPDATED FOR DASHBOARD SHORTCUTS)
-let editors = {}; // Biến chứa các editor
-
-window.openModal = async (id, colName, preSelectType = null) => {
-    const modal = document.querySelector('.modal-overlay');
-    const container = document.getElementById('modal-fields');
-    document.getElementById('exam-collection').value = colName;
-    document.getElementById('exam-id').value = id;
-    
-    modal.classList.add('show');
-    container.innerHTML = '<div class="text-center py-20"><i class="fas fa-spinner fa-spin text-orange-500 text-3xl"></i></div>';
-
-    let data = {};
-    if(id !== 'new') {
-        const snap = await getDoc(doc(db, colName, id));
-        if(snap.exists()) data = snap.data();
-    }
-
-    // Toolbar cho phép: Đậm, Nghiêng, Căn lề
-    const toolbar = [['bold', 'italic', 'underline'], [{ 'align': [] }], ['clean']];
-
-    let html = '';
-    if (colName === 'fulltest_bank') {
-        html = `
-            <div class="space-y-6">
-                <div><label class="label-custom">NGỮ LIỆU ĐỌC HIỂU</label><div id="edit-ft-read-text"></div></div>
-                <div><label class="label-custom">CÂU HỎI ĐỌC HIỂU (Dùng [NEXT] để tách)</label><div id="edit-ft-read-qs"></div></div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div><label class="label-custom">CÂU 1 (2.0đ)</label><div id="edit-ft-nlxh"></div></div>
-                    <div><label class="label-custom">CÂU 2 (4.0đ)</label><div id="edit-ft-nlvh"></div></div>
-                </div>
-            </div>`;
-    } else if (colName === 'quiz_bank') {
-        html = `
-            <div class="space-y-6">
-                <div><label class="label-custom">CÂU HỎI TRẮC NGHIỆM</label><div id="edit-ex-q"></div></div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    ${['A', 'B', 'C', 'D'].map((label, i) => `
-                        <div class="flex items-center gap-4 glass-input">
-                            <input type="radio" name="correct-choice" value="${i}" ${data.correct === i ? 'checked' : ''} class="w-5 h-5 accent-orange-500">
-                            <span class="font-black text-slate-300 text-xl">${label}</span>
-                            <input id="ex-opt-${i}" class="bg-transparent border-none outline-none flex-1 font-bold" value="${data.options?.[i] || ''}">
-                        </div>`).join('')}
-                </div>
-            </div>`;
-    } else if (colName === 'reading_bank') {
-        html = `
-            <div class="space-y-6">
-                <div><label class="label-custom">TIÊU ĐỀ</label><input id="ex-title" class="glass-input font-bold" value="${data.title||''}"></div>
-                <div><label class="label-custom">VĂN BẢN NGỮ LIỆU</label><div id="edit-ex-text"></div></div>
-                <div><label class="label-custom">CÂU HỎI (Dùng [NEXT] để tách)</label><div id="edit-ex-qs"></div></div>
-            </div>`;
-    } else {
-        html = `
-            <div class="flex gap-4 mb-4">
-                <div class="flex-1"><label class="label-custom">LOẠI ĐỀ</label><select id="ex-type" class="glass-input font-bold" onchange="toggleGenreInput()"><option value="nlxh" ${data.type === 'nlxh' ? 'selected' : ''}>NL Xã Hội</option><option value="nlvh" ${data.type === 'nlvh' ? 'selected' : ''}>NL Văn Học</option></select></div>
-                <div id="genre-wrapper" class="flex-1 ${data.type === 'nlvh' ? '' : 'hidden'}"><label class="label-custom">THỂ LOẠI</label><select id="ex-genre" class="glass-input"><option value="Truyện" ${data.genre === 'Truyện' ? 'selected' : ''}>Truyện</option><option value="Thơ" ${data.genre === 'Thơ' ? 'selected' : ''}>Thơ</option><option value="Kịch" ${data.genre === 'Kịch' ? 'selected' : ''}>Kịch</option><option value="Ký" ${data.genre === 'Ký' ? 'selected' : ''}>Ký</option></select></div>
-            </div>
-            <div id="work-wrapper" class="${data.type === 'nlvh' ? '' : 'hidden'} mb-4"><label class="label-custom">TÁC PHẨM</label><input id="ex-work" class="glass-input" value="${data.workName||''}"></div>
-            <div class="space-y-6">
-                <div><label class="label-custom">YÊU CẦU ĐỀ BÀI</label><div id="edit-ex-topic"></div></div>
-                <div><label class="label-custom">NGỮ LIỆU PHỤ (NẾU CÓ)</label><div id="edit-ex-text"></div></div>
-                <div><label class="label-custom">GỢI Ý CHẤM (AI)</label><div id="edit-ex-hint"></div></div>
-            </div>`;
-    }
-    container.innerHTML = html;
-
-    // Khởi tạo Quill
-    const initQ = (id, content) => {
-        const q = new Quill(id, { modules: { toolbar: toolbar }, theme: 'snow' });
-        q.clipboard.dangerouslyPasteHTML(content || "");
-        return q;
+    // UI NAV
+    window.switchView = (viewId, el) => {
+        document.querySelectorAll('.view-section').forEach(e => e.classList.add('hidden'));
+        document.getElementById('view-' + viewId).classList.remove('hidden');
+        if(el) {
+            document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+            el.classList.add('active');
+        }
+        if(viewId === 'bank') loadBank(currentCollection);
+        if(viewId === 'journal') loadLevelsList();
+        if(viewId === 'history') loadSubmissions();
+        if(viewId === 'news') loadNews(currentNewsFilter);
     };
 
-    setTimeout(() => {
-        editors = {};
-        if (colName === 'fulltest_bank') {
-            editors.readText = initQ('#edit-ft-read-text', data.reading_text);
-            editors.readQs = initQ('#edit-ft-read-qs', (data.reading_questions||[]).join('<p>[NEXT]</p>'));
-            editors.nlxh = initQ('#edit-ft-nlxh', data.nlxh_topic);
-            editors.nlvh = initQ('#edit-ft-nlvh', data.nlvh_topic);
-        } else if (colName === 'quiz_bank') {
-            editors.q = initQ('#edit-ex-q', data.question);
-        } else if (colName === 'reading_bank') {
-            editors.text = initQ('#edit-ex-text', data.text);
-            editors.qs = initQ('#edit-ex-qs', (data.questions||[]).map(x=>x.q).join('<p>[NEXT]</p>'));
-        } else {
-            editors.topic = initQ('#edit-ex-topic', data.topic);
-            editors.text = initQ('#edit-ex-text', data.text);
-            editors.hint = initQ('#edit-ex-hint', data.hint);
-        }
-    }, 50);
-};
+    window.closeModal = () => document.querySelector('.modal-overlay').classList.remove('show');
 
-        window.toggleGenreInput = () => {
-            const type = document.getElementById('ex-type').value;
-            const gw = document.getElementById('genre-wrapper');
-            const ww = document.getElementById('work-wrapper');
-            
-            if(type === 'nlvh') {
-                gw.classList.remove('hidden');
-                ww.classList.remove('hidden');
-            } else {
-                gw.classList.add('hidden');
-                ww.classList.add('hidden');
-            }
-        };
-
-        // 4. SAVE DATA
-window.saveExamData = async () => {
-    const id = document.getElementById('exam-id').value;
-    const colName = document.getElementById('exam-collection').value;
-    let data = { createdAt: serverTimestamp() };
-
-    if (colName === 'fulltest_bank') {
-        data.type = 'fulltest';
-        data.reading_text = editors.readText.root.innerHTML;
-        data.reading_questions = editors.readQs.root.innerHTML.split('[NEXT]').map(q => q.replace(/<[^>]*>/g, '').trim()).filter(x => x);
-        data.nlxh_topic = editors.nlxh.root.innerHTML;
-        data.nlvh_topic = editors.nlvh.root.innerHTML;
-    } else if (colName === 'quiz_bank') {
-        data.type = 'tracnghiem';
-        data.question = editors.q.root.innerHTML;
-        data.options = [0,1,2,3].map(i => document.getElementById(`ex-opt-${i}`).value);
-        data.correct = parseInt(document.querySelector('input[name="correct-choice"]:checked')?.value || 0);
-    } else if (colName === 'reading_bank') {
-        data.type = 'dochieu';
-        data.title = document.getElementById('ex-title').value;
-        data.text = editors.text.root.innerHTML;
-        data.questions = editors.qs.root.innerHTML.split('[NEXT]').map(q => ({ q: q.replace(/<[^>]*>/g, '').trim() })).filter(x => x.q);
-    } else {
-        data.type = document.getElementById('ex-type').value;
-        data.topic = editors.topic.root.innerHTML;
-        data.text = editors.text.root.innerHTML;
-        data.hint = editors.hint.root.innerHTML;
-        if(data.type === 'nlvh') {
-            data.genre = document.getElementById('ex-genre').value;
-            data.workName = document.getElementById('ex-work').value;
-        }
+    // 1. STATS
+    async function safeCount(colName) {
+        try {
+            const coll = collection(db, colName);
+            const snapshot = await getCountFromServer(coll);
+            return snapshot.data().count;
+        } catch (e) { return 0; }
     }
 
-    await (id === 'new' ? addDoc(collection(db, colName), data) : updateDoc(doc(db, colName, id), data));
-    showToast("Đã lưu!"); closeModal(); loadBank(colName);
-};
+    async function loadStats() {
+        const [u, e1, e2, e3, e4, sub, news] = await Promise.all([
+            safeCount("users"),
+            safeCount("fulltest_bank"),
+            safeCount("essay_bank"),
+            safeCount("reading_bank"),
+            safeCount("quiz_bank"),
+            safeCount("activities"),
+            safeCount("literary_news")
+        ]);
+        document.getElementById('stat-users').innerText = u;
+        document.getElementById('stat-exams').innerText = e1 + e2 + e3 + e4;
+        document.getElementById('stat-subs').innerText = sub;
+        document.getElementById('stat-levels').innerText = news;
+    }
 
-        window.deleteItem = async (col, id) => { if(confirm("Xóa vĩnh viễn?")) { await deleteDoc(doc(db, col, id)); loadBank(col); loadStats(); } };
+    // 2. BANK LOGIC
+    window.loadBank = async (colName, btnEl) => {
+        currentCollection = colName;
+        if(btnEl) {
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('active', 'bg-gradient-to-r', 'from-orange-500', 'to-red-500', 'text-white', 'shadow-lg');
+                b.classList.add('text-gray-500', 'hover:bg-white');
+            });
+            btnEl.classList.remove('text-gray-500', 'hover:bg-white');
+            btnEl.classList.add('active', 'bg-gradient-to-r', 'from-orange-500', 'to-red-500', 'text-white', 'shadow-lg');
+        }
+        const tbody = document.getElementById('bank-table-body');
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-10"><i class="fas fa-spinner fa-spin text-orange-500 text-2xl"></i></td></tr>';
+        
+        try {
+            const q = query(collection(db, colName), orderBy("createdAt", "desc"), limit(20));
+            const snap = await getDocs(q);
+            tbody.innerHTML = "";
+            if(snap.empty) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-400 font-bold">Trống rỗng.</td></tr>'; return; }
 
-        // 5. LEVEL & HISTORY (Basic Logic Kept)
-        window.toggleLevelFields = () => {
-            const type = document.getElementById('lvl-type').value;
-            ['lvl-field-json', 'lvl-field-reading', 'lvl-field-essay'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            if(type === 'dochieu') document.getElementById('lvl-field-reading').classList.remove('hidden');
-            else if(type === 'tracnghiem') document.getElementById('lvl-field-json').classList.remove('hidden');
-            else document.getElementById('lvl-field-essay').classList.remove('hidden');
-        };
-
-        window.loadLevelsList = async () => {
-            const listEl = document.getElementById('level-list');
-            listEl.innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin text-gray-400"></i></div>';
-            const snap = await getDocs(query(collection(db, "study_levels"), orderBy("level", "asc")));
-            listEl.innerHTML = "";
             snap.forEach(d => {
                 const data = d.data();
-                const div = document.createElement('div');
-                div.className = "p-4 bg-white border border-gray-100 rounded-xl hover:bg-orange-50 cursor-pointer transition flex items-center justify-between group shadow-sm";
-                div.onclick = () => fillLevelForm(d.id, data);
-                div.innerHTML = `<span class="text-xs font-black bg-gray-100 px-2 py-1 rounded text-gray-500">LV ${data.level}</span><span class="font-bold text-gray-700 text-sm ml-2 flex-1">${data.title}</span><i class="fas fa-chevron-right text-gray-300 text-xs"></i>`;
-                listEl.appendChild(div);
+                let badgeColor = "bg-gray-100 text-gray-500";
+                if (data.type === 'nlvh') badgeColor = "bg-orange-100 text-orange-600";
+                if (data.type === 'nlxh') badgeColor = "bg-green-100 text-green-600";
+                if (data.type === 'dochieu') badgeColor = "bg-blue-100 text-blue-600";
+                if (data.type === 'tracnghiem') badgeColor = "bg-purple-100 text-purple-600";
+                if (data.type === 'fulltest') badgeColor = "bg-violet-100 text-violet-600";
+
+                let label = data.type === 'nlvh' ? `NLVH (${data.genre || ''})` : (data.type === 'nlxh' ? 'NL Xã Hội' : data.type.toUpperCase());
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="font-mono text-xs text-gray-400">#${d.id.slice(0,5)}</td>
+                    <td><span class="px-2 py-1 rounded-md text-[10px] font-black uppercase ${badgeColor}">${label}</span></td>
+                    <td class="font-bold text-gray-700 truncate max-w-xs">${data.title || data.topic || data.question || 'Đề thi tổng hợp'}</td>
+                    <td class="text-right">
+                        <button onclick="openModal('${d.id}', '${colName}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors"><i class="fas fa-pen"></i></button>
+                        <button onclick="deleteItem('${colName}', '${d.id}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg ml-1 transition-colors"><i class="fas fa-trash"></i></button>
+                    </td>`;
+                tbody.appendChild(tr);
             });
-        };
+        } catch(e) { console.error(e); }
+    };
 
-        window.fillLevelForm = (id, data) => {
-            document.getElementById('lvl-id').value = id;
-            document.getElementById('lvl-num').value = data.level;
-            document.getElementById('lvl-type').value = data.type;
-            document.getElementById('lvl-title').value = data.title;
-            document.getElementById('lvl-desc').value = data.desc;
-            document.getElementById('lvl-form-title').innerText = `Edit Level ${data.level}`;
-            document.getElementById('btn-del-lvl').classList.remove('hidden');
-            toggleLevelFields(); 
-            if(data.type === 'dochieu') {
-                document.getElementById('lvl-read-title').value = data.content.title || '';
-                document.getElementById('lvl-read-text').value = data.content.text || '';
-                document.getElementById('lvl-read-qs').value = data.content.questions ? data.content.questions.map(x=>x.q).join('\n') : '';
-            } else if(data.type === 'tracnghiem') {
-                document.getElementById('lvl-content-json').value = typeof data.content === 'string' ? data.content : JSON.stringify(data.content, null, 2);
-            } else {
-                document.getElementById('lvl-essay-topic').value = data.content.topic || '';
-                document.getElementById('lvl-essay-text').value = data.content.text || '';
-                document.getElementById('lvl-essay-hint').value = data.content.hint || '';
-            }
-        };
-
-        window.resetLevelForm = () => {
-            document.getElementById('level-form').reset();
-            document.getElementById('lvl-id').value = "";
-            document.getElementById('lvl-form-title').innerText = "Tạo Level Mới";
-            document.getElementById('btn-del-lvl').classList.add('hidden');
-            toggleLevelFields();
-        };
-
-        window.saveLevel = async () => {
-            const id = document.getElementById('lvl-id').value;
-            const type = document.getElementById('lvl-type').value;
-            let content = {};
-            try {
-                if(type === 'dochieu') {
-                    content.title = document.getElementById('lvl-read-title').value;
-                    content.text = document.getElementById('lvl-read-text').value;
-                    content.questions = document.getElementById('lvl-read-qs').value.split('\n').filter(x=>x.trim()).map(x=>({q:x}));
-                } else if(type === 'tracnghiem') {
-                    content = JSON.parse(document.getElementById('lvl-content-json').value);
-                } else {
-                    content.topic = document.getElementById('lvl-essay-topic').value;
-                    content.text = document.getElementById('lvl-essay-text').value;
-                    content.hint = document.getElementById('lvl-essay-hint').value;
-                }
-                const data = { level: parseInt(document.getElementById('lvl-num').value), type, title: document.getElementById('lvl-title').value, desc: document.getElementById('lvl-desc').value, content, updatedAt: serverTimestamp() };
-                if(id) await updateDoc(doc(db, "study_levels", id), data);
-                else await addDoc(collection(db, "study_levels"), { ...data, createdAt: serverTimestamp() });
-                showToast("Saved Level!"); loadLevelsList(); resetLevelForm(); loadStats();
-            } catch(e) { alert("Check JSON or Inputs"); }
-        };
-
-        window.deleteLevel = async () => { if(confirm("Delete?")) { await deleteDoc(doc(db, "study_levels", document.getElementById('lvl-id').value)); loadLevelsList(); resetLevelForm(); loadStats(); } };
-
-        window.loadSubmissions = async () => {
-            const tbody = document.getElementById('history-list');
-            tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center"><i class="fas fa-spinner fa-spin"></i></td></tr>';
-            try {
-                const snap = await getDocs(query(collection(db, "activities"), orderBy("timestamp", "desc"), limit(15)));
-                tbody.innerHTML = "";
-                snap.forEach(d => {
-                    const data = d.data();
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `<td class="font-bold text-gray-700">${data.userName||'User'}</td><td class="text-sm">${data.examTitle||'Bài tập'}</td><td class="font-black text-orange-500">${data.score}</td><td class="text-xs text-gray-400 font-mono">${new Date(data.timestamp.seconds*1000).toLocaleDateString('vi-VN')}</td>`;
-                    tbody.appendChild(tr);
-                });
-            } catch(e) { tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400">No Data</td></tr>'; }
-        };
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = msg;
-            t.classList.remove('translate-x-60');
-            setTimeout(() => t.classList.add('translate-x-60'), 3000);
+    // --- NEW: LITERARY NEWS LOGIC ---
+    window.loadNews = async (filterType, btnEl) => {
+        currentNewsFilter = filterType;
+        if(btnEl) {
+            document.querySelectorAll('.filter-btn-news').forEach(b => {
+                b.classList.remove('active', 'bg-gradient-to-r', 'from-orange-500', 'to-red-500', 'text-white', 'shadow-lg');
+                b.classList.add('text-gray-500', 'hover:bg-white');
+            });
+            btnEl.classList.remove('text-gray-500', 'hover:bg-white');
+            btnEl.classList.add('active', 'bg-gradient-to-r', 'from-orange-500', 'to-red-500', 'text-white', 'shadow-lg');
         }
-    </script>
+
+        const tbody = document.getElementById('news-table-body');
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-10"><i class="fas fa-spinner fa-spin text-orange-500 text-2xl"></i></td></tr>';
+
+        try {
+            let q;
+            if (filterType === 'all') {
+                q = query(collection(db, "literary_news"), orderBy("createdAt", "desc"), limit(20));
+            } else {
+                q = query(collection(db, "literary_news"), where("type", "==", filterType), orderBy("createdAt", "desc"), limit(20));
+            }
+            
+            const snap = await getDocs(q);
+            tbody.innerHTML = "";
+            if(snap.empty) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-400 font-bold">Chưa có bài viết nào.</td></tr>'; return; }
+
+            snap.forEach(d => {
+                const data = d.data();
+                let typeLabel = "Khác";
+                let typeColor = "bg-gray-100 text-gray-500";
+                
+                if(data.type === 'danchung') { typeLabel = "Dẫn chứng NLXH"; typeColor = "bg-green-100 text-green-700"; }
+                if(data.type === 'lyluan') { typeLabel = "Lý luận VH"; typeColor = "bg-purple-100 text-purple-700"; }
+                if(data.type === 'vanhay') { typeLabel = "Văn hay chữ tốt"; typeColor = "bg-orange-100 text-orange-700"; }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="font-bold text-gray-800">${data.title}</td>
+                    <td><span class="px-2 py-1 rounded-md text-[10px] font-black uppercase ${typeColor}">${typeLabel}</span></td>
+                    <td class="text-sm text-gray-500 truncate max-w-xs">${data.summary || '...'}</td>
+                    <td class="text-right">
+                        <button onclick="openModal('${d.id}', 'literary_news')" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors"><i class="fas fa-pen"></i></button>
+                        <button onclick="deleteItem('literary_news', '${d.id}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg ml-1 transition-colors"><i class="fas fa-trash"></i></button>
+                    </td>`;
+                tbody.appendChild(tr);
+            });
+        } catch(e) { console.error(e); }
+    }
+
+    // 3. MODAL LOGIC (UPDATED WITH SAFE INIT)
+    window.openModal = async (id, colName) => {
+        const modal = document.querySelector('.modal-overlay');
+        const container = document.getElementById('modal-fields');
+        document.getElementById('exam-collection').value = colName;
+        document.getElementById('exam-id').value = id;
+        
+        modal.classList.add('show');
+        container.innerHTML = '<div class="text-center py-20"><i class="fas fa-spinner fa-spin text-orange-500 text-3xl"></i></div>';
+
+        let data = {};
+        if(id !== 'new') {
+            const snap = await getDoc(doc(db, colName, id));
+            if(snap.exists()) data = snap.data();
+        }
+
+        const toolbar = [['bold', 'italic', 'underline', 'strike'], ['blockquote', 'code-block'], [{ 'header': 1 }, { 'header': 2 }], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'align': [] }], ['clean']];
+        const simpleToolbar = [['bold', 'italic', 'underline'], [{ 'align': [] }], ['clean']];
+
+        let html = '';
+        
+        if (colName === 'literary_news') {
+            html = `
+                <div class="grid grid-cols-3 gap-6 mb-4">
+                    <div class="col-span-2">
+                        <label class="label-custom">Tiêu đề bài viết</label>
+                        <input id="news-title" class="glass-input font-bold" value="${data.title || ''}" placeholder="Nhập tiêu đề hấp dẫn...">
+                    </div>
+                    <div>
+                        <label class="label-custom">Chuyên mục</label>
+                        <select id="news-type" class="glass-input">
+                            <option value="danchung" ${data.type === 'danchung' ? 'selected' : ''}>Dẫn chứng NLXH</option>
+                            <option value="lyluan" ${data.type === 'lyluan' ? 'selected' : ''}>Lý luận văn học</option>
+                            <option value="vanhay" ${data.type === 'vanhay' ? 'selected' : ''}>Văn hay chữ tốt</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="label-custom">Link Ảnh Bìa (URL)</label>
+                    <div class="flex gap-4 items-center">
+                        <input id="news-img" class="glass-input flex-1" value="${data.img || ''}" placeholder="https://...">
+                        ${data.img ? `<img src="${data.img}" class="w-10 h-10 rounded object-cover border">` : ''}
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label class="label-custom">Mô tả ngắn (Sapo)</label>
+                    <textarea id="news-summary" class="glass-input h-24" placeholder="Tóm tắt nội dung bài viết...">${data.summary || ''}</textarea>
+                </div>
+                <div>
+                    <label class="label-custom">Nội dung chi tiết</label>
+                    <div id="news-content" style="min-height: 300px; background: white;"></div>
+                </div>
+            `;
+        } else if (colName === 'fulltest_bank') {
+            html = `
+                <div class="space-y-6">
+                    <div><label class="label-custom">NGỮ LIỆU ĐỌC HIỂU</label><div id="edit-ft-read-text"></div></div>
+                    <div><label class="label-custom">CÂU HỎI ĐỌC HIỂU (Dùng [NEXT] để tách)</label><div id="edit-ft-read-qs"></div></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div><label class="label-custom">CÂU 1 (2.0đ)</label><div id="edit-ft-nlxh"></div></div>
+                        <div><label class="label-custom">CÂU 2 (4.0đ)</label><div id="edit-ft-nlvh"></div></div>
+                    </div>
+                </div>`;
+        } else if (colName === 'quiz_bank') {
+            html = `
+                <div class="space-y-6">
+                    <div><label class="label-custom">CÂU HỎI TRẮC NGHIỆM</label><div id="edit-ex-q"></div></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${['A', 'B', 'C', 'D'].map((label, i) => `
+                            <div class="flex items-center gap-4 glass-input">
+                                <input type="radio" name="correct-choice" value="${i}" ${data.correct === i ? 'checked' : ''} class="w-5 h-5 accent-orange-500">
+                                <span class="font-black text-slate-300 text-xl">${label}</span>
+                                <input id="ex-opt-${i}" class="bg-transparent border-none outline-none flex-1 font-bold" value="${data.options?.[i] || ''}">
+                            </div>`).join('')}
+                    </div>
+                </div>`;
+        } else if (colName === 'reading_bank') {
+            html = `
+                <div class="space-y-6">
+                    <div><label class="label-custom">TIÊU ĐỀ</label><input id="ex-title" class="glass-input font-bold" value="${data.title||''}"></div>
+                    <div><label class="label-custom">VĂN BẢN NGỮ LIỆU</label><div id="edit-ex-text"></div></div>
+                    <div><label class="label-custom">CÂU HỎI (Dùng [NEXT] để tách)</label><div id="edit-ex-qs"></div></div>
+                </div>`;
+        } else {
+            html = `
+                <div class="flex gap-4 mb-4">
+                    <div class="flex-1"><label class="label-custom">LOẠI ĐỀ</label><select id="ex-type" class="glass-input font-bold" onchange="toggleGenreInput()"><option value="nlxh" ${data.type === 'nlxh' ? 'selected' : ''}>NL Xã Hội</option><option value="nlvh" ${data.type === 'nlvh' ? 'selected' : ''}>NL Văn Học</option></select></div>
+                    <div id="genre-wrapper" class="flex-1 ${data.type === 'nlvh' ? '' : 'hidden'}"><label class="label-custom">THỂ LOẠI</label><select id="ex-genre" class="glass-input"><option value="Truyện" ${data.genre === 'Truyện' ? 'selected' : ''}>Truyện</option><option value="Thơ" ${data.genre === 'Thơ' ? 'selected' : ''}>Thơ</option><option value="Kịch" ${data.genre === 'Kịch' ? 'selected' : ''}>Kịch</option><option value="Ký" ${data.genre === 'Ký' ? 'selected' : ''}>Ký</option></select></div>
+                </div>
+                <div id="work-wrapper" class="${data.type === 'nlvh' ? '' : 'hidden'} mb-4"><label class="label-custom">TÁC PHẨM</label><input id="ex-work" class="glass-input" value="${data.workName||''}"></div>
+                <div class="space-y-6">
+                    <div><label class="label-custom">YÊU CẦU ĐỀ BÀI</label><div id="edit-ex-topic"></div></div>
+                    <div><label class="label-custom">NGỮ LIỆU PHỤ (NẾU CÓ)</label><div id="edit-ex-text"></div></div>
+                    <div><label class="label-custom">GỢI Ý CHẤM (AI)</label><div id="edit-ex-hint"></div></div>
+                </div>`;
+        }
+        container.innerHTML = html;
+
+        const initQ = (id, content, bar) => {
+            if(!document.querySelector(id)) return null;
+            const q = new Quill(id, { modules: { toolbar: bar || simpleToolbar }, theme: 'snow' });
+            q.clipboard.dangerouslyPasteHTML(content || "");
+            return q;
+        };
+
+        // Reset editors object
+        editors = {};
+
+        // Tăng timeout lên 100ms để đảm bảo DOM đã render xong
+        setTimeout(() => {
+            if (colName === 'literary_news') {
+                editors.content = initQ('#news-content', data.content, toolbar);
+            } else if (colName === 'fulltest_bank') {
+                editors.readText = initQ('#edit-ft-read-text', data.reading_text);
+                editors.readQs = initQ('#edit-ft-read-qs', (data.reading_questions||[]).join('<p>[NEXT]</p>'));
+                editors.nlxh = initQ('#edit-ft-nlxh', data.nlxh_topic);
+                editors.nlvh = initQ('#edit-ft-nlvh', data.nlvh_topic);
+            } else if (colName === 'quiz_bank') {
+                editors.q = initQ('#edit-ex-q', data.question);
+            } else if (colName === 'reading_bank') {
+                editors.text = initQ('#edit-ex-text', data.text);
+                editors.qs = initQ('#edit-ex-qs', (data.questions||[]).map(x=>x.q).join('<p>[NEXT]</p>'));
+            } else {
+                editors.topic = initQ('#edit-ex-topic', data.topic);
+                editors.text = initQ('#edit-ex-text', data.text);
+                editors.hint = initQ('#edit-ex-hint', data.hint);
+            }
+        }, 100);
+    };
+
+    window.toggleGenreInput = () => {
+        const type = document.getElementById('ex-type').value;
+        const gw = document.getElementById('genre-wrapper');
+        const ww = document.getElementById('work-wrapper');
+        if(type === 'nlvh') { gw.classList.remove('hidden'); ww.classList.remove('hidden'); } 
+        else { gw.classList.add('hidden'); ww.classList.add('hidden'); }
+    };
+
+    // 4. SAVE DATA (FIXED CRASH)
+    window.saveExamData = async () => {
+        const id = document.getElementById('exam-id').value;
+        const colName = document.getElementById('exam-collection').value;
+        let data = { createdAt: serverTimestamp() };
+
+        try {
+            if (colName === 'literary_news') {
+                data.title = document.getElementById('news-title').value || "Bản tin mới";
+                data.type = document.getElementById('news-type').value;
+                data.img = document.getElementById('news-img').value || "";
+                data.summary = document.getElementById('news-summary').value || "";
+                // Kiểm tra an toàn xem editor có tồn tại không
+                data.content = editors.content ? editors.content.root.innerHTML : "";
+            } 
+            else if (colName === 'fulltest_bank') {
+                data.type = 'fulltest';
+                data.reading_text = editors.readText.root.innerHTML;
+                data.reading_questions = editors.readQs.root.innerHTML.split('[NEXT]').map(q => q.replace(/<[^>]*>/g, '').trim()).filter(x => x);
+                data.nlxh_topic = editors.nlxh.root.innerHTML;
+                data.nlvh_topic = editors.nlvh.root.innerHTML;
+            } 
+            else if (colName === 'quiz_bank') {
+                data.type = 'tracnghiem';
+                data.question = editors.q.root.innerHTML;
+                data.options = [0,1,2,3].map(i => document.getElementById(`ex-opt-${i}`).value);
+                data.correct = parseInt(document.querySelector('input[name="correct-choice"]:checked')?.value || 0);
+            } 
+            else if (colName === 'reading_bank') {
+                data.type = 'dochieu';
+                data.title = document.getElementById('ex-title').value;
+                data.text = editors.text.root.innerHTML;
+                data.questions = editors.qs.root.innerHTML.split('[NEXT]').map(q => ({ q: q.replace(/<[^>]*>/g, '').trim() })).filter(x => x.q);
+            } 
+            else {
+                data.type = document.getElementById('ex-type').value;
+                data.topic = editors.topic.root.innerHTML;
+                data.text = editors.text.root.innerHTML;
+                data.hint = editors.hint.root.innerHTML;
+                if(data.type === 'nlvh') {
+                    data.genre = document.getElementById('ex-genre').value;
+                    data.workName = document.getElementById('ex-work').value;
+                }
+            }
+
+            if (id === 'new') {
+                await addDoc(collection(db, colName), data);
+            } else {
+                await updateDoc(doc(db, colName, id), data);
+            }
+
+            showToast("Đã lưu thành công!");
+            closeModal();
+            
+            // Reload lại danh sách tương ứng
+            if (colName === 'literary_news') loadNews(currentNewsFilter);
+            else loadBank(colName);
+            loadStats();
+
+        } catch (e) {
+            console.error("Lỗi khi lưu:", e);
+            alert("Có lỗi xảy ra: " + e.message);
+        }
+    };
+
+    window.deleteItem = async (col, id) => { 
+        if(confirm("Xóa vĩnh viễn?")) { 
+            await deleteDoc(doc(db, col, id)); 
+            if(col === 'literary_news') loadNews(currentNewsFilter);
+            else loadBank(col); 
+            loadStats(); 
+        } 
+    };
+
+    // 5. LEVEL & HISTORY
+    window.toggleLevelFields = () => {
+        const type = document.getElementById('lvl-type').value;
+        ['lvl-field-json', 'lvl-field-reading', 'lvl-field-essay'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        if(type === 'dochieu') document.getElementById('lvl-field-reading').classList.remove('hidden');
+        else if(type === 'tracnghiem') document.getElementById('lvl-field-json').classList.remove('hidden');
+        else document.getElementById('lvl-field-essay').classList.remove('hidden');
+    };
+
+    window.loadLevelsList = async () => {
+        const listEl = document.getElementById('level-list');
+        listEl.innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin text-gray-400"></i></div>';
+        const snap = await getDocs(query(collection(db, "study_levels"), orderBy("level", "asc")));
+        listEl.innerHTML = "";
+        snap.forEach(d => {
+            const data = d.data();
+            const div = document.createElement('div');
+            div.className = "p-4 bg-white border border-gray-100 rounded-xl hover:bg-orange-50 cursor-pointer transition flex items-center justify-between group shadow-sm";
+            div.onclick = () => fillLevelForm(d.id, data);
+            div.innerHTML = `<span class="text-xs font-black bg-gray-100 px-2 py-1 rounded text-gray-500">LV ${data.level}</span><span class="font-bold text-gray-700 text-sm ml-2 flex-1">${data.title}</span><i class="fas fa-chevron-right text-gray-300 text-xs"></i>`;
+            listEl.appendChild(div);
+        });
+    };
+
+    window.fillLevelForm = (id, data) => {
+        document.getElementById('lvl-id').value = id;
+        document.getElementById('lvl-num').value = data.level;
+        document.getElementById('lvl-type').value = data.type;
+        document.getElementById('lvl-title').value = data.title;
+        document.getElementById('lvl-desc').value = data.desc;
+        document.getElementById('lvl-form-title').innerText = `Edit Level ${data.level}`;
+        document.getElementById('btn-del-lvl').classList.remove('hidden');
+        toggleLevelFields(); 
+        if(data.type === 'dochieu') {
+            document.getElementById('lvl-read-title').value = data.content.title || '';
+            document.getElementById('lvl-read-text').value = data.content.text || '';
+            document.getElementById('lvl-read-qs').value = data.content.questions ? data.content.questions.map(x=>x.q).join('\n') : '';
+        } else if(data.type === 'tracnghiem') {
+            document.getElementById('lvl-content-json').value = typeof data.content === 'string' ? data.content : JSON.stringify(data.content, null, 2);
+        } else {
+            document.getElementById('lvl-essay-topic').value = data.content.topic || '';
+            document.getElementById('lvl-essay-text').value = data.content.text || '';
+            document.getElementById('lvl-essay-hint').value = data.content.hint || '';
+        }
+    };
+
+    window.resetLevelForm = () => {
+        document.getElementById('level-form').reset();
+        document.getElementById('lvl-id').value = "";
+        document.getElementById('lvl-form-title').innerText = "Tạo Level Mới";
+        document.getElementById('btn-del-lvl').classList.add('hidden');
+        toggleLevelFields();
+    };
+
+    window.saveLevel = async () => {
+        const id = document.getElementById('lvl-id').value;
+        const type = document.getElementById('lvl-type').value;
+        let content = {};
+        try {
+            if(type === 'dochieu') {
+                content.title = document.getElementById('lvl-read-title').value;
+                content.text = document.getElementById('lvl-read-text').value;
+                content.questions = document.getElementById('lvl-read-qs').value.split('\n').filter(x=>x.trim()).map(x=>({q:x}));
+            } else if(type === 'tracnghiem') {
+                content = JSON.parse(document.getElementById('lvl-content-json').value);
+            } else {
+                content.topic = document.getElementById('lvl-essay-topic').value;
+                content.text = document.getElementById('lvl-essay-text').value;
+                content.hint = document.getElementById('lvl-essay-hint').value;
+            }
+            const data = { level: parseInt(document.getElementById('lvl-num').value), type, title: document.getElementById('lvl-title').value, desc: document.getElementById('lvl-desc').value, content, updatedAt: serverTimestamp() };
+            if(id) await updateDoc(doc(db, "study_levels", id), data);
+            else await addDoc(collection(db, "study_levels"), { ...data, createdAt: serverTimestamp() });
+            showToast("Saved Level!"); loadLevelsList(); resetLevelForm(); loadStats();
+        } catch(e) { alert("Check JSON or Inputs"); }
+    };
+
+    window.deleteLevel = async () => { if(confirm("Delete?")) { await deleteDoc(doc(db, "study_levels", document.getElementById('lvl-id').value)); loadLevelsList(); resetLevelForm(); loadStats(); } };
+
+    window.loadSubmissions = async () => {
+        const tbody = document.getElementById('history-list');
+        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center"><i class="fas fa-spinner fa-spin"></i></td></tr>';
+        try {
+            const snap = await getDocs(query(collection(db, "activities"), orderBy("timestamp", "desc"), limit(15)));
+            tbody.innerHTML = "";
+            snap.forEach(d => {
+                const data = d.data();
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td class="font-bold text-gray-700">${data.userName||'User'}</td><td class="text-sm">${data.examTitle||'Bài tập'}</td><td class="font-black text-orange-500">${data.score}</td><td class="text-xs text-gray-400 font-mono">${new Date(data.timestamp.seconds*1000).toLocaleDateString('vi-VN')}</td>`;
+                tbody.appendChild(tr);
+            });
+        } catch(e) { tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400">No Data</td></tr>'; }
+    };
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        document.getElementById('toast-msg').innerText = msg;
+        t.classList.remove('translate-x-60');
+        setTimeout(() => t.classList.add('translate-x-60'), 3000);
+    }
+</script>
 </body>
 </html>
