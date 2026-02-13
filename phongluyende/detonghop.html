@@ -467,7 +467,7 @@
         } catch(e) { 
             console.error(e); 
             let msg = "Có lỗi xảy ra, vui lòng thử lại!";
-            if (e.message === "SERVER_ERROR") msg = "Server Groq đang bận. Bạn hãy bấm nộp lại nhé!";
+            if (e.message === "SERVER_ERROR") msg = "Server đang bận. Bạn hãy bấm nộp lại nhé!";
             if (e.message === "INVALID_FORMAT") msg = "Dữ liệu trả về bị lỗi. Vui lòng bấm nộp lại!";
             showPopup("Lỗi AI", msg, "error");
         } finally { 
