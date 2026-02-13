@@ -29,54 +29,54 @@
 
         .main-content { 
             width: 100%; 
-            padding: 40px; 
+            padding: 20px; 
             min-height: 100vh; 
             position: relative; 
-            max-width: 1000px; 
+            max-width: 850px; 
             margin: 0 auto;
         }
 
         /* --- GLASS STYLES --- */
         .glass-header {
-            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 10px 30px rgba(255, 143, 80, 0.15);
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 4px 30px rgba(0,0,0,0.05);
             border-radius: 9999px; transition: all 0.3s;
         }
         .liquid-glass {
-            background: rgba(255, 255, 255, 0.6);
-            box-shadow: 0 8px 32px 0 rgba(255, 130, 60, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 10px 40px -10px rgba(255, 130, 60, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px; transition: transform 0.3s;
+            border-radius: 24px; transition: transform 0.3s; margin-bottom: 2rem;
         }
 
-        /* --- FORMAT VĂN BẢN (MỚI) --- */
+        /* --- FORMAT VĂN BẢN --- */
         .passage-content {
             font-family: 'Merriweather', serif; 
             line-height: 1.8; 
             color: #374151; 
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             text-align: justify;
+            margin-bottom: 20px;
         }
-        /* Định dạng các thẻ HTML từ Editor */
-        .passage-content p { margin-bottom: 1rem; }
+        .passage-content p { margin-bottom: 0.8rem; }
         .passage-content strong, .passage-content b { font-weight: 700; color: #111827; }
         .passage-content em, .passage-content i { font-style: italic; }
         .passage-content u { text-decoration: underline; text-decoration-color: var(--primary); text-underline-offset: 4px; }
         .passage-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
         .passage-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
-        .passage-content li { margin-bottom: 0.5rem; }
-        .passage-content blockquote { border-left: 4px solid var(--primary); padding-left: 1rem; margin: 1rem 0; font-style: italic; color: #6b7280; }
+        .passage-content blockquote { border-left: 4px solid var(--primary); padding-left: 1rem; margin: 1rem 0; font-style: italic; color: #6b7280; background: #fff7ed; padding: 10px 10px 10px 20px; border-radius: 0 8px 8px 0; }
 
         .glass-input {
             width: 100%; 
             background: #FFFFFF !important; 
-            border: 2px solid #E2E8F0; 
+            border: 2px solid #e2e8f0; 
             border-radius: 16px; 
-            padding: 18px; 
+            padding: 16px; 
             font-size: 1rem; 
             transition: 0.2s ease-in-out; 
             color: #1E293B;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+            resize: none;
         }
         .glass-input:focus { 
             border-color: var(--primary); 
@@ -84,36 +84,35 @@
             box-shadow: 0 0 0 4px rgba(255, 143, 80, 0.15); 
         }
 
-        .q-label { font-weight: 800; color: #c2410c; margin-bottom: 12px; display: block; font-size: 1.1rem; }
+        .q-label { font-weight: 800; color: #c2410c; margin-bottom: 10px; display: block; font-size: 1rem; }
 
         /* --- AI RESULT --- */
         .ai-result { display: none; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); margin-top: 30px; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
 
         .score-circle {
-            width: 120px; height: 120px; border-radius: 50%;
+            width: 100px; height: 100px; border-radius: 50%;
             background: conic-gradient(var(--primary) 0%, rgba(255,255,255,0.5) 0%);
             display: flex; align-items: center; justify-content: center;
             position: relative; margin-right: 20px; flex-shrink: 0;
             box-shadow: 0 10px 30px rgba(255, 143, 80, 0.2);
         }
         .score-inner {
-            width: 100px; height: 100px; background: white; border-radius: 50%;
+            width: 80px; height: 80px; background: white; border-radius: 50%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        .badge-correct { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; }
-        .badge-partial { background: #fefce8; color: #ca8a04; border: 1px solid #fde047; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; }
-        .badge-wrong { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; }
+        .badge-correct { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; }
+        .badge-partial { background: #fefce8; color: #ca8a04; border: 1px solid #fde047; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; }
+        .badge-wrong { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; }
 
-        /* --- POPUP --- */
+        /* --- POPUP & LOADING --- */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(8px);
             z-index: 9999; display: none; align-items: center; justify-content: center;
             opacity: 0; transition: opacity 0.3s ease;
         }
         .modal-overlay.open { display: flex; opacity: 1; }
-        
         .modal-box {
             background: white; width: 90%; max-width: 450px; border-radius: 32px;
             padding: 32px; text-align: center; position: relative;
@@ -124,19 +123,18 @@
         .modal-overlay.open .modal-box { transform: scale(1); }
 
         .icon-box {
-            width: 70px; height: 70px; border-radius: 50%; margin: 0 auto 16px;
+            width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 16px;
             display: flex; align-items: center; justify-content: center; font-size: 2rem;
         }
         .icon-warning { background: #FFF7ED; color: #EA580C; }
         .icon-error { background: #FEF2F2; color: #EF4444; }
         .icon-info { background: #EFF6FF; color: #3B82F6; }
 
-        /* --- LOADING --- */
         .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .loader-robot { font-size: 5rem; color: var(--primary); animation: robotBounce 1s infinite alternate; filter: drop-shadow(0 10px 10px rgba(255,143,80,0.3)); }
         @keyframes robotBounce { from { transform: translateY(0); } to { transform: translateY(-20px); } }
 
-        @media (max-width: 640px) { .main-content { padding: 20px; } }
+        @media (max-width: 640px) { .main-content { padding: 16px; } }
 
 /* --- GLOBAL SCROLLBAR STYLE --- */
 
@@ -186,7 +184,7 @@
                 <i id="alert-icon" class="fas fa-exclamation-triangle"></i>
             </div>
             <h3 id="alert-title" class="text-2xl font-black text-gray-800 mb-2">Thông báo</h3>
-            <p id="alert-msg" class="text-gray-500 mb-8 font-medium">Nội dung thông báo...</p>
+            <p id="alert-msg" class="text-gray-500 mb-8">Nội dung thông báo...</p>
             <div id="alert-actions" class="flex gap-3 justify-center"></div>
         </div>
     </div>
@@ -196,8 +194,8 @@
     </div>
 
     <main class="main-content">
-        <div class="sticky top-6 z-50 mb-10 px-2">
-            <div class="glass-header px-6 py-3 flex justify-between items-center bg-white/80">
+        <div class="sticky top-6 z-50 mb-12 px-2">
+            <div class="max-w-5xl mx-auto glass-header px-6 py-3 flex justify-between items-center bg-white/80">
                 <a href="../dashboard/nhatkyhoctap.html" class="flex items-center gap-3 text-gray-600 font-bold hover:text-orange-500 transition group">
                     <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-orange-400 group-hover:scale-110 transition-transform">
                         <i class="fas fa-arrow-left"></i>
@@ -207,8 +205,8 @@
                 
                 <div class="flex items-center gap-4">
                     <div class="text-right hidden sm:block">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Thời gian</p>
-                        <p class="text-base font-black text-gray-800" id="timer-text">30:00</p>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Thời gian còn lại</p>
+                        <p class="text-base font-black text-gray-800" id="timer-text">30 phút 00 giây</p>
                     </div>
                     <div class="w-12 h-12 rounded-full flex items-center justify-center shadow-lg relative overflow-hidden bg-white">
                         <svg class="w-10 h-10 absolute" viewBox="0 0 36 36">
@@ -221,17 +219,17 @@
             </div>
         </div>
 
-        <div class="pb-20">
-            <div class="liquid-glass p-10 mb-10 relative overflow-hidden bg-gradient-to-br from-white/80 to-white/40">
+        <div class="max-w-3xl mx-auto pb-20">
+            <div class="liquid-glass p-8 mb-10 relative overflow-hidden bg-gradient-to-br from-white/80 to-white/40">
                 <div class="relative z-10">
                     <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Level 2</span>
-                    <h1 id="lvl-title-display" class="text-3xl md:text-4xl font-black text-gray-800 mt-4 mb-2">Đang tải đề bài...</h1>
+                    <h1 id="lvl-title-display" class="text-4xl font-black text-gray-800 mt-4 mb-2">Đang tải đề bài...</h1>
                     <p class="text-gray-500 font-medium">Yêu cầu: Đạt tối thiểu <span class="text-orange-600 font-bold">6.0 điểm</span> để qua màn.</p>
                 </div>
                 <i class="fas fa-book-open absolute -right-6 -bottom-8 text-9xl text-orange-500/10 rotate-12"></i>
             </div>
 
-            <div class="liquid-glass p-8 md:p-10 mb-8 bg-white border border-orange-100">
+            <div class="liquid-glass p-8 md:p-10 mb-8 bg-white border border-orange-100/50">
                 <div class="relative z-10">
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-lg"><i class="fas fa-quote-left"></i></div>
@@ -241,7 +239,8 @@
                 </div>
             </div>
 
-            <div id="questions-form" class="space-y-8"></div>
+            <div id="questions-form" class="space-y-8">
+                </div>
 
             <div class="mt-12 text-center" id="submit-area">
                 <button onclick="confirmSubmission()" class="group relative inline-flex items-center justify-center px-12 py-5 font-black text-white transition-all duration-300 bg-gray-900 rounded-3xl hover:shadow-2xl hover:shadow-orange-500/20 hover:scale-105 active:scale-95 overflow-hidden">
@@ -277,7 +276,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
@@ -286,7 +285,7 @@
 
     const API_URL = `/.netlify/functions/gemini-proxy`;
     let userUid = null;
-    let levelData = null;
+    let levelData = null; 
 
     // --- POPUP FUNCTION ---
     window.showPopup = (type, title, msg, confirmCallback = null) => {
@@ -298,6 +297,7 @@
         document.getElementById('alert-title').innerText = title;
         document.getElementById('alert-msg').innerText = msg;
         
+        // Reset Icon classes
         iconBox.className = "icon-box";
         if (type === 'warning') { iconBox.classList.add('icon-warning'); icon.className = "fas fa-exclamation-triangle"; }
         else if (type === 'error') { iconBox.classList.add('icon-error'); icon.className = "fas fa-times-circle"; }
@@ -307,15 +307,15 @@
 
         if (confirmCallback) {
             const b1 = document.createElement('button'); 
-            b1.className = "px-6 py-3 rounded-xl font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition";
-            b1.innerText = "Xem lại"; b1.onclick = () => modal.classList.remove('open');
+            b1.className = "px-6 py-3 rounded-xl font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition text-sm";
+            b1.innerText = "Kiểm tra lại"; b1.onclick = () => modal.classList.remove('open');
             const b2 = document.createElement('button'); 
-            b2.className = "px-6 py-3 rounded-xl font-bold bg-orange-500 text-white shadow-lg hover:bg-orange-600 transition";
+            b2.className = "px-6 py-3 rounded-xl font-bold bg-orange-500 text-white shadow-lg hover:bg-orange-600 transition text-sm";
             b2.innerText = "Nộp bài"; b2.onclick = () => { modal.classList.remove('open'); confirmCallback(); };
             actions.append(b1, b2);
         } else {
             const b = document.createElement('button'); 
-            b.className = "px-8 py-3 rounded-xl font-bold bg-gray-900 text-white hover:bg-gray-800 transition";
+            b.className = "px-8 py-3 rounded-xl font-bold bg-gray-900 text-white hover:bg-gray-800 transition text-sm";
             b.innerText = "Đã hiểu"; b.onclick = () => modal.classList.remove('open');
             actions.appendChild(b);
         }
@@ -324,10 +324,12 @@
 
     onAuthStateChanged(auth, (u) => {
         if (u) { userUid = u.uid; initLevelData(); }
-        else { showPopup('info', 'Yêu cầu đăng nhập', 'Bạn cần đăng nhập để lưu kết quả.', () => window.location.href = "../log.html"); }
+        else { 
+            showPopup('info', 'Yêu cầu đăng nhập', 'Bạn cần đăng nhập để hệ thống lưu lại kết quả học tập.', () => window.location.href = "../log.html");
+        }
     });
 
-    // --- 1. TẢI DỮ LIỆU TỪ FIREBASE ---
+    // --- 1. TẢI DỮ LIỆU LEVEL 2 TỪ FIREBASE ---
     async function initLevelData() {
         try {
             const q = query(collection(db, "study_levels"), where("level", "==", 2));
@@ -335,7 +337,7 @@
             
             if (snap.empty) {
                 document.getElementById('lvl-title-display').innerText = "Chưa có dữ liệu";
-                document.getElementById('prompt-passage').innerHTML = "<p class='text-center text-red-500'>Admin chưa tạo nội dung.</p>";
+                document.getElementById('prompt-passage').innerHTML = "<p class='text-center text-red-500'>Admin chưa tạo nội dung cho Level 2.</p>";
                 return;
             }
             
@@ -343,21 +345,21 @@
             levelData = docSnap.content; 
 
             document.getElementById('lvl-title-display').innerText = levelData.title || "Bài tập Đọc Hiểu";
-            // SỬA: Dùng innerHTML để hiển thị văn bản có định dạng HTML
             document.getElementById('prompt-passage').innerHTML = levelData.text || "";
 
             const form = document.getElementById('questions-form');
             form.innerHTML = "";
+            
             if (levelData.questions && Array.isArray(levelData.questions)) {
                 levelData.questions.forEach((qItem, i) => {
                     const div = document.createElement('div');
                     div.className = "liquid-glass p-6 md:p-8 bg-white border border-gray-100";
                     div.innerHTML = `
-                        <label class="q-label flex gap-3">
-                            <span class="bg-orange-100 text-orange-600 px-2 py-1 rounded text-sm h-fit">Câu ${i+1}</span>
-                            <span>${qItem.q}</span>
-                        </label>
-                        <textarea class="glass-input h-32 resize-none" id="ans-${i}" placeholder="Nhập câu trả lời của bạn vào đây..."></textarea>
+                        <div class="flex items-start gap-4 mb-3">
+                             <span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-lg text-base font-bold h-fit whitespace-nowrap flex-shrink-0">Câu ${i+1}</span>
+                             <span class="font-bold text-gray-800 text-base leading-relaxed pt-1">${qItem.q}</span>
+                        </div>
+                        <textarea class="glass-input h-32 resize-none mt-1 w-full" id="ans-${i}" placeholder="Nhập câu trả lời của bạn vào đây..."></textarea>
                     `;
                     form.appendChild(div);
                 });
@@ -368,55 +370,48 @@
         }
     }
 
-    // --- 2. CHẤM ĐIỂM AI ---
+    // --- 2. XỬ LÝ CHẤM ĐIỂM AI ---
     window.confirmSubmission = () => {
         if(!levelData) return;
         let filledCount = 0;
-        levelData.questions.forEach((_, i) => { if (document.getElementById(`ans-${i}`).value.trim()) filledCount++; });
-        if (filledCount < levelData.questions.length) {
-            showPopup('warning', 'Chưa hoàn thành', `Bạn mới trả lời ${filledCount}/${levelData.questions.length} câu. Bạn có chắc muốn nộp bài không?`, handleRealSubmit);
+        const total = levelData.questions.length;
+        levelData.questions.forEach((_, i) => {
+            if (document.getElementById(`ans-${i}`).value.trim()) filledCount++;
+        });
+
+        if (filledCount < total) {
+            showPopup('warning', 'Chưa hoàn thành', `Bạn mới trả lời ${filledCount}/${total} câu. Bạn có chắc muốn nộp bài không?`, handleRealSubmit);
         } else {
-            showPopup('warning', 'Xác nhận nộp bài', 'AI sẽ chấm điểm bài làm của bạn.', handleRealSubmit);
+            showPopup('warning', 'Xác nhận nộp bài', 'Hệ thống AI sẽ chấm điểm bài làm của bạn. Hành động này không thể hoàn tác.', handleRealSubmit);
         }
     };
 
     const handleRealSubmit = async () => {
         document.getElementById('loading-overlay').style.display = 'flex';
         
-        const studentAnswers = levelData.questions.map((q, i) => `Câu ${i+1} (${q.q}): ${document.getElementById(`ans-${i}`).value}`).join('\n');
+        const studentAnswers = levelData.questions.map((q, i) => 
+            `Câu ${i+1} (Đề: ${q.q}):\nTrả lời: ${document.getElementById(`ans-${i}`).value}`
+        ).join('\n\n');
+
+        const systemPrompt = `
+        Đóng vai: Bạn là giáo viên Ngữ Văn chấm thi nghiêm túc nhưng khích lệ học sinh.
+        Nhiệm vụ: Chấm điểm bài đọc hiểu dựa trên ngữ liệu sau.
         
-        // Loại bỏ HTML tag khỏi ngữ liệu khi gửi cho AI để tiết kiệm token (tùy chọn)
-        // const cleanText = levelData.text.replace(/<[^>]*>?/gm, ''); 
+        NGỮ LIỆU GỐC: """${levelData.text}"""
+        
+        BÀI LÀM HỌC SINH:
+        ${studentAnswers}
 
-const systemPrompt = `
-BẠN LÀ: Thành viên Hội đồng ra đề và chấm thi tốt nghiệp THPT Quốc gia - Chuyên gia cao cấp về kĩ năng giải mã ngữ liệu Đọc hiểu.
-THÁI ĐỘ: Khắt khe, tỉ mỉ. Bạn coi trọng sự chính xác tuyệt đối trong thuật ngữ và kĩ năng suy luận logic.
-NHIỆM VỤ: Chấm điểm ĐỌC HIỂU (Thang 4.0):
-- Câu 1, 2 (0.5đ/câu): Sai thuật ngữ Tiếng Việt/Văn học = 0 điểm.
-- Câu 3, 4, 5 (1.0đ/câu): Yêu cầu lí giải có chiều sâu, bám sát ngữ liệu, không diễn xuôi.
-
-=== CHIẾN DỊCH TRUY QUÉT AI (RĂN ĐE CAO) ===
-- AI Check: Phát hiện bài làm dùng ChatGPT để tóm tắt ý một cách trơn tru nhưng rỗng tuếch, liệt kê ý khô khan như mục lục.
-- 'human_score' < 50% nếu câu trả lời quá "tròn trịa" một cách máy móc.
-
-YÊU CẦU TRẢ VỀ JSON DUY NHẤT:
-{
-    "human_score": (int 0-100),
-    "ai_comment": "Nhận xét đanh thép về tính trung thực.",
-    "score": (float quy đổi thang 10 để đồng bộ hệ thống),
-    "reading_score": "Tổng điểm trên 4.0 (Ghi rõ: Q1:..., Q2:..., Q3:..., Q4:..., Q5:...)",
-    "general_comment": "Lời phê sắc sảo về tư duy giải mã văn bản.",
-    "strengths": ["Điểm cộng kiến thức 1", "..."],
-    "weaknesses": ["Lỗi hời hợt/sai thuật ngữ 1", "..."],
-    "correction_html": "HTML bài sửa. Ép font Merriweather. Dùng <span class='text-bad'>[Sai]</span>, <span class='text-good'>[Đúng]</span>, <span class='text-fix'>[Đáp án chuẩn]</span>.",
-    "orientation": "Định hướng phương pháp đọc hiểu chuyên sâu."
-}
-
-VĂN BẢN: ${q.text}
-CÂU HỎI: ${JSON.stringify(q.questions)}
-BÀI LÀM: ${content}
-`;
-
+        Yêu cầu Output JSON (Không Markdown):
+        {
+            "score": (số điểm thực trên thang 10, làm tròn 1 chữ số thập phân),
+            "feedback": [
+                { "q": "Câu 1", "status": "correct" (đúng) | "partial" (thiếu ý) | "wrong" (sai), "comment": "Nhận xét ngắn gọn lỗi sai hoặc ý hay" },
+                ... (lặp lại cho các câu còn lại)
+            ],
+            "advice": "Lời khuyên chung ngắn gọn (tối đa 2 câu)"
+        }
+        `;
 
         try {
             const response = await fetch(API_URL, {
@@ -424,80 +419,120 @@ BÀI LÀM: ${content}
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
             });
+            
             const data = await response.json();
-            const res = JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json|```/g, "").trim());
+            let rawText = data.candidates[0].content.parts[0].text;
+            rawText = rawText.replace(/```json|```/g, "").trim();
+            
+            const res = JSON.parse(rawText);
 
             showResultUI(res);
             
             if(userUid) {
                 await addDoc(collection(db, "activities"), { 
-                    uid: userUid, userName: auth.currentUser.displayName || "User",
-                    examTitle: levelData.title, action: `Đọc hiểu Level 2: ${res.score}đ`, type: "journal", score: res.score, timestamp: serverTimestamp() 
+                    uid: userUid, 
+                    userName: auth.currentUser.displayName || "User",
+                    examTitle: levelData.title,
+                    action: `Đọc hiểu Level 2: ${res.score}đ`, 
+                    type: "journal", 
+                    score: res.score, 
+                    timestamp: serverTimestamp() 
                 });
+                
                 if(res.score >= 6) {
                     await setDoc(doc(db, "users_progress", userUid), { currentLevel: 3, lastPassed: serverTimestamp() }, { merge: true });
                 }
             }
-        } catch (e) { showPopup('error', 'Lỗi chấm bài', 'Hệ thống đang bận.'); } 
-        finally { document.getElementById('loading-overlay').style.display = 'none'; }
+        } catch (e) { 
+            console.error(e);
+            showPopup('error', 'Lỗi chấm bài', 'AI không phản hồi hoặc lỗi hệ thống. Vui lòng thử lại!'); 
+        } finally { 
+            document.getElementById('loading-overlay').style.display = 'none'; 
+        }
     };
 
     function showResultUI(res) {
-        document.getElementById('result-box').style.display = 'block';
-        document.getElementById('submit-area').style.display = 'none';
-        document.getElementById('score-text').innerText = res.score;
+        const resultBox = document.getElementById('result-box');
+        resultBox.style.display = 'block';
+        document.getElementById('submit-area').style.display = 'none'; 
         
-        const title = document.getElementById('result-title');
+        let currentScore = 0;
+        const targetScore = res.score;
+        const scoreInterval = setInterval(() => {
+            if(currentScore >= targetScore) {
+                clearInterval(scoreInterval);
+                document.getElementById('score-text').innerText = targetScore;
+            } else {
+                currentScore += 0.5;
+                document.getElementById('score-text').innerText = currentScore.toFixed(1);
+            }
+        }, 50);
+
         const ring = document.getElementById('score-ring');
+        const title = document.getElementById('result-title');
         
         if (res.score >= 6) {
-            title.innerText = "ĐẠT YÊU CẦU"; title.className = "text-3xl font-black text-green-600 mb-1";
-            ring.style.background = `conic-gradient(#10B981 ${res.score*10}%, #eee 0%)`;
+            title.innerText = "ĐẠT YÊU CẦU!"; title.className = "text-3xl font-black text-green-600 mb-1";
+            ring.style.background = `conic-gradient(#10B981 ${res.score*10}%, rgba(255,255,255,0.5) 0%)`;
             document.getElementById('next-btn').classList.remove('hidden');
         } else {
             title.innerText = "CHƯA ĐẠT"; title.className = "text-3xl font-black text-red-500 mb-1";
-            ring.style.background = `conic-gradient(#EF4444 ${res.score*10}%, #eee 0%)`;
+            ring.style.background = `conic-gradient(#EF4444 ${res.score*10}%, rgba(255,255,255,0.5) 0%)`;
             document.getElementById('retry-btn').classList.remove('hidden');
         }
 
-        const mapStatus = { "correct": "badge-correct", "partial": "badge-partial", "wrong": "badge-wrong" };
-        const mapText = { "correct": "ĐÚNG", "partial": "THIẾU Ý", "wrong": "SAI" };
+        const statusMap = { "correct": "badge-correct", "partial": "badge-partial", "wrong": "badge-wrong" };
+        const textMap = { "correct": "ĐÚNG", "partial": "THIẾU Ý", "wrong": "CHƯA ĐÚNG" };
 
         document.getElementById('feedback-content').innerHTML = res.feedback.map(f => `
             <div class="bg-white/60 rounded-2xl p-5 border border-white shadow-sm mb-3">
                 <div class="flex justify-between items-center mb-2">
                     <span class="font-bold text-gray-800 text-sm">${f.q}</span>
-                    <span class="${mapStatus[f.status]}">${mapText[f.status]}</span>
+                    <span class="${statusMap[f.status]}">${textMap[f.status]}</span>
                 </div>
-                <p class="text-sm text-gray-600 italic">${f.comment}</p>
+                <p class="text-sm text-gray-600 leading-relaxed"><i class="fas fa-comment-dots text-orange-300 mr-2"></i>${f.comment}</p>
             </div>
-        `).join('') + `<div class="bg-orange-50 p-4 rounded-xl text-sm italic mt-4 text-gray-600 border border-orange-100">💡 ${res.advice}</div>`;
+        `).join('') + `
+            <div class="bg-orange-50 p-5 rounded-2xl border border-orange-100 mt-6 flex gap-4 items-start">
+                <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 flex-shrink-0"><i class="fas fa-lightbulb"></i></div>
+                <div>
+                    <h4 class="font-bold text-gray-800 text-sm mb-1">Lời khuyên từ giáo viên</h4>
+                    <p class="text-sm text-gray-600 italic">"${res.advice}"</p>
+                </div>
+            </div>
+        `;
         
-        document.getElementById('result-box').scrollIntoView({ behavior: 'smooth' });
+        resultBox.scrollIntoView({ behavior: 'smooth' });
     }
 
     window.nextLevel = () => window.location.href = "../dashboard/nhatkyhoctap.html";
 
-    // Timer
+    // Timer Logic
     let totalSeconds = 1800; 
+    const timerCircle = document.getElementById('timer-circle');
     const timerText = document.getElementById('timer-text');
     const timerMini = document.getElementById('timer-mini');
-    const timerCircle = document.getElementById('timer-circle');
 
     const interval = setInterval(() => {
         if(totalSeconds > 0) {
             totalSeconds--;
             const m = Math.floor(totalSeconds / 60);
             const s = totalSeconds % 60;
-            timerText.innerText = `${m}:${s<10?'0'+s:s}`;
+            
+            timerText.innerText = `${m}:${s < 10 ? '0'+s : s}`;
             timerMini.innerText = m;
-            const pct = (totalSeconds / 1800) * 100;
-            timerCircle.setAttribute('stroke-dasharray', `${pct}, 100`);
+            const percent = (totalSeconds / 1800) * 100;
+            timerCircle.setAttribute('stroke-dasharray', `${percent}, 100`);
+            if(totalSeconds < 300) timerCircle.classList.replace('text-orange-500', 'text-red-500');
         } else {
             clearInterval(interval);
-            showPopup('warning', 'Hết giờ!', 'Hệ thống tự động nộp bài.', handleRealSubmit);
+            showPopup('warning', 'Hết giờ!', 'Thời gian làm bài đã kết thúc. Hệ thống sẽ tự động nộp bài.', handleRealSubmit);
         }
     }, 1000);
+
+    fetch('menu.html').then(r=>r.text()).then(h=>{
+        const p = document.getElementById('menu-placeholder'); if(p) p.innerHTML=h;
+    });
 </script>
 </body>
 </html>
