@@ -666,7 +666,7 @@ ${content}
         console.error("Lỗi:", e);
         const msg = e.message === "SERVER_TIMEOUT" 
             ? "Ngữ liệu dài khiến AI phản hồi hơi chậm. Hãy bấm nộp bài lại 1-2 lần nữa nhé!" 
-            : "Hệ thống đang bận xử lý dữ liệu, Vui lòng thử nộp lại sau giây lát nhe!";
+            : "Ngữ liệu dài khiến AI phản hồi hơi chậm. Hãy bấm nộp bài lại 1-2 lần nữa nhé!";
         showPopup("Thông báo", msg, "error");
     } finally {
         loading.style.display = 'none';
