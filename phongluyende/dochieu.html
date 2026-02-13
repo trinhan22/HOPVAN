@@ -173,8 +173,6 @@
 
     <div class="loading-overlay" id="loading-overlay">
         <div class="loader-robot"><i class="fas fa-robot"></i></div>
-        <h3 class="mt-4 font-bold text-gray-800 text-lg">AI ĐANG CHẤM BÀI...</h3>
-        <p class="text-sm text-gray-500">Đang phân tích kỹ năng Đọc Hiểu của bạn...</p>
     </div>
 
     <div id="generic-popup" class="custom-modal">
@@ -429,10 +427,13 @@
 
     window.removeHighlight = () => { document.execCommand('removeFormat'); document.getElementById('highlight-menu').style.display = 'none'; };
 
-    // --- 5. AI CHẤM ĐIỂM ---
+// --- 5. AI CHẤM ĐIỂM (BẢN CHI TIẾT: CHECK AI + FIX FONT + NHẬN XÉT) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
-        if(content.length < 20) { document.getElementById('short-essay-popup').style.display = 'flex'; return; }
+        if(content.length < 20) { 
+            showPopup("Chú ý", "Câu trả lời quá ngắn, vui lòng viết chi tiết hơn để AI có thể chấm điểm chính xác!", "warning"); 
+            return; 
+        }
 
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex';
@@ -440,91 +441,123 @@
         const q = window.currentExamData;
         const qList = (q.questions || []).map(i => i.q).join("\n");
         
-        const systemPrompt = `
-        BẠN LÀ: Giáo viên Ngữ văn chuyên gia luyện thi THPT Quốc gia (Chương trình GDPT 2018).
-        VAI TRÒ: Chuyên gia chấm chữa phần ĐỌC HIỂU với độ chính xác tuyệt đối về thuật ngữ văn học và kĩ năng phân tích ngữ liệu.
-        THÁI ĐỘ: Tỉ mỉ, hàn lâm, sắc sảo. Nhận xét thẳng thắn vào trọng tâm kiến thức, không dùng lời sáo rỗng.
+const systemPrompt = `
+BẠN LÀ: Thành viên Hội đồng ra đề và chấm thi tốt nghiệp THPT Quốc gia - Chuyên gia cao cấp về kĩ năng giải mã ngữ liệu Đọc hiểu.
+THÁI ĐỘ: Khắt khe, tỉ mỉ. Bạn coi trọng sự chính xác tuyệt đối trong thuật ngữ và kĩ năng suy luận logic.
+NHIỆM VỤ: Chấm điểm ĐỌC HIỂU (Thang 4.0):
+- Câu 1, 2 (0.5đ/câu): Sai thuật ngữ Tiếng Việt/Văn học = 0 điểm.
+- Câu 3, 4, 5 (1.0đ/câu): Yêu cầu lí giải có chiều sâu, bám sát ngữ liệu, không diễn xuôi.
 
-        NHIỆM VỤ: Chấm điểm bài làm Đọc Hiểu dựa trên khung điểm chuẩn 4.0:
-        - Câu 1, 2 (Nhận biết): 0.5 điểm/câu. Yêu cầu gọi đúng tên thuật ngữ (PTBĐ, thể thơ, biện pháp tu từ...).
-        - Câu 3, 4, 5 (Thông hiểu/Vận dụng): 1.0 điểm/câu. Yêu cầu lí giải sâu sắc, không diễn xuôi lại văn bản.
+=== CHIẾN DỊCH TRUY QUÉT AI (RĂN ĐE CAO) ===
+- AI Check: Phát hiện bài làm dùng ChatGPT để tóm tắt ý một cách trơn tru nhưng rỗng tuếch, liệt kê ý khô khan như mục lục.
+- 'human_score' < 50% nếu câu trả lời quá "tròn trịa" một cách máy móc.
 
-        QUY TRÌNH CHẤM BẮT BUỘC:
+YÊU CẦU TRẢ VỀ JSON DUY NHẤT:
+{
+    "human_score": (int 0-100),
+    "ai_comment": "Nhận xét đanh thép về tính trung thực.",
+    "score": (float quy đổi thang 10 để đồng bộ hệ thống),
+    "reading_score": "Tổng điểm trên 4.0 (Ghi rõ: Q1:..., Q2:..., Q3:..., Q4:..., Q5:...)",
+    "general_comment": "Lời phê sắc sảo về tư duy giải mã văn bản.",
+    "strengths": ["Điểm cộng kiến thức 1", "..."],
+    "weaknesses": ["Lỗi hời hợt/sai thuật ngữ 1", "..."],
+    "correction_html": "HTML bài sửa. Ép font Merriweather. Dùng <span class='text-bad'>[Sai]</span>, <span class='text-good'>[Đúng]</span>, <span class='text-fix'>[Đáp án chuẩn]</span>.",
+    "orientation": "Định hướng phương pháp đọc hiểu chuyên sâu."
+}
 
-        1. KIỂM TRA ĐỘ TRUNG THỰC (AI DETECTION):
-        - Phân tích văn phong: Nếu câu trả lời quá trơn tru theo kiểu máy móc, dùng các từ nối "vô hồn" đặc trưng của AI, hoặc trả lời quá dài dòng không cần thiết -> human_score thấp.
-        - Ưu tiên bài làm có sự diễn đạt tự nhiên, tư duy cá nhân rõ nét.
-
-        2. CHẤM ĐIỂM CHUYÊN MÔN:
-        - Đối chiếu bài làm với nội dung Văn bản và Hệ thống câu hỏi.
-        - Soi lỗi: Sai lệch thuật ngữ, hiểu sai hàm ý của tác giả, trả lời thiếu vế, diễn đạt lủng củng.
-        - Thang điểm tối đa là 4.0. Trả về kết quả quy đổi ra thang 10 ở mục 'score' để đồng bộ hệ thống, nhưng ghi rõ điểm thành phần trong 'detailed_scores'.
-
-        3. SỬA BÀI CHI TIẾT (HTML FORMAT):
-        - Sử dụng <span class="text-bad"> cho lỗi sai thuật ngữ hoặc câu trả lời chưa đúng trọng tâm.
-        - Sử dụng <span class="text-fix"> để gợi ý đáp án chuẩn xác ngay cạnh lỗi.
-        - Sử dụng <span class="text-good"> khen ngợi cách dùng từ đắt hoặc ý hiểu sâu sắc.
-
-        YÊU CẦU TRẢ VỀ JSON DUY NHẤT (KHÔNG MARKDOWN):
-        {
-        "human_score": (int 0-100),
-        "ai_comment": "Nhận xét ngắn về độ tự nhiên của bài làm.",
-        "score": (float, thang điểm 10 - ví dụ: 7.5),
-        "detailed_scores": {
-            "q1": "x/0.5",
-            "q2": "x/0.5",
-            "q3": "x/1.0",
-            "q4": "x/1.0",
-            "q5": "x/1.0 (nếu có)"
-        },
-        "total_reading_score": "Tổng điểm trên 4.0",
-        "correction_html": "HTML bài làm đã highlight lỗi và ý hay. Xuống dòng dùng <br>.",
-        "idea_feedback": ["Điểm cộng về kiến thức 1", "Sự tinh tế trong cảm thụ 1"],
-        "missing_points": ["Lỗi sai thuật ngữ", "Ý trả lời còn hời hợt"],
-        "orientation": "Lời khuyên để cải thiện kĩ năng giải mã văn bản Đọc hiểu."
-        }
-
-        DỮ LIỆU ĐỀ BÀI:
-        - VĂN BẢN: ${q.text}
-        - CÂU HỎI: ${JSON.stringify(q.questions)}
-
-        BÀI LÀM CỦA HỌC SINH:
-        ${content}
-        `;
-
+VĂN BẢN: ${q.text}
+CÂU HỎI: ${JSON.stringify(q.questions)}
+BÀI LÀM: ${content}
+`;
         try {
-            const res = await fetch(API_URL, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] }) });
+            const res = await fetch(API_URL, { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] }) 
+            });
             const data = await res.json();
-            const text = data.candidates[0].content.parts[0].text.replace(/```json|```/g, "").trim();
-            const result = JSON.parse(text);
+            const rawText = data.candidates[0].content.parts[0].text;
+            
+            // Dùng Regex lấy JSON để tránh lỗi ký tự dư thừa
+            const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+            const result = JSON.parse(jsonMatch[0]);
 
             document.getElementById('input-section').classList.add('hidden');
             const out = document.getElementById('output-section');
-            out.classList.remove('hidden');
-            out.style.display = 'flex';
+            out.classList.remove('hidden'); out.style.display = 'flex';
 
             const barColor = result.human_score > 75 ? '#22c55e' : (result.human_score > 50 ? '#f59e0b' : '#ef4444');
 
+            // Render kết quả với Font Merriweather mảnh
             document.getElementById('ai-correction-box').innerHTML = `
-                <div class="max-w-2xl mx-auto pb-10">
-                    <div class="text-center mb-6">
-                        <div class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">TỔNG ĐIỂM ĐỌC HIỂU</div>
-                        <div class="text-6xl font-black text-orange-500 mb-2">${result.score}/4.0</div>
-                        <p class="text-gray-600 italic">"${result.general_comment}"</p>
+                <div class="max-w-2xl mx-auto pb-10" style="font-family: 'Merriweather', serif; font-weight: 300;">
+                    
+                    <div class="text-center mb-8">
+                        <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Kết quả đọc hiểu</div>
+                        <div class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2">${result.reading_score}</div>
+                        <p class="text-gray-600 italic px-4 font-light">"${result.general_comment}"</p>
                     </div>
-                    <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm mb-6">
-                        <div class="flex justify-between items-center mb-2"><span class="text-xs font-bold text-gray-400 uppercase">Độ chân thực</span><span class="font-bold" style="color:${barColor}">${result.human_score}%</span></div>
-                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div style="width:${result.human_score}%; background:${barColor}" class="h-full rounded-full"></div></div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm mb-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Độ chân thực (AI Check)</span>
+                            <span class="font-bold text-sm" style="color:${barColor}">${result.human_score}%</span>
+                        </div>
+                        <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div style="width:${result.human_score}%; background:${barColor}" class="h-full"></div>
+                        </div>
+                        <p class="text-[11px] text-gray-400 mt-2 italic font-light">${result.ai_comment}</p>
                     </div>
-                    <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-                        <h4 class="font-black text-gray-800 border-b pb-4 mb-6 text-lg">CHI TIẾT CHẤM BÀI</h4>
-                        <div class="leading-loose text-gray-700 font-serif text-lg space-y-4 font-light">${result.correction_html}</div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        <div class="bg-green-50/50 p-5 rounded-2xl border border-green-100">
+                            <h4 class="text-green-700 font-bold text-[10px] uppercase mb-3"><i class="fas fa-check-circle mr-1"></i> Điểm tốt</h4>
+                            <ul class="text-xs text-green-800 space-y-2 font-medium">
+                                ${result.strengths.map(s => `<li>• ${s}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="bg-red-50/50 p-5 rounded-2xl border border-red-100">
+                            <h4 class="text-red-700 font-bold text-[10px] uppercase mb-3"><i class="fas fa-exclamation-triangle mr-1"></i> Cần cải thiện</h4>
+                            <ul class="text-xs text-red-800 space-y-2 font-medium">
+                                ${result.weaknesses.map(w => `<li>• ${w}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm mb-8">
+                        <h4 class="font-black text-gray-800 border-b pb-4 mb-6 text-xs uppercase tracking-widest">Gợi ý sửa chi tiết</h4>
+                        <div class="leading-loose text-gray-700 font-light text-lg space-y-4 text-justify">
+                            ${result.correction_html}
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-900 text-white p-6 rounded-2xl shadow-xl">
+                        <div class="flex items-center gap-2 mb-2 text-orange-400">
+                            <i class="fas fa-lightbulb"></i>
+                            <span class="text-[10px] font-black uppercase tracking-widest">Định hướng kĩ năng</span>
+                        </div>
+                        <p class="text-sm text-gray-300 leading-relaxed font-light italic">${result.orientation}</p>
                     </div>
                 </div>
             `;
-            // Lưu Firebase
-            if (auth.currentUser) { await addDoc(collection(db, "activities"), { uid: auth.currentUser.uid, type: "reading", score: result.score, timestamp: serverTimestamp(), examId: q.id }); }
-        } catch(e) { console.error(e); showPopup("Lỗi AI", "Hệ thống đang bận, vui lòng thử lại sau!", "error"); } finally { loading.style.display = 'none'; }
+
+            // Lưu Firebase (sử dụng score thang 10 để đồng bộ Dashboard)
+            if (auth.currentUser) { 
+                await addDoc(collection(db, "activities"), { 
+                    uid: auth.currentUser.uid, 
+                    type: "reading", 
+                    score: result.score, 
+                    timestamp: serverTimestamp(), 
+                    examId: q.id 
+                }); 
+            }
+
+        } catch(e) { 
+            console.error(e); 
+            showPopup("Lỗi AI", "Hệ thống đang bận xử lý dữ liệu, Nhân vui lòng thử nộp lại sau giây lát nhe!", "error"); 
+        } finally { 
+            loading.style.display = 'none'; 
+        }
     };
 
     window.resetExam = () => { document.getElementById('input-section').classList.remove('hidden'); document.getElementById('output-section').classList.add('hidden'); document.getElementById('output-section').style.display = 'none'; };
