@@ -408,26 +408,87 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         setTimeout(setupHighlightEvent, 100);
     };
 
+// --- 5. TÍNH NĂNG HIGHLIGHT (BẢN FIX DOM) ---
     function setupHighlightEvent() {
         const container = document.getElementById('reading-passage');
         const menu = document.getElementById('highlight-menu');
+        
         if(!container || !menu) return;
-        container.onmouseup = () => {
-            const selection = window.getSelection();
-            if (selection.toString().trim().length > 0 && container.contains(selection.anchorNode)) {
-                const rect = selection.getRangeAt(0).getBoundingClientRect();
-                menu.style.top = `${rect.top - 50}px`;
-                menu.style.left = `${rect.left + rect.width/2 - 60}px`;
-                menu.style.display = 'flex';
-            } else { menu.style.display = 'none'; }
+
+        // 1. Hiện menu khi bôi đen xong
+        container.onmouseup = (e) => {
+            // Chờ 1 chút để selection cập nhật kịp
+            setTimeout(() => {
+                const sel = window.getSelection();
+                const str = sel.toString().trim();
+
+                if (str.length > 0 && container.contains(sel.anchorNode)) {
+                    const rect = sel.getRangeAt(0).getBoundingClientRect();
+                    
+                    // Tính toán vị trí để menu hiện ngay trên đầu dòng chữ
+                    // rect.top + window.scrollY để tính đúng khi cuộn trang
+                    menu.style.top = `${rect.top + window.scrollY - 45}px`; 
+                    menu.style.left = `${rect.left + (rect.width / 2) - 60}px`;
+                    menu.style.display = 'flex';
+                } else {
+                    menu.style.display = 'none';
+                }
+            }, 10);
         };
-        document.onmousedown = (e) => { if(!menu.contains(e.target) && !container.contains(e.target)) menu.style.display = 'none'; };
+
+        // 2. Ẩn menu khi click ra ngoài
+        document.onmousedown = (e) => {
+            if(!menu.contains(e.target) && !container.contains(e.target)) {
+                menu.style.display = 'none';
+            }
+        };
     }
+
+    // Hàm tô màu (Dùng thẻ SPAN bọc lấy chữ)
     window.applyHighlight = (cls) => {
-        try { document.execCommand('backColor', false, cls === 'highlight-yellow' ? '#fef08a' : cls === 'highlight-green' ? '#bbf7d0' : '#fbcfe8'); 
-        window.getSelection().removeAllRanges(); document.getElementById('highlight-menu').style.display = 'none'; } catch(e) {}
+        const sel = window.getSelection();
+        if (!sel.rangeCount) return;
+
+        try {
+            const range = sel.getRangeAt(0);
+            
+            // Tạo thẻ span có màu nền
+            const span = document.createElement('span');
+            span.className = cls; // Class màu (vàng/xanh/hồng)
+            
+            // Bọc vùng chọn bằng thẻ span
+            range.surroundContents(span);
+            
+            // Xóa chọn và ẩn menu
+            sel.removeAllRanges();
+            document.getElementById('highlight-menu').style.display = 'none';
+        } catch(e) {
+            // Lỗi này xảy ra khi bôi đen vắt qua 2 đoạn văn (thẻ P) khác nhau
+            showPopup("Lỗi Highlight", "Vui lòng chỉ bôi đen trong một đoạn văn, không kéo qua đoạn khác nhe!", "warning");
+        }
     };
-    window.removeHighlight = () => { document.execCommand('removeFormat'); document.getElementById('highlight-menu').style.display = 'none'; };
+
+    // Hàm xóa màu
+    window.removeHighlight = () => {
+        const sel = window.getSelection();
+        if (!sel.rangeCount) return;
+
+        // Tìm xem con trỏ chuột đang nằm trong thẻ Span màu nào
+        let node = sel.anchorNode;
+        // Nếu đang chọn text node, nhảy lên thẻ cha
+        if (node.nodeType === 3) node = node.parentElement; 
+
+        if (node.tagName === 'SPAN' && node.className.includes('highlight-')) {
+            // Thay thế thẻ Span bằng nội dung text bên trong nó (Gỡ bỏ màu)
+            const text = document.createTextNode(node.innerText);
+            node.parentNode.replaceChild(text, node);
+            
+            document.getElementById('highlight-menu').style.display = 'none';
+            sel.removeAllRanges();
+        } else {
+            showPopup("Mẹo", "Để xóa, hãy đặt con trỏ chuột vào vùng màu cần xóa rồi bấm nút tẩy.", "info");
+        }
+    };
 
     // --- 1. HÀM HIỂN THỊ KẾT QUẢ (PHẢI NẰM NGOÀI ĐỂ KHÔNG LỖI) ---
     function renderAIResult(result) {
@@ -477,52 +538,52 @@ window.handleAISubmission = async () => {
 
         const q = window.currentExamData;
         
-        // Prompt giữ nguyên
+        // PROMPT GIÁM KHẢO KHẮT KHE (GIỮ NGUYÊN XI)
         const systemPrompt = `
-        BẠN LÀ: Giám khảo Hội đồng chấm thi tốt nghiệp THPT Quốc gia - Chuyên gia cao cấp về kiểm định chất lượng Ngữ văn (Chương trình GDPT 2018).
-        THÁI ĐỘ: Khắt khe, sắc sảo, hàn lâm và tuyệt đối công tâm. Bạn có "nhãn quan" cực nhạy để phát hiện mọi hành vi dùng văn mẫu hoặc AI.
-        NGÔN NGỮ: Sử dụng thuật ngữ văn học chuyên sâu. Không nhận xét chung chung - phải chỉ rõ "tốt ở đâu, yếu chỗ nào".
+    BẠN LÀ: Giám khảo Hội đồng chấm thi tốt nghiệp THPT Quốc gia - Chuyên gia cao cấp về kiểm định chất lượng Ngữ văn (Chương trình GDPT 2018).
+    THÁI ĐỘ: Khắt khe, sắc sảo, hàn lâm và tuyệt đối công tâm. Bạn có "nhãn quan" cực nhạy để phát hiện mọi hành vi dùng văn mẫu hoặc AI.
+    NGÔN NGỮ: Sử dụng thuật ngữ văn học chuyên sâu (tư duy biện chứng, điểm nhìn nghệ thuật, diễn ngôn, tính đa thanh, thao tác lập luận...). Không nhận xét chung chung - phải chỉ rõ "tốt ở đâu, yếu chỗ nào".
 
-        NHIỆM VỤ: Chấm bài thi Tổng hợp theo đúng khung điểm chuẩn 2025:
-        1. PHẦN I: ĐỌC HIỂU (4.0 điểm)
-        - Câu 1, 2: 0.5đ/câu (Yêu cầu chính xác 100% thuật ngữ: PTBĐ, Thể thơ, Thao tác lập luận...). Sai thuật ngữ = 0 điểm.
-        - Câu 3, 4, 5: 1.0đ/câu (Yêu cầu lí giải sắc sảo, thấu đáo, không diễn xuôi lại văn bản).
-        2. PHẦN II: LÀM VĂN (6.0 điểm)
-        - Câu 1 (2.0đ): NLXH hoặc NLVH (Đoạn văn hoặc bài văn ngắn).
-        - Câu 2 (4.0đ): NLVH hoặc NLXH (Bài văn nghị luận chuyên sâu).
-        *AI phải tự đọc đề để xác định câu nào là 2.0đ và câu nào là 4.0đ để đòi hỏi sức nặng kiến thức tương ứng.*
+    NHIỆM VỤ: Chấm bài thi Tổng hợp theo đúng khung điểm chuẩn 2025:
+    1. PHẦN I: ĐỌC HIỂU (4.0 điểm)
+       - Câu 1, 2: 0.5đ/câu (Yêu cầu chính xác 100% thuật ngữ: PTBĐ, Thể thơ, Thao tác lập luận...). Sai thuật ngữ = 0 điểm.
+       - Câu 3, 4, 5: 1.0đ/câu (Yêu cầu lí giải sắc sảo, thấu đáo, không diễn xuôi lại văn bản).
+    2. PHẦN II: LÀM VĂN (6.0 điểm)
+       - Câu 1 (2.0đ): NLXH hoặc NLVH (Đoạn văn hoặc bài văn ngắn).
+       - Câu 2 (4.0đ): NLVH hoặc NLXH (Bài văn nghị luận chuyên sâu).
+       *AI phải tự đọc đề để xác định câu nào là 2.0đ và câu nào là 4.0đ để đòi hỏi sức nặng kiến thức tương ứng.*
 
-        === CHIẾN DỊCH TRUY QUÉT AI & VĂN MẪU (RĂN ĐE CAO) ===
-        - Nếu bài làm dùng các cấu trúc "văn máy" rập khuôn như: "Trong bối cảnh hiện nay...", "Bên cạnh đó...", "Hơn nữa...", "Tóm lại...", "Như vậy..." một cách vô hồn -> Trừ nặng điểm 'human_score' và đánh giá thấp phần Sáng tạo.
-        - Phát hiện dẫn chứng "xác ướp" (Nick Vujicic, Edison...) dùng hời hợt -> Trừ điểm thực tế.
-        - 'human_score' < 50%: Bài làm vô hồn, lệ thuộc máy móc.
+    === CHIẾN DỊCH TRUY QUÉT AI & VĂN MẪU (RĂN ĐE CAO) ===
+    - Nếu bài làm dùng các cấu trúc "văn máy" rập khuôn như: "Trong bối cảnh hiện nay...", "Bên cạnh đó...", "Hơn nữa...", "Tóm lại...", "Như vậy..." một cách vô hồn -> Trừ nặng điểm 'human_score' và đánh giá thấp phần Sáng tạo.
+    - Phát hiện dẫn chứng "xác ướp" (Nick Vujicic, Edison...) dùng hời hợt -> Trừ điểm thực tế.
+    - 'human_score' < 50%: Bài làm vô hồn, lệ thuộc máy móc.
 
-        YÊU CẦU TRẢ VỀ JSON DUY NHẤT (KHÔNG DẪN CHUYỆN):
-        {
-            "human_score": (int 0-100),
-            "ai_comment": "Nhận xét khắt khe về tính trung thực của văn phong, chỉ điểm các đoạn rập khuôn.",
-            "score": (float thang 10, làm tròn 0.25),
-            "detailed_scores": {
-                "reading": "x/4.0",
-                "writing_c1": "x/2.0",
-                "writing_c2": "x/4.0"
-            },
-            "general_comment": "Lời phê sắc sảo của Giám khảo cấp Quốc gia.",
-            "strengths": ["Ưu điểm chuyên môn 1", "Sự sáng tạo 2"],
-            "weaknesses": ["Lỗi tư duy hời hợt/sai thuật ngữ 1", "Hạn chế dẫn chứng 2"],
-            "correction_html": "HTML bài sửa. Ép font Merriweather. Dùng <span class='text-bad'>[Lỗi]</span>, <span class='text-good'>[Hay]</span>, <span class='text-fix'>[Sửa]</span>.",
-            "orientation": "Định hướng tư duy văn chương chuyên sâu để bài viết có 'hồn' và sắc bén hơn."
-        }
+    YÊU CẦU TRẢ VỀ JSON DUY NHẤT (KHÔNG DẪN CHUYỆN):
+    {
+        "human_score": (int 0-100),
+        "ai_comment": "Nhận xét khắt khe về tính trung thực của văn phong, chỉ điểm các đoạn rập khuôn.",
+        "score": (float thang 10, làm tròn 0.25),
+        "detailed_scores": {
+            "reading": "x/4.0",
+            "writing_c1": "x/2.0",
+            "writing_c2": "x/4.0"
+        },
+        "general_comment": "Lời phê sắc sảo của Giám khảo cấp Quốc gia.",
+        "strengths": ["Ưu điểm chuyên môn 1", "Sự sáng tạo 2"],
+        "weaknesses": ["Lỗi tư duy hời hợt/sai thuật ngữ 1", "Hạn chế dẫn chứng 2"],
+        "correction_html": "HTML bài sửa. Ép font Merriweather. Dùng <span class='text-bad'>[Lỗi]</span>, <span class='text-good'>[Hay]</span>, <span class='text-fix'>[Sửa]</span>.",
+        "orientation": "Định hướng tư duy văn chương chuyên sâu để bài viết có 'hồn' và sắc bén hơn."
+    }
 
-        DỮ LIỆU ĐỀ BÀI:
-        - Đọc hiểu: ${q.reading_text}
-        - Câu hỏi Đọc hiểu: ${q.reading_questions}
-        - Làm văn Câu 1: ${q.nlxh_topic}
-        - Làm văn Câu 2: ${q.nlvh_topic}
+    DỮ LIỆU ĐỀ BÀI:
+    - Đọc hiểu: ${q.reading_text}
+    - Câu hỏi Đọc hiểu: ${q.reading_questions}
+    - Làm văn Câu 1: ${q.nlxh_topic}
+    - Làm văn Câu 2: ${q.nlvh_topic}
 
-        BÀI LÀM CỦA HỌC SINH:
-        ${content}
-        `;
+    BÀI LÀM CỦA HỌC SINH:
+    ${content}
+    `;
 
         try {
             const res = await fetch(API_URL, {
@@ -531,27 +592,26 @@ window.handleAISubmission = async () => {
                 body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
             });
             
-            // 1. Kiểm tra lỗi mạng/server trước
+            // Kiểm tra lỗi 504 Gateway Timeout hoặc lỗi mạng
             if (!res.ok) throw new Error("SERVER_ERROR");
 
-            // 2. Lấy dữ liệu JSON từ Google (Cái này là vỏ bọc)
             const data = await res.json();
             
-            // 3. Bóc tách nội dung văn bản (Cái ruột)
+            // Kiểm tra xem Google có trả về nội dung không (tránh lỗi undefined)
             if (!data.candidates || !data.candidates[0].content) throw new Error("NO_CONTENT");
+
             const rawText = data.candidates[0].content.parts[0].text;
             
-            // 4. Dùng Regex lọc lấy JSON kết quả chấm bài từ nội dung văn bản
+            // Regex thần thánh để lọc JSON sạch
             const jsonMatch = rawText.match(/\{[\s\S]*\}/);
             if (!jsonMatch) throw new Error("INVALID_FORMAT");
             
-            // 5. Parse thành object kết quả cuối cùng
             const result = JSON.parse(jsonMatch[0]);
 
-            // 6. Hiển thị
+            // Gọi hàm hiển thị kết quả (Hàm này phải nằm ngoài handleAISubmission nha)
             renderAIResult(result);
 
-            // 7. Lưu Firebase
+            // Lưu Firebase
             if (auth.currentUser) {
                 await addDoc(collection(db, "activities"), {
                     uid: auth.currentUser.uid,
@@ -565,8 +625,12 @@ window.handleAISubmission = async () => {
         } catch(e) {
             console.error("Lỗi chi tiết:", e);
             let msg = "Có lỗi xảy ra, vui lòng thử lại!";
-            if (e.message === "SERVER_ERROR") msg = "Ngữ liệu dài khiến AI phản hồi hơi chậm. Hãy bấm nộp bài lại 1-2 lần nữa nhé!";
-            if (e.message === "INVALID_FORMAT") msg = "Ngữ liệu dài khiến AI phản hồi hơi chậm. Hãy bấm nộp bài lại 1-2 lần nữa nhé!";
+            
+            // Thông báo lỗi thân thiện hơn
+            if (e.message === "SERVER_ERROR") msg = "Server đang bận (504). Bài quá dài, Nhân hãy bấm nộp lại 1-2 lần nhé!";
+            if (e.message === "INVALID_FORMAT") msg = "AI trả về dữ liệu bị lỗi format. Vui lòng nộp lại!";
+            if (e.message === "NO_CONTENT") msg = "AI từ chối phản hồi (có thể do nội dung vi phạm chính sách).";
+
             showPopup("Thông báo", msg, "error");
         } finally {
             loading.style.display = 'none';

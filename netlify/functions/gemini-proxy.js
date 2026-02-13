@@ -1,56 +1,50 @@
-// netlify/functions/gemini-proxy.js
-exports.handler = async (event) => {
-    // 1. Xử lý yêu cầu OPTIONS (CORS Preflight)
-    // Trình duyệt sẽ gửi yêu cầu này trước khi gửi POST thật để kiểm tra quyền truy cập
-    if (event.httpMethod === "OPTIONS") {
-        return {
-            statusCode: 200,
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Headers": "Content-Type",
-                "Access-Control-Allow-Methods": "POST, OPTIONS"
-            },
-            body: ""
-        };
+// netlify/functions/groq-proxy.js (hoặc sửa đè lên gemini-proxy.js)
+
+export default async (req, context) => {
+  if (req.method !== "POST") {
+    return new Response("Method Not Allowed", { status: 405 });
+  }
+
+  try {
+    const body = await req.json();
+    const { messages, systemPrompt } = body;
+
+    // Cấu trúc messages chuẩn cho Groq (giống OpenAI)
+    const conversation = [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: messages } // messages ở đây là bài làm của học sinh
+    ];
+
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${Netlify.env.get("GROQ_API_KEY")}`, // Đảm bảo đã set biến này trên Netlify
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile", // Mô hình Llama 3 mới nhất, cực thông minh và nhanh
+        messages: conversation,
+        temperature: 0.3, // Giảm độ sáng tạo để chấm điểm chính xác hơn
+        max_tokens: 4096,
+        response_format: { type: "json_object" } // Ép Groq trả về JSON chuẩn luôn (tính năng xịn của Groq)
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error?.message || "Groq API Error");
     }
 
-    // 2. Lấy API KEY từ biến môi trường của Netlify
-    const API_KEY = process.env.GEMINI_API_KEY; 
-    
-    // 3. Cấu hình Model (Sử dụng gemini-1.5-flash để tốc độ phản hồi nhanh nhất)
-    const MODEL_NAME = "gemini-2.5-flash"; 
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
+    // Trả về đúng cấu trúc để Frontend xử lý
+    return new Response(JSON.stringify(data), {
+      headers: { "Content-Type": "application/json" },
+    });
 
-
-    try {
-        // 4. Gửi yêu cầu từ Server Netlify đến Google API
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: event.body 
-        });
-
-        const data = await response.json();
-
-        // 5. Trả kết quả về cho trình duyệt kèm theo Headers cho phép truy cập
-        return {
-            statusCode: 200,
-            headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Headers": "Content-Type"
-            },
-            body: JSON.stringify(data)
-        };
-    } catch (error) {
-        console.error("Proxy Error:", error);
-        return { 
-            statusCode: 500, 
-            headers: { 
-                "Access-Control-Allow-Origin": "*",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ error: "Lỗi kết nối AI: " + error.message }) 
-        };
-    }
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 };
