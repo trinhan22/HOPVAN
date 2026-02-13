@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hopvan - Luyện Đề Trắc Nghiệm</title>
+    <title>HopVan - Luyện Đề Trắc Nghiệm</title>
+    
     <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
-    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh." />
     <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
     <meta property="og:url" content="https://hopvan.netlify.app" />
     <meta property="og:type" content="article" />
 
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF8F50">
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -19,7 +24,6 @@
         :root {
             --primary: #FF8F50;
             --primary-dark: #e67e22;
-            --bg-body: #f8f9fa;
             --border-color: #dee2e6;
             --sidebar-width: 320px;
         }
@@ -27,255 +31,193 @@
         * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
         
         body { 
-            background-color: var(--bg-body); 
+            background-color: #f8f9fa; 
             height: 100vh; overflow: hidden; display: flex; flex-direction: column;
         }
 
+        /* --- SCROLLBAR ĐẸP --- */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; transition: 0.3s; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
         /* --- HEADER --- */
         .exam-header {
-            height: 60px; background: white; border-bottom: 1px solid var(--border-color);
+            height: 65px; background: white; border-bottom: 1px solid var(--border-color);
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; flex-shrink: 0; z-index: 50;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            padding: 0 25px; flex-shrink: 0; z-index: 50;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
         .exam-title { font-weight: 800; font-size: 1.1rem; color: #2d3436; text-transform: uppercase; }
         .exam-timer {
-            background: #fff7ed; color: #c2410c; 
-            padding: 6px 16px; border-radius: 6px; 
-            font-weight: 800; font-size: 1.2rem; border: 1px solid #ffedd5;
-            display: flex; align-items: center; gap: 8px;
+            background: #2d3436; color: white; 
+            padding: 8px 20px; border-radius: 12px; 
+            font-weight: 700; font-size: 1.2rem; font-family: 'Monaco', monospace;
+            display: flex; align-items: center; gap: 10px;
         }
 
         /* --- MAIN LAYOUT --- */
-        .exam-container {
-            flex: 1; display: flex; overflow: hidden; position: relative;
-        }
+        .exam-container { flex: 1; display: flex; overflow: hidden; }
 
-        /* LEFT: QUESTION LIST */
         .question-stream {
             flex: 1; overflow-y: auto; padding: 30px;
-            scroll-behavior: smooth;
-            background: #f8f9fa;
+            background: #fdfdfd;
         }
-        .question-stream::-webkit-scrollbar { width: 8px; }
-        .question-stream::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-
+        
         .q-card {
-            background: white; border: 1px solid var(--border-color);
-            border-radius: 8px; padding: 20px 25px; margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            background: white; border: 1px solid #f1f5f9;
+            border-radius: 20px; padding: 25px; margin-bottom: 25px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.02);
             scroll-margin-top: 20px;
         }
-        .q-card.active { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
 
-        .q-meta { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
         .q-num { 
-            background: #2d3436; color: white; font-weight: 700; 
-            padding: 4px 10px; border-radius: 4px; font-size: 0.9rem; 
+            background: #fff7ed; color: #ea580c; font-weight: 800; 
+            padding: 4px 12px; border-radius: 8px; font-size: 0.8rem; border: 1px solid #fed7aa;
+            display: inline-block; margin-bottom: 15px;
         }
-        .q-id { color: #95a5a6; font-size: 0.85rem; font-weight: 600; }
         
+        /* CÂU HỎI CHỮ THƯỜNG (THIN) */
         .q-content { 
-            font-size: 1.05rem; 
-            color: #2d3436; 
-            font-weight: 600; 
-            line-height: 1.6; 
-            margin-bottom: 20px; 
-            /* THÊM DÒNG NÀY */
+            font-size: 1.1rem; color: #1e293b; 
+            font-weight: 400; 
+            line-height: 1.8; margin-bottom: 25px; 
             white-space: pre-wrap; 
-            word-break: break-word;
         }
 
-        .opt-group { display: flex; flex-direction: column; gap: 10px; }
         .opt-label {
-            display: flex; align-items: flex-start; gap: 12px; cursor: pointer;
-            padding: 12px 15px; border-radius: 6px; border: 1px solid #edf2f7;
-            transition: 0.2s;
+            display: flex; align-items: center; gap: 12px; cursor: pointer;
+            padding: 14px 20px; border-radius: 12px; border: 1px solid #f1f5f9;
+            transition: 0.2s; margin-bottom: 10px; background: #f8fafc;
         }
         .opt-label:hover { background: #fff7ed; border-color: #fed7aa; }
-        
-        .opt-radio {
-            appearance: none; width: 18px; height: 18px; border: 2px solid #cbd5e1; border-radius: 50%;
-            margin-top: 3px; flex-shrink: 0; position: relative;
-        }
-        .opt-radio:checked { border-color: var(--primary); background: var(--primary); }
-        .opt-radio:checked::after {
-            content: ''; position: absolute; inset: 4px; background: white; border-radius: 50%;
-        }
-        
         .opt-label.selected { background: #fff7ed; border-color: var(--primary); }
-        .opt-label.correct { background: #dcfce7 !important; border-color: #22c55e !important; }
-        .opt-label.wrong { background: #fee2e2 !important; border-color: #ef4444 !important; }
+        .opt-label.correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #166534; }
+        .opt-label.wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #991b1b; }
 
-        .q-explain {
-            margin-top: 15px; 
-            padding: 15px; 
-            background: #ecfdf5; 
-            border: 1px solid #a7f3d0;
-            border-radius: 6px; 
-            font-size: 0.95rem; 
-            color: #065f46; 
-            display: none;
-            /* THÊM DÒNG NÀY */
-            white-space: pre-wrap;
-        }
-
-        /* RIGHT: SIDEBAR (INFO & MATRIX) */
+        /* --- SIDEBAR --- */
         .exam-sidebar {
             width: var(--sidebar-width); background: white; border-left: 1px solid var(--border-color);
             display: flex; flex-direction: column; flex-shrink: 0;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.02);
         }
-
-        .student-info {
-            padding: 20px; border-bottom: 1px solid var(--border-color);
-            background: #fafafa;
-        }
-        .student-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
-        .st-label { color: #636e72; }
-        .st-val { font-weight: 700; color: #2d3436; }
-
-        .matrix-container { flex: 1; padding: 20px; overflow-y: auto; }
-        .matrix-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 15px; color: #2d3436; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .question-grid {
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
-        }
+        .matrix-container { flex: 1; padding: 25px; overflow-y: auto; }
+        .question-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         .q-dot {
-            height: 35px; border-radius: 4px; border: 1px solid #dee2e6;
+            height: 40px; border-radius: 10px; border: 1px solid #e2e8f0;
             display: flex; align-items: center; justify-content: center;
-            font-size: 0.9rem; font-weight: 600; color: #636e72; cursor: pointer;
+            font-size: 0.85rem; font-weight: 700; color: #64748b; cursor: pointer;
             transition: 0.2s; background: white;
         }
-        .q-dot:hover { border-color: var(--primary); color: var(--primary); }
-        
-        .q-dot.done { background: #fed7aa; color: #c2410c; border-color: #fed7aa; }
+        .q-dot.done { background: #ea580c; color: white; border-color: #ea580c; }
         .q-dot.correct { background: #22c55e; color: white; border-color: #22c55e; }
         .q-dot.wrong { background: #ef4444; color: white; border-color: #ef4444; }
 
-        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-color); background: white; }
         .btn-submit {
-            width: 100%; padding: 12px; border-radius: 6px; border: none;
+            width: 100%; padding: 14px; border-radius: 12px; border: none;
             background: linear-gradient(135deg, #FF8F50, #FF5E62);
-            color: white; font-weight: 700; text-transform: uppercase; cursor: pointer;
-            transition: 0.3s; box-shadow: 0 4px 6px rgba(255, 143, 80, 0.2);
+            color: white; font-weight: 800; text-transform: uppercase; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 143, 80, 0.3); transition: 0.3s;
         }
-        .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); }
 
-        /* MODAL POPUP (CONFIRMATION) */
-        .modal-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
-            z-index: 1000; justify-content: center; align-items: center; padding: 20px;
-            animation: fadeIn 0.2s ease;
+        /* --- POPUP MODAL --- */
+        .custom-modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px); z-index: 20000;
+            justify-content: center; align-items: center;
         }
         .modal-box {
-            background: white; border-radius: 20px; padding: 30px; width: 100%; max-width: 400px;
-            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-            transform: scale(0.9); animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            background: white; padding: 35px; border-radius: 28px;
+            width: 90%; max-width: 420px; text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        @keyframes popIn { to { transform: scale(1); } }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
-        /* Loading */
-        .loading-overlay { 
-            position: fixed; inset: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(5px);
-            z-index: 1100; display: none; flex-direction: column; align-items: center; justify-content: center;
-        }
+        .modal-icon { font-size: 3.5rem; margin-bottom: 15px; }
+        .modal-actions { display: flex; gap: 12px; margin-top: 25px; }
+        .btn-modal { flex: 1; padding: 12px; border-radius: 12px; font-weight: 800; transition: 0.2s; }
+        .btn-cancel { background: #f1f5f9; color: #64748b; }
+        .btn-confirm { background: var(--primary); color: white; }
+        .btn-confirm-red { background: #ef4444; color: white; }
 
-        /* Mobile */
-        .mobile-toggle { display: none; }
-        @media (max-width: 1024px) {
-            .exam-sidebar { 
-                position: fixed; right: -100%; top: 60px; bottom: 0; width: 280px; 
-                z-index: 100; transition: 0.3s;
-            }
-            .exam-sidebar.open { right: 0; }
-            .mobile-toggle { display: block; font-size: 1.5rem; cursor: pointer; }
-            .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90; }
-            .overlay.show { display: block; }
-        }
+        .popup-error .modal-icon { color: #ef4444; }
+        .popup-warning .modal-icon { color: #f59e0b; }
     </style>
 </head>
-<body>
+<body class="custom-scrollbar">
 
-    <div class="loading-overlay" id="loading-overlay">
-        <i class="fas fa-circle-notch fa-spin text-4xl text-orange-500"></i>
-        <p class="mt-3 font-bold text-gray-600">Đang nộp bài...</p>
-    </div>
-
-    <div class="modal-overlay" id="confirm-modal">
-        <div class="modal-box">
-            <div class="text-orange-500 text-5xl mb-4"><i class="fas fa-question-circle"></i></div>
-            <h3 class="text-2xl font-black text-gray-800 mb-2">Nộp bài thi?</h3>
-            <p id="confirm-msg" class="text-gray-600 mb-6 font-medium">Bạn có chắc chắn muốn nộp bài không?</p>
-            <div class="flex gap-3 justify-center">
-                <button onclick="closeConfirmModal()" class="px-5 py-2.5 rounded-lg font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition">
-                    Xem lại
-                </button>
-                <button onclick="submitQuiz()" class="px-5 py-2.5 rounded-lg font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:shadow-lg transition">
-                    Nộp ngay
-                </button>
+    <div id="submit-confirm-popup" class="custom-modal">
+        <div class="modal-box popup-warning">
+            <div class="modal-icon"><i class="fas fa-question-circle"></i></div>
+            <h3 class="font-black text-2xl mb-2 text-gray-800">Nộp bài thi?</h3>
+            <p id="submit-popup-msg" class="text-gray-600 leading-relaxed">Bạn có chắc chắn muốn nộp bài không?</p>
+            <div class="modal-actions">
+                <button onclick="closeSubmitPopup()" class="btn-modal btn-cancel">Hủy</button>
+                <button onclick="submitQuiz()" class="btn-modal btn-confirm">Xác nhận nộp</button>
             </div>
         </div>
+    </div>
+
+    <div id="generic-popup" class="custom-modal">
+        <div class="modal-box" id="popup-box">
+            <div id="popup-icon" class="modal-icon"><i class="fas fa-info-circle"></i></div>
+            <h3 id="popup-title" class="font-bold text-xl mb-2">Thông báo</h3>
+            <p id="popup-message" class="text-gray-600"></p>
+            <div class="mt-6">
+                <button onclick="document.getElementById('generic-popup').style.display='none'" class="w-full py-3 rounded-xl bg-gray-800 text-white font-bold">Đã hiểu</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading-overlay" class="fixed inset-0 bg-white/90 z-[10000] hidden flex-col items-center justify-center">
+        <i class="fas fa-circle-notch fa-spin text-4xl text-orange-500"></i>
+        <p class="mt-3 font-bold text-gray-500">Đang chấm điểm...</p>
     </div>
 
     <header class="exam-header">
         <div class="flex items-center gap-4">
-            <a href="../dashboard/phongluyende.html" class="flex items-center gap-2 text-gray-600 hover:text-orange-500 transition">
-                <i class="fas fa-arrow-left"></i> <span class="font-bold hidden sm:inline">Thoát</span>
+            <a href="../dashboard/phongluyende.html" class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:text-orange-500 transition border border-gray-100">
+                <i class="fas fa-arrow-left"></i>
             </a>
-            <div class="h-6 w-px bg-gray-300 mx-2 hidden sm:block"></div>
-            <h1 class="exam-title text-sm sm:text-base">Luyện Đề Trắc Nghiệm</h1>
+            <h1 class="exam-title">Luyện Đề Trắc Nghiệm</h1>
         </div>
-        
-        <div class="flex items-center gap-4">
-            <div class="exam-timer">
-                <i class="far fa-clock"></i> <span id="timer">45:00</span>
-            </div>
-            <i class="fas fa-th mobile-toggle text-gray-600" onclick="toggleSidebar()"></i>
+        <div class="exam-timer">
+            <i class="far fa-clock"></i> <span id="timer">40:00</span>
         </div>
     </header>
 
     <div class="exam-container">
-        <div class="overlay" id="mobile-overlay" onclick="toggleSidebar()"></div>
-
-        <main class="question-stream" id="quiz-container">
+        <main class="question-stream custom-scrollbar" id="quiz-container">
             <div class="text-center mt-20">
-                <i class="fas fa-spinner fa-spin text-4xl text-orange-400"></i>
-                <p class="mt-3 text-gray-500 font-bold">Đang tải đề thi...</p>
+                <i class="fas fa-circle-notch fa-spin text-4xl text-orange-400"></i>
+                <p class="mt-3 text-gray-400 font-bold">Đang khởi tạo 30 câu hỏi...</p>
             </div>
         </main>
 
-        <aside class="exam-sidebar" id="sidebar">
-            <div class="student-info">
-                <div class="student-row">
-                    <span class="st-label">Thí sinh:</span>
-                    <span class="st-val" id="student-name"></span>
-                </div>
-                <div class="student-row">
-                    <span class="st-label">Môn thi:</span>
-                    <span class="st-val">Văn Học</span>
-                </div>
-                <div class="student-row">
-                    <span class="st-label">Số câu:</span>
-                    <span class="st-val" id="total-q-count">0</span>
-                </div>
-            </div>
-
-            <div class="matrix-container">
-                <div class="matrix-title">Danh sách câu hỏi</div>
-                <div class="question-grid" id="question-matrix">
+        <aside class="exam-sidebar">
+            <div class="p-6 border-b bg-gray-50/50">
+                <div class="flex items-center gap-3 mb-4">
+                    <div id="user-avatar" class="w-11 h-11 rounded-full bg-orange-500 text-white flex items-center justify-center font-black text-lg shadow-lg">?</div>
+                    <div>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Thí sinh</p>
+                        <p class="font-bold text-gray-800" id="student-name">Đang tải...</p>
                     </div>
+                </div>
+                <div class="flex justify-between text-xs font-bold text-gray-500 uppercase">
+                    <span>Số câu: <b class="text-orange-600">30</b></span>
+                    <span>Môn: <b>Ngữ Văn</b></span>
+                </div>
             </div>
 
-            <div class="sidebar-footer">
-                <button onclick="openConfirmModal()" id="btn-submit" class="btn-submit">
-                    Nộp Bài Thi
-                </button>
-                <button onclick="resetQuiz()" id="btn-retry" class="btn-submit hidden bg-gray-500 !bg-none !bg-gray-600">
-                    Làm Đề Khác
-                </button>
-                <div class="mt-3 text-center">
-                    <p id="score-text" class="text-xl font-black text-orange-500 hidden">0.00 Điểm</p>
+            <div class="matrix-container custom-scrollbar">
+                <div class="question-grid" id="question-matrix"></div>
+            </div>
+
+            <div class="p-6 border-t bg-white">
+                <button onclick="openSubmitPopup()" id="btn-submit" class="btn-submit">Nộp Bài Thi</button>
+                <button onclick="location.reload()" id="btn-retry" class="btn-submit hidden !bg-gray-800">Làm Đề Khác</button>
+                <div id="score-display" class="mt-4 text-center hidden">
+                    <p id="score-text" class="text-4xl font-black text-orange-500">0.00</p>
                 </div>
             </div>
         </aside>
@@ -286,7 +228,6 @@
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     
-    // --- FIREBASE CONFIG ---
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -295,235 +236,125 @@
     let allQuestions = [];
     let userAnswers = {};
     let isSubmitted = false;
+    let timeLeft = 2400; // 40 phút
 
-    // 1. Auth & Load User Info
-    onAuthStateChanged(auth, (u) => {
-        if (u) {
-            document.getElementById('student-name').innerText = u.displayName || "Học sinh";
-        } else {
-            window.location.href = "../log.html"; // Chuyển hướng nếu chưa đăng nhập
-        }
+    // --- POPUP LOGIC ---
+    window.openSubmitPopup = () => {
+        const modal = document.getElementById('submit-confirm-popup');
+        const msg = document.getElementById('submit-popup-msg');
+        const done = Object.keys(userAnswers).length;
+        msg.innerHTML = `Bạn đã hoàn thành <b>${done}/30</b> câu. Bạn có chắc chắn muốn nộp bài ngay bây giờ không?`;
+        modal.style.display = 'flex';
+    };
+    window.closeSubmitPopup = () => document.getElementById('submit-confirm-popup').style.display = 'none';
+
+    window.showGenericPopup = (title, message, type = 'info') => {
+        const modal = document.getElementById('generic-popup');
+        const box = document.getElementById('popup-box');
+        box.classList.remove('popup-error', 'popup-warning');
+        if(type === 'error') box.classList.add('popup-error');
+        if(type === 'warning') box.classList.add('popup-warning');
+        document.getElementById('popup-title').innerText = title;
+        document.getElementById('popup-message').innerText = message;
+        modal.style.display = 'flex';
+    };
+
+    onAuthStateChanged(auth, u => {
+        if(u) {
+            document.getElementById('student-name').innerText = u.displayName || u.email;
+            document.getElementById('user-avatar').innerText = (u.displayName || u.email).charAt(0).toUpperCase();
+            loadQuizData();
+        } else window.location.href = "../log.html";
     });
 
-    // 2. Load Data
     async function loadQuizData() {
-        const qContainer = document.getElementById('quiz-container');
         try {
-            // Trích xuất dữ liệu từ collection quiz_bank
-            const querySnapshot = await getDocs(collection(db, "quiz_bank"));
-            const rawData = [];
-            
-            querySnapshot.forEach((doc) => {
-                rawData.push({ id: doc.id, ...doc.data() });
-            });
-
-            if (rawData.length === 0) {
-                qContainer.innerHTML = `<p class="text-center py-10 text-gray-400 font-bold">Kho đề trắc nghiệm đang trống. Hãy thêm câu hỏi ở trang Admin.</p>`;
-                return;
-            }
-
-            // Trộn ngẫu nhiên và lấy tối đa 20 câu
-            allQuestions = rawData.sort(() => 0.5 - Math.random()).slice(0, 20); 
-            renderQuiz();
-        } catch (error) {
-            console.error("Lỗi tải đề:", error);
-            qContainer.innerHTML = `<p class="text-red-500 text-center font-bold">Lỗi kết nối Firebase: ${error.message}</p>`;
-        }
+            const snap = await getDocs(collection(db, "quiz_bank"));
+            const raw = []; snap.forEach(doc => raw.push({ id: doc.id, ...doc.data() }));
+            allQuestions = raw.sort(() => 0.5 - Math.random()).slice(0, 30);
+            renderQuiz(); startTimer();
+        } catch (e) { showGenericPopup("Lỗi", "Không thể tải đề thi!", "error"); }
     }
 
-    // 3. Render
     function renderQuiz() {
         const qContainer = document.getElementById('quiz-container');
         const mContainer = document.getElementById('question-matrix');
-        const totalCount = document.getElementById('total-q-count');
-        
-        qContainer.innerHTML = '';
-        mContainer.innerHTML = '';
-        totalCount.innerText = allQuestions.length;
-        
-        userAnswers = {};
-        isSubmitted = false;
-        
-        document.getElementById('btn-submit').classList.remove('hidden');
-        document.getElementById('btn-retry').classList.add('hidden');
-        document.getElementById('score-text').classList.add('hidden');
-
-        allQuestions.forEach((q, index) => {
+        qContainer.innerHTML = ''; mContainer.innerHTML = '';
+        allQuestions.forEach((q, i) => {
             const card = document.createElement('div');
-            card.className = 'q-card';
-            card.id = `q-${index}`;
-            
-            let optionsHtml = '';
-            q.options.forEach((opt, optIndex) => {
-                optionsHtml += `
-                    <label class="opt-label" id="lbl-${index}-${optIndex}">
-                        <input type="radio" name="q${index}" class="opt-radio" 
-                               onchange="handleSelect(${index}, ${optIndex})">
-                        <span class="text-gray-700 text-sm font-medium">${opt}</span>
-                    </label>
-                `;
-            });
-
-            card.innerHTML = `
-                <div class="q-meta">
-                    <span class="q-num">Câu ${index + 1}</span>
-                    <span class="q-id">ID: #${q.id}</span>
-                </div>
-                <div class="q-content">${q.question}</div>
-                <div class="opt-group">${optionsHtml}</div>
-                <div class="q-explain" id="explain-${index}">
-                    <strong><i class="fas fa-check-circle"></i> Giải thích:</strong> ${q.explanation}
-                </div>
-            `;
+            card.className = 'q-card'; card.id = `q-${i}`;
+            let optionsHtml = q.options.map((opt, oi) => `
+                <label class="opt-label" id="lbl-${i}-${oi}">
+                    <input type="radio" name="q${i}" class="hidden" onchange="handleSelect(${i}, ${oi})">
+                    <span class="w-7 h-7 rounded-full border-2 border-gray-200 flex items-center justify-center text-[10px] font-bold transition-all">${String.fromCharCode(65 + oi)}</span>
+                    <span class="text-gray-700 text-sm font-medium">${opt}</span>
+                </label>`).join('');
+            card.innerHTML = `<span class="q-num">Câu ${i+1}</span><div class="q-content">${q.question}</div><div class="opt-group">${optionsHtml}</div><div class="hidden mt-4 p-4 bg-green-50 border border-green-100 rounded-xl text-sm text-green-700" id="explain-${i}"><b>Giải thích:</b> ${q.explanation}</div>`;
             qContainer.appendChild(card);
-
             const dot = document.createElement('div');
-            dot.className = 'q-dot';
-            dot.innerText = index + 1;
-            dot.id = `dot-${index}`;
-            dot.onclick = () => {
-                document.getElementById(`q-${index}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
-                if(window.innerWidth <= 1024) toggleSidebar();
-            };
+            dot.className = 'q-dot'; dot.innerText = i + 1; dot.id = `dot-${i}`;
+            dot.onclick = () => document.getElementById(`q-${i}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
             mContainer.appendChild(dot);
         });
     }
 
-    // 4. Handle Selection
-    window.handleSelect = (qIndex, optIndex) => {
+    window.handleSelect = (qi, oi) => {
         if(isSubmitted) return;
-        userAnswers[qIndex] = optIndex;
-        
-        const labels = document.querySelectorAll(`#q-${qIndex} .opt-label`);
-        labels.forEach(l => l.classList.remove('selected'));
-        document.getElementById(`lbl-${qIndex}-${optIndex}`).classList.add('selected');
-        document.getElementById(`dot-${qIndex}`).classList.add('done');
+        userAnswers[qi] = oi;
+        document.querySelectorAll(`#q-${qi} .opt-label`).forEach(l => l.classList.remove('selected'));
+        document.getElementById(`lbl-${qi}-${oi}`).classList.add('selected');
+        document.getElementById(`dot-${qi}`).classList.add('done');
     };
 
-    // 5. Modal Logic
-    window.openConfirmModal = () => {
-        const modal = document.getElementById('confirm-modal');
-        const msg = document.getElementById('confirm-msg');
-        
-        const doneCount = Object.keys(userAnswers).length;
-        const total = allQuestions.length;
-        const remain = total - doneCount;
-
-        if(remain > 0) {
-            msg.innerHTML = `Bạn mới hoàn thành <b class="text-orange-600">${doneCount}/${total}</b> câu.<br>Vẫn còn <b class="text-red-500">${remain}</b> câu chưa làm.`;
-        } else {
-            msg.innerHTML = `Bạn đã hoàn thành tất cả <b class="text-green-600">${total}</b> câu.<br>Bạn có chắc muốn nộp bài không?`;
-        }
-        
-        modal.style.display = 'flex';
-    };
-
-    window.closeConfirmModal = () => {
-        document.getElementById('confirm-modal').style.display = 'none';
-    };
-
-    // 6. Submit Logic
     window.submitQuiz = async () => {
-        closeConfirmModal(); // Đóng modal trước
+        closeSubmitPopup();
         document.getElementById('loading-overlay').style.display = 'flex';
-        
         isSubmitted = true;
         let score = 0;
 
-        // Grading Logic
-        // Tìm đoạn này trong hàm submitQuiz và sửa lại keys:
-        allQuestions.forEach((q, index) => {
-            const selected = userAnswers[index];
-            const correct = q.correct; // Sửa từ correct_index thành correct (theo data Admin)
-            const dot = document.getElementById(`dot-${index}`);
-            const explain = document.getElementById(`explain-${index}`);
-
-            const radios = document.querySelectorAll(`input[name="q${index}"]`);
-            radios.forEach(r => r.disabled = true);
-
-            // Hiển thị giải thích nếu có
-            if(q.explanation && explain) explain.style.display = 'block'; 
-
+        allQuestions.forEach((q, i) => {
+            const selected = userAnswers[i];
+            const correct = q.correct;
+            const dot = document.getElementById(`dot-${i}`);
+            if(q.explanation) document.getElementById(`explain-${i}`).classList.remove('hidden');
             if (selected === correct) {
-                score++;
-                dot.classList.add('correct');
-                document.getElementById(`lbl-${index}-${selected}`).classList.add('correct');
+                score++; dot.className = 'q-dot correct';
+                document.getElementById(`lbl-${i}-${selected}`).className = 'opt-label correct';
             } else {
-                dot.classList.add('wrong');
-                if (selected !== undefined) {
-                    document.getElementById(`lbl-${index}-${selected}`).classList.add('wrong');
-                }
-                // Luôn hiển thị đáp án đúng để học sinh đối chiếu
-                document.getElementById(`lbl-${index}-${correct}`).classList.add('correct');
+                dot.className = 'q-dot wrong';
+                if (selected !== undefined) document.getElementById(`lbl-${i}-${selected}`).className = 'opt-label wrong';
+                document.getElementById(`lbl-${i}-${correct}`).className = 'opt-label correct';
             }
         });
 
         const finalScore = (score / allQuestions.length) * 10;
-        const scoreText = document.getElementById('score-text');
-        scoreText.innerText = `${finalScore.toFixed(2)} ĐIỂM`;
-        scoreText.classList.remove('hidden');
-
+        document.getElementById('score-text').innerText = `${finalScore.toFixed(2)} ĐIỂM`;
+        document.getElementById('score-display').classList.remove('hidden');
         document.getElementById('btn-submit').classList.add('hidden');
         document.getElementById('btn-retry').classList.remove('hidden');
-        
         clearInterval(timerInterval);
 
-        // Save to Firestore
         if (auth.currentUser) {
-            try {
-                await addDoc(collection(db, "activities"), {
-                    uid: auth.currentUser.uid,
-                    action: `Hoàn thành Trắc nghiệm: ${score}/${allQuestions.length} câu (${finalScore.toFixed(1)} điểm)`,
-                    type: "quiz",
-                    timestamp: serverTimestamp()
-                });
-            } catch (e) {
-                console.error("Lỗi lưu kết quả: ", e);
-            }
+            await addDoc(collection(db, "activities"), {
+                uid: auth.currentUser.uid,
+                action: `Trắc nghiệm: ${score}/30 câu (${finalScore.toFixed(1)}đ)`,
+                type: "quiz", timestamp: serverTimestamp()
+            });
         }
-
         document.getElementById('loading-overlay').style.display = 'none';
     };
 
-    window.resetQuiz = () => {
-        if(confirm("Làm đề khác nhé?")) {
-            loadQuizData();
-            startTimer();
-        }
-    };
-
-    // 7. Timer
-    let timeLeft = 2700; // 45 phút
     let timerInterval;
-    
     function startTimer() {
-        clearInterval(timerInterval);
-        timeLeft = 2700; 
-        const el = document.getElementById('timer');
-        
         timerInterval = setInterval(() => {
-            if(timeLeft <= 0) {
-                clearInterval(timerInterval);
-                submitQuiz(); // Tự động nộp
-                alert("Hết giờ làm bài! Hệ thống đã tự động nộp bài.");
-            } else {
+            if(timeLeft <= 0) { clearInterval(timerInterval); submitQuiz(); showGenericPopup("Hết giờ", "Thời gian đã hết, hệ thống tự động nộp bài!", "warning"); }
+            else {
                 timeLeft--;
-                const m = Math.floor(timeLeft / 60);
-                const s = timeLeft % 60;
-                el.innerText = `${m}:${s < 10 ? '0' + s : s}`;
+                const m = Math.floor(timeLeft / 60); const s = timeLeft % 60;
+                document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' + s : s}`;
             }
         }, 1000);
     }
-
-    // 8. Mobile UI
-    window.toggleSidebar = () => {
-        document.getElementById('sidebar').classList.toggle('open');
-        document.getElementById('mobile-overlay').classList.toggle('show');
-    };
-
-    loadQuizData();
-    startTimer();
-
 </script>
 </body>
 </html>

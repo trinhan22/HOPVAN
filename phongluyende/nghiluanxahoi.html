@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>HopVan - Luyện Đề NLXH</title>
     
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#FF8F50">
-    <link rel="apple-touch-icon" href="../LOGO.WEBP">
-
     <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
     <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh." />
     <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
@@ -16,581 +12,542 @@
     <meta property="og:type" content="article" />
 
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF8F50">
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
     <style>
         :root {
             --primary: #FF8F50;
-            --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --sidebar-width: 280px;
+            --glass-bg: rgba(255, 255, 255, 0.95);
         }
 
-        * { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
-        
         body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
             background-color: #FFF5EC; 
-            height: 100vh; 
-            overflow: hidden; 
-            position: relative;
+            height: 100vh; overflow: hidden; 
         }
 
-        /* --- BACKGROUND --- */
-        .background-blobs { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
-        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: floatBlob 10s infinite alternate; }
-        .blob-1 { width: 600px; height: 600px; background: #FCA96A; top: -150px; left: -150px; }
-        .blob-2 { width: 500px; height: 500px; background: #FCD5B5; bottom: -100px; right: -100px; }
-        @keyframes floatBlob { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, 60px); } }
+        /* --- ẨN SIDEBAR --- */
+        #menu-placeholder { display: none !important; }
 
-        /* --- LAYOUT CHÍNH (Đã Fix Hở Sườn & Menu) --- */
-        .dashboard-container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-
-        /* PC: Menu cố định bên trái */
-        #menu-placeholder {
-            position: fixed;
-            top: 0; left: 0;
-            width: var(--sidebar-width);
-            height: 100vh;
-            z-index: 50;
-        }
-
-        /* PC: Nội dung tràn màn hình, dùng padding để né menu */
         .main-content {
-            width: 100%;
-            height: 100vh;
+            width: 100%; height: 100vh;
             background: var(--glass-bg);
-            backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
-            
-            margin-left: 0;
-            padding-top: 40px;
-            padding-bottom: 40px;
-            padding-right: 40px;
-            padding-left: calc(var(--sidebar-width) + 40px); /* 280px + 40px */
-            
-            overflow-y: auto;
-            position: relative;
-            -webkit-overflow-scrolling: touch;
-            border-left: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 20px 40px;
+            display: flex; flex-direction: column;
         }
 
-        /* --- MOBILE HEADER & OVERLAY --- */
-        .mobile-header {
-            display: none; position: fixed; top: 0; left: 0; right: 0;
-            height: 70px; background: white; z-index: 100;
-            align-items: center; padding: 0 20px; border-bottom: 1px solid #f0f0f0;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
-        }
-        #sidebar-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
-            z-index: 998;
-        }
+        .header-bar { flex-shrink: 0; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; flex: 1; overflow: hidden; padding-bottom: 20px; }
 
-        /* --- UI ELEMENTS --- */
-        .prompt-card {
-            background: white; border-radius: 30px; padding: 35px;
+        /* --- CỘT TRÁI: ĐỀ BÀI (STYLE GIẤY THI) --- */
+        .column-card {
+            background: white; border-radius: 24px; 
             border: 1px solid rgba(255, 143, 80, 0.2);
-            box-shadow: 0 15px 35px rgba(255, 143, 80, 0.05);
-            position: relative; overflow: hidden; margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            display: flex; flex-direction: column; 
+            height: 100%; overflow: hidden;
         }
-        .prompt-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: var(--primary-gradient);
+        .card-header {
+            padding: 16px 24px; background: #fff7ed; border-bottom: 1px solid #fed7aa;
+            display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+        }
+        .prompt-body { 
+            padding: 30px; overflow-y: auto; flex: 1; 
+            background-color: #fffcf8; /* Nền giấy ngà nhẹ */
+            transition: font-size 0.2s ease;
         }
 
-        .workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; min-height: 500px; }
-
-        .editor-container {
-            background: white; border-radius: 30px; border: 1px solid rgba(0,0,0,0.05);
-            display: flex; flex-direction: column; overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.02); transition: 0.3s;
-            height: 100%;
+        /* KHUNG CHỨA NỘI DUNG */
+        .passage-box {
+            background: white; padding: 24px; 
+            border-radius: 16px; border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            margin-bottom: 20px;
+            position: relative;
         }
-        .editor-container:focus-within { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 20px 50px rgba(255, 143, 80, 0.1); }
+        
+        /* TYPOGRAPHY CHỮ THƯỜNG (THIN) */
+        .exam-content {
+            font-family: 'Merriweather', serif;
+            font-weight: 300; /* Chữ mảnh Thin */
+            font-size: 1.1rem; 
+            line-height: 2.0; /* Dãn dòng rộng */
+            color: #1e293b; 
+            text-align: justify;
+            white-space: pre-wrap;
+        }
 
+        /* --- CỘT PHẢI: BÀI LÀM --- */
         .writing-area { 
-            flex: 1; width: 100%; padding: 30px; border: none; outline: none; resize: none; 
-            font-size: 1.1rem; line-height: 1.9; color: #1E293B; 
-            /* Thay đổi: Nền trắng đặc 100% để tách biệt hẳn với nền kính */
-            background: #FFFFFF !important; 
-            border-radius: 0 0 30px 30px;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+            width: 100%; height: 100%; padding: 24px; 
+            border: none; outline: none; resize: none; 
+            font-size: 1.1rem; line-height: 2.0; 
+            color: #334155; background: transparent;
+            font-family: 'Merriweather', serif;
+            background-image: linear-gradient(#f1f5f9 1px, transparent 1px);
+            background-size: 100% 2.2rem; background-attachment: local;
+            font-weight: 300;
         }
-
-        #prompt-passage {
-            white-space: pre-wrap; /* Giữ định dạng xuống dòng nếu đề có ngữ liệu thơ/văn */
-            line-height: 1.8;
+        .footer-action {
+            padding: 16px; border-top: 1px solid #f1f5f9; background: white; 
+            display: flex; justify-content: flex-end; flex-shrink: 0;
         }
-
-        .ai-result-view { padding: 30px; font-size: 1.1rem; line-height: 1.9; overflow-y: auto; background-color: #fafafa; height: 100%; }
-        
-        .text-good { color: #10B981; background: #ECFDF5; font-weight: 600; padding: 2px 4px; border-radius: 6px; text-decoration: none; }
-        .text-bad { color: #EF4444; background: #FEF2F2; text-decoration: line-through; padding: 2px 4px; border-radius: 6px; }
-        .text-fix { color: #3B82F6; font-weight: 700; font-style: italic; }
-
-        .ai-meter-box {
-            background: #fff; padding: 20px; border-radius: 20px; margin-bottom: 25px;
-            border: 1px solid #f0f0f0; box-shadow: 0 5px 15px rgba(0,0,0,0.03);
-            display: flex; align-items: center; justify-content: space-between;
+        .submit-btn {
+            background: linear-gradient(135deg, #FF8F50, #FF5E62); color: white; 
+            padding: 12px 32px; border-radius: 50px; font-weight: 800; 
+            box-shadow: 0 4px 15px rgba(255, 143, 80, 0.3); transition: 0.2s;
         }
-        .meter-label { font-weight: 800; color: #2d3436; font-size: 0.9rem; text-transform: uppercase; }
-        .meter-score { font-weight: 900; font-size: 1.2rem; }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 143, 80, 0.4); }
 
-        /* --- LOADING OVERLAY --- */
-        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        .loader-robot { font-size: 4rem; color: var(--primary); animation: robotBounce 1s infinite alternate; }
-        @keyframes robotBounce { from { transform: translateY(0); } to { transform: translateY(-20px); } }
+        /* --- POPUP STYLES --- */
+        .custom-modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px); z-index: 20000;
+            justify-content: center; align-items: center; animation: fadeIn 0.2s;
+        }
+        .modal-box {
+            background: white; padding: 30px; border-radius: 24px;
+            width: 90%; max-width: 400px; text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: scale(0.9); animation: zoomIn 0.2s forwards;
+        }
+        .modal-icon { font-size: 3rem; margin-bottom: 15px; }
+        .modal-actions { margin-top: 25px; display: flex; gap: 10px; justify-content: center; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 12px; font-weight: 700; transition: 0.2s; }
+        .popup-error .modal-icon { color: #ef4444; } .popup-error button { background: #ef4444; color: white; }
+        .popup-warning .modal-icon { color: #f59e0b; } .popup-warning button { background: #f59e0b; color: white; }
+        .popup-info .modal-icon { color: #3b82f6; } .popup-info button { background: #3b82f6; color: white; }
 
-        /* --- POPUP MODAL CHUNG --- */
-        .custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 20001; justify-content: center; align-items: center; animation: fadeIn 0.2s ease; }
-        .modal-box { background: white; padding: 35px; border-radius: 30px; text-align: center; width: 90%; max-width: 400px; box-shadow: 0 25px 60px rgba(0,0,0,0.2); transform: scale(0.9); animation: zoomIn 0.2s ease forwards; border: 1px solid rgba(255,255,255,0.9); }
-        .modal-icon { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 20px; }
+        /* --- HIGHLIGHT TOOLTIP --- */
+        ::selection { background: #fed7aa; color: #431407; }
+        .highlight-yellow { background-color: #fef08a; border-bottom: 2px solid #facc15; }
+        .highlight-green { background-color: #bbf7d0; border-bottom: 2px solid #4ade80; }
+        .highlight-pink { background-color: #fbcfe8; border-bottom: 2px solid #f472b6; }
+        #highlight-menu {
+            position: absolute; display: none; background: white; 
+            border-radius: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); 
+            padding: 6px 10px; z-index: 1000; gap: 8px; border: 1px solid #f3f4f6;
+            animation: popIn 0.15s ease;
+        }
+        .hl-btn { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.1s; }
+        .hl-btn:hover { transform: scale(1.2); }
+
+        /* --- LOADING & AI VIEW --- */
+        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .loader-robot { font-size: 4rem; color: var(--primary); animation: bounce 1s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
         
-        .modal-box h3 { margin-bottom: 10px; font-weight: 800; font-size: 1.5rem; }
-        .modal-box p { margin-bottom: 25px; font-size: 1rem; line-height: 1.6; color: #666; }
-        .modal-actions { display: flex; gap: 12px; }
-        .modal-btn { flex: 1; padding: 14px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; transition: 0.2s; font-size: 0.95rem; }
-        
-        /* Styles */
-        .error-style .modal-icon { background: #FEF2F2; color: #EF4444; }
-        .error-style h3 { color: #DC2626; }
-        .btn-cancel { background: #F3F4F6; color: #4B5563; }
-        .btn-action-red { background: #EF4444; color: white; box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3); }
-        
-        .warning-style .modal-icon { background: #FFFBEB; color: #F59E0B; }
-        .warning-style h3 { color: #D97706; }
-        .btn-action-yellow { background: #F59E0B; color: white; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3); }
+        .ai-result-view { padding: 24px; overflow-y: auto; height: 100%; background: #f8fafc; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes zoomIn { from { transform: scale(0.9); } to { transform: scale(1); } }
 
-        /* --- MOBILE RESPONSIVE --- */
+        /* --- MOBILE --- */
+        .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 70px; background: white; z-index: 100; align-items: center; padding: 0 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         @media (max-width: 1024px) {
+            body { overflow: auto; height: auto; }
             .mobile-header { display: flex; }
-            #sidebar-overlay.active { display: block; }
-
-            /* QUAN TRỌNG: Không ẩn #menu-placeholder hoàn toàn */
-            #menu-placeholder { 
-                display: block !important; 
-                width: 0; 
-                height: 0; 
-                overflow: visible; 
-                z-index: 9999;
-            }
-            
-            aside {
-                position: fixed !important; 
-                left: 0 !important; top: 0 !important; bottom: 0 !important;
-                transform: translateX(-100%); 
-                z-index: 9999 !important; 
-                width: 280px !important; 
-                background: white !important;
-                transition: transform 0.3s ease-in-out !important;
-                box-shadow: none;
-                height: 100vh !important;
-            }
-            aside.open { 
-                transform: translateX(0) !important;
-                box-shadow: 10px 0 50px rgba(0,0,0,0.15) !important;
-            }
-
-            .main-content { 
-                margin-left: 0 !important; 
-                width: 100% !important; 
-                padding: 90px 20px 40px !important; 
-                padding-left: 20px !important;
-                height: 100vh;
-                border-left: none;
-            }
-            
-            .workspace-grid { grid-template-columns: 1fr; min-height: auto; gap: 40px; }
-            .prompt-card { padding: 25px; }
-            
-            .user-avatar, #timer { display: none; } 
-            
-            .flex-wrap { flex-direction: column; gap: 12px; }
-            #topic-select, button[onclick="randomizeQuestion()"] { width: 100%; }
+            .header-bar { display: none; }
+            .main-content { padding: 80px 16px 20px; height: auto; }
+            .workspace-grid { display: flex; flex-direction: column; height: auto; }
+            .column-card { height: 600px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
-
-    <div class="mobile-header lg:hidden">
-        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl mr-4 focus:outline-none">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="flex items-center gap-2">
-            <img src="../LOGO.WEBP" alt="Logo" class="w-8 h-8">
-            <span class="font-black text-orange-500 text-lg">HOPVAN</span>
-        </div>
-        <div class="ml-auto bg-black text-white px-4 py-1.5 rounded-lg font-bold text-sm">
-            <span id="timer-mobile">30:00</span>
-        </div>
+    <div id="highlight-menu">
+        <button class="hl-btn bg-yellow-200" onclick="applyHighlight('highlight-yellow')" title="Vàng"></button>
+        <button class="hl-btn bg-green-200" onclick="applyHighlight('highlight-green')" title="Xanh"></button>
+        <button class="hl-btn bg-pink-200" onclick="applyHighlight('highlight-pink')" title="Hồng"></button>
+        <button class="hl-btn bg-gray-100 text-gray-500 flex items-center justify-center" onclick="removeHighlight()" title="Xóa"><i class="fas fa-eraser text-xs"></i></button>
     </div>
-
-    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <div class="loading-overlay" id="loading-overlay">
         <div class="loader-robot"><i class="fas fa-robot"></i></div>
-        <h3 class="text-2xl font-black mt-6 bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent">AI ĐANG CHẤM BÀI...</h3>
-        <p class="text-gray-500 mt-2 font-medium">Chờ chút nhé, giáo viên AI đang đọc bài văn của bạn</p>
+        <h3 class="mt-4 font-bold text-gray-800 text-lg">AI ĐANG CHẤM BÀI...</h3>
+        <p class="text-sm text-gray-500">Giáo viên đang đọc kỹ đoạn văn NLXH của bạn...</p>
     </div>
 
-    <div id="ai-error-popup" class="custom-modal">
-        <div class="modal-box error-style">
-            <div class="modal-icon"><i class="fas fa-exclamation-circle"></i></div>
-            <h3>AI Hiện Đang Quá Tải</h3>
-            <p>Hệ thống đang tiếp nhận quá nhiều yêu cầu cùng lúc. Vui lòng thử lại sau giây lát.</p>
+    <div id="generic-popup" class="custom-modal">
+        <div class="modal-box">
+            <div id="popup-icon" class="modal-icon"><i class="fas fa-info-circle"></i></div>
+            <h3 id="popup-title" class="font-bold text-xl mb-2 text-gray-800">Thông báo</h3>
+            <p id="popup-message" class="text-gray-600">Nội dung thông báo...</p>
             <div class="modal-actions">
-                <button id="btn-ai-cancel" class="modal-btn btn-cancel">Hủy bỏ</button>
-                <button id="btn-ai-retry" class="modal-btn btn-action-red">Thử lại ngay</button>
+                <button onclick="closePopup()" class="modal-btn hover:opacity-90">Đã hiểu</button>
             </div>
         </div>
     </div>
 
     <div id="short-essay-popup" class="custom-modal">
-        <div class="modal-box warning-style">
+        <div class="modal-box popup-warning">
             <div class="modal-icon"><i class="fas fa-pen-nib"></i></div>
-            <h3>Bài Viết Quá Ngắn</h3>
-            <p>Bài làm NLXH cần ít nhất <strong>100 từ</strong> để AI có thể phân tích chính xác. Hãy viết thêm chút nữa nhé!</p>
+            <h3 class="font-bold text-xl mb-2">Bài Quá Ngắn</h3>
+            <p class="text-gray-600">Đoạn văn NLXH cần ít nhất <strong>50 từ</strong> để AI chấm chính xác nhé.</p>
             <div class="modal-actions">
-                <button id="btn-short-close" class="modal-btn btn-action-yellow w-full">Đã hiểu, viết tiếp</button>
+                <button onclick="document.getElementById('short-essay-popup').style.display='none'" class="modal-btn bg-orange-100 !text-white-600 hover:bg-orange-200">Viết tiếp</button>
             </div>
         </div>
+    </div>
+
+    <div class="mobile-header lg:hidden">
+        <div class="flex items-center gap-2">
+            <img src="../LOGO.WEBP" class="w-8 h-8">
+            <span class="font-black text-orange-500 text-lg">HOPVAN</span>
+        </div>
+        <div class="ml-auto bg-gray-900 text-white px-3 py-1 rounded text-xs font-bold font-mono" id="timer-mobile">00:00</div>
     </div>
 
     <div class="dashboard-container">
         <div id="menu-placeholder"></div>
 
         <main class="main-content">
-            <div class="flex justify-between items-center mb-8 flex-wrap gap-4 hidden lg:flex">
-                <div class="flex items-center gap-5">
+            <div class="header-bar hidden lg:flex">
+                <div class="flex items-center gap-4">
+                    <a href="../dashboard/phongluyende.html" class="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-orange-500 transition shadow-sm">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
                     <div>
-                        <h2 class="text-2xl md:text-3xl font-black text-gray-800 tracking-tight">Luyện Đề NLXH</h2>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                            <p class="text-sm text-gray-500 font-bold uppercase tracking-widest">Trạng thái: Sẵn sàng</p>
+                        <h2 class="text-2xl font-black text-gray-800">Luyện Đề NLXH</h2>
+                        <div class="flex items-center gap-2">
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                    <button onclick="randomizeQuestion()" class="bg-white px-5 py-3 rounded-2xl font-bold text-gray-500 hover:text-orange-500 hover:bg-orange-50 transition-all shadow-sm border border-gray-100 flex items-center gap-2 text-sm md:text-base">
-                        <i class="fas fa-sync-alt text-orange-400"></i> Đổi đề khác
-                    </button>
-                    <div class="bg-black text-white px-6 py-3 rounded-2xl font-black flex items-center gap-3 shadow-xl">
-                        <i class="fas fa-clock text-orange-400"></i> <span id="timer" class="text-xl">30:00</span>
+                
+                <div class="flex items-center gap-4">
+                    <div class="bg-white rounded-xl border border-gray-200 flex items-center p-1 shadow-sm">
+                        <span class="text-xs font-bold text-gray-400 pl-3 pr-2 uppercase">Cỡ đề:</span>
+                        <button onclick="adjustPromptSize(-1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded text-gray-600"><i class="fas fa-minus text-xs"></i></button>
+                        <span class="w-px h-4 bg-gray-200 mx-1"></span>
+                        <button onclick="adjustPromptSize(1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded text-gray-600"><i class="fas fa-plus text-xs"></i></button>
                     </div>
-                    <div class="user-avatar" id="avatar-initial" style="width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.4rem; box-shadow: 0 8px 20px rgba(255, 143, 80, 0.3); transform: rotate(-5deg);"></div>
-                </div>
-            </div>
 
-            <div class="prompt-card">
-                <span class="inline-block bg-orange-50 text-orange-600 px-4 py-1.5 rounded-xl font-black text-xs uppercase tracking-widest mb-4">Nghị Luận Xã Hội</span>
-                <h3 id="prompt-text" class="text-xl font-extrabold text-gray-800 leading-relaxed">Đang tải dữ liệu...</h3>
-                <p id="prompt-hint" class="mt-4 text-gray-500 italic flex items-center gap-2">
-                    <i class="fas fa-lightbulb text-orange-400"></i> <span id="hint-content">Gợi ý: ...</span>
-                </p>
+                    <button onclick="randomizeQuestion()" class="bg-white px-4 py-2 rounded-xl font-bold text-gray-600 hover:text-orange-600 border border-gray-200 text-sm shadow-sm flex gap-2 items-center">
+                        <i class="fas fa-sync-alt"></i> Đổi đề
+                    </button>
+                    
+                    <div class="bg-gray-900 text-white px-5 py-2 rounded-xl font-mono font-bold flex items-center gap-2 shadow-lg">
+                        <i class="fas fa-stopwatch text-green-400"></i> <span id="timer">00:00</span>
+                    </div>
+                </div>
             </div>
 
             <div class="workspace-grid">
-                <div class="editor-container">
-                    <div class="px-6 py-4 bg-gray-50/50 border-b flex justify-between items-center flex-wrap gap-3">
-                        <div class="flex items-center gap-3 w-full md:w-auto">
-                            <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Bài làm</span>
-                            <button onclick="document.getElementById('file-upload').click()" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-gray-600 hover:text-orange-500 transition shadow-sm">
-                                <i class="fas fa-paperclip"></i> Tải tệp (.docx)
-                            </button>
-                            <input type="file" id="file-upload" class="hidden" accept=".txt, .docx">
+                
+                <div class="column-card">
+                    <div class="card-header">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-orange-600 uppercase text-xs tracking-widest bg-white px-3 py-1 rounded-full border border-orange-100">
+                                <i class="fas fa-quote-left mr-1 text-[10px]"></i> Nghị luận xã hội
+                            </span>
+                            <span class="text-[10px] text-gray-400 italic">(Bôi đen để Highlight)</span>
                         </div>
-                        <span id="word-count" class="text-xs font-black bg-gray-200 text-gray-600 px-3 py-1 rounded-lg ml-auto">0 TỪ</span>
-                    </div>
-                    <textarea id="student-essay" class="writing-area" placeholder="Hãy bắt đầu bài viết của bạn tại đây..."></textarea>
-                </div>
-
-                <div class="editor-container">
-                    <div class="px-8 py-5 bg-gray-50/50 border-b flex justify-between items-center">
-                        <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Phản hồi từ AI</span>
-                        <button id="submit-btn" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-2.5 rounded-xl font-black text-sm hover:scale-105 transition shadow-lg active:scale-95">NỘP BÀI</button>
+                        <span id="exam-code" class="text-xs font-bold text-gray-400">LOADING...</span>
                     </div>
                     
-                    <div id="ai-correction-box" class="ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400">
-                        <div>
-                            <i class="fas fa-robot text-5xl mb-4 opacity-20"></i>
-                            <p class="font-bold text-lg">Sẵn sàng chấm bài</p>
+                    <div class="scrollable-content prompt-body" id="prompt-content">
+                        <div class="animate-pulse space-y-4">
+                            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                            <div class="h-4 bg-gray-200 rounded w-full"></div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="overall-feedback-box" class="mt-10 pb-20 hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="p-8 bg-green-50 rounded-[40px] border border-green-100 shadow-sm relative overflow-hidden">
-                        <i class="fas fa-check-circle absolute -right-4 -top-4 text-7xl text-green-100"></i>
-                        <h4 class="text-green-700 font-black text-lg mb-4">Điểm sáng tạo & Nội dung</h4>
-                        <ul id="idea-list" class="space-y-3 text-green-800 font-medium text-sm"></ul>
+                <div class="column-card relative">
+                    <div id="input-section" class="flex flex-col h-full">
+                        <div class="card-header bg-white">
+                            <span class="font-black text-xs text-gray-400 uppercase tracking-widest">BÀI LÀM CỦA BẠN</span>
+                            <div class="flex gap-2">
+                                <button onclick="document.getElementById('file-upload').click()" class="text-xs font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded hover:bg-blue-100 transition">
+                                    <i class="fas fa-paperclip mr-1"></i> File
+                                </button>
+                                <input type="file" id="file-upload" class="hidden" accept=".txt, .docx">
+                                <span id="word-count" class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">0 TỪ</span>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 overflow-hidden relative">
+                            <textarea id="student-essay" class="writing-area" 
+                                placeholder="Viết đoạn văn NLXH tại đây..."></textarea>
+                        </div>
+
+                        <div class="footer-action">
+                            <button onclick="handleAISubmission()" class="submit-btn flex items-center gap-2">
+                                <span>NỘP BÀI</span> <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="p-8 bg-red-50 rounded-[40px] border border-red-100 shadow-sm relative overflow-hidden">
-                        <i class="fas fa-exclamation-triangle absolute -right-4 -top-4 text-7xl text-red-100"></i>
-                        <h4 class="text-red-700 font-black text-lg mb-4">Cần cải thiện</h4>
-                        <ul id="missing-list" class="space-y-3 text-red-800 font-medium text-sm"></ul>
+
+                    <div id="output-section" class="hidden h-full flex-col">
+                        <div class="card-header bg-gray-900 border-none text-white">
+                            <span class="font-bold text-sm uppercase"><i class="fas fa-robot mr-2 text-orange-400"></i>Kết quả chấm</span>
+                            <button onclick="resetExam()" class="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded transition">Làm lại</button>
+                        </div>
+                        <div id="ai-correction-box" class="ai-result-view"></div>
                     </div>
                 </div>
+
             </div>
         </main>
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- CẤU HÌNH FIREBASE ---
+    // --- CONFIG FIREBASE ---
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
     const API_URL = `/.netlify/functions/gemini-proxy`;
-    let questionsData = [];
+    let questionsData = []; 
     window.currentExamData = null;
 
-    // --- LOGIC 1: SIDEBAR & TIMER (GIỮ NGUYÊN) ---
-    window.toggleSidebar = () => {
-        const sidebar = document.querySelector('aside') || document.getElementById('main-sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        if (sidebar && overlay) {
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : 'auto';
-        }
+    // --- POPUP HANDLER ---
+    window.showPopup = (title, message, type = 'info') => {
+        const modal = document.getElementById('generic-popup');
+        const box = modal.querySelector('.modal-box');
+        const icon = document.getElementById('popup-icon');
+        box.classList.remove('popup-error', 'popup-warning');
+        document.getElementById('popup-title').innerText = title;
+        document.getElementById('popup-message').innerText = message;
+        if (type === 'error') { box.classList.add('popup-error'); icon.innerHTML = '<i class="fas fa-exclamation-circle"></i>'; }
+        else if (type === 'warning') { box.classList.add('popup-warning'); icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>'; }
+        else { icon.innerHTML = '<i class="fas fa-info-circle"></i>'; }
+        modal.style.display = 'flex';
+    };
+    window.closePopup = () => document.getElementById('generic-popup').style.display = 'none';
+
+    // --- 1. CHỈNH CỠ CHỮ ---
+    let promptFontSize = 17;
+    window.adjustPromptSize = (amount) => {
+        promptFontSize += amount;
+        if(promptFontSize < 14) promptFontSize = 14;
+        if(promptFontSize > 26) promptFontSize = 26;
+        document.querySelector('.prompt-body').style.fontSize = `${promptFontSize}px`;
+        const contents = document.querySelectorAll('.exam-content');
+        contents.forEach(el => el.style.fontSize = `${promptFontSize}px`);
     };
 
-    let timeLeft = 1800; 
-    const timerElement = document.getElementById('timer');
-    const timerMobileElement = document.getElementById('timer-mobile');
-
+    // --- 2. TIMER (ĐẾM TỚI) ---
+    let timerInterval;
+    let secondsElapsed = 0;
     function startTimer() {
-        const countdown = setInterval(() => {
-            if (timeLeft <= 0) {
-                clearInterval(countdown);
-                if(timerElement) timerElement.innerText = "00:00";
-                if(timerMobileElement) timerMobileElement.innerText = "00:00";
-                alert("Hết thời gian!");
-            } else {
-                timeLeft--;
-                let m = Math.floor(timeLeft / 60).toString().padStart(2,'0');
-                let s = (timeLeft % 60).toString().padStart(2,'0');
-                const timeString = `${m}:${s}`;
-                if(timerElement) timerElement.innerText = timeString;
-                if(timerMobileElement) timerMobileElement.innerText = timeString;
-            }
+        clearInterval(timerInterval);
+        secondsElapsed = 0;
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            const m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+            const s = (secondsElapsed % 60).toString().padStart(2, '0');
+            const txt = `${m}:${s}`;
+            if(document.getElementById('timer')) document.getElementById('timer').innerText = txt;
+            if(document.getElementById('timer-mobile')) document.getElementById('timer-mobile').innerText = txt;
         }, 1000);
     }
+    function stopTimer() { clearInterval(timerInterval); }
 
-    // --- LOGIC 2: QUẢN LÝ TẢI DỮ LIỆU (Sửa lỗi Load đầu trang) ---
-    onAuthStateChanged(auth, (u) => {
-        if (u) {
-            const n = u.displayName || u.email;
-            const avatar = document.getElementById('avatar-initial');
-            if(avatar) avatar.innerText = n.charAt(0).toUpperCase();
-            startTimer();
-            // CHỈ GỌI LOAD ĐỀ KHI ĐÃ ĐĂNG NHẬP
-            loadQuestions(); 
-        } else { 
-            window.location.href = "../log.html"; 
-        }
-    });
-
+    // --- 3. TẢI ĐỀ NLXH TỪ FIREBASE ---
     async function loadQuestions() {
-        const promptTextUI = document.getElementById('prompt-text');
-        // Hiệu ứng chờ chuẩn ứng dụng chuyên nghiệp
-        promptTextUI.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Đang tải kho đề NLXH...';
-
         try {
             const q = query(collection(db, "essay_bank"), where("type", "==", "nlxh"));
             const querySnapshot = await getDocs(q);
-            
             questionsData = [];
             querySnapshot.forEach((doc) => {
                 questionsData.push({ id: doc.id, ...doc.data() });
             });
 
-            if (questionsData.length > 0) {
-                // ĐÃ TẢI XONG MỚI HIỂN THỊ
-                randomizeQuestion(); 
-            } else {
-                promptTextUI.innerText = "Kho đề trống. Hãy thêm đề ở trang Admin!";
+            if (questionsData.length === 0) {
+                document.getElementById('prompt-content').innerHTML = `<div class="text-center py-10 text-gray-400">Kho đề NLXH trống.</div>`;
+                return;
             }
+            randomizeQuestion();
         } catch (e) {
             console.error(e);
-            promptTextUI.innerText = "Lỗi kết nối Firebase. Vui lòng tải lại trang!";
+            showPopup("Lỗi", "Không thể tải kho đề NLXH!", "error");
         }
     }
 
+    // --- 4. HIỂN THỊ ĐỀ (CHỮ THƯỜNG - STYLE HỘP GIẤY) ---
     window.randomizeQuestion = () => {
-        // Bảo vệ hàm nếu dữ liệu chưa về kịp
         if (!questionsData || questionsData.length === 0) return;
-        
         const q = questionsData[Math.floor(Math.random() * questionsData.length)];
         window.currentExamData = q;
 
-        document.getElementById('prompt-text').innerText = q.topic;
-        document.getElementById('hint-content').innerText = q.hint || "Phân tích các khía cạnh: Biểu hiện, Nguyên nhân, Ý nghĩa, Phản đề và Bài học.";
-
-        const passageUI = document.getElementById('prompt-passage');
-        if (q.text && q.text.trim() !== "") {
-            if(passageUI) {
-                passageUI.innerText = q.text;
-                passageUI.parentElement.classList.remove('hidden');
-            }
-        } else if (passageUI) {
-            passageUI.parentElement.classList.add('hidden');
-        }
-
-        // Reset UI bài làm
+        document.getElementById('exam-code').innerText = `MÃ: ${q.id.slice(0, 6).toUpperCase()}`;
         document.getElementById('student-essay').value = "";
-        document.getElementById('word-count').innerText = "0 TỪ";
-        document.getElementById('overall-feedback-box').classList.add('hidden');
         
-        const aiBox = document.getElementById('ai-correction-box');
-        aiBox.className = "ai-result-view h-full flex flex-col items-center justify-center text-center text-gray-400";
-        aiBox.innerHTML = `<div><i class="fas fa-robot text-5xl mb-4 opacity-20"></i><p class="font-bold text-lg">Sẵn sàng chấm bài</p></div>`;
+        setupHighlightEvent();
+        
+        const htmlContent = `
+            <div id="reading-passage" class="relative pb-10">
+                <div class="passage-box">
+                    <span class="text-xs font-bold text-gray-400 uppercase block mb-3 italic">Yêu cầu đề bài:</span>
+                    <div class="exam-content font-normal text-gray-800" id="text-content">
+                        ${q.topic}
+                    </div>
+                </div>
+
+                ${q.text ? `
+                    <div class="passage-box">
+                        <span class="text-xs font-bold text-gray-400 uppercase block mb-2 italic">Ngữ liệu tham khảo:</span>
+                        <div class="exam-content highlight-text font-normal">${q.text}</div>
+                    </div>` : ''}
+
+                <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100 mt-6">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-lightbulb text-blue-500 text-sm"></i>
+                        <span class="text-xs font-black text-blue-600 uppercase tracking-widest">Gợi ý làm bài</span>
+                    </div>
+                    <p class="text-sm text-blue-800 leading-relaxed italic font-normal">
+                        ${q.hint || "Phân tích các khía cạnh: Biểu hiện, Nguyên nhân, Ý nghĩa, Phản đề và Bài học."}
+                    </p>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('prompt-content').innerHTML = htmlContent;
+        promptFontSize = 17;
+        document.querySelector('.prompt-body').style.fontSize = `17px`;
+        setTimeout(setupHighlightEvent, 100);
+        startTimer();
     };
 
-    // --- LOGIC 3: ĐỌC FILE DOCX (GIỮ NGUYÊN MAMMOTH) ---
-    document.getElementById('file-upload').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        const textarea = document.getElementById('student-essay');
-        if (file.name.endsWith('.docx')) {
-            reader.onload = function(event) {
-                mammoth.extractRawText({arrayBuffer: event.target.result}).then(r => {
-                    textarea.value = r.value; textarea.dispatchEvent(new Event('input'));
-                });
-            };
-            reader.readAsArrayBuffer(file);
-        } else if (file.name.endsWith('.txt')) {
-            reader.onload = function(event) { textarea.value = event.target.result; textarea.dispatchEvent(new Event('input')); };
-            reader.readAsText(file);
-        }
-    });
+    // --- 5. TÍNH NĂNG HIGHLIGHT ---
+    function setupHighlightEvent() {
+        const container = document.getElementById('reading-passage');
+        const menu = document.getElementById('highlight-menu');
+        if(!container || !menu) return;
 
-    // --- LOGIC 4: POPUP HANDLERS (GIỮ NGUYÊN) ---
-    window.showAiError = () => document.getElementById('ai-error-popup').style.display = 'flex';
-    window.hideAiError = () => document.getElementById('ai-error-popup').style.display = 'none';
-    window.showShortEssay = () => document.getElementById('short-essay-popup').style.display = 'flex';
-    window.hideShortEssay = () => document.getElementById('short-essay-popup').style.display = 'none';
+        container.onmouseup = () => {
+            const selection = window.getSelection();
+            if (selection.toString().trim().length > 0) {
+                const rect = selection.getRangeAt(0).getBoundingClientRect();
+                menu.style.top = `${rect.top - 50}px`; menu.style.left = `${rect.left + rect.width/2 - 60}px`; menu.style.display = 'flex';
+            } else { menu.style.display = 'none'; }
+        };
+        document.onmousedown = (e) => { if(!menu.contains(e.target) && !container.contains(e.target)) menu.style.display = 'none'; };
+    }
 
-    document.getElementById('btn-ai-cancel').addEventListener('click', hideAiError);
-    document.getElementById('btn-ai-retry').addEventListener('click', () => { hideAiError(); handleAISubmission(); });
-    document.getElementById('btn-short-close').addEventListener('click', hideShortEssay);
+    window.applyHighlight = (cls) => {
+        const color = cls === 'highlight-yellow' ? '#fef08a' : cls === 'highlight-green' ? '#bbf7d0' : '#fbcfe8';
+        document.execCommand('backColor', false, color);
+        document.getElementById('highlight-menu').style.display = 'none';
+    };
+    window.removeHighlight = () => { document.execCommand('removeFormat'); document.getElementById('highlight-menu').style.display = 'none'; };
 
-    // --- LOGIC 5: MAIN AI LOGIC (GIỮ NGUYÊN PROMPT CỦA BẠN) ---
-    async function handleAISubmission() {
+    // --- 6. AI CHẤM ĐIỂM ---
+    window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
-        if (content.split(/\s+/).length < 50) {
-            showShortEssay();
-            return;
-        }
-
+        if(content.length < 50) { document.getElementById('short-essay-popup').style.display = 'flex'; return; }
+        
         const loading = document.getElementById('loading-overlay');
-        loading.style.display = 'flex';
+        loading.style.display = 'flex'; stopTimer();
 
         const q = window.currentExamData;
-        
-        // --- ĐÂY LÀ PROMPT GỐC CỦA BẠN (GIỮ NGUYÊN 100%) ---
         const systemPrompt = `
-            BẠN LÀ: Giáo viên Ngữ văn lớp 12 uy tín, chuyên chấm thi Nghị luận Xã hội.
-            THÁI ĐỘ: Nghiêm túc, công tâm, ngôn ngữ phê bình sắc sảo, hàn lâm.
+        BẠN LÀ: Chuyên gia Ngữ văn K12 - Giám khảo chuyên trách chấm thi Nghị luận Xã hội (Chương trình GDPT 2018).
+        VAI TRÒ: Giáo viên Ngữ văn có tư duy sắc bén, am hiểu các vấn đề thời sự, chính trị, đạo đức và lối sống.
+        THÁI ĐỘ: Nghiêm túc, tỉ mỉ, học thuật. Nhận xét thẳng thắn vào các lỗ hổng lập luận, không dùng lời sáo rỗng.
 
-            NHIỆM VỤ:
-            1. KIỂM TRA ĐỘ TRUNG THỰC (AI DETECTION):
-               - Phân tích văn phong để tìm dấu hiệu AI (văn mẫu, sáo rỗng, cấu trúc lặp).
-               - Đánh giá 'human_score' (0-100).
-            
-            2. CHẤM ĐIỂM CHUYÊN MÔN (NLXH 200 CHỮ):
-               - Kiểm tra cấu trúc đoạn văn: Giải thích -> Phân tích/Bàn luận -> Chứng minh -> Phản đề -> Bài học.
-               - Đánh giá dẫn chứng: Có tính thời sự, tiêu biểu không?
-               - Chấm điểm trên thang 10 (NLXH thường tối đa 2.0 điểm trong bài thi, nhưng ở đây chấm thang 10 cho dễ hình dung chất lượng).
-            
-            3. SỬA BÀI CHI TIẾT:
-               - Tạo HTML, tô đỏ lỗi (<span class="text-bad">), tô xanh ý hay (<span class="text-good">), gợi ý sửa (<span class="text-fix">).
+        NHIỆM VỤ: Chấm bài làm NLXH dựa trên yêu cầu linh hoạt của đề bài (Đoạn văn ~200 chữ hoặc Bài văn ~600 chữ).
 
-            TRẢ VỀ JSON DUY NHẤT:
-            {
-              "human_score": (0-100),
-              "ai_comment": "Nhận xét ngắn về độ tự nhiên.",
-              "score": (Điểm số thang 10, ví dụ 8.0),
-              "correction_html": "HTML bài làm đã sửa...",
-              "idea_feedback": ["Ưu điểm 1", "Ưu điểm 2"],
-              "missing_points": ["Hạn chế 1", "Hạn chế 2"]
-            }
+        === QUY TRÌNH CHẤM VÀ ĐÁNH GIÁ ===
 
-            --- ĐỀ BÀI ---
-            CHỦ ĐỀ: ${q.topic}
-            GỢI Ý: ${q.hint}
-            
-            --- BÀI LÀM HỌC SINH ---
-            ${content}
+        1. NHẬN DIỆN KIỂU BÀI:
+        - AI tự đọc yêu cầu đề để xác định đây là Đoạn văn (tập trung 1 khía cạnh) hay Bài văn (phân tích toàn diện).
+        - Kiểm tra dung lượng thực tế so với yêu cầu để đánh giá kĩ năng khống chế văn bản.
+
+        2. KIỂM TRA ĐỘ TRUNG THỰC (AI DETECTION):
+        - Soi lỗi văn phong "máy": Dùng từ nối rập khuôn, các luận điểm chia đều chằn chặn thiếu điểm nhấn, dẫn chứng chung chung không có tính thời sự.
+        - Đánh giá human_score (0-100). Ưu tiên những bài có góc nhìn cá nhân độc đáo, dẫn chứng mới mẻ.
+
+        3. CHẤM ĐIỂM CHUYÊN MÔN (THANG 10):
+        - Cấu trúc (2đ): Giải thích -> Phân tích/Bàn luận -> Chứng minh (Dẫn chứng) -> Phản đề -> Bài học.
+        - Nội dung (5đ): Sự thấu đáo trong việc giải quyết vấn đề, tính thuyết phục của lí lẽ.
+        - Dẫn chứng (2đ): Ưu tiên dẫn chứng thực tế, người thật việc thật, có tính thời sự.
+        - Sáng tạo & Diễn đạt (1đ): Cá tính văn chương và độ mượt mà của ngôn từ.
+
+        4. SỬA BÀI CHI TIẾT (HTML FORMAT):
+        - <span class="text-bad"> cho lỗi dùng từ sai, diễn đạt lủng củng hoặc tư duy lệch lạc.
+        - <span class="text-fix"> cho phương án sửa đổi tối ưu ngay bên cạnh lỗi.
+        - <span class="text-good"> cho những câu văn có sức nặng, hình ảnh đắt giá hoặc lập luận xuất sắc.
+
+        YÊU CẦU TRẢ VỀ JSON DUY NHẤT (KHÔNG MARKDOWN):
+        {
+        "human_score": (int 0-100),
+        "ai_comment": "Nhận xét về độ tự nhiên và cá tính của bài viết.",
+        "score": (float, làm tròn đến 0.25),
+        "word_count_detect": "Số chữ thực tế AI đếm được",
+        "essay_type": "Nhận diện: Đoạn văn (200) hay Bài văn (600)",
+        "detailed_scores": {
+            "structure": "x/2.0",
+            "content": "x/5.0",
+            "evidence": "x/2.0",
+            "expression": "x/1.0"
+        },
+        "correction_html": "HTML bài làm đã highlight lỗi và ý hay. Xuống dòng dùng <br>.",
+        "idea_feedback": ["Điểm sáng về dẫn chứng/lập luận 1", "Sự sáng tạo 1"],
+        "missing_points": ["Lỗi logic", "Dẫn chứng sáo rỗng", "Thiếu phản đề..."],
+        "orientation": "Lời khuyên để nâng tầm tư duy phản biện và kĩ năng viết NLXH."
+        }
+
+        DỮ LIỆU ĐỀ BÀI:
+        - CHỦ ĐỀ NLXH: ${q.topic}
+        - GỢI Ý/NGỮ LIỆU (NẾU CÓ): ${q.text || "Không có"}
+        - YÊU CẦU DUNG LƯỢNG: ${q.hint || "Tự chọn"}
+
+        BÀI LÀM CỦA HỌC SINH:
+        ${content}
         `;
 
         try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
-            });
+            const res = await fetch(API_URL, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] }) });
+            const data = await res.json();
+            const result = JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json|```/g, "").trim());
 
-            const data = await response.json();
-            const rawText = data.candidates[0].content.parts[0].text;
-            const res = JSON.parse(rawText.replace(/```json|```/g, "").trim());
+            document.getElementById('input-section').classList.add('hidden');
+            const out = document.getElementById('output-section');
+            out.classList.remove('hidden'); out.style.display = 'flex';
 
-            // --- HIỂN THỊ KẾT QUẢ (GIỮ NGUYÊN LOGIC MÀU SẮC) ---
-            let barColor = res.human_score < 50 ? '#ef4444' : (res.human_score < 75 ? '#f59e0b' : '#22c55e');
-            let verdictText = res.human_score < 50 ? "Nghi vấn AI" : (res.human_score < 75 ? "Hơi giống máy" : "Tự nhiên");
-
-            const aiMeterHTML = `<div class="ai-meter-box"><div><div class="meter-label">Độ Chân Thực</div><div style="font-size: 0.8rem; color: #888;">${res.ai_comment}</div></div><div style="text-align: right;"><div class="meter-score" style="color: ${barColor}">${res.human_score}%</div><div style="font-size: 0.7rem; font-weight: 700; color: ${barColor}">${verdictText}</div></div></div><div style="margin-bottom: 20px; font-weight: 800; font-size: 1.2rem; color: var(--primary);">ĐIỂM SỐ: ${res.score}/10</div>`;
-
-            const box = document.getElementById('ai-correction-box');
-            box.className = "ai-result-view h-full text-left text-gray-800 overflow-y-auto"; 
-            box.innerHTML = aiMeterHTML + res.correction_html;
-
-            document.getElementById('idea-list').innerHTML = res.idea_feedback.map(i => `<li>• ${i}</li>`).join('');
-            document.getElementById('missing-list').innerHTML = res.missing_points.map(i => `<li>• ${i}</li>`).join('');
-            document.getElementById('overall-feedback-box').classList.remove('hidden');
-
-            await addDoc(collection(db, "activities"), {
-                uid: auth.currentUser.uid,
-                action: `NLXH: ${q.topic.substring(0, 30)}... (${res.score} điểm)`,
-                type: "nlxh",
-                score: res.score,
-                timestamp: serverTimestamp()
-            });
-
-        } catch (e) { console.error(e); showAiError(); } 
+            const barColor = result.human_score > 75 ? '#22c55e' : (result.human_score > 50 ? '#f59e0b' : '#ef4444');
+            document.getElementById('ai-correction-box').innerHTML = `
+                <div class="max-w-2xl mx-auto pb-10">
+                    <div class="text-center mb-6">
+                        <div class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">TỔNG ĐIỂM NLXH</div>
+                        <div class="text-6xl font-black text-orange-500 mb-2">${result.score}</div>
+                        <p class="text-gray-500 italic">"${result.general_comment}"</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm mb-6">
+                        <div class="flex justify-between items-center mb-2"><span class="text-xs font-bold text-gray-400 uppercase">Độ chân thực</span><span class="font-bold" style="color:${barColor}">${result.human_score}%</span></div>
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div style="width:${result.human_score}%; background:${barColor}" class="h-full rounded-full"></div></div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+                        <h4 class="font-black text-gray-800 border-b pb-4 mb-6 text-lg">CHI TIẾT BÀI SỬA</h4>
+                        <div class="leading-loose text-gray-700 font-serif text-lg space-y-4 text-justify font-light">${result.correction_html}</div>
+                    </div>
+                </div>`;
+            
+            if (auth.currentUser) { await addDoc(collection(db, "activities"), { uid: auth.currentUser.uid, type: "nlxh", score: result.score, timeSpent: document.getElementById('timer').innerText, timestamp: serverTimestamp() }); }
+        } catch(e) { showPopup("Lỗi AI", "Hệ thống bận, vui lòng thử lại sau!", "error"); }
         finally { loading.style.display = 'none'; }
     };
 
-    // --- LOGIC 6: TIỆN ÍCH CUỐI (GIỮ NGUYÊN) ---
-    document.getElementById('submit-btn').onclick = handleAISubmission;
-    document.getElementById('student-essay').oninput = function() {
-        const c = this.value.trim().split(/\s+/).filter(x => x).length;
-        document.getElementById('word-count').innerText = `${c} TỪ`;
-    };
+    window.resetExam = () => { document.getElementById('input-section').classList.remove('hidden'); document.getElementById('output-section').classList.add('hidden'); document.getElementById('output-section').style.display = 'none'; startTimer(); };
 
-    fetch('menu.html').then(r => r.text()).then(h => {
-        const ph = document.getElementById('menu-placeholder'); ph.innerHTML = h;
-        ph.querySelectorAll('script').forEach(old => { const ns = document.createElement('script'); ns.text = old.text; document.body.appendChild(ns); });
-    });
+    onAuthStateChanged(auth, u => { if(u) { loadQuestions(); } else window.location.href="../log.html"; });
+    document.getElementById('student-essay').oninput = function() { const c = this.value.trim().split(/\s+/).filter(x => x).length; document.getElementById('word-count').innerText = `${c} TỪ`; };
 </script>
 </body>
 </html>

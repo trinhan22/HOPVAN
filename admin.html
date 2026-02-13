@@ -14,6 +14,8 @@
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -138,7 +140,26 @@
         ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
         .gradient-text { background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    </style>
+
+.ql-editor.ql-blank::before { color: #94A3B8 !important; font-style: normal; }
+
+/* Tạo nút kéo cho bộ soạn thảo */
+.ql-container.ql-snow {
+    resize: vertical; /* Cho phép kéo to nhỏ theo chiều dọc */
+    overflow-y: auto;
+    background: #F8FAFC !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 0 0 16px 16px;
+}
+/* Giới hạn chiều cao tối thiểu và tối đa */
+#edit-ft-read-text, #edit-ex-text, #edit-ex-topic { min-height: 200px; }
+.ql-toolbar.ql-snow {
+    border-radius: 16px 16px 0 0 !important;
+    border: 1px solid #E2E8F0 !important;
+    background: white;
+}
+.ql-editor { font-size: 1rem; line-height: 1.6; }
+</style>
 </head>
 <body class="h-screen flex">
 
@@ -254,7 +275,7 @@
                             <div class="icon-box bg-green-50 text-green-500"><i class="fas fa-newspaper"></i></div>
                             <div>
                                 <h4 class="font-bold text-gray-800 text-lg">Đề NLXH</h4>
-                                <p class="text-xs text-gray-400 font-bold mt-1 uppercase">Đoạn văn 200 chữ</p>
+                                <p class="text-xs text-gray-400 font-bold mt-1 uppercase">Phân tích vấn đề</p>
                             </div>
                         </div>
 
@@ -407,7 +428,7 @@
         </div>
     </div>
 
-    <div id="toast" class="fixed top-8 right-8 bg-white/90 backdrop-blur pl-4 pr-6 py-4 rounded-2xl shadow-2xl border border-white flex items-center gap-4 transform translate-x-60 transition-all duration-500 z-[100]">
+    <div id="toast" class="fixed top-8 right-2 bg-white/90 backdrop-blur pl-4 pr-6 py-4 rounded-2xl shadow-2xl border border-white flex items-center gap-4 transform translate-x-60 transition-all duration-500 z-[100]">
         <div class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center"><i class="fas fa-check"></i></div>
         <div>
             <h4 class="font-bold text-gray-800 text-sm">Thành công</h4>
@@ -426,6 +447,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         let currentCollection = 'essay_bank';
+        let quillEditors = {};
 
         // INIT DATE
         document.getElementById('current-date').innerText = new Date().toLocaleDateString('vi-VN', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
@@ -559,108 +581,98 @@
         };
 
         // 3. MODAL LOGIC (UPDATED FOR DASHBOARD SHORTCUTS)
-        window.openModal = async (id, colName, preSelectType = null) => {
-            const modal = document.querySelector('.modal-overlay');
-            const container = document.getElementById('modal-fields');
-            document.getElementById('exam-collection').value = colName;
-            document.getElementById('exam-id').value = id;
-            
-            modal.classList.add('show');
-            container.innerHTML = '<div class="text-center py-20"><i class="fas fa-spinner fa-spin text-orange-500 text-3xl"></i></div>';
+let editors = {}; // Biến chứa các editor
 
-            let data = {};
-            if(id !== 'new') {
-                const snap = await getDoc(doc(db, colName, id));
-                if(snap.exists()) data = snap.data();
-                document.getElementById('modal-title').innerText = "Edit Content";
-            } else {
-                document.getElementById('modal-title').innerText = "Create New Content";
-            }
+window.openModal = async (id, colName, preSelectType = null) => {
+    const modal = document.querySelector('.modal-overlay');
+    const container = document.getElementById('modal-fields');
+    document.getElementById('exam-collection').value = colName;
+    document.getElementById('exam-id').value = id;
+    
+    modal.classList.add('show');
+    container.innerHTML = '<div class="text-center py-20"><i class="fas fa-spinner fa-spin text-orange-500 text-3xl"></i></div>';
 
-            // FORM GENERATION
-            let html = '';
-            if (colName === 'fulltest_bank') {
-                document.getElementById('modal-subtitle').innerText = "FULL TEST STRUCTURE";
-                html = `
-                    <input type="hidden" id="ex-type" value="fulltest">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="space-y-4">
-                            <h4 class="font-black text-blue-500 uppercase tracking-widest text-xs border-b border-blue-100 pb-2">I. Đọc Hiểu (3.0đ)</h4>
-                            <div><label class="label-custom">Văn bản ngữ liệu</label><textarea id="ft-read-text" class="glass-input h-40 font-mono text-sm">${data.reading_text||''}</textarea></div>
-                            <div><label class="label-custom">Câu hỏi (Mỗi dòng 1 câu)</label><textarea id="ft-read-qs" class="glass-input h-32" placeholder="- PTBĐ chính là gì?&#10;- Nội dung chính...">${(data.reading_questions||[]).join('\n')}</textarea></div>
-                        </div>
-                        <div class="space-y-4">
-                            <h4 class="font-black text-purple-500 uppercase tracking-widest text-xs border-b border-purple-100 pb-2">II. Làm Văn (7.0đ)</h4>
-                            <div><label class="label-custom">NL Xã Hội (2.0đ)</label><textarea id="ft-nlxh" class="glass-input h-32" placeholder="Chủ đề đoạn văn 200 chữ...">${data.nlxh_topic||''}</textarea></div>
-                            <div><label class="label-custom">NL Văn Học (5.0đ)</label><textarea id="ft-nlvh" class="glass-input h-40" placeholder="Đề bài phân tích tác phẩm...">${data.nlvh_topic||''}</textarea></div>
-                        </div>
-                    </div>
-                `;
-            } else if (colName === 'quiz_bank') {
-                document.getElementById('modal-subtitle').innerText = "MULTIPLE CHOICE QUESTION";
-                html = `
-                    <input type="hidden" id="ex-type" value="tracnghiem">
-                    <div><label class="label-custom">Câu hỏi</label><textarea id="ex-q" class="glass-input h-24 font-bold text-lg text-gray-700">${data.question || ''}</textarea></div>
-                    <div class="grid grid-cols-2 gap-4 mt-4">
-                        <div class="relative"><span class="absolute left-3 top-3 font-bold text-gray-300">A</span><input id="ex-a" class="glass-input pl-8" value="${data.options?.[0]||''}"></div>
-                        <div class="relative"><span class="absolute left-3 top-3 font-bold text-gray-300">B</span><input id="ex-b" class="glass-input pl-8" value="${data.options?.[1]||''}"></div>
-                        <div class="relative"><span class="absolute left-3 top-3 font-bold text-gray-300">C</span><input id="ex-c" class="glass-input pl-8" value="${data.options?.[2]||''}"></div>
-                        <div class="relative"><span class="absolute left-3 top-3 font-bold text-gray-300">D</span><input id="ex-d" class="glass-input pl-8" value="${data.options?.[3]||''}"></div>
-                    </div>
-                    <div class="mt-4 w-1/3"><label class="label-custom">Đáp án đúng (0-3)</label><input type="number" id="ex-correct" class="glass-input font-bold text-orange-500" value="${data.correct??0}"></div>
-                `;
-            } else if (colName === 'reading_bank') {
-                document.getElementById('modal-subtitle').innerText = "READING COMPREHENSION";
-                html = `
-                    <input type="hidden" id="ex-type" value="dochieu">
-                    <div class="mb-4"><label class="label-custom">Tiêu đề</label><input id="ex-title" class="glass-input font-bold text-lg" value="${data.title||''}"></div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div><label class="label-custom">Văn bản</label><textarea id="ex-text" class="glass-input h-64 font-mono text-sm leading-relaxed">${data.text||''}</textarea></div>
-                        <div><label class="label-custom">Câu hỏi (Tách dòng)</label><textarea id="ex-qs" class="glass-input h-64">${(data.questions||[]).map(x=>x.q).join('\n')}</textarea></div>
-                    </div>
-                `;
-            } else {
-                // ESSAY (NLXH / NLVH)
-                document.getElementById('modal-subtitle').innerText = "LITERATURE ESSAY EDITOR";
-                html = `
-                    <div class="flex gap-4 mb-4">
-                        <div class="flex-1">
-                            <label class="label-custom">Loại đề</label>
-                            <select id="ex-type" class="glass-input font-bold" onchange="toggleGenreInput()">
-                                <option value="nlxh" ${data.type === 'nlxh' ? 'selected' : ''}>Nghị Luận Xã Hội</option>
-                                <option value="nlvh" ${data.type === 'nlvh' ? 'selected' : ''}>Nghị Luận Văn Học</option>
-                            </select>
-                        </div>
-                        <div id="genre-wrapper" class="flex-1 ${data.type === 'nlvh' ? '' : 'hidden'}">
-                            <label class="label-custom">Thể loại văn học</label>
-                            <select id="ex-genre" class="glass-input">
-                                <option value="Truyện" ${data.genre === 'Truyện' ? 'selected' : ''}>Truyện (Truyện ngắn, Tiểu thuyết)</option>
-                                <option value="Thơ" ${data.genre === 'Thơ' ? 'selected' : ''}>Thơ (Trữ tình, Trường ca)</option>
-                                <option value="Kịch" ${data.genre === 'Kịch' ? 'selected' : ''}>Kịch (Bi kịch, Hài kịch)</option>
-                                <option value="Ký" ${data.genre === 'Ký' ? 'selected' : ''}>Ký (Tùy bút, Tản văn)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div id="work-wrapper" class="${data.type === 'nlvh' ? '' : 'hidden'} mb-4">
-                        <label class="label-custom">Tên Tác phẩm / Tác giả</label>
-                        <input id="ex-work" class="glass-input" placeholder="Ví dụ: Vợ chồng A Phủ - Tô Hoài" value="${data.workName||''}">
-                    </div>
-                    <div class="mb-4"><label class="label-custom">Yêu cầu Đề bài</label><textarea id="ex-topic" class="glass-input h-32 font-bold text-lg text-gray-800">${data.topic||''}</textarea></div>
-                    <div class="mb-4"><label class="label-custom">Ngữ liệu (Nếu có)</label><textarea id="ex-text" class="glass-input h-24 font-mono text-sm">${data.text||''}</textarea></div>
-                    <div><label class="label-custom">Gợi ý chấm AI</label><textarea id="ex-hint" class="glass-input h-24">${data.hint||''}</textarea></div>
-                `;
-            }
-            container.innerHTML = html;
+    let data = {};
+    if(id !== 'new') {
+        const snap = await getDoc(doc(db, colName, id));
+        if(snap.exists()) data = snap.data();
+    }
 
-            // Handle Pre-select logic from Dashboard
-            if (colName === 'essay_bank') {
-                if(data.type) document.getElementById('ex-type').value = data.type;
-                else if(preSelectType) document.getElementById('ex-type').value = preSelectType;
-                
-                if(data.genre) document.getElementById('ex-genre').value = data.genre;
-                toggleGenreInput();
-            }
-        };
+    // Toolbar cho phép: Đậm, Nghiêng, Căn lề
+    const toolbar = [['bold', 'italic', 'underline'], [{ 'align': [] }], ['clean']];
+
+    let html = '';
+    if (colName === 'fulltest_bank') {
+        html = `
+            <div class="space-y-6">
+                <div><label class="label-custom">NGỮ LIỆU ĐỌC HIỂU</label><div id="edit-ft-read-text"></div></div>
+                <div><label class="label-custom">CÂU HỎI ĐỌC HIỂU (Dùng [NEXT] để tách)</label><div id="edit-ft-read-qs"></div></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div><label class="label-custom">CÂU 1 (2.0đ)</label><div id="edit-ft-nlxh"></div></div>
+                    <div><label class="label-custom">CÂU 2 (4.0đ)</label><div id="edit-ft-nlvh"></div></div>
+                </div>
+            </div>`;
+    } else if (colName === 'quiz_bank') {
+        html = `
+            <div class="space-y-6">
+                <div><label class="label-custom">CÂU HỎI TRẮC NGHIỆM</label><div id="edit-ex-q"></div></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${['A', 'B', 'C', 'D'].map((label, i) => `
+                        <div class="flex items-center gap-4 glass-input">
+                            <input type="radio" name="correct-choice" value="${i}" ${data.correct === i ? 'checked' : ''} class="w-5 h-5 accent-orange-500">
+                            <span class="font-black text-slate-300 text-xl">${label}</span>
+                            <input id="ex-opt-${i}" class="bg-transparent border-none outline-none flex-1 font-bold" value="${data.options?.[i] || ''}">
+                        </div>`).join('')}
+                </div>
+            </div>`;
+    } else if (colName === 'reading_bank') {
+        html = `
+            <div class="space-y-6">
+                <div><label class="label-custom">TIÊU ĐỀ</label><input id="ex-title" class="glass-input font-bold" value="${data.title||''}"></div>
+                <div><label class="label-custom">VĂN BẢN NGỮ LIỆU</label><div id="edit-ex-text"></div></div>
+                <div><label class="label-custom">CÂU HỎI (Dùng [NEXT] để tách)</label><div id="edit-ex-qs"></div></div>
+            </div>`;
+    } else {
+        html = `
+            <div class="flex gap-4 mb-4">
+                <div class="flex-1"><label class="label-custom">LOẠI ĐỀ</label><select id="ex-type" class="glass-input font-bold" onchange="toggleGenreInput()"><option value="nlxh" ${data.type === 'nlxh' ? 'selected' : ''}>NL Xã Hội</option><option value="nlvh" ${data.type === 'nlvh' ? 'selected' : ''}>NL Văn Học</option></select></div>
+                <div id="genre-wrapper" class="flex-1 ${data.type === 'nlvh' ? '' : 'hidden'}"><label class="label-custom">THỂ LOẠI</label><select id="ex-genre" class="glass-input"><option value="Truyện" ${data.genre === 'Truyện' ? 'selected' : ''}>Truyện</option><option value="Thơ" ${data.genre === 'Thơ' ? 'selected' : ''}>Thơ</option><option value="Kịch" ${data.genre === 'Kịch' ? 'selected' : ''}>Kịch</option><option value="Ký" ${data.genre === 'Ký' ? 'selected' : ''}>Ký</option></select></div>
+            </div>
+            <div id="work-wrapper" class="${data.type === 'nlvh' ? '' : 'hidden'} mb-4"><label class="label-custom">TÁC PHẨM</label><input id="ex-work" class="glass-input" value="${data.workName||''}"></div>
+            <div class="space-y-6">
+                <div><label class="label-custom">YÊU CẦU ĐỀ BÀI</label><div id="edit-ex-topic"></div></div>
+                <div><label class="label-custom">NGỮ LIỆU PHỤ (NẾU CÓ)</label><div id="edit-ex-text"></div></div>
+                <div><label class="label-custom">GỢI Ý CHẤM (AI)</label><div id="edit-ex-hint"></div></div>
+            </div>`;
+    }
+    container.innerHTML = html;
+
+    // Khởi tạo Quill
+    const initQ = (id, content) => {
+        const q = new Quill(id, { modules: { toolbar: toolbar }, theme: 'snow' });
+        q.clipboard.dangerouslyPasteHTML(content || "");
+        return q;
+    };
+
+    setTimeout(() => {
+        editors = {};
+        if (colName === 'fulltest_bank') {
+            editors.readText = initQ('#edit-ft-read-text', data.reading_text);
+            editors.readQs = initQ('#edit-ft-read-qs', (data.reading_questions||[]).join('<p>[NEXT]</p>'));
+            editors.nlxh = initQ('#edit-ft-nlxh', data.nlxh_topic);
+            editors.nlvh = initQ('#edit-ft-nlvh', data.nlvh_topic);
+        } else if (colName === 'quiz_bank') {
+            editors.q = initQ('#edit-ex-q', data.question);
+        } else if (colName === 'reading_bank') {
+            editors.text = initQ('#edit-ex-text', data.text);
+            editors.qs = initQ('#edit-ex-qs', (data.questions||[]).map(x=>x.q).join('<p>[NEXT]</p>'));
+        } else {
+            editors.topic = initQ('#edit-ex-topic', data.topic);
+            editors.text = initQ('#edit-ex-text', data.text);
+            editors.hint = initQ('#edit-ex-hint', data.hint);
+        }
+    }, 50);
+};
 
         window.toggleGenreInput = () => {
             const type = document.getElementById('ex-type').value;
@@ -677,51 +689,41 @@
         };
 
         // 4. SAVE DATA
-        window.saveExamData = async () => {
-            const id = document.getElementById('exam-id').value;
-            const colName = document.getElementById('exam-collection').value;
-            const type = document.getElementById('ex-type').value;
-            let data = { type, createdAt: serverTimestamp() };
+window.saveExamData = async () => {
+    const id = document.getElementById('exam-id').value;
+    const colName = document.getElementById('exam-collection').value;
+    let data = { createdAt: serverTimestamp() };
 
-            if (colName === 'fulltest_bank') {
-                data.type = 'fulltest';
-                data.reading_text = document.getElementById('ft-read-text').value;
-                data.reading_questions = document.getElementById('ft-read-qs').value.split('\n').filter(x=>x.trim());
-                data.nlxh_topic = document.getElementById('ft-nlxh').value;
-                data.nlvh_topic = document.getElementById('ft-nlvh').value;
-            } else if (colName === 'quiz_bank') {
-                data.question = document.getElementById('ex-q').value;
-                data.options = [document.getElementById('ex-a').value, document.getElementById('ex-b').value, document.getElementById('ex-c').value, document.getElementById('ex-d').value];
-                data.correct = parseInt(document.getElementById('ex-correct').value);
-            } else if (colName === 'reading_bank') {
-                data.title = document.getElementById('ex-title').value;
-                data.text = document.getElementById('ex-text').value;
-                data.questions = document.getElementById('ex-qs').value.split('\n').filter(x=>x.trim()).map(x=>({q:x}));
-            } else {
-                data.topic = document.getElementById('ex-topic').value;
-                data.text = document.getElementById('ex-text').value;
-                data.hint = document.getElementById('ex-hint').value;
-                
-                // Lưu thông tin bổ sung nếu là NLVH
-                if(type === 'nlvh') {
-                    data.genre = document.getElementById('ex-genre').value;
-                    data.workName = document.getElementById('ex-work').value;
-                } else {
-                    // Dọn dẹp nếu đổi về NLXH
-                    data.genre = null;
-                    data.workName = null;
-                }
-            }
-            try {
-                if(id === 'new') await addDoc(collection(db, colName), data);
-                else { delete data.createdAt; await updateDoc(doc(db, colName, id), data); }
-                
-                showToast("Lưu dữ liệu thành công!");
-                closeModal();
-                if(document.getElementById('view-bank').classList.contains('hidden') === false) loadBank(colName);
-                loadStats();
-            } catch(e) { alert(e.message); }
-        };
+    if (colName === 'fulltest_bank') {
+        data.type = 'fulltest';
+        data.reading_text = editors.readText.root.innerHTML;
+        data.reading_questions = editors.readQs.root.innerHTML.split('[NEXT]').map(q => q.replace(/<[^>]*>/g, '').trim()).filter(x => x);
+        data.nlxh_topic = editors.nlxh.root.innerHTML;
+        data.nlvh_topic = editors.nlvh.root.innerHTML;
+    } else if (colName === 'quiz_bank') {
+        data.type = 'tracnghiem';
+        data.question = editors.q.root.innerHTML;
+        data.options = [0,1,2,3].map(i => document.getElementById(`ex-opt-${i}`).value);
+        data.correct = parseInt(document.querySelector('input[name="correct-choice"]:checked')?.value || 0);
+    } else if (colName === 'reading_bank') {
+        data.type = 'dochieu';
+        data.title = document.getElementById('ex-title').value;
+        data.text = editors.text.root.innerHTML;
+        data.questions = editors.qs.root.innerHTML.split('[NEXT]').map(q => ({ q: q.replace(/<[^>]*>/g, '').trim() })).filter(x => x.q);
+    } else {
+        data.type = document.getElementById('ex-type').value;
+        data.topic = editors.topic.root.innerHTML;
+        data.text = editors.text.root.innerHTML;
+        data.hint = editors.hint.root.innerHTML;
+        if(data.type === 'nlvh') {
+            data.genre = document.getElementById('ex-genre').value;
+            data.workName = document.getElementById('ex-work').value;
+        }
+    }
+
+    await (id === 'new' ? addDoc(collection(db, colName), data) : updateDoc(doc(db, colName, id), data));
+    showToast("Đã lưu!"); closeModal(); loadBank(colName);
+};
 
         window.deleteItem = async (col, id) => { if(confirm("Xóa vĩnh viễn?")) { await deleteDoc(doc(db, col, id)); loadBank(col); loadStats(); } };
 
