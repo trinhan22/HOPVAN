@@ -465,15 +465,19 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
     }
 
     // --- 2. HÀM NỘP BÀI (WINDOWS GLOBAL) ---
-    window.handleAISubmission = async () => {
+window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
         if(content.split(/\s+/).filter(x => x).length < 50) { 
-            document.getElementById('short-essay-popup').style.display = 'flex'; return; 
+            document.getElementById('short-essay-popup').style.display = 'flex'; 
+            return; 
         }
+
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex';
+
         const q = window.currentExamData;
         
+        // Prompt giữ nguyên
         const systemPrompt = `
 BẠN LÀ: Giám khảo Hội đồng chấm thi tốt nghiệp THPT Quốc gia - Chuyên gia cao cấp về kiểm định chất lượng Ngữ văn (Chương trình GDPT 2018).
 THÁI ĐỘ: Khắt khe, sắc sảo, hàn lâm và tuyệt đối công tâm. Bạn có "nhãn quan" cực nhạy để phát hiện mọi hành vi dùng văn mẫu hoặc AI.
@@ -522,30 +526,51 @@ ${content}
 
         try {
             const res = await fetch(API_URL, {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
             });
             
-            if (!res.ok) throw new Error("SERVER_TIMEOUT");
+            // 1. Kiểm tra lỗi mạng/server trước
+            if (!res.ok) throw new Error("SERVER_ERROR");
 
-            const rawText = await res.text(); 
-            const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+            // 2. Lấy dữ liệu JSON từ Google (Cái này là vỏ bọc)
+            const data = await res.json();
             
+            // 3. Bóc tách nội dung văn bản (Cái ruột)
+            if (!data.candidates || !data.candidates[0].content) throw new Error("NO_CONTENT");
+            const rawText = data.candidates[0].content.parts[0].text;
+            
+            // 4. Dùng Regex lọc lấy JSON kết quả chấm bài từ nội dung văn bản
+            const jsonMatch = rawText.match(/\{[\s\S]*\}/);
             if (!jsonMatch) throw new Error("INVALID_FORMAT");
             
+            // 5. Parse thành object kết quả cuối cùng
             const result = JSON.parse(jsonMatch[0]);
+
+            // 6. Hiển thị
             renderAIResult(result);
 
+            // 7. Lưu Firebase
             if (auth.currentUser) {
                 await addDoc(collection(db, "activities"), {
-                    uid: auth.currentUser.uid, type: "fulltest", score: result.score, timestamp: serverTimestamp(), examId: q.id
+                    uid: auth.currentUser.uid,
+                    type: "fulltest",
+                    score: result.score,
+                    timestamp: serverTimestamp(),
+                    examId: q.id
                 });
             }
+
         } catch(e) {
-            console.error("Lỗi:", e);
-            const msg = e.message === "SERVER_TIMEOUT" ? "Bài thi quá dài khiến AI xử lý hơi lâu. Nhân hãy bấm 'Nộp bài' lại một lần nữa nhé!" : "Hệ thống đang bận, vui lòng thử lại sau giây lát!";
+            console.error("Lỗi chi tiết:", e);
+            let msg = "Có lỗi xảy ra, vui lòng thử lại!";
+            if (e.message === "SERVER_ERROR") msg = "Server đang bận (504). Bài quá dài, Nhân hãy bấm nộp lại nhé!";
+            if (e.message === "INVALID_FORMAT") msg = "AI trả về dữ liệu lỗi. Vui lòng nộp lại!";
             showPopup("Thông báo", msg, "error");
-        } finally { loading.style.display = 'none'; }
+        } finally {
+            loading.style.display = 'none';
+        }
     };
 
     window.resetExam = () => {
