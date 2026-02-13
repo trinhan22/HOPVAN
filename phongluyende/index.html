@@ -236,6 +236,7 @@
             const randomDoc = docs[Math.floor(Math.random() * docs.length)];
             const data = randomDoc.data();
             
+            // Ép kiểu chuẩn để tránh lỗi undefined
             window.currentExamData = { 
                 ...data, 
                 id: randomDoc.id, 
@@ -382,38 +383,36 @@
         loading.style.display = 'flex';
         const q = window.currentExamData;
         
+        // PROMPT ĐA NĂNG
         const systemPrompt = `
-        BẠN LÀ: Giám khảo đa năng Hội đồng chấm thi THPT Quốc gia - Chuyên gia kiểm định chất lượng ngôn ngữ.
-        NHIỆM VỤ: Chấm bài dựa trên đề NGẪU NHIÊN học sinh bốc được (Đọc hiểu/NLXH/NLVH).
+BẠN LÀ: Giám khảo cao cấp Hội đồng chấm thi THPT Quốc gia.
+NHIỆM VỤ: Chấm bài dựa trên đề NGẪU NHIÊN: ${q.type}.
 
-        === CƠ CHẾ TỰ NHẬN DIỆN (BẮT BUỘC) ===
-        1. Tự nhận diện loại đề: ${exam.type}. 
-        2. Áp dụng thang điểm chuẩn xác:
-        - Đọc hiểu: 4.0 điểm (Sai thuật ngữ = 0đ).
-        - Làm văn: 2.0đ hoặc 4.0đ tùy yêu cầu dung lượng đoạn văn hay bài văn.
-        3. Luôn quy đổi về 'score' thang điểm 10 để đồng bộ hệ thống.
+=== CƠ CHẾ TỰ NHẬN DIỆN & CHẤM ĐIỂM ===
+1. Nếu là ĐỌC HIỂU: Chấm thang 4.0 (Sai thuật ngữ = 0đ).
+2. Nếu là NLXH/NLVH: Chấm thang 10 (Đánh giá tư duy, dẫn chứng).
+*LƯU Ý: Luôn trả về 'score' quy đổi ra thang 10 để đồng bộ hệ thống.*
 
-        === KIỂM TRA AI (RĂN ĐE CAO) ===
-        - human_score (0-100): Phát hiện văn phong "máy" (từ nối vô hồn, liệt kê ý khô khan). 
+=== KIỂM TRA AI (RĂN ĐE) ===
+- human_score (0-100): Trừ điểm nặng nếu văn phong máy móc, sáo rỗng.
 
-        YÊU CẦU TRẢ VỀ JSON DUY NHẤT:
-        {
-            "human_score": (int),
-            "ai_comment": "Nhận xét đanh thép về văn phong.",
-            "score": (float thang 10),
-            "type_detected": "Loại đề AI nhận diện được",
-            "general_comment": "Lời phê tổng quát của Giám khảo.",
-            "strengths": ["Ưu điểm 1", "..."],
-            "weaknesses": ["Hạn chế 1", "..."],
-            "correction_html": "HTML bài sửa. Ép font Merriweather. Dùng <span class='text-bad'>[Lỗi]</span>, <span class='text-good'>[Hay]</span>, <span class='text-fix'>[Sửa]</span>.",
-            "orientation": "Định hướng tư duy văn chương."
-        }
+YÊU CẦU TRẢ VỀ JSON DUY NHẤT:
+{
+    "human_score": (int),
+    "ai_comment": "Nhận xét văn phong.",
+    "score": (float thang 10),
+    "type_detected": "Loại đề (Đọc hiểu/NLXH/NLVH)",
+    "general_comment": "Lời phê tổng quát.",
+    "strengths": ["..."],
+    "weaknesses": ["..."],
+    "correction_html": "HTML bài sửa. Ép font Merriweather. Dùng <span class='text-bad'>[Lỗi]</span>, <span class='text-good'>[Hay]</span>, <span class='text-fix'>[Sửa]</span>.",
+    "orientation": "Định hướng."
+}
 
-        ĐỀ BÀI: ${exam.topic || exam.title}
-        NGỮ LIỆU: ${exam.text || "Không có"}
-        BÀI LÀM: ${content}
-        `;
-
+NỘI DUNG ĐỀ: ${q.topic || q.title}
+NGỮ LIỆU: ${q.text || "Không có"}
+CÂU HỎI: ${JSON.stringify(q.questions || "")}
+`;
 
         try {
             // GỬI SANG BACKEND GROQ

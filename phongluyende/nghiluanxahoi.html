@@ -89,14 +89,14 @@
         <div class="modal-box popup-warning">
             <div class="modal-icon"><i class="fas fa-pen-nib"></i></div>
             <h3 class="font-bold text-xl mb-2">Bài Quá Ngắn</h3>
-            <p class="text-gray-600">Đoạn văn NLXH cần ít nhất <strong>50 từ</strong> để AI chấm chính xác nhé.</p>
+            <p class="text-gray-600">Bài làm cần ít nhất <strong>50 từ</strong> để AI chấm chính xác. Hãy viết thêm chút nữa nhé!</p>
             <div class="modal-actions"><button onclick="document.getElementById('short-essay-popup').style.display='none'" class="modal-btn bg-orange-100 !text-white-600 hover:bg-orange-200">Viết tiếp</button></div>
         </div>
     </div>
 
     <div class="mobile-header lg:hidden">
         <div class="flex items-center gap-2"><img src="../LOGO.WEBP" class="w-8 h-8"><span class="font-black text-orange-500 text-lg">HOPVAN</span></div>
-        <div class="ml-auto bg-gray-900 text-white px-3 py-1 rounded text-xs font-bold font-mono" id="timer-mobile">20:00</div>
+        <div class="ml-auto bg-gray-900 text-white px-3 py-1 rounded text-xs font-bold font-mono" id="timer-mobile">60:00</div>
     </div>
 
     <div class="dashboard-container">
@@ -115,7 +115,7 @@
                         <button onclick="adjustPromptSize(1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded text-gray-600"><i class="fas fa-plus text-xs"></i></button>
                     </div>
                     <button onclick="randomizeQuestion()" class="bg-white px-4 py-2 rounded-xl font-bold text-gray-600 hover:text-orange-600 border border-gray-200 text-sm shadow-sm flex gap-2 items-center"><i class="fas fa-sync-alt"></i> Đổi đề</button>
-                    <div class="bg-gray-900 text-white px-5 py-2 rounded-xl font-mono font-bold flex items-center gap-2 shadow-lg"><i class="fas fa-clock text-orange-400"></i> <span id="timer">20:00</span></div>
+                    <div class="bg-gray-900 text-white px-5 py-2 rounded-xl font-mono font-bold flex items-center gap-2 shadow-lg"><i class="fas fa-clock text-orange-400"></i> <span id="timer">60:00</span></div>
                 </div>
             </div>
 
@@ -239,7 +239,7 @@
         promptFontSize = 17;
         document.querySelector('.prompt-body').style.fontSize = `17px`;
         setTimeout(setupHighlightEvent, 100);
-        startTimer();
+        startTimer(); // Reset đồng hồ về 60p
     };
 
     // --- HIGHLIGHT (FIX DOM) ---
@@ -324,7 +324,7 @@
             </div>`;
     }
 
-    // --- 2. HÀM NỘP BÀI (GROQ/LLAMA 3) ---
+    // --- 2. HÀM NỘP BÀI (GROQ VERSION) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
         if(content.split(/\s+/).filter(x => x).length < 50) { 
@@ -333,40 +333,40 @@
         
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex'; 
-        stopTimer();
+        clearInterval(timerInterval); // Dừng đồng hồ khi nộp bài
 
         const q = window.currentExamData;
         
         const systemPrompt = `
-        BẠN LÀ: Trưởng hội đồng chấm thi Ngữ văn - Chuyên gia cao cấp về Nghị luận Xã hội (GDPT 2018).
-        VAI TRÒ: Giám khảo có nhãn quan sắc bén, bài trừ tuyệt đối văn mẫu rập khuôn và hành vi dùng AI viết bài.
-        THÁI ĐỘ: Quyết liệt, ngôn ngữ phê bình hàn lâm. Tập trung vào tư duy phản biện và tính thời sự.
+    BẠN LÀ: Trưởng hội đồng chấm thi Ngữ văn - Chuyên gia cao cấp về Nghị luận Xã hội (GDPT 2018).
+    VAI TRÒ: Giám khảo có nhãn quan sắc bén, bài trừ tuyệt đối văn mẫu rập khuôn và hành vi dùng AI viết bài.
+    THÁI ĐỘ: Quyết liệt, ngôn ngữ phê bình hàn lâm. Tập trung vào tư duy phản biện và tính thời sự.
 
-        NHIỆM VỤ: Chấm điểm bài làm NLXH (Đoạn văn ~200 chữ hoặc Bài văn ~600 chữ).
+    NHIỆM VỤ: Chấm điểm bài làm NLXH (Đoạn văn ~200 chữ hoặc Bài văn ~600 chữ).
 
-        === TRUY QUÉT AI & DẪN CHỨNG "XÁC ƯỚP" ===
-        - human_score (0-100): Trừ nặng điểm nếu dùng từ nối sáo rỗng rập khuôn của AI.
-        - Bài trừ các dẫn chứng lối mòn (Nick Vujicic, Edison, thầy Nguyễn Ngọc Ký...) nếu dùng một cách hời hợt. Ưu tiên dẫn chứng thực tế, mới mẻ.
+    === TRUY QUÉT AI & DẪN CHỨNG "XÁC ƯỚP" ===
+    - human_score (0-100): Trừ nặng điểm nếu dùng từ nối sáo rỗng rập khuôn của AI.
+    - Bài trừ các dẫn chứng lối mòn (Nick Vujicic, Edison, thầy Nguyễn Ngọc Ký...) nếu dùng một cách hời hợt. Ưu tiên dẫn chứng thực tế, mới mẻ.
 
-        YÊU CẦU TRẢ VỀ JSON DUY NHẤT:
-        {
-            "human_score": (int),
-            "ai_comment": "Nhận xét đanh thép về văn phong máy hay người.",
-            "score": (float thang 10, làm tròn 0.25),
-            "essay_type": "Nhận diện: Đoạn văn 200 chữ hoặc Bài văn 600 chữ",
-            "general_comment": "Lời phê sắc sảo của Giám khảo.",
-            "strengths": ["Điểm sáng tư duy 1", "..."],
-            "weaknesses": ["Lỗi logic/hời hợt 1", "Dẫn chứng cũ kĩ 2"],
-            "correction_html": "HTML bài sửa. Ép font Merriweather. Dùng <span class='text-bad'>[Lỗi]</span>, <span class='text-good'>[Hay]</span>, <span class='text-fix'>[Gợi ý sửa]</span>.",
-            "orientation": "Lời khuyên để nâng tầm tư duy phản biện cá nhân."
-        }
+    YÊU CẦU TRẢ VỀ JSON DUY NHẤT:
+    {
+        "human_score": (int),
+        "ai_comment": "Nhận xét đanh thép về văn phong máy hay người.",
+        "score": (float thang 10, làm tròn 0.25),
+        "essay_type": "Nhận diện: Đoạn văn 200 chữ hoặc Bài văn 600 chữ",
+        "general_comment": "Lời phê sắc sảo của Giám khảo.",
+        "strengths": ["Điểm sáng tư duy 1", "..."],
+        "weaknesses": ["Lỗi logic/hời hợt 1", "Dẫn chứng cũ kĩ 2"],
+        "correction_html": "HTML bài sửa. Ép font Merriweather. Dùng <span class='text-bad'>[Lỗi]</span>, <span class='text-good'>[Hay]</span>, <span class='text-fix'>[Gợi ý sửa]</span>.",
+        "orientation": "Lời khuyên để nâng tầm tư duy phản biện cá nhân."
+    }
 
-        ĐỀ BÀI: ${q.topic}
-        BÀI LÀM: ${content}
-        `;
+    ĐỀ BÀI: ${q.topic}
+    BÀI LÀM: ${content}
+    `;
 
         try {
-            // GỬI SANG BACKEND GROQ (Cấu trúc messages)
+            // GỬI SANG BACKEND GROQ
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
@@ -387,7 +387,6 @@
 
             const rawText = data.choices[0].message.content;
             
-            // Regex lấy JSON sạch
             const jsonMatch = rawText.match(/\{[\s\S]*\}/);
             if (!jsonMatch) throw new Error("INVALID_FORMAT");
 
@@ -410,16 +409,44 @@
         }
     };
 
-    window.resetExam = () => {
-        document.getElementById('input-section').classList.remove('hidden');
-        document.getElementById('output-section').classList.add('hidden');
-        document.getElementById('output-section').style.display = 'none';
+    window.resetExam = () => { 
+        document.getElementById('input-section').classList.remove('hidden'); 
+        document.getElementById('output-section').classList.add('hidden'); 
+        document.getElementById('output-section').style.display = 'none'; 
+        startTimer(); // Reset đồng hồ về 60p
     };
 
-    let timeLeft = 1200; 
-    function startTimer() { setInterval(() => { if(timeLeft > 0) { timeLeft--; const m = Math.floor(timeLeft / 60); const s = timeLeft % 60; document.getElementById('timer').innerText = `${Math.floor(m/60)}:${(m%60).toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; if(document.getElementById('timer-mobile')) document.getElementById('timer-mobile').innerText = document.getElementById('timer').innerText; } else if (timeLeft === 0) { timeLeft = -1; showPopup("Hết Giờ", "Đã hết thời gian làm bài Đọc Hiểu!", "warning"); } }, 1000); }
+    // --- ĐỒNG HỒ ĐẾM NGƯỢC 60 PHÚT ---
+    let timerInterval; 
+    let timeLeft = 3600; // 60 phút * 60 giây
 
-    onAuthStateChanged(auth, u => { if(u) { startTimer(); loadQuestions(); } else window.location.href="../log.html"; });
+    function startTimer() {
+        clearInterval(timerInterval);
+        timeLeft = 3600; // Reset về 60 phút
+        
+        // Cập nhật ngay lập tức
+        updateTimerDisplay(timeLeft);
+
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft < 0) {
+                clearInterval(timerInterval);
+                showPopup("Hết giờ", "Đã hết thời gian làm bài!", "warning");
+                return;
+            }
+            updateTimerDisplay(timeLeft);
+        }, 1000);
+    }
+
+    function updateTimerDisplay(t) {
+        const m = Math.floor(t / 60).toString().padStart(2, '0');
+        const s = (t % 60).toString().padStart(2, '0');
+        const txt = `${m}:${s}`;
+        if(document.getElementById('timer')) document.getElementById('timer').innerText = txt;
+        if(document.getElementById('timer-mobile')) document.getElementById('timer-mobile').innerText = txt;
+    }
+
+    onAuthStateChanged(auth, u => { if(u) { loadQuestions(); } else window.location.href="../log.html"; });
     document.getElementById('file-upload').addEventListener('change', (e) => { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); if(f.name.endsWith('.docx')) { r.onload = (ev) => mammoth.extractRawText({arrayBuffer: ev.target.result}).then(res => document.getElementById('student-essay').value = res.value); r.readAsArrayBuffer(f); } else showPopup("Lỗi", "Chỉ nhận file .docx", "error"); });
     document.getElementById('student-essay').oninput = function() { document.getElementById('word-count').innerText = `${this.value.trim().split(/\s+/).filter(x => x).length} TỪ`; };
 </script>

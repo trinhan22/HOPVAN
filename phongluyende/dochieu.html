@@ -12,7 +12,6 @@
     <meta property="og:type" content="article" />
 
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
-
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#FF8F50">
 
@@ -99,7 +98,7 @@
 
     <div class="mobile-header lg:hidden">
         <div class="flex items-center gap-2"><img src="../LOGO.WEBP" class="w-8 h-8"><span class="font-black text-orange-500 text-lg">HOPVAN</span></div>
-        <div class="ml-auto bg-gray-900 text-white px-3 py-1 rounded text-xs font-bold font-mono" id="timer-mobile">20:00</div>
+        <div class="ml-auto bg-gray-900 text-white px-3 py-1 rounded text-xs font-bold font-mono" id="timer-mobile">30:00</div>
     </div>
 
     <div class="dashboard-container">
@@ -118,7 +117,7 @@
                         <button onclick="adjustPromptSize(1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded text-gray-600"><i class="fas fa-plus text-xs"></i></button>
                     </div>
                     <button onclick="randomizeQuestion()" class="bg-white px-4 py-2 rounded-xl font-bold text-gray-600 hover:text-orange-600 border border-gray-200 text-sm shadow-sm flex gap-2 items-center"><i class="fas fa-sync-alt"></i> Đổi đề</button>
-                    <div class="bg-gray-900 text-white px-5 py-2 rounded-xl font-mono font-bold flex items-center gap-2 shadow-lg"><i class="fas fa-clock text-orange-400"></i> <span id="timer">20:00</span></div>
+                    <div class="bg-gray-900 text-white px-5 py-2 rounded-xl font-mono font-bold flex items-center gap-2 shadow-lg"><i class="fas fa-clock text-orange-400"></i> <span id="timer">30:00</span></div>
                 </div>
             </div>
 
@@ -244,7 +243,7 @@
         setTimeout(setupHighlightEvent, 100);
     };
 
-    // --- HIGHLIGHT (DOM) ---
+    // --- HIGHLIGHT (FIX DOM) ---
     function setupHighlightEvent() {
         const container = document.getElementById('reading-passage');
         const menu = document.getElementById('highlight-menu');
@@ -298,7 +297,7 @@
         document.getElementById('ai-correction-box').innerHTML = `
             <div class="max-w-2xl mx-auto pb-10 custom-scrollbar" style="font-family: 'Merriweather', serif; font-weight: 300;">
                 <div class="text-center mb-8">
-                    <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Tổng điểm Đọc hiểu (Groq)</div>
+                    <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Tổng điểm Đọc hiểu (Groq AI)</div>
                     <div class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2">
                         ${result.reading_score}<span class="text-2xl text-gray-400">/4.0</span>
                     </div>
@@ -350,33 +349,34 @@
         
         // PROMPT CHUẨN GROQ
         const systemPrompt = `
-        BẠN LÀ: Thành viên Hội đồng ra đề và chấm thi tốt nghiệp THPT Quốc gia - Chuyên gia cao cấp về kĩ năng giải mã ngữ liệu Đọc hiểu.
-        THÁI ĐỘ: Khắt khe, tỉ mỉ. Bạn coi trọng sự chính xác tuyệt đối trong thuật ngữ và kĩ năng suy luận logic.
-        NHIỆM VỤ: Chấm điểm ĐỌC HIỂU (Thang 4.0):
-        - Câu 1, 2 (0.5đ/câu): Sai thuật ngữ Tiếng Việt/Văn học = 0 điểm.
-        - Câu 3, 4, 5 (1.0đ/câu): Yêu cầu lí giải có chiều sâu, bám sát ngữ liệu, không diễn xuôi.
+    BẠN LÀ: Thành viên Hội đồng ra đề và chấm thi tốt nghiệp THPT Quốc gia - Chuyên gia cao cấp về kĩ năng giải mã ngữ liệu Đọc hiểu.
+    THÁI ĐỘ: Khắt khe, tỉ mỉ. Bạn coi trọng sự chính xác tuyệt đối trong thuật ngữ và kĩ năng suy luận logic.
+    NHIỆM VỤ: Chấm điểm ĐỌC HIỂU (Thang 4.0):
+    - Câu 1, 2 (0.5đ/câu): Sai thuật ngữ Tiếng Việt/Văn học = 0 điểm.
+    - Câu 3, 4, 5 (1.0đ/câu): Yêu cầu lí giải có chiều sâu, bám sát ngữ liệu, không diễn xuôi.
 
-        === CHIẾN DỊCH TRUY QUÉT AI (RĂN ĐE CAO) ===
-        - AI Check: Phát hiện bài làm dùng ChatGPT để tóm tắt ý một cách trơn tru nhưng rỗng tuếch, liệt kê ý khô khan như mục lục.
-        - 'human_score' < 50% nếu câu trả lời quá "tròn trịa" một cách máy móc.
+    === CHIẾN DỊCH TRUY QUÉT AI (RĂN ĐE CAO) ===
+    - AI Check: Phát hiện bài làm dùng ChatGPT để tóm tắt ý một cách trơn tru nhưng rỗng tuếch.
+    - 'human_score' < 50% nếu câu trả lời quá "tròn trịa" một cách máy móc.
 
-        YÊU CẦU TRẢ VỀ JSON DUY NHẤT:
-        {
-            "human_score": (int 0-100),
-            "ai_comment": "Nhận xét đanh thép về tính trung thực.",
-            "score": (float quy đổi thang 10 để đồng bộ hệ thống),
-            "reading_score": "Tổng điểm trên 4.0 (Ghi rõ: Q1:..., Q2:..., Q3:..., Q4:..., Q5:...)",
-            "general_comment": "Lời phê sắc sảo về tư duy giải mã văn bản.",
-            "strengths": ["Điểm cộng kiến thức 1", "..."],
-            "weaknesses": ["Lỗi hời hợt/sai thuật ngữ 1", "..."],
-            "correction_html": "HTML bài sửa. Ép font Merriweather. Dùng <span class='text-bad'>[Sai]</span>, <span class='text-good'>[Đúng]</span>, <span class='text-fix'>[Đáp án chuẩn]</span>.",
-            "orientation": "Định hướng phương pháp đọc hiểu chuyên sâu."
-        }
+    YÊU CẦU TRẢ VỀ JSON DUY NHẤT (KHÔNG DẪN CHUYỆN):
+    {
+        "human_score": (int 0-100),
+        "ai_comment": "Nhận xét đanh thép về tính trung thực.",
+        "score_out_of_10": (float quy đổi thang 10),
+        "reading_score": (float - ví dụ 3.75),
+        "detailed_breakdown": "Q1: 0.5, Q2: 0.5, Q3: 1.0, Q4: 0.75, Q5: 1.0",
+        "general_comment": "Lời phê sắc sảo của Giám khảo.",
+        "strengths": ["..."],
+        "weaknesses": ["..."],
+        "correction_html": "HTML bài làm đã sửa. Dùng <span class='text-bad'>[Sai]</span>, <span class='text-good'>[Đúng]</span>, <span class='text-fix'>[Sửa]</span>.",
+        "orientation": "Định hướng kĩ năng."
+    }
 
-        VĂN BẢN: ${q.text}
-        CÂU HỎI: ${JSON.stringify(q.questions)}
-        BÀI LÀM: ${content}
-        `;  
+    VĂN BẢN: ${q.text}
+    CÂU HỎI: ${JSON.stringify(q.questions)}
+    BÀI LÀM: ${content}
+    `;
 
         try {
             // GỬI SANG BACKEND GROQ
@@ -433,7 +433,7 @@
         document.getElementById('output-section').style.display = 'none';
     };
 
-    let timeLeft = 1200; 
+    let timeLeft = 1800; 
     function startTimer() { setInterval(() => { if(timeLeft > 0) { timeLeft--; const m = Math.floor(timeLeft / 60); const s = timeLeft % 60; document.getElementById('timer').innerText = `${Math.floor(m/60)}:${(m%60).toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; if(document.getElementById('timer-mobile')) document.getElementById('timer-mobile').innerText = document.getElementById('timer').innerText; } else if (timeLeft === 0) { timeLeft = -1; showPopup("Hết Giờ", "Đã hết thời gian làm bài Đọc Hiểu!", "warning"); } }, 1000); }
 
     onAuthStateChanged(auth, u => { if(u) { startTimer(); loadQuestions(); } else window.location.href="../log.html"; });
