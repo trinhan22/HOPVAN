@@ -13,7 +13,7 @@
     <style>
         :root { --primary: #FF8F50; }
         body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: flex; color: #2d3436;
+            font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: block; color: #2d3436;
             background: radial-gradient(at 0% 0%, hsla(25,100%,95%,1) 0, transparent 50%), 
                         radial-gradient(at 100% 100%, hsla(15,100%,96%,1) 0, transparent 50%), 
                         #fff9f5;
@@ -112,6 +112,42 @@
         .fa-circle-notch { animation: spin 1s linear infinite; margin-right: 8px; }
 
         @media (max-width: 1024px) { #menu-placeholder { display: none; } .main-content { padding: 20px; } }
+
+/* --- GLOBAL SCROLLBAR STYLE --- */
+
+/* 1. Thiết lập độ rộng/cao của thanh trượt */
+::-webkit-scrollbar {
+    width: 10px;  /* Độ rộng cho thanh dọc */
+    height: 10px; /* Độ cao cho thanh ngang */
+}
+
+/* 2. Thiết lập rãnh trượt (Track) - Nền chìm */
+::-webkit-scrollbar-track {
+    background: rgba(255, 143, 80, 0.05); /* Màu cam cực nhạt, gần như trong suốt */
+    border-radius: 10px;
+}
+
+/* 3. Thiết lập tay nắm (Thumb) - Phần di chuyển */
+::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 143, 80, 0.3); /* Mặc định là cam nhạt */
+    border-radius: 10px; /* Bo tròn mềm mại */
+    
+    /* Mẹo: Tạo viền trong suốt để thanh trượt trông nhỏ hơn và "lơ lửng" */
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: background-color 0.3s ease;
+}
+
+/* 4. Hiệu ứng khi di chuột vào (Hover) */
+::-webkit-scrollbar-thumb:hover {
+    background-color: #FF8F50; /* Đổi sang màu cam chính thương hiệu */
+    border: 1px solid transparent; /* Làm thanh trượt to ra một chút khi hover */
+}
+
+/* 5. (Tùy chọn) Ẩn nút mũi tên 2 đầu (nếu trình duyệt hiển thị) */
+::-webkit-scrollbar-button {
+    display: none;
+}
     </style>
 </head>
 <body>
@@ -224,7 +260,7 @@
         
         document.getElementById('alert-title').innerText = title;
         document.getElementById('alert-msg').innerText = msg;
-        iconBox.className = "icon-box";
+        iconBox.className = "icon-box"; // Reset class
         actions.innerHTML = "";
 
         if (type === 'warning') {
@@ -232,13 +268,15 @@
             icon.className = "fas fa-exclamation-triangle";
             if (confirmCallback) {
                 const cnlBtn = document.createElement('button');
-                cnlBtn.className = "px-6 py-3 rounded-xl font-bold bg-gray-100 text-gray-600";
+                cnlBtn.className = "px-6 py-3 rounded-xl font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition";
                 cnlBtn.innerText = "Kiểm tra lại";
                 cnlBtn.onclick = () => modal.classList.remove('open');
+                
                 const cfBtn = document.createElement('button');
-                cfBtn.className = "px-6 py-3 rounded-xl font-bold bg-orange-500 text-white shadow-lg";
+                cfBtn.className = "px-6 py-3 rounded-xl font-bold bg-orange-500 text-white shadow-lg hover:shadow-orange-200 transition";
                 cfBtn.innerText = "Nộp ngay";
                 cfBtn.onclick = () => { modal.classList.remove('open'); confirmCallback(); };
+                
                 actions.append(cnlBtn, cfBtn);
             }
         } else if (type === 'error') {
@@ -249,7 +287,7 @@
             btn.innerText = "Đóng";
             btn.onclick = () => modal.classList.remove('open');
             actions.appendChild(btn);
-        } else {
+        } else { // Info
             iconBox.classList.add('icon-info');
             icon.className = "fas fa-info-circle";
             const btn = document.createElement('button');
@@ -270,14 +308,27 @@
     async function initQuiz() {
         const form = document.getElementById('quiz-form');
         form.innerHTML = '<div class="text-center py-20"><i class="fas fa-circle-notch fa-spin text-orange-500 text-4xl"></i></div>';
+        
         try {
+            // Logic lấy tất cả câu hỏi level 1
             const q = query(collection(db, "study_levels"), where("level", "==", 1));
             const snap = await getDocs(q);
+
             if (snap.empty) {
                 form.innerHTML = '<p class="text-center text-red-500 font-black py-20 bg-white rounded-3xl">LEVEL 1 CHƯA CÓ DỮ LIỆU TRÊN ADMIN!</p>';
                 return;
             }
-            currentQuestions = snap.docs[0].data().content;
+
+            // Gộp data (giả sử mỗi doc chứa 1 câu hoặc mảng)
+            currentQuestions = [];
+            snap.forEach(doc => {
+                const data = doc.data();
+                if(data.content) {
+                    if (Array.isArray(data.content)) currentQuestions = currentQuestions.concat(data.content);
+                    else currentQuestions.push(data.content);
+                }
+            });
+
             form.innerHTML = ''; 
             currentQuestions.forEach((item, index) => {
                 const div = document.createElement('div');
@@ -312,9 +363,14 @@
             for(let r of radios) { if(r.checked) selected = parseInt(r.value); r.disabled = true; }
             
             const correctIdx = item.correct; 
-            document.getElementById(`lbl-${index}-${correctIdx}`).classList.add('correct');
+            const correctLbl = document.getElementById(`lbl-${index}-${correctIdx}`);
+            if(correctLbl) correctLbl.classList.add('correct');
+            
             if(selected === correctIdx) correctCount++;
-            else if (selected !== -1) document.getElementById(`lbl-${index}-${selected}`).classList.add('wrong');
+            else if (selected !== -1) {
+                const wrongLbl = document.getElementById(`lbl-${index}-${selected}`);
+                if(wrongLbl) wrongLbl.classList.add('wrong');
+            }
         });
 
         const totalScore = parseFloat(((correctCount / currentQuestions.length) * 10).toFixed(1));
@@ -345,6 +401,8 @@
             try {
                 await addDoc(collection(db, "activities"), {
                     uid: userUid,
+                    userName: auth.currentUser.displayName || "User",
+                    examTitle: "Trắc nghiệm Level 1",
                     action: `Vượt ải Level 1: ${totalScore} điểm`,
                     type: "journal",
                     score: totalScore,
@@ -364,6 +422,8 @@
         const msg = done < currentQuestions.length 
             ? `Bạn mới hoàn thành ${done}/${currentQuestions.length} câu. Vẫn muốn nộp chứ?` 
             : 'Bạn đã hoàn thành bài thi. Bạn có chắc muốn nộp bài không?';
+        
+        // Gọi Popup mới thay cho confirm cũ
         showPopup('warning', 'Xác nhận nộp bài', msg, submitQuizProcess);
     };
 
@@ -403,11 +463,6 @@
             submitQuizProcess();
         }
     }, 1000);
-
-    fetch('menu.html').then(r=>r.text()).then(h=>{
-        const p = document.getElementById('menu-placeholder'); p.innerHTML=h;
-        p.querySelectorAll('script').forEach(s=>{const n=document.createElement('script');n.text=s.text;document.body.appendChild(n)});
-    });
 </script>
 </body>
 </html>

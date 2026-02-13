@@ -381,115 +381,125 @@
                 </div>
             </div>
 
-            <div id="view-journal" class="view-section hidden h-full">
-                <div class="flex gap-8 h-[calc(100vh-160px)]">
-                    <div class="w-1/3 glass-panel rounded-3xl flex flex-col overflow-hidden">
-                        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white/40">
-                            <h3 class="font-bold text-gray-800">Cấu trúc Level</h3>
-                            <button onclick="resetLevelForm()" class="w-8 h-8 rounded-full bg-orange-100 text-orange-500 hover:bg-orange-500 hover:text-white transition flex items-center justify-center">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                        <div id="level-list" class="flex-1 overflow-y-auto p-4 space-y-3">
-                            </div>
-                    </div>
-                    
-                    <div class="flex-1 glass-panel rounded-3xl p-8 overflow-y-auto bg-white/60">
-                        <div class="flex items-center justify-between mb-8">
-                            <div>
-                                <h3 class="text-2xl font-black text-gray-800" id="lvl-form-title">Thiết lập Level</h3>
-                                <p class="text-sm text-gray-500">Tùy chỉnh nội dung bài học theo cấp độ</p>
-                            </div>
-                            <div class="px-3 py-1 bg-orange-50 text-orange-600 rounded-lg text-xs font-black uppercase tracking-wider">Lộ trình học tập</div>
-                        </div>
-                        
-                        <form id="level-form" class="space-y-6">
-                            <input type="hidden" id="lvl-id">
-                            
-                            <div class="grid grid-cols-2 gap-6">
-                                <div>
-                                    <label class="label-custom">Thứ tự Level (Số)</label>
-                                    <input type="number" id="lvl-num" class="glass-input" placeholder="Ví dụ: 1">
-                                </div>
-                                <div>
-                                    <label class="label-custom">Loại hình bài tập</label>
-                                    <select id="lvl-type" class="glass-input font-bold" onchange="toggleLevelFields()">
-                                        <option value="tracnghiem">Câu hỏi Trắc nghiệm</option>
-                                        <option value="dochieu">Bài tập Đọc hiểu</option>
-                                        <option value="nlxh">Nghị luận Xã hội</option>
-                                        <option value="nlvh">Nghị luận Văn học</option>
-                                    </select>
-                                </div>
-                            </div>
+<div id="view-journal" class="view-section hidden h-full">
+    <div class="flex gap-8 h-[calc(100vh-160px)]">
+        
+        <div class="w-1/3 glass-panel rounded-3xl flex flex-col overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white/40">
+                <h3 class="font-bold text-gray-800">Danh sách Level</h3>
+                <button onclick="resetLevelForm()" class="w-8 h-8 rounded-full bg-orange-100 text-orange-500 hover:bg-orange-500 hover:text-white transition flex items-center justify-center shadow-sm">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div id="level-list" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                </div>
+        </div>
+        
+<div class="flex-1 glass-panel rounded-3xl p-8 overflow-y-auto bg-white/60 custom-scrollbar">
+     <div class="flex items-center justify-between mb-8">
+        <div>
+            <h3 class="text-2xl font-black text-gray-800" id="lvl-form-title">Tạo Level Mới</h3>
+            <p class="text-sm text-gray-500">Thiết lập nội dung bài học & bài tập</p>
+        </div>
+        <div class="px-3 py-1 bg-orange-100 text-orange-600 rounded-lg text-xs font-black uppercase tracking-wider">Editor Mode</div>
+    </div>
+    
+    <form id="level-form" class="space-y-6">
+        <input type="hidden" id="lvl-id">
+        
+        <div class="grid grid-cols-3 gap-6">
+            <div class="col-span-1">
+                <label class="label-custom">Thứ tự Level</label>
+                <input type="number" id="lvl-num" class="glass-input font-bold text-center" placeholder="1">
+            </div>
+            <div class="col-span-2">
+                <label class="label-custom">Loại bài tập</label>
+                <select id="lvl-type" class="glass-input font-bold cursor-pointer" onchange="toggleLevelFields()">
+                    <option value="tracnghiem">Bộ câu hỏi Trắc nghiệm</option>
+                    <option value="dochieu">Bài tập Đọc hiểu</option>
+                    <option value="nlxh">Nghị luận Xã hội</option>
+                    <option value="nlvh">Nghị luận Văn học</option>
+                </select>
+            </div>
+        </div>
 
-                            <div>
-                                <label class="label-custom">Tiêu đề Level</label>
-                                <input id="lvl-title" class="glass-input" placeholder="Ví dụ: Khởi động kiến thức nền">
-                            </div>
+        <div>
+            <label class="label-custom">Tiêu đề Level</label>
+            <input id="lvl-title" class="glass-input" placeholder="Ví dụ: Khởi động văn học dân gian">
+        </div>
+        <div>
+            <label class="label-custom">Mô tả ngắn</label>
+            <input id="lvl-desc" class="glass-input" placeholder="Mục tiêu bài học...">
+        </div>
 
-                            <div>
-                                <label class="label-custom">Mô tả ngắn</label>
-                                <input id="lvl-desc" class="glass-input" placeholder="Ghi chú mục tiêu của level này...">
-                            </div>
+        <hr class="border-dashed border-gray-300 my-4">
 
-                            <div class="p-6 rounded-3xl border-2 border-dashed border-orange-200 bg-orange-50/30 mt-4">
-                                
-                                <div id="lvl-field-tracnghiem" class="hidden space-y-6">
-                                    <div>
-                                        <label class="label-custom text-orange-600">Câu hỏi chính</label>
-                                        <textarea id="lvl-quiz-q" class="glass-input h-20" placeholder="Nhập câu hỏi trắc nghiệm..."></textarea>
-                                    </div>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div class="flex items-center gap-4 glass-input bg-white">
-                                            <input type="radio" name="lvl-correct" value="0" class="w-5 h-5 accent-orange-500">
-                                            <span class="font-black text-slate-300 text-xl">A</span>
-                                            <input id="lvl-quiz-opt-0" class="bg-transparent border-none outline-none flex-1 font-bold" placeholder="Đáp án A">
-                                        </div>
-                                        <div class="flex items-center gap-4 glass-input bg-white">
-                                            <input type="radio" name="lvl-correct" value="1" class="w-5 h-5 accent-orange-500">
-                                            <span class="font-black text-slate-300 text-xl">B</span>
-                                            <input id="lvl-quiz-opt-1" class="bg-transparent border-none outline-none flex-1 font-bold" placeholder="Đáp án B">
-                                        </div>
-                                        <div class="flex items-center gap-4 glass-input bg-white">
-                                            <input type="radio" name="lvl-correct" value="2" class="w-5 h-5 accent-orange-500">
-                                            <span class="font-black text-slate-300 text-xl">C</span>
-                                            <input id="lvl-quiz-opt-2" class="bg-transparent border-none outline-none flex-1 font-bold" placeholder="Đáp án C">
-                                        </div>
-                                        <div class="flex items-center gap-4 glass-input bg-white">
-                                            <input type="radio" name="lvl-correct" value="3" class="w-5 h-5 accent-orange-500">
-                                            <span class="font-black text-slate-300 text-xl">D</span>
-                                            <input id="lvl-quiz-opt-3" class="bg-transparent border-none outline-none flex-1 font-bold" placeholder="Đáp án D">
-                                        </div>
-                                    </div>
-                                    <p class="text-[10px] font-bold text-gray-400 italic">* Tích chọn vào hình tròn để xác định đáp án đúng.</p>
-                                </div>
+        <div id="lvl-field-tracnghiem" class="hidden">
+            <div class="flex justify-between items-center mb-4">
+                <label class="label-custom text-orange-600">Danh sách câu hỏi</label>
+                <span class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">Tự động trộn đề</span>
+            </div>
+            <div id="quiz-list" class="space-y-6 mb-6"></div>
+            <button type="button" onclick="addQuizQuestion()" class="w-full py-4 border-2 border-dashed border-orange-300 text-orange-500 rounded-2xl font-bold hover:bg-orange-50 hover:border-orange-400 transition flex items-center justify-center gap-2 group">
+                <i class="fas fa-plus-circle group-hover:scale-110 transition"></i> Thêm câu hỏi trắc nghiệm
+            </button>
+        </div>
 
-                                <div id="lvl-field-reading" class="hidden space-y-4">
-                                    <label class="label-custom text-blue-600">Nội dung Đọc hiểu</label>
-                                    <input id="lvl-read-title" class="glass-input font-bold" placeholder="Tiêu đề văn bản ngữ liệu">
-                                    <textarea id="lvl-read-text" class="glass-input h-40 font-serif" placeholder="Dán nội dung văn bản vào đây..."></textarea>
-                                    <div>
-                                        <label class="label-custom text-blue-600">Câu hỏi (Ngăn cách bằng [NEXT])</label>
-                                        <textarea id="lvl-read-qs" class="glass-input h-24" placeholder="Câu hỏi 1 [NEXT] Câu hỏi 2 [NEXT] ..."></textarea>
-                                    </div>
-                                </div>
-
-                                <div id="lvl-field-essay" class="hidden space-y-4">
-                                    <label class="label-custom text-green-600">Đề bài Nghị luận</label>
-                                    <textarea id="lvl-essay-topic" class="glass-input h-24 font-bold" placeholder="Nhập đề bài nghị luận..."></textarea>
-                                    <textarea id="lvl-essay-text" class="glass-input h-24" placeholder="Ngữ liệu phụ (nếu có)"></textarea>
-                                    <textarea id="lvl-essay-hint" class="glass-input h-32" placeholder="Dàn ý gợi ý hoặc từ khóa chấm điểm..."></textarea>
-                                </div>
-                            </div>
-
-                            <div class="flex justify-end gap-3 pt-6 border-t border-gray-100">
-                                <button type="button" onclick="deleteLevel()" id="btn-del-lvl" class="hidden px-6 py-3 text-red-500 font-bold hover:bg-red-50 rounded-xl text-sm transition">Xóa Level</button>
-                                <button type="button" onclick="saveLevel()" class="px-8 py-3 bg-gray-900 text-white rounded-xl font-bold hover:shadow-xl hover:scale-105 transition text-sm">Cập nhật Level</button>
-                            </div>
-                        </form>
-                    </div>
+        <div id="lvl-field-reading" class="hidden space-y-6">
+            <div>
+                <label class="label-custom text-blue-600">Tiêu đề văn bản</label>
+                <input id="lvl-read-title" class="glass-input font-bold" placeholder="VD: Mùa xuân nho nhỏ">
+            </div>
+            
+            <div>
+                <label class="label-custom text-blue-600">Ngữ liệu Đọc hiểu (Văn bản/Thơ)</label>
+                <div class="bg-white rounded-xl overflow-hidden border border-gray-200">
+                    <div id="editor-read-text" style="height: 250px;"></div>
                 </div>
             </div>
+            
+            <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                <label class="label-custom text-blue-600">Câu hỏi tự luận</label>
+                <p class="text-[10px] text-gray-400 mb-2 font-medium">Dùng thẻ <b>[NEXT]</b> để ngăn cách.</p>
+                <textarea id="lvl-read-qs" class="glass-input h-32 bg-white" placeholder="Câu 1... [NEXT] Câu 2..."></textarea>
+            </div>
+        </div>
+
+        <div id="lvl-field-essay" class="hidden space-y-6">
+            <div>
+                <label class="label-custom text-green-600">Đề bài Làm văn</label>
+                <div class="bg-white rounded-xl overflow-hidden border border-gray-200">
+                    <div id="editor-essay-topic" style="height: 120px;"></div>
+                </div>
+            </div>
+            
+            <div>
+                <label class="label-custom text-green-600">Ngữ liệu phụ / Trích dẫn (Nếu có)</label>
+                <div class="bg-white rounded-xl overflow-hidden border border-gray-200">
+                    <div id="editor-essay-text" style="height: 120px;"></div>
+                </div>
+            </div>
+
+            <div>
+                <label class="label-custom text-green-600">Gợi ý chấm điểm (AI Prompt)</label>
+                <div class="bg-white rounded-xl overflow-hidden border border-gray-200">
+                    <div id="editor-essay-hint" style="height: 150px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sticky bottom-0 -mx-8 -mb-8 px-8 py-5 bg-white/20 backdrop-blur-xl border-t border-white/30 flex justify-end gap-3 rounded-b-3xl z-20">
+            <button type="button" onclick="deleteLevel()" id="btn-del-lvl" class="hidden px-6 py-3 text-red-500 font-bold hover:bg-red-50 rounded-xl text-sm transition flex items-center">
+                <i class="fas fa-trash-alt mr-2"></i> Xóa
+            </button>
+            <button type="button" onclick="saveLevel()" class="px-8 py-3 bg-gray-900 text-white rounded-xl font-bold shadow-lg shadow-gray-900/20 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 text-sm flex items-center">
+                <i class="fas fa-save mr-2"></i> Lưu Thay Đổi
+            </button>
+        </div>
+    </form>
+</div>
+    </div>
+</div>
 
             <div id="view-history" class="view-section hidden">
                 <div class="glass-panel rounded-3xl p-8">
@@ -941,22 +951,66 @@
     };
 
     // 6. LEVEL & HISTORY
-    window.toggleLevelFields = () => {
-        const type = document.getElementById('lvl-type').value;
-        // Ẩn tất cả
-        ['lvl-field-tracnghiem', 'lvl-field-reading', 'lvl-field-essay'].forEach(id => {
-            document.getElementById(id).classList.add('hidden');
-        });
+window.addQuizQuestion = (data = {}) => {
+    const container = document.getElementById('quiz-list');
+    // Tạo ID ngẫu nhiên để group các radio button lại với nhau không bị trùng
+    const uniqueId = Date.now() + Math.random().toString(36).substr(2, 9);
+
+    const div = document.createElement('div');
+    div.className = "quiz-item p-5 bg-white rounded-2xl border border-gray-200 shadow-sm relative group hover:border-orange-300 transition-all";
+    
+    // Lấy dữ liệu cũ nếu có (chế độ sửa) hoặc để trống (chế độ tạo mới)
+    const qVal = data.question || "";
+    const opts = data.options || ["", "", "", ""];
+    const corr = data.correct !== undefined ? data.correct : 0; // Mặc định đáp án A (0) nếu chưa chọn
+
+    div.innerHTML = `
+        <div class="flex justify-between items-center mb-3">
+            <span class="text-xs font-black text-orange-500 uppercase tracking-wider bg-orange-50 px-2 py-1 rounded">Câu hỏi</span>
+            <button type="button" onclick="this.closest('.quiz-item').remove()" class="text-gray-300 hover:text-red-500 transition px-2" title="Xóa câu này">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
         
-        // Hiện cái tương ứng
-        if(type === 'tracnghiem') {
-            document.getElementById('lvl-field-tracnghiem').classList.remove('hidden');
-        } else if(type === 'dochieu') {
-            document.getElementById('lvl-field-reading').classList.remove('hidden');
-        } else {
-            document.getElementById('lvl-field-essay').classList.remove('hidden');
+        <textarea class="glass-input h-20 mb-4 font-medium q-input bg-gray-50 focus:bg-white" placeholder="Nhập nội dung câu hỏi...">${qVal}</textarea>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            ${[0, 1, 2, 3].map((i) => `
+                <div class="flex items-center gap-3 bg-white p-2 rounded-xl border border-gray-100 hover:border-orange-300 transition-colors shadow-sm">
+                    <div class="relative flex items-center justify-center w-8 h-8">
+                        <input type="radio" name="correct-${uniqueId}" value="${i}" class="peer w-5 h-5 accent-orange-500 cursor-pointer z-10" ${corr === i ? 'checked' : ''}>
+                        <div class="absolute inset-0 rounded-full bg-orange-100 scale-0 peer-checked:scale-100 transition-transform"></div>
+                    </div>
+                    <span class="font-black text-gray-400 text-sm">${String.fromCharCode(65 + i)}</span>
+                    <input class="bg-transparent border-none outline-none flex-1 text-sm font-medium text-gray-700 placeholder-gray-300 opt-input" placeholder="Đáp án ${String.fromCharCode(65 + i)}" value="${opts[i]}">
+                </div>
+            `).join('')}
+        </div>
+    `;
+    container.appendChild(div);
+    
+    // Scroll nhẹ xuống câu hỏi vừa tạo
+    div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+};
+
+window.toggleLevelFields = () => {
+    const type = document.getElementById('lvl-type').value;
+    ['lvl-field-tracnghiem', 'lvl-field-reading', 'lvl-field-essay'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+    
+    if(type === 'tracnghiem') {
+        document.getElementById('lvl-field-tracnghiem').classList.remove('hidden');
+        // Nếu list đang trống thì thêm 1 câu mặc định
+        if(document.getElementById('quiz-list').children.length === 0) {
+            addQuizQuestion();
         }
-    };
+    } else if(type === 'dochieu') {
+        document.getElementById('lvl-field-reading').classList.remove('hidden');
+    } else {
+        document.getElementById('lvl-field-essay').classList.remove('hidden');
+    }
+};
 
     window.loadLevelsList = async () => {
         const listEl = document.getElementById('level-list');
@@ -991,108 +1045,133 @@
         }
     };
 
-    window.fillLevelForm = (id, data) => {
-        resetLevelForm(); // Clear trước khi đổ
-        
-        document.getElementById('lvl-id').value = id;
-        document.getElementById('lvl-num').value = data.level;
-        document.getElementById('lvl-type').value = data.type;
-        document.getElementById('lvl-title').value = data.title;
-        document.getElementById('lvl-desc').value = data.desc;
-        document.getElementById('lvl-form-title').innerText = `Chỉnh sửa Level ${data.level}`;
-        document.getElementById('btn-del-lvl').classList.remove('hidden');
-        
-        toggleLevelFields(); 
+// --- KHỞI TẠO EDITOR CHO JOURNAL ---
+// Biến lưu trữ các instance của Quill để dùng lại
+let journalEditors = {};
 
-        if(data.type === 'tracnghiem') {
-            document.getElementById('lvl-quiz-q').value = data.content.question || '';
-            const opts = data.content.options || [];
-            opts.forEach((opt, i) => {
-                if(document.getElementById(`lvl-quiz-opt-${i}`)) {
-                    document.getElementById(`lvl-quiz-opt-${i}`).value = opt;
-                }
+// Hàm khởi tạo (chạy 1 lần khi trang load hoặc khi mở view này)
+function initJournalEditors() {
+    if (journalEditors.readText) return; // Đã tạo rồi thì thôi
+
+    const toolbarOptions = [
+        ['bold', 'italic', 'underline'],        // Chữ đậm, nghiêng, gạch chân
+        [{ 'align': [] }],                      // Căn trái, giữa, phải
+        [{ 'header': [1, 2, false] }],          // Tiêu đề
+        ['clean']                               // Xóa định dạng
+    ];
+
+    journalEditors.readText = new Quill('#editor-read-text', { theme: 'snow', modules: { toolbar: toolbarOptions }, placeholder: 'Nhập nội dung văn bản/thơ...' });
+    journalEditors.essayTopic = new Quill('#editor-essay-topic', { theme: 'snow', modules: { toolbar: toolbarOptions }, placeholder: 'Nhập yêu cầu đề bài...' });
+    journalEditors.essayText = new Quill('#editor-essay-text', { theme: 'snow', modules: { toolbar: toolbarOptions }, placeholder: 'Nhập ngữ liệu bổ sung...' });
+    journalEditors.essayHint = new Quill('#editor-essay-hint', { theme: 'snow', modules: { toolbar: toolbarOptions }, placeholder: 'Nhập hướng dẫn chấm cho AI...' });
+}
+
+// Gọi hàm này ngay khi script chạy (hoặc khi switchView)
+initJournalEditors();
+
+window.fillLevelForm = (id, data) => {
+    resetLevelForm();
+    
+    document.getElementById('lvl-id').value = id;
+    document.getElementById('lvl-num').value = data.level;
+    document.getElementById('lvl-type').value = data.type;
+    document.getElementById('lvl-title').value = data.title;
+    document.getElementById('lvl-desc').value = data.desc;
+    document.getElementById('lvl-form-title').innerText = `Sửa Level ${data.level}`;
+    document.getElementById('btn-del-lvl').classList.remove('hidden');
+    
+    toggleLevelFields(); 
+
+    if(data.type === 'tracnghiem') {
+        const content = data.content;
+        if (Array.isArray(content)) content.forEach(q => addQuizQuestion(q));
+        else if (content && typeof content === 'object') addQuizQuestion(content);
+        else addQuizQuestion();
+    } 
+    else if(data.type === 'dochieu') {
+        document.getElementById('lvl-read-title').value = data.content.title || '';
+        document.getElementById('lvl-read-qs').value = data.content.questions ? data.content.questions.map(x => x.q).join(' [NEXT] ') : '';
+        
+        // Đổ dữ liệu vào Quill Editor
+        journalEditors.readText.root.innerHTML = data.content.text || '';
+    } 
+    else {
+        // Đổ dữ liệu vào Quill Editor (Nghị luận)
+        journalEditors.essayTopic.root.innerHTML = data.content.topic || '';
+        journalEditors.essayText.root.innerHTML = data.content.text || '';
+        journalEditors.essayHint.root.innerHTML = data.content.hint || '';
+    }
+};
+
+window.resetLevelForm = () => {
+    document.getElementById('level-form').reset();
+    document.getElementById('lvl-id').value = "";
+    document.getElementById('lvl-form-title').innerText = "Tạo Level Mới";
+    document.getElementById('btn-del-lvl').classList.add('hidden');
+    document.getElementById('quiz-list').innerHTML = "";
+    
+    // Reset các Editor về trống
+    journalEditors.readText.setText('');
+    journalEditors.essayTopic.setText('');
+    journalEditors.essayText.setText('');
+    journalEditors.essayHint.setText('');
+
+    toggleLevelFields();
+    if(document.getElementById('lvl-type').value === 'tracnghiem') addQuizQuestion();
+};
+
+window.saveLevel = async () => {
+    const id = document.getElementById('lvl-id').value;
+    const type = document.getElementById('lvl-type').value;
+    const levelNum = parseInt(document.getElementById('lvl-num').value);
+    
+    let content = {};
+    
+    try {
+        if(type === 'tracnghiem') {
+            // ... (Giữ nguyên logic trắc nghiệm cũ của bạn) ...
+            const quizItems = document.querySelectorAll('.quiz-item');
+            if (quizItems.length === 0) throw new Error("Cần ít nhất 1 câu hỏi!");
+            content = Array.from(quizItems).map(item => {
+                const questionText = item.querySelector('.q-input').value;
+                const optionInputs = item.querySelectorAll('.opt-input');
+                const options = Array.from(optionInputs).map(opt => opt.value);
+                const checkedRadio = item.querySelector('input[type="radio"]:checked');
+                const correct = checkedRadio ? parseInt(checkedRadio.value) : 0;
+                return { question: questionText, options: options, correct: correct };
             });
-            // Set radio đáp án đúng
-            const radio = document.querySelector(`input[name="lvl-correct"][value="${data.content.correct}"]`);
-            if(radio) radio.checked = true;
+        } 
+        else if(type === 'dochieu') {
+            content.title = document.getElementById('lvl-read-title').value;
+            // Lấy HTML từ Editor thay vì value
+            content.text = journalEditors.readText.root.innerHTML; 
+            
+            const qsRaw = document.getElementById('lvl-read-qs').value;
+            content.questions = qsRaw.split('[NEXT]').map(q => ({ q: q.trim() })).filter(x => x.q !== "");
+        } 
+        else {
+            // Lấy HTML từ Editor (Nghị luận)
+            content.topic = journalEditors.essayTopic.root.innerHTML;
+            content.text = journalEditors.essayText.root.innerHTML;
+            content.hint = journalEditors.essayHint.root.innerHTML;
+        }
 
-        } else if(data.type === 'dochieu') {
-            document.getElementById('lvl-read-title').value = data.content.title || '';
-            document.getElementById('lvl-read-text').value = data.content.text || '';
-            // Biến mảng questions thành chuỗi dùng [NEXT]
-            if(data.content.questions) {
-                document.getElementById('lvl-read-qs').value = data.content.questions.map(x => x.q).join(' [NEXT] ');
-            }
+        const finalData = {
+            level: levelNum, type: type, title: document.getElementById('lvl-title').value,
+            desc: document.getElementById('lvl-desc').value, content: content, updatedAt: serverTimestamp()
+        };
+
+        if(id) {
+            await updateDoc(doc(db, "study_levels", id), finalData);
+            showToast("Đã cập nhật level!");
         } else {
-            document.getElementById('lvl-essay-topic').value = data.content.topic || '';
-            document.getElementById('lvl-essay-text').value = data.content.text || '';
-            document.getElementById('lvl-essay-hint').value = data.content.hint || '';
+            finalData.createdAt = serverTimestamp();
+            await addDoc(collection(db, "study_levels"), finalData);
+            showToast("Đã tạo level mới!");
         }
-    };
-
-    window.resetLevelForm = () => {
-        document.getElementById('level-form').reset();
-        document.getElementById('lvl-id').value = "";
-        document.getElementById('lvl-form-title').innerText = "Tạo Level Mới";
-        document.getElementById('btn-del-lvl').classList.add('hidden');
-        // Reset radio buttons
-        document.querySelectorAll('input[name="lvl-correct"]').forEach(r => r.checked = false);
-        toggleLevelFields();
-    };
-
-    window.saveLevel = async () => {
-        const id = document.getElementById('lvl-id').value;
-        const type = document.getElementById('lvl-type').value;
-        const levelNum = parseInt(document.getElementById('lvl-num').value);
-        
-        let content = {};
-        
-        try {
-            if(type === 'tracnghiem') {
-                content.question = document.getElementById('lvl-quiz-q').value;
-                content.options = [0,1,2,3].map(i => document.getElementById(`lvl-quiz-opt-${i}`).value);
-                content.correct = parseInt(document.querySelector('input[name="lvl-correct"]:checked')?.value || 0);
-            } 
-            else if(type === 'dochieu') {
-                content.title = document.getElementById('lvl-read-title').value;
-                content.text = document.getElementById('lvl-read-text').value;
-                // Xử lý chuỗi [NEXT] thành mảng object
-                const qsRaw = document.getElementById('lvl-read-qs').value;
-                content.questions = qsRaw.split('[NEXT]').map(q => ({ q: q.trim() })).filter(x => x.q !== "");
-            } 
-            else {
-                content.topic = document.getElementById('lvl-essay-topic').value;
-                content.text = document.getElementById('lvl-essay-text').value;
-                content.hint = document.getElementById('lvl-essay-hint').value;
-            }
-
-            const finalData = {
-                level: levelNum,
-                type: type,
-                title: document.getElementById('lvl-title').value,
-                desc: document.getElementById('lvl-desc').value,
-                content: content,
-                updatedAt: serverTimestamp()
-            };
-
-            if(id) {
-                await updateDoc(doc(db, "study_levels", id), finalData);
-                showToast("Đã cập nhật level thành công!");
-            } else {
-                finalData.createdAt = serverTimestamp();
-                await addDoc(collection(db, "study_levels"), finalData);
-                showToast("Đã tạo level mới!");
-            }
-
-            loadLevelsList();
-            resetLevelForm();
-            loadStats(); // Cập nhật lại số lượng ở Dashboard
-
-        } catch(e) {
-            console.error(e);
-            alert("Có lỗi xảy ra, vui lòng kiểm tra lại các ô nhập liệu!");
-        }
-    };
+        loadLevelsList(); resetLevelForm(); loadStats();
+    } catch(e) { console.error(e); alert("Lỗi: " + e.message); }
+};
 
     window.deleteLevel = async () => {
         const id = document.getElementById('lvl-id').value;
