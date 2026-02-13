@@ -312,7 +312,7 @@
     </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -326,58 +326,36 @@
     let questionsData = []; 
     window.currentExamData = null;
 
-    // --- HÀM HIỂN THỊ POPUP ---
+    // --- HELPER FUNCTIONS ---
     window.showPopup = (title, message, type = 'info') => {
         const modal = document.getElementById('generic-popup');
         const box = modal.querySelector('.modal-box');
         const icon = document.getElementById('popup-icon');
-        
-        // Reset classes
         box.classList.remove('popup-error', 'popup-warning', 'popup-info');
-        
-        // Set content & theme
         document.getElementById('popup-title').innerText = title;
         document.getElementById('popup-message').innerText = message;
-        
-        if (type === 'error') {
-            box.classList.add('popup-error');
-            icon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
-        } else if (type === 'warning') {
-            box.classList.add('popup-warning');
-            icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
-        } else {
-            box.classList.add('popup-info');
-            icon.innerHTML = '<i class="fas fa-info-circle"></i>';
-        }
-        
+        if (type === 'error') { box.classList.add('popup-error'); icon.innerHTML = '<i class="fas fa-exclamation-circle"></i>'; } 
+        else if (type === 'warning') { box.classList.add('popup-warning'); icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>'; } 
+        else { box.classList.add('popup-info'); icon.innerHTML = '<i class="fas fa-info-circle"></i>'; }
         modal.style.display = 'flex';
     };
+    window.closePopup = () => document.getElementById('generic-popup').style.display = 'none';
 
-    window.closePopup = () => {
-        document.getElementById('generic-popup').style.display = 'none';
-    };
-
-    // --- 1. CHỈNH CỠ CHỮ ---
     let promptFontSize = 17;
     window.adjustPromptSize = (amount) => {
         promptFontSize += amount;
         if(promptFontSize < 14) promptFontSize = 14;
         if(promptFontSize > 26) promptFontSize = 26;
-        
         document.querySelector('.prompt-body').style.fontSize = `${promptFontSize}px`;
-        const contents = document.querySelectorAll('.exam-content');
-        contents.forEach(el => el.style.fontSize = `${promptFontSize}px`);
+        document.querySelectorAll('.exam-content').forEach(el => el.style.fontSize = `${promptFontSize}px`);
     };
 
-    // --- 2. TẢI ĐỀ TỪ FIREBASE (FULLTEST_BANK) ---
+    // --- DATA LOADING ---
     async function loadQuestions() {
         try {
             const querySnapshot = await getDocs(collection(db, "fulltest_bank"));
             questionsData = [];
-            querySnapshot.forEach((doc) => {
-                questionsData.push({ id: doc.id, ...doc.data() });
-            });
-
+            querySnapshot.forEach(doc => questionsData.push({ id: doc.id, ...doc.data() }));
             if (questionsData.length === 0) {
                 document.getElementById('prompt-content').innerHTML = `<div class="text-center py-10 text-gray-400">Kho đề trống.</div>`;
                 return;
@@ -389,84 +367,51 @@
         }
     }
 
-    // --- 3. HIỂN THỊ ĐỀ (GIAO DIỆN HỘP GIẤY) ---
     window.randomizeQuestion = () => {
         if (!questionsData || questionsData.length === 0) return;
         const q = questionsData[Math.floor(Math.random() * questionsData.length)];
         window.currentExamData = q;
-
         document.getElementById('exam-code').innerText = `MÃ: ${q.id.slice(0, 6).toUpperCase()}`;
         document.getElementById('student-essay').value = "";
-        
-        // Reset Highlight
         setupHighlightEvent();
-        
-        // Render nội dung trong các Hộp Giấy (Passage Box)
-        const htmlContent = `
+        document.getElementById('prompt-content').innerHTML = `
             <div id="reading-passage" class="relative pb-10">
-                
                 <div class="passage-box">
                     <span class="section-badge bg-blue-100 text-blue-700">I. ĐỌC HIỂU (4.0 điểm)</span>
-                    
-                    <div class="exam-content highlight-text mt-3" id="text-content">
-                        ${q.reading_text || "Đang cập nhật..."}
-                    </div>
-                    
+                    <div class="exam-content highlight-text mt-3" id="text-content">${q.reading_text || "Đang cập nhật..."}</div>
                     <div class="mt-6 space-y-3">
                         ${(q.reading_questions || []).map((txt, idx) => `
                             <div class="question-box">
-                                <span class="font-bold text-blue-600 block mb-1 text-sm uppercase">
-                                    Câu ${idx + 1} (${idx < 2 ? '0.5' : '1.0'}đ)
-                                </span>
+                                <span class="font-bold text-blue-600 block mb-1 text-sm uppercase">Câu ${idx + 1} (${idx < 2 ? '0.5' : '1.0'}đ)</span>
                                 <div class="text-gray-800 text-sm font-medium leading-relaxed">${txt}</div>
-                            </div>
-                        `).join('')}
+                            </div>`).join('')}
                     </div>
                 </div>
-
                 <div class="mt-8">
                     <span class="section-badge bg-orange-100 text-orange-700 mb-4 block text-center">II. LÀM VĂN (6.0 điểm)</span>
-                    
                     <div class="passage-box">
                         <div class="flex items-center gap-2 mb-3">
                             <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold uppercase">Câu 1 (2.0đ)</span>
-                            <span class="text-xs font-bold text-gray-400 uppercase"></span>
                         </div>
-                        <div class="exam-content">
-                            "${q.nlxh_topic}"
-                        </div>
+                        <div class="exam-content">"${q.nlxh_topic}"</div>
                     </div>
-
                     <div class="passage-box">
                         <div class="flex items-center gap-2 mb-3">
                             <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-bold uppercase">Câu 2 (4.0đ)</span>
-                            <span class="text-xs font-bold text-gray-400 uppercase"></span>
                         </div>
-                        <div class="exam-content">
-                            ${q.nlvh_topic}
-                        </div>
+                        <div class="exam-content">${q.nlvh_topic}</div>
                     </div>
                 </div>
-            </div>
-        `;
-        
-        document.getElementById('prompt-content').innerHTML = htmlContent;
-        
-        // Đồng bộ cỡ chữ
+            </div>`;
         promptFontSize = 17;
         document.querySelector('.prompt-body').style.fontSize = `17px`;
-        const contents = document.querySelectorAll('.exam-content');
-        contents.forEach(el => el.style.fontSize = `17px`);
-        
         setTimeout(setupHighlightEvent, 100);
     };
 
-    // --- 4. TÍNH NĂNG HIGHLIGHT ---
     function setupHighlightEvent() {
         const container = document.getElementById('reading-passage');
         const menu = document.getElementById('highlight-menu');
         if(!container || !menu) return;
-
         container.onmouseup = () => {
             const selection = window.getSelection();
             if (selection.toString().trim().length > 0 && container.contains(selection.anchorNode)) {
@@ -474,120 +419,65 @@
                 menu.style.top = `${rect.top - 50}px`;
                 menu.style.left = `${rect.left + rect.width/2 - 60}px`;
                 menu.style.display = 'flex';
-            } else {
-                menu.style.display = 'none';
-            }
+            } else { menu.style.display = 'none'; }
         };
-        
-        document.onmousedown = (e) => {
-            if(!menu.contains(e.target) && !container.contains(e.target)) menu.style.display = 'none';
-        };
+        document.onmousedown = (e) => { if(!menu.contains(e.target) && !container.contains(e.target)) menu.style.display = 'none'; };
     }
-
     window.applyHighlight = (cls) => {
-        const sel = window.getSelection();
-        if(!sel.rangeCount) return;
-        try {
-            const span = document.createElement('span');
-            span.className = cls;
-            sel.getRangeAt(0).surroundContents(span);
-            sel.removeAllRanges();
-            document.getElementById('highlight-menu').style.display = 'none';
-        } catch(e) { showPopup("Chú ý", "Vui lòng không tô đè lên vùng đã tô!", "warning"); }
+        try { document.execCommand('backColor', false, cls === 'highlight-yellow' ? '#fef08a' : cls === 'highlight-green' ? '#bbf7d0' : '#fbcfe8'); 
+        window.getSelection().removeAllRanges(); document.getElementById('highlight-menu').style.display = 'none'; } catch(e) {}
     };
+    window.removeHighlight = () => { document.execCommand('removeFormat'); document.getElementById('highlight-menu').style.display = 'none'; };
 
-    window.removeHighlight = () => {
-        document.execCommand('removeFormat');
-        document.getElementById('highlight-menu').style.display = 'none';
-    };
+    // --- 1. HÀM HIỂN THỊ KẾT QUẢ (PHẢI NẰM NGOÀI ĐỂ KHÔNG LỖI) ---
+    function renderAIResult(result) {
+        document.getElementById('input-section').classList.add('hidden');
+        const out = document.getElementById('output-section');
+        out.style.display = 'flex';
+        out.classList.remove('hidden', 'h-0');
+        out.classList.add('flex-col', 'h-full');
 
-    // --- 5. AI CHẤM ĐIỂM (THANG 4-6) ---
-// --- 1. HÀM HIỂN THỊ KẾT QUẢ (TÁCH RIÊNG ĐỂ FIX FONT & THANH CUỘN) ---
-function renderAIResult(result) {
-    document.getElementById('input-section').classList.add('hidden');
-    const out = document.getElementById('output-section');
-    out.style.display = 'flex';
-    out.classList.remove('hidden');
-    out.classList.add('flex-col', 'h-full'); // Đảm bảo chiếm trọn khung để cuộn được
+        const barColor = result.human_score > 75 ? '#22c55e' : (result.human_score > 50 ? '#f59e0b' : '#ef4444');
 
-    const barColor = result.human_score > 75 ? '#22c55e' : (result.human_score > 50 ? '#f59e0b' : '#ef4444');
-
-    document.getElementById('ai-correction-box').innerHTML = `
-        <div class="max-w-3xl mx-auto pb-10 custom-scrollbar" style="font-family: 'Merriweather', serif; font-weight: 300;">
-            
-            <div class="text-center mb-8">
-                <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Kết quả Giám khảo cấp Quốc gia</div>
-                <div class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2">${result.score}</div>
-                <div class="grid grid-cols-3 gap-2 max-w-sm mx-auto mt-4">
-                    <div class="bg-blue-50 py-2 rounded-lg text-[10px] font-bold text-blue-600">Đọc hiểu: ${result.detailed_scores.reading}</div>
-                    <div class="bg-green-50 py-2 rounded-lg text-[10px] font-bold text-green-600">Câu 1: ${result.detailed_scores.writing_c1}</div>
-                    <div class="bg-purple-50 py-2 rounded-lg text-[10px] font-bold text-purple-600">Câu 2: ${result.detailed_scores.writing_c2}</div>
+        document.getElementById('ai-correction-box').innerHTML = `
+            <div class="max-w-3xl mx-auto pb-10 custom-scrollbar" style="font-family: 'Merriweather', serif; font-weight: 300;">
+                <div class="text-center mb-8">
+                    <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Kết quả Giám khảo Quốc gia</div>
+                    <div class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2">${result.score}</div>
+                    <div class="grid grid-cols-3 gap-2 max-w-sm mx-auto mt-4">
+                        <div class="bg-blue-50 py-2 rounded-lg text-[10px] font-bold text-blue-600 text-center">Đọc hiểu: ${result.detailed_scores.reading}</div>
+                        <div class="bg-green-50 py-2 rounded-lg text-[10px] font-bold text-green-600 text-center">Câu 1: ${result.detailed_scores.writing_c1}</div>
+                        <div class="bg-purple-50 py-2 rounded-lg text-[10px] font-bold text-purple-600 text-center">Câu 2: ${result.detailed_scores.writing_c2}</div>
+                    </div>
                 </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm mb-6">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Độ chân thực (AI Detection)</span>
-                    <span class="font-bold text-sm" style="color:${barColor}">${result.human_score}%</span>
+                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm mb-6">
+                    <div class="flex justify-between items-center mb-2"><span class="text-[10px] font-black text-gray-400 uppercase">Độ chân thực (AI Check)</span><span class="font-bold text-sm" style="color:${barColor}">${result.human_score}%</span></div>
+                    <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div style="width:${result.human_score}%; background:${barColor}" class="h-full"></div></div>
+                    <p class="text-[11px] text-gray-400 mt-2 italic">"${result.ai_comment}"</p>
                 </div>
-                <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div style="width:${result.human_score}%; background:${barColor}" class="h-full"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <div class="bg-green-50/50 p-5 rounded-2xl border border-green-100"><h4 class="text-green-700 font-bold text-[10px] uppercase mb-3">Điểm tích cực</h4><ul class="text-xs text-green-800 space-y-2">${result.strengths.map(s => `<li>• ${s}</li>`).join('')}</ul></div>
+                    <div class="bg-red-50/50 p-5 rounded-2xl border border-red-100"><h4 class="text-red-700 font-bold text-[10px] uppercase mb-3">Cần lưu ý</h4><ul class="text-xs text-red-800 space-y-2">${result.weaknesses.map(w => `<li>• ${w}</li>`).join('')}</ul></div>
                 </div>
-                <p class="text-[11px] text-gray-400 mt-2 italic font-light">"${result.ai_comment}"</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                <div class="bg-green-50/50 p-5 rounded-2xl border border-green-100">
-                    <h4 class="text-green-700 font-bold text-[10px] uppercase mb-3"><i class="fas fa-check-circle mr-1"></i> Điểm tích cực</h4>
-                    <ul class="text-xs text-green-800 space-y-2 font-medium">
-                        ${result.strengths.map(s => `<li>• ${s}</li>`).join('')}
-                    </ul>
-                </div>
-                <div class="bg-red-50/50 p-5 rounded-2xl border border-red-100">
-                    <h4 class="text-red-700 font-bold text-[10px] uppercase mb-3"><i class="fas fa-exclamation-triangle mr-1"></i> Cần lưu ý</h4>
-                    <ul class="text-xs text-red-800 space-y-2 font-medium">
-                        ${result.weaknesses.map(w => `<li>• ${w}</li>`).join('')}
-                    </ul>
-                </div>
-            </div>
-
-            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm mb-8">
-                <h4 class="font-black text-gray-800 border-b pb-4 mb-6 text-xs uppercase tracking-widest">Chi tiết sửa bài & Phân tích thuật ngữ</h4>
-                <div class="leading-loose text-gray-700 text-lg space-y-4 text-justify font-light">
-                    ${result.correction_html}
-                </div>
-                <div class="mt-6 pt-4 border-t text-sm italic text-gray-500 text-center font-light">"${result.general_comment}"</div>
-            </div>
-
-            <div class="bg-gray-900 text-white p-6 rounded-2xl shadow-xl">
-                <div class="flex items-center gap-2 mb-2 text-orange-400">
-                    <i class="fas fa-compass"></i>
-                    <span class="text-[10px] font-black uppercase tracking-widest">Định hướng tư duy văn chương</span>
-                </div>
-                <p class="text-sm text-gray-300 leading-relaxed font-light italic">"${result.orientation}"</p>
-            </div>
-        </div>
-    `;
-}
-
-// --- 2. HÀM XỬ LÝ NỘP BÀI (GIỮ NGUYÊN PROMPT KHẮT KHE) ---
-window.handleAISubmission = async () => {
-    const content = document.getElementById('student-essay').value.trim();
-    if(content.split(/\s+/).filter(x => x).length < 50) { 
-        document.getElementById('short-essay-popup').style.display = 'flex'; 
-        return; 
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm mb-8"><h4 class="font-black text-gray-800 border-b pb-4 mb-6 text-xs uppercase">Chi tiết sửa bài</h4><div class="leading-loose text-gray-700 text-lg space-y-4 text-justify font-light">${result.correction_html}</div></div>
+                <div class="bg-gray-900 text-white p-6 rounded-2xl shadow-xl"><div class="flex items-center gap-2 mb-2 text-orange-400"><i class="fas fa-compass"></i><span class="text-[10px] font-black uppercase">Định hướng</span></div><p class="text-sm text-gray-300 italic font-light">"${result.orientation}"</p></div>
+            </div>`;
     }
 
-    const loading = document.getElementById('loading-overlay');
-    loading.style.display = 'flex';
-
-    const q = window.currentExamData;
-    
-    // GIỮ NGUYÊN PROMPT GIÁM KHẢO KHẮT KHE CỦA NHÂN
-    const systemPrompt = `
+    // --- 2. HÀM NỘP BÀI (WINDOWS GLOBAL) ---
+    window.handleAISubmission = async () => {
+        const content = document.getElementById('student-essay').value.trim();
+        if(content.split(/\s+/).filter(x => x).length < 50) { 
+            document.getElementById('short-essay-popup').style.display = 'flex'; return; 
+        }
+        const loading = document.getElementById('loading-overlay');
+        loading.style.display = 'flex';
+        const q = window.currentExamData;
+        
+        const systemPrompt = `
 BẠN LÀ: Giám khảo Hội đồng chấm thi tốt nghiệp THPT Quốc gia - Chuyên gia cao cấp về kiểm định chất lượng Ngữ văn (Chương trình GDPT 2018).
 THÁI ĐỘ: Khắt khe, sắc sảo, hàn lâm và tuyệt đối công tâm. Bạn có "nhãn quan" cực nhạy để phát hiện mọi hành vi dùng văn mẫu hoặc AI.
-NGÔN NGỮ: Sử dụng thuật ngữ văn học chuyên sâu (tư duy biện chứng, điểm nhìn nghệ thuật, diễn ngôn, tính đa thanh, thao tác lập luận...). Không nhận xét chung chung - phải chỉ rõ "tốt ở đâu, yếu chỗ nào".
+NGÔN NGỮ: Sử dụng thuật ngữ văn học chuyên sâu. Không nhận xét chung chung - phải chỉ rõ "tốt ở đâu, yếu chỗ nào".
 
 NHIỆM VỤ: Chấm bài thi Tổng hợp theo đúng khung điểm chuẩn 2025:
 1. PHẦN I: ĐỌC HIỂU (4.0 điểm)
@@ -630,48 +520,33 @@ BÀI LÀM CỦA HỌC SINH:
 ${content}
 `;
 
-    try {
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
-        });
-        
-        if (!res.ok) throw new Error("SERVER_TIMEOUT");
-
-        const data = await res.json();
-        const rawText = data.candidates[0].content.parts[0].text;
-        
-        // Regex bóc tách JSON chuẩn (tránh AI nói dư thừa bên ngoài)
-        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) throw new Error("INVALID_FORMAT");
-        
-        const result = JSON.parse(jsonMatch[0]);
-
-        // GỌI HÀM HIỂN THỊ KẾT QUẢ
-        renderAIResult(result);
-
-        // Lưu Firebase
-        if (auth.currentUser) {
-            await addDoc(collection(db, "activities"), {
-                uid: auth.currentUser.uid,
-                type: "fulltest",
-                score: result.score,
-                timestamp: serverTimestamp(),
-                examId: q.id
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
             });
-        }
+            
+            if (!res.ok) throw new Error("SERVER_TIMEOUT");
 
-    } catch(e) {
-        console.error("Lỗi:", e);
-        const msg = e.message === "SERVER_TIMEOUT" 
-            ? "Ngữ liệu dài khiến AI phản hồi hơi chậm. Hãy bấm nộp bài lại 1-2 lần nữa nhé!" 
-            : "Ngữ liệu dài khiến AI phản hồi hơi chậm. Hãy bấm nộp bài lại 1-2 lần nữa nhé!";
-        showPopup("Thông báo", msg, "error");
-    } finally {
-        loading.style.display = 'none';
-    }
-};
+            const rawText = await res.text(); 
+            const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+            
+            if (!jsonMatch) throw new Error("INVALID_FORMAT");
+            
+            const result = JSON.parse(jsonMatch[0]);
+            renderAIResult(result);
+
+            if (auth.currentUser) {
+                await addDoc(collection(db, "activities"), {
+                    uid: auth.currentUser.uid, type: "fulltest", score: result.score, timestamp: serverTimestamp(), examId: q.id
+                });
+            }
+        } catch(e) {
+            console.error("Lỗi:", e);
+            const msg = e.message === "SERVER_TIMEOUT" ? "Bài thi quá dài khiến AI xử lý hơi lâu. Nhân hãy bấm 'Nộp bài' lại một lần nữa nhé!" : "Hệ thống đang bận, vui lòng thử lại sau giây lát!";
+            showPopup("Thông báo", msg, "error");
+        } finally { loading.style.display = 'none'; }
+    };
 
     window.resetExam = () => {
         document.getElementById('input-section').classList.remove('hidden');
@@ -679,46 +554,12 @@ ${content}
         document.getElementById('output-section').classList.remove('h-full');
     };
 
-    // --- UPLOAD, TIMER ---
     let timeLeft = 7200; 
-    function startTimer() {
-        setInterval(() => {
-            if(timeLeft > 0) {
-                timeLeft--;
-                const m = Math.floor(timeLeft / 60);
-                const s = timeLeft % 60;
-                const txt = `${Math.floor(m/60)}:${(m%60).toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                if(document.getElementById('timer')) document.getElementById('timer').innerText = txt;
-                if(document.getElementById('timer-mobile')) document.getElementById('timer-mobile').innerText = txt;
-            } else if (timeLeft === 0) {
-                timeLeft = -1; // Stop repeating alert
-                showPopup("Hết Giờ!", "Đã hết thời gian làm bài. Vui lòng nộp bài.", "warning");
-            }
-        }, 1000);
-    }
+    function startTimer() { setInterval(() => { if(timeLeft > 0) { timeLeft--; const m = Math.floor(timeLeft / 60); const s = timeLeft % 60; document.getElementById('timer').innerText = `${Math.floor(m/60)}:${(m%60).toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; if(document.getElementById('timer-mobile')) document.getElementById('timer-mobile').innerText = document.getElementById('timer').innerText; } else if (timeLeft === 0) { timeLeft = -1; showPopup("Hết Giờ!", "Đã hết thời gian làm bài. Vui lòng nộp bài.", "warning"); } }, 1000); }
 
-    onAuthStateChanged(auth, u => {
-        if(u) { startTimer(); loadQuestions(); } 
-        else window.location.href="../log.html";
-    });
-
-    document.getElementById('file-upload').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        if(file.name.endsWith('.docx')) {
-            reader.onload = (ev) => mammoth.extractRawText({arrayBuffer: ev.target.result}).then(r => document.getElementById('student-essay').value = r.value);
-            reader.readAsArrayBuffer(file);
-        } else {
-            showPopup("Lỗi Định Dạng", "Chỉ hỗ trợ file Word (.docx)", "error");
-        }
-    });
-
-    document.getElementById('student-essay').oninput = function() {
-        const c = this.value.trim().split(/\s+/).filter(x => x).length;
-        document.getElementById('word-count').innerText = `${c} TỪ`;
-    };
-
+    onAuthStateChanged(auth, u => { if(u) { startTimer(); loadQuestions(); } else window.location.href="../log.html"; });
+    document.getElementById('file-upload').addEventListener('change', (e) => { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); if(f.name.endsWith('.docx')) { r.onload = (ev) => mammoth.extractRawText({arrayBuffer: ev.target.result}).then(res => document.getElementById('student-essay').value = res.value); r.readAsArrayBuffer(f); } else showPopup("Lỗi", "Chỉ nhận file .docx", "error"); });
+    document.getElementById('student-essay').oninput = function() { document.getElementById('word-count').innerText = `${this.value.trim().split(/\s+/).filter(x => x).length} TỪ`; };
 </script>
 </body>
 </html>
