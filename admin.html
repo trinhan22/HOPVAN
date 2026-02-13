@@ -6,11 +6,8 @@
     <title>HopVan Admin - Studio</title>
 
     <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
-    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh." />
     <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
-    <meta property="og:url" content="https://hopvan.netlify.app" />
-    <meta property="og:type" content="article" />
-
+    
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -71,13 +68,41 @@
         }
         .nav-item.active i { color: white; }
 
-        /* --- CARDS & WIDGETS --- */
+        /* --- CARDS & WIDGETS (UPDATED WATERMARK STYLE) --- */
         .stat-card {
-            background: rgba(255,255,255,0.6); border: 1px solid white;
-            border-radius: 24px; padding: 24px;
-            transition: 0.3s; cursor: default;
+            background: rgba(255,255,255,0.6); 
+            border: 1px solid white;
+            border-radius: 24px; 
+            padding: 24px;
+            transition: 0.3s; 
+            cursor: default;
+            position: relative; /* Quan trọng để định vị icon con */
+            overflow: hidden;   /* Cắt phần thừa của icon */
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .stat-card:hover { transform: translateY(-5px); background: white; box-shadow: 0 15px 30px rgba(0,0,0,0.05); }
+
+        /* Style cho icon chìm (Watermark) */
+        .watermark-icon {
+            position: absolute;
+            right: -10px;
+            bottom: -15px;
+            font-size: 80px;
+            opacity: 0.15; /* Độ mờ */
+            transform: rotate(-15deg);
+            pointer-events: none;
+            z-index: 0;
+            color: currentColor; /* Lấy màu của text cha */
+        }
+        
+        /* Nội dung card phải nổi lên trên icon chìm */
+        .stat-card-content {
+            position: relative;
+            z-index: 1;
+        }
 
         .action-card {
             position: relative; overflow: hidden;
@@ -92,23 +117,18 @@
             border-radius: 14px; font-size: 1.4rem; margin-bottom: 12px;
         }
 
-        /* --- INPUTS (ĐÃ SỬA: RÕ RÀNG HƠN) --- */
+        /* --- INPUTS --- */
         .glass-input {
             width: 100%; padding: 14px 18px; border-radius: 14px;
-            /* Nền màu xám nhẹ thay vì trong suốt */
-            background: #F8FAFC; 
-            /* Viền rõ ràng */
-            border: 1px solid #E2E8F0; 
+            background: #F8FAFC; border: 1px solid #E2E8F0; 
             font-size: 0.95rem; color: #1E293B; outline: none; transition: 0.2s ease-in-out;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
         }
         .glass-input:focus { 
-            background: white; 
-            border-color: var(--primary); 
+            background: white; border-color: var(--primary); 
             box-shadow: 0 0 0 4px rgba(255, 143, 80, 0.15); 
         }
         .glass-input::placeholder { color: #94A3B8; font-weight: 500; }
-        
         .label-custom { font-size: 0.75rem; font-weight: 800; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
 
         /* --- TABLE --- */
@@ -133,70 +153,18 @@
         }
         .modal-overlay.show .modal-box { transform: scale(1) translateY(0); }
 
-        /* SCROLLBAR */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+        /* EDITOR & SCROLLBAR */
+        .ql-container.ql-snow { resize: vertical; overflow-y: auto; background: #F8FAFC !important; border: 1px solid #E2E8F0 !important; border-radius: 0 0 16px 16px; }
+        #edit-ft-read-text, #edit-ex-text, #edit-ex-topic { min-height: 200px; }
+        .ql-toolbar.ql-snow { border-radius: 16px 16px 0 0 !important; border: 1px solid #E2E8F0 !important; background: white; }
+        .ql-editor { font-size: 1rem; line-height: 1.6; }
 
-        .gradient-text { background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-.ql-editor.ql-blank::before { color: #94A3B8 !important; font-style: normal; }
-
-/* Tạo nút kéo cho bộ soạn thảo */
-.ql-container.ql-snow {
-    resize: vertical; /* Cho phép kéo to nhỏ theo chiều dọc */
-    overflow-y: auto;
-    background: #F8FAFC !important;
-    border: 1px solid #E2E8F0 !important;
-    border-radius: 0 0 16px 16px;
-}
-/* Giới hạn chiều cao tối thiểu và tối đa */
-#edit-ft-read-text, #edit-ex-text, #edit-ex-topic { min-height: 200px; }
-.ql-toolbar.ql-snow {
-    border-radius: 16px 16px 0 0 !important;
-    border: 1px solid #E2E8F0 !important;
-    background: white;
-}
-.ql-editor { font-size: 1rem; line-height: 1.6; }
-
-
-/* --- GLOBAL SCROLLBAR STYLE --- */
-
-/* 1. Thiết lập độ rộng/cao của thanh trượt */
-::-webkit-scrollbar {
-    width: 10px;  /* Độ rộng cho thanh dọc */
-    height: 10px; /* Độ cao cho thanh ngang */
-}
-
-/* 2. Thiết lập rãnh trượt (Track) - Nền chìm */
-::-webkit-scrollbar-track {
-    background: rgba(255, 143, 80, 0.05); /* Màu cam cực nhạt, gần như trong suốt */
-    border-radius: 10px;
-}
-
-/* 3. Thiết lập tay nắm (Thumb) - Phần di chuyển */
-::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 143, 80, 0.3); /* Mặc định là cam nhạt */
-    border-radius: 10px; /* Bo tròn mềm mại */
-    
-    /* Mẹo: Tạo viền trong suốt để thanh trượt trông nhỏ hơn và "lơ lửng" */
-    border: 2px solid transparent;
-    background-clip: content-box;
-    transition: background-color 0.3s ease;
-}
-
-/* 4. Hiệu ứng khi di chuột vào (Hover) */
-::-webkit-scrollbar-thumb:hover {
-    background-color: #FF8F50; /* Đổi sang màu cam chính thương hiệu */
-    border: 1px solid transparent; /* Làm thanh trượt to ra một chút khi hover */
-}
-
-/* 5. (Tùy chọn) Ẩn nút mũi tên 2 đầu (nếu trình duyệt hiển thị) */
-::-webkit-scrollbar-button {
-    display: none;
-}
-</style>
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
+        ::-webkit-scrollbar-button { display: none; }
+    </style>
 </head>
 <body class="h-screen flex">
 
@@ -268,27 +236,36 @@
             <div id="view-dashboard" class="view-section space-y-10 animate-fade-in">
                 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="stat-card">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-xl"><i class="fas fa-users"></i></div>
+                    <div class="stat-card text-blue-500">
+                        <div class="stat-card-content">
+                            <h3 class="text-4xl font-black text-gray-800" id="stat-users">0</h3>
+                            <p class="text-xs font-bold text-gray-400 uppercase mt-2">Người dùng</p>
                         </div>
-                        <h3 class="text-3xl font-black text-gray-800" id="stat-users">0</h3>
-                        <p class="text-xs font-bold text-gray-400 uppercase mt-1">Người dùng</p>
+                        <i class="fas fa-users watermark-icon"></i>
                     </div>
-                    <div class="stat-card">
-                        <div class="w-12 h-12 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center text-xl mb-4"><i class="fas fa-file-signature"></i></div>
-                        <h3 class="text-3xl font-black text-gray-800" id="stat-exams">0</h3>
-                        <p class="text-xs font-bold text-gray-400 uppercase mt-1">Câu hỏi</p>
+
+                    <div class="stat-card text-orange-500">
+                        <div class="stat-card-content">
+                            <h3 class="text-4xl font-black text-gray-800" id="stat-exams">0</h3>
+                            <p class="text-xs font-bold text-gray-400 uppercase mt-2">Tổng Câu Hỏi</p>
+                        </div>
+                        <i class="fas fa-file-signature watermark-icon"></i>
                     </div>
-                    <div class="stat-card">
-                        <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-500 flex items-center justify-center text-xl mb-4"><i class="fas fa-graduation-cap"></i></div>
-                        <h3 class="text-3xl font-black text-gray-800" id="stat-subs">0</h3>
-                        <p class="text-xs font-bold text-gray-400 uppercase mt-1">Lượt làm bài</p>
+
+                    <div class="stat-card text-purple-500">
+                        <div class="stat-card-content">
+                            <h3 class="text-4xl font-black text-gray-800" id="stat-subs">0</h3>
+                            <p class="text-xs font-bold text-gray-400 uppercase mt-2">Lượt Làm Bài</p>
+                        </div>
+                        <i class="fas fa-graduation-cap watermark-icon"></i>
                     </div>
-                     <div class="stat-card">
-                        <div class="w-12 h-12 rounded-2xl bg-pink-50 text-pink-500 flex items-center justify-center text-xl mb-4"><i class="fas fa-pen-nib"></i></div>
-                        <h3 class="text-3xl font-black text-gray-800" id="stat-levels">0</h3>
-                        <p class="text-xs font-bold text-gray-400 uppercase mt-1">Dẫn Chứng</p>
+
+                    <div class="stat-card text-pink-500">
+                        <div class="stat-card-content">
+                            <h3 class="text-4xl font-black text-gray-800" id="stat-levels">0</h3>
+                            <p class="text-xs font-bold text-gray-400 uppercase mt-2">Bài Viết</p>
+                        </div>
+                        <i class="fas fa-pen-nib watermark-icon"></i>
                     </div>
                 </div>
 
@@ -298,7 +275,8 @@
                     </h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
-                            <div onclick="openModal('new', 'fulltest_bank')" class="action-card group md:col-span-2 bg-gradient-to-br from-orange-400 to-red-400 text-white border-none shadow-xl shadow-orange-500/30">                            <div class="relative z-10">
+                        <div onclick="openModal('new', 'fulltest_bank')" class="action-card group md:col-span-2 bg-gradient-to-br from-orange-400 to-red-400 text-white border-none shadow-xl shadow-orange-500/30">                            
+                            <div class="relative z-10">
                                 <div class="icon-box bg-white/20 text-white"><i class="fas fa-layer-group"></i></div>
                                 <h4 class="font-black text-2xl">Tạo Full Đề Thi</h4>
                                 <p class="text-white/80 text-sm mt-1 font-medium">Gồm Đọc Hiểu + NLXH + NLVH</p>
@@ -404,58 +382,106 @@
                 <div class="flex gap-8 h-[calc(100vh-160px)]">
                     <div class="w-1/3 glass-panel rounded-3xl flex flex-col overflow-hidden">
                         <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white/40">
-                            <h3 class="font-bold text-gray-800">Level</h3>
-                            <button onclick="resetLevelForm()" class="w-8 h-8 rounded-full bg-orange-100 text-orange-500 hover:bg-orange-500 hover:text-white transition flex items-center justify-center"><i class="fas fa-plus"></i></button>
+                            <h3 class="font-bold text-gray-800">Cấu trúc Level</h3>
+                            <button onclick="resetLevelForm()" class="w-8 h-8 rounded-full bg-orange-100 text-orange-500 hover:bg-orange-500 hover:text-white transition flex items-center justify-center">
+                                <i class="fas fa-plus"></i>
+                            </button>
                         </div>
-                        <div id="level-list" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+                        <div id="level-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+                            </div>
                     </div>
                     
                     <div class="flex-1 glass-panel rounded-3xl p-8 overflow-y-auto bg-white/60">
-                         <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center justify-between mb-8">
                             <div>
-                                <h3 class="text-2xl font-black text-gray-800" id="lvl-form-title">Tạo Level Mới</h3>
-                                <p class="text-sm text-gray-500">Thiết lập nội dung bài học</p>
+                                <h3 class="text-2xl font-black text-gray-800" id="lvl-form-title">Thiết lập Level</h3>
+                                <p class="text-sm text-gray-500">Tùy chỉnh nội dung bài học theo cấp độ</p>
                             </div>
-                            <div class="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-black uppercase tracking-wider">Editor Mode</div>
+                            <div class="px-3 py-1 bg-orange-50 text-orange-600 rounded-lg text-xs font-black uppercase tracking-wider">Lộ trình học tập</div>
                         </div>
                         
                         <form id="level-form" class="space-y-6">
                             <input type="hidden" id="lvl-id">
+                            
                             <div class="grid grid-cols-2 gap-6">
-                                <div><label class="label-custom">Thứ tự</label><input type="number" id="lvl-num" class="glass-input" placeholder="1"></div>
                                 <div>
-                                    <label class="label-custom">Loại bài</label>
-                                    <select id="lvl-type" class="glass-input" onchange="toggleLevelFields()">
-                                        <option value="tracnghiem">Trắc nghiệm</option>
-                                        <option value="dochieu">Đọc hiểu</option>
-                                        <option value="nlxh">Nghị luận XH</option>
-                                        <option value="nlvh">Nghị luận VH</option>
+                                    <label class="label-custom">Thứ tự Level (Số)</label>
+                                    <input type="number" id="lvl-num" class="glass-input" placeholder="Ví dụ: 1">
+                                </div>
+                                <div>
+                                    <label class="label-custom">Loại hình bài tập</label>
+                                    <select id="lvl-type" class="glass-input font-bold" onchange="toggleLevelFields()">
+                                        <option value="tracnghiem">Câu hỏi Trắc nghiệm</option>
+                                        <option value="dochieu">Bài tập Đọc hiểu</option>
+                                        <option value="nlxh">Nghị luận Xã hội</option>
+                                        <option value="nlvh">Nghị luận Văn học</option>
                                     </select>
                                 </div>
                             </div>
-                            <div><label class="label-custom">Tiêu đề</label><input id="lvl-title" class="glass-input"></div>
-                            <div><label class="label-custom">Mô tả</label><input id="lvl-desc" class="glass-input"></div>
 
-                            <div class="p-6 rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50/50 mt-4">
-                                <div id="lvl-field-json">
-                                    <label class="label-custom text-gray-500">JSON Data (Trắc Nghiệm)</label>
-                                    <textarea id="lvl-content-json" class="glass-input h-48 font-mono text-sm bg-white" placeholder='{"question": "...", "options": [], "correct": 0}'></textarea>
+                            <div>
+                                <label class="label-custom">Tiêu đề Level</label>
+                                <input id="lvl-title" class="glass-input" placeholder="Ví dụ: Khởi động kiến thức nền">
+                            </div>
+
+                            <div>
+                                <label class="label-custom">Mô tả ngắn</label>
+                                <input id="lvl-desc" class="glass-input" placeholder="Ghi chú mục tiêu của level này...">
+                            </div>
+
+                            <div class="p-6 rounded-3xl border-2 border-dashed border-orange-200 bg-orange-50/30 mt-4">
+                                
+                                <div id="lvl-field-tracnghiem" class="hidden space-y-6">
+                                    <div>
+                                        <label class="label-custom text-orange-600">Câu hỏi chính</label>
+                                        <textarea id="lvl-quiz-q" class="glass-input h-20" placeholder="Nhập câu hỏi trắc nghiệm..."></textarea>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="flex items-center gap-4 glass-input bg-white">
+                                            <input type="radio" name="lvl-correct" value="0" class="w-5 h-5 accent-orange-500">
+                                            <span class="font-black text-slate-300 text-xl">A</span>
+                                            <input id="lvl-quiz-opt-0" class="bg-transparent border-none outline-none flex-1 font-bold" placeholder="Đáp án A">
+                                        </div>
+                                        <div class="flex items-center gap-4 glass-input bg-white">
+                                            <input type="radio" name="lvl-correct" value="1" class="w-5 h-5 accent-orange-500">
+                                            <span class="font-black text-slate-300 text-xl">B</span>
+                                            <input id="lvl-quiz-opt-1" class="bg-transparent border-none outline-none flex-1 font-bold" placeholder="Đáp án B">
+                                        </div>
+                                        <div class="flex items-center gap-4 glass-input bg-white">
+                                            <input type="radio" name="lvl-correct" value="2" class="w-5 h-5 accent-orange-500">
+                                            <span class="font-black text-slate-300 text-xl">C</span>
+                                            <input id="lvl-quiz-opt-2" class="bg-transparent border-none outline-none flex-1 font-bold" placeholder="Đáp án C">
+                                        </div>
+                                        <div class="flex items-center gap-4 glass-input bg-white">
+                                            <input type="radio" name="lvl-correct" value="3" class="w-5 h-5 accent-orange-500">
+                                            <span class="font-black text-slate-300 text-xl">D</span>
+                                            <input id="lvl-quiz-opt-3" class="bg-transparent border-none outline-none flex-1 font-bold" placeholder="Đáp án D">
+                                        </div>
+                                    </div>
+                                    <p class="text-[10px] font-bold text-gray-400 italic">* Tích chọn vào hình tròn để xác định đáp án đúng.</p>
                                 </div>
+
                                 <div id="lvl-field-reading" class="hidden space-y-4">
-                                    <input id="lvl-read-title" class="glass-input font-bold" placeholder="Tiêu đề văn bản">
-                                    <textarea id="lvl-read-text" class="glass-input h-32 font-mono text-sm" placeholder="Nội dung văn bản"></textarea>
-                                    <textarea id="lvl-read-qs" class="glass-input h-24" placeholder="Câu hỏi (mỗi dòng 1 câu)"></textarea>
+                                    <label class="label-custom text-blue-600">Nội dung Đọc hiểu</label>
+                                    <input id="lvl-read-title" class="glass-input font-bold" placeholder="Tiêu đề văn bản ngữ liệu">
+                                    <textarea id="lvl-read-text" class="glass-input h-40 font-serif" placeholder="Dán nội dung văn bản vào đây..."></textarea>
+                                    <div>
+                                        <label class="label-custom text-blue-600">Câu hỏi (Ngăn cách bằng [NEXT])</label>
+                                        <textarea id="lvl-read-qs" class="glass-input h-24" placeholder="Câu hỏi 1 [NEXT] Câu hỏi 2 [NEXT] ..."></textarea>
+                                    </div>
                                 </div>
+
                                 <div id="lvl-field-essay" class="hidden space-y-4">
-                                    <textarea id="lvl-essay-topic" class="glass-input h-24 font-bold" placeholder="Đề bài"></textarea>
-                                    <textarea id="lvl-essay-text" class="glass-input h-24" placeholder="Ngữ liệu (nếu có)"></textarea>
-                                    <textarea id="lvl-essay-hint" class="glass-input h-24" placeholder="Gợi ý chấm"></textarea>
+                                    <label class="label-custom text-green-600">Đề bài Nghị luận</label>
+                                    <textarea id="lvl-essay-topic" class="glass-input h-24 font-bold" placeholder="Nhập đề bài nghị luận..."></textarea>
+                                    <textarea id="lvl-essay-text" class="glass-input h-24" placeholder="Ngữ liệu phụ (nếu có)"></textarea>
+                                    <textarea id="lvl-essay-hint" class="glass-input h-32" placeholder="Dàn ý gợi ý hoặc từ khóa chấm điểm..."></textarea>
                                 </div>
                             </div>
 
-                            <div class="flex justify-end gap-3 pt-6">
-                                <button type="button" onclick="deleteLevel()" id="btn-del-lvl" class="hidden px-6 py-3 text-red-500 font-bold hover:bg-red-50 rounded-xl text-sm transition">Xóa</button>
-                                <button type="button" onclick="saveLevel()" class="px-8 py-3 bg-gray-900 text-white rounded-xl font-bold hover:shadow-xl hover:scale-105 transition text-sm">Lưu Level</button>
+                            <div class="flex justify-end gap-3 pt-6 border-t border-gray-100">
+                                <button type="button" onclick="deleteLevel()" id="btn-del-lvl" class="hidden px-6 py-3 text-red-500 font-bold hover:bg-red-50 rounded-xl text-sm transition">Xóa Level</button>
+                                <button type="button" onclick="saveLevel()" class="px-8 py-3 bg-gray-900 text-white rounded-xl font-bold hover:shadow-xl hover:scale-105 transition text-sm">Cập nhật Level</button>
                             </div>
                         </form>
                     </div>
@@ -529,7 +555,7 @@
     let questionsData = []; 
     let currentCollection = 'essay_bank';
     let currentNewsFilter = 'all';
-    let editors = {}; // Biến quan trọng để lưu bộ soạn thảo
+    let editors = {}; 
 
     // INIT DATE
     document.getElementById('current-date').innerText = new Date().toLocaleDateString('vi-VN', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
@@ -633,7 +659,7 @@
         } catch(e) { console.error(e); }
     };
 
-    // --- NEW: LITERARY NEWS LOGIC ---
+    // --- 3. LITERARY NEWS LOGIC ---
     window.loadNews = async (filterType, btnEl) => {
         currentNewsFilter = filterType;
         if(btnEl) {
@@ -653,12 +679,12 @@
             if (filterType === 'all') {
                 q = query(collection(db, "literary_news"), orderBy("createdAt", "desc"), limit(20));
             } else {
-                q = query(collection(db, "literary_news"), where("type", "==", filterType), orderBy("createdAt", "desc"), limit(20));
+                q = query(collection(db, "literary_news"), where("type", "==", filterType), limit(20));
             }
             
             const snap = await getDocs(q);
             tbody.innerHTML = "";
-            if(snap.empty) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-400 font-bold">Chưa có bài viết nào.</td></tr>'; return; }
+            if(snap.empty) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-400 font-bold">Chưa có bài viết nào thuộc mục này.</td></tr>'; return; }
 
             snap.forEach(d => {
                 const data = d.data();
@@ -680,11 +706,14 @@
                     </td>`;
                 tbody.appendChild(tr);
             });
-        } catch(e) { console.error(e); }
+        } catch(e) { 
+            console.error(e);
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">Lỗi tải dữ liệu: ${e.message}</td></tr>`;
+        }
     }
 
-    // 3. MODAL LOGIC (UPDATED WITH SAFE INIT)
-    window.openModal = async (id, colName) => {
+    // 4. MODAL LOGIC
+    window.openModal = async (id, colName, preSelectType = null) => {
         const modal = document.querySelector('.modal-overlay');
         const container = document.getElementById('modal-fields');
         document.getElementById('exam-collection').value = colName;
@@ -705,11 +734,11 @@
         let html = '';
         
         if (colName === 'literary_news') {
-            html = `
+             html = `
                 <div class="grid grid-cols-3 gap-6 mb-4">
                     <div class="col-span-2">
                         <label class="label-custom">Tiêu đề bài viết</label>
-                        <input id="news-title" class="glass-input font-bold" value="${data.title || ''}" placeholder="Nhập tiêu đề hấp dẫn...">
+                        <input id="news-title" class="glass-input font-bold" value="${data.title || ''}" placeholder="Nhập tiêu đề...">
                     </div>
                     <div>
                         <label class="label-custom">Chuyên mục</label>
@@ -728,8 +757,8 @@
                     </div>
                 </div>
                 <div class="mb-6">
-                    <label class="label-custom">Thể loại</label>
-                    <textarea id="news-summary" class="glass-input h-24" placeholder="Con người và thiên nhiên...">${data.summary || ''}</textarea>
+                    <label class="label-custom">Chủ đề</label>
+                    <textarea id="news-summary" class="glass-input h-24" placeholder="Tuổi trẻ trong kỷ nguyên vươn mình...">${data.summary || ''}</textarea>
                 </div>
                 <div>
                     <label class="label-custom">Nội dung chi tiết</label>
@@ -737,17 +766,17 @@
                 </div>
             `;
         } else if (colName === 'fulltest_bank') {
-            html = `
+             html = `
                 <div class="space-y-6">
                     <div><label class="label-custom">NGỮ LIỆU ĐỌC HIỂU</label><div id="edit-ft-read-text"></div></div>
-                    <div><label class="label-custom">CÂU HỎI ĐỌC HIỂU (Dùng [NEXT] để tách)</label><div id="edit-ft-read-qs"></div></div>
+                    <div><label class="label-custom">CÂU HỎI ĐỌC HIỂU (Dùng [NEXT] để tách dòng)</label><div id="edit-ft-read-qs"></div></div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div><label class="label-custom">CÂU 1 (2.0đ)</label><div id="edit-ft-nlxh"></div></div>
                         <div><label class="label-custom">CÂU 2 (4.0đ)</label><div id="edit-ft-nlvh"></div></div>
                     </div>
                 </div>`;
         } else if (colName === 'quiz_bank') {
-            html = `
+             html = `
                 <div class="space-y-6">
                     <div><label class="label-custom">CÂU HỎI TRẮC NGHIỆM</label><div id="edit-ex-q"></div></div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -760,19 +789,37 @@
                     </div>
                 </div>`;
         } else if (colName === 'reading_bank') {
-            html = `
+             html = `
                 <div class="space-y-6">
                     <div><label class="label-custom">TIÊU ĐỀ</label><input id="ex-title" class="glass-input font-bold" value="${data.title||''}"></div>
                     <div><label class="label-custom">VĂN BẢN NGỮ LIỆU</label><div id="edit-ex-text"></div></div>
-                    <div><label class="label-custom">CÂU HỎI (Dùng [NEXT] để tách)</label><div id="edit-ex-qs"></div></div>
+                    <div><label class="label-custom">CÂU HỎI (Dùng [NEXT] để tách dòng)</label><div id="edit-ex-qs"></div></div>
                 </div>`;
         } else {
+            const currentType = data.type || preSelectType || 'nlxh';
             html = `
                 <div class="flex gap-4 mb-4">
-                    <div class="flex-1"><label class="label-custom">LOẠI ĐỀ</label><select id="ex-type" class="glass-input font-bold" onchange="toggleGenreInput()"><option value="nlxh" ${data.type === 'nlxh' ? 'selected' : ''}>NL Xã Hội</option><option value="nlvh" ${data.type === 'nlvh' ? 'selected' : ''}>NL Văn Học</option></select></div>
-                    <div id="genre-wrapper" class="flex-1 ${data.type === 'nlvh' ? '' : 'hidden'}"><label class="label-custom">THỂ LOẠI</label><select id="ex-genre" class="glass-input"><option value="Truyện" ${data.genre === 'Truyện' ? 'selected' : ''}>Truyện</option><option value="Thơ" ${data.genre === 'Thơ' ? 'selected' : ''}>Thơ</option><option value="Kịch" ${data.genre === 'Kịch' ? 'selected' : ''}>Kịch</option><option value="Ký" ${data.genre === 'Ký' ? 'selected' : ''}>Ký</option></select></div>
+                    <div class="flex-1">
+                        <label class="label-custom">LOẠI ĐỀ</label>
+                        <select id="ex-type" class="glass-input font-bold" onchange="toggleGenreInput()">
+                            <option value="nlxh" ${currentType === 'nlxh' ? 'selected' : ''}>NL Xã Hội</option>
+                            <option value="nlvh" ${currentType === 'nlvh' ? 'selected' : ''}>NL Văn Học</option>
+                        </select>
+                    </div>
+                    <div id="genre-wrapper" class="flex-1 ${currentType === 'nlvh' ? '' : 'hidden'}">
+                        <label class="label-custom">THỂ LOẠI</label>
+                        <select id="ex-genre" class="glass-input">
+                            <option value="Truyện" ${data.genre === 'Truyện' ? 'selected' : ''}>Truyện</option>
+                            <option value="Thơ" ${data.genre === 'Thơ' ? 'selected' : ''}>Thơ</option>
+                            <option value="Kịch" ${data.genre === 'Kịch' ? 'selected' : ''}>Kịch</option>
+                            <option value="Ký" ${data.genre === 'Ký' ? 'selected' : ''}>Ký</option>
+                        </select>
+                    </div>
                 </div>
-                <div id="work-wrapper" class="${data.type === 'nlvh' ? '' : 'hidden'} mb-4"><label class="label-custom">TÁC PHẨM</label><input id="ex-work" class="glass-input" value="${data.workName||''}"></div>
+                <div id="work-wrapper" class="${currentType === 'nlvh' ? '' : 'hidden'} mb-4">
+                    <label class="label-custom">TÁC PHẨM</label>
+                    <input id="ex-work" class="glass-input" value="${data.workName||''}" placeholder="Vd: Vợ chồng A Phủ">
+                </div>
                 <div class="space-y-6">
                     <div><label class="label-custom">YÊU CẦU ĐỀ BÀI</label><div id="edit-ex-topic"></div></div>
                     <div><label class="label-custom">NGỮ LIỆU PHỤ (NẾU CÓ)</label><div id="edit-ex-text"></div></div>
@@ -788,10 +835,7 @@
             return q;
         };
 
-        // Reset editors object
         editors = {};
-
-        // Tăng timeout lên 100ms để đảm bảo DOM đã render xong
         setTimeout(() => {
             if (colName === 'literary_news') {
                 editors.content = initQ('#news-content', data.content, toolbar);
@@ -821,7 +865,7 @@
         else { gw.classList.add('hidden'); ww.classList.add('hidden'); }
     };
 
-    // 4. SAVE DATA (FIXED CRASH)
+    // 5. SAVE DATA
     window.saveExamData = async () => {
         const id = document.getElementById('exam-id').value;
         const colName = document.getElementById('exam-collection').value;
@@ -833,7 +877,6 @@
                 data.type = document.getElementById('news-type').value;
                 data.img = document.getElementById('news-img').value || "";
                 data.summary = document.getElementById('news-summary').value || "";
-                // Kiểm tra an toàn xem editor có tồn tại không
                 data.content = editors.content ? editors.content.root.innerHTML : "";
             } 
             else if (colName === 'fulltest_bank') {
@@ -875,7 +918,6 @@
             showToast("Đã lưu thành công!");
             closeModal();
             
-            // Reload lại danh sách tương ứng
             if (colName === 'literary_news') loadNews(currentNewsFilter);
             else loadBank(colName);
             loadStats();
@@ -895,45 +937,89 @@
         } 
     };
 
-    // 5. LEVEL & HISTORY
+    // 6. LEVEL & HISTORY
     window.toggleLevelFields = () => {
         const type = document.getElementById('lvl-type').value;
-        ['lvl-field-json', 'lvl-field-reading', 'lvl-field-essay'].forEach(id => document.getElementById(id).classList.add('hidden'));
-        if(type === 'dochieu') document.getElementById('lvl-field-reading').classList.remove('hidden');
-        else if(type === 'tracnghiem') document.getElementById('lvl-field-json').classList.remove('hidden');
-        else document.getElementById('lvl-field-essay').classList.remove('hidden');
+        // Ẩn tất cả
+        ['lvl-field-tracnghiem', 'lvl-field-reading', 'lvl-field-essay'].forEach(id => {
+            document.getElementById(id).classList.add('hidden');
+        });
+        
+        // Hiện cái tương ứng
+        if(type === 'tracnghiem') {
+            document.getElementById('lvl-field-tracnghiem').classList.remove('hidden');
+        } else if(type === 'dochieu') {
+            document.getElementById('lvl-field-reading').classList.remove('hidden');
+        } else {
+            document.getElementById('lvl-field-essay').classList.remove('hidden');
+        }
     };
 
     window.loadLevelsList = async () => {
         const listEl = document.getElementById('level-list');
         listEl.innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin text-gray-400"></i></div>';
-        const snap = await getDocs(query(collection(db, "study_levels"), orderBy("level", "asc")));
-        listEl.innerHTML = "";
-        snap.forEach(d => {
-            const data = d.data();
-            const div = document.createElement('div');
-            div.className = "p-4 bg-white border border-gray-100 rounded-xl hover:bg-orange-50 cursor-pointer transition flex items-center justify-between group shadow-sm";
-            div.onclick = () => fillLevelForm(d.id, data);
-            div.innerHTML = `<span class="text-xs font-black bg-gray-100 px-2 py-1 rounded text-gray-500">LV ${data.level}</span><span class="font-bold text-gray-700 text-sm ml-2 flex-1">${data.title}</span><i class="fas fa-chevron-right text-gray-300 text-xs"></i>`;
-            listEl.appendChild(div);
-        });
+        
+        try {
+            const q = query(collection(db, "study_levels"), orderBy("level", "asc"));
+            const snap = await getDocs(q);
+            listEl.innerHTML = "";
+            
+            if(snap.empty) {
+                listEl.innerHTML = '<p class="text-center text-gray-400 text-sm py-10 font-bold">Chưa có level nào được tạo.</p>';
+                return;
+            }
+
+            snap.forEach(d => {
+                const data = d.data();
+                const div = document.createElement('div');
+                div.className = "p-4 bg-white border border-gray-100 rounded-xl hover:bg-orange-50 cursor-pointer transition flex items-center justify-between group shadow-sm";
+                div.onclick = () => fillLevelForm(d.id, data);
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="text-[10px] font-black bg-gray-100 px-2 py-1 rounded text-gray-500 group-hover:bg-orange-500 group-hover:text-white transition">LV ${data.level}</span>
+                        <span class="font-bold text-gray-700 text-sm truncate max-w-[150px]">${data.title}</span>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-300 text-xs group-hover:translate-x-1 transition"></i>
+                `;
+                listEl.appendChild(div);
+            });
+        } catch(e) {
+            console.error("Lỗi load level:", e);
+        }
     };
 
     window.fillLevelForm = (id, data) => {
+        resetLevelForm(); // Clear trước khi đổ
+        
         document.getElementById('lvl-id').value = id;
         document.getElementById('lvl-num').value = data.level;
         document.getElementById('lvl-type').value = data.type;
         document.getElementById('lvl-title').value = data.title;
         document.getElementById('lvl-desc').value = data.desc;
-        document.getElementById('lvl-form-title').innerText = `Edit Level ${data.level}`;
+        document.getElementById('lvl-form-title').innerText = `Chỉnh sửa Level ${data.level}`;
         document.getElementById('btn-del-lvl').classList.remove('hidden');
+        
         toggleLevelFields(); 
-        if(data.type === 'dochieu') {
+
+        if(data.type === 'tracnghiem') {
+            document.getElementById('lvl-quiz-q').value = data.content.question || '';
+            const opts = data.content.options || [];
+            opts.forEach((opt, i) => {
+                if(document.getElementById(`lvl-quiz-opt-${i}`)) {
+                    document.getElementById(`lvl-quiz-opt-${i}`).value = opt;
+                }
+            });
+            // Set radio đáp án đúng
+            const radio = document.querySelector(`input[name="lvl-correct"][value="${data.content.correct}"]`);
+            if(radio) radio.checked = true;
+
+        } else if(data.type === 'dochieu') {
             document.getElementById('lvl-read-title').value = data.content.title || '';
             document.getElementById('lvl-read-text').value = data.content.text || '';
-            document.getElementById('lvl-read-qs').value = data.content.questions ? data.content.questions.map(x=>x.q).join('\n') : '';
-        } else if(data.type === 'tracnghiem') {
-            document.getElementById('lvl-content-json').value = typeof data.content === 'string' ? data.content : JSON.stringify(data.content, null, 2);
+            // Biến mảng questions thành chuỗi dùng [NEXT]
+            if(data.content.questions) {
+                document.getElementById('lvl-read-qs').value = data.content.questions.map(x => x.q).join(' [NEXT] ');
+            }
         } else {
             document.getElementById('lvl-essay-topic').value = data.content.topic || '';
             document.getElementById('lvl-essay-text').value = data.content.text || '';
@@ -946,47 +1032,111 @@
         document.getElementById('lvl-id').value = "";
         document.getElementById('lvl-form-title').innerText = "Tạo Level Mới";
         document.getElementById('btn-del-lvl').classList.add('hidden');
+        // Reset radio buttons
+        document.querySelectorAll('input[name="lvl-correct"]').forEach(r => r.checked = false);
         toggleLevelFields();
     };
 
     window.saveLevel = async () => {
         const id = document.getElementById('lvl-id').value;
         const type = document.getElementById('lvl-type').value;
+        const levelNum = parseInt(document.getElementById('lvl-num').value);
+        
         let content = {};
+        
         try {
-            if(type === 'dochieu') {
+            if(type === 'tracnghiem') {
+                content.question = document.getElementById('lvl-quiz-q').value;
+                content.options = [0,1,2,3].map(i => document.getElementById(`lvl-quiz-opt-${i}`).value);
+                content.correct = parseInt(document.querySelector('input[name="lvl-correct"]:checked')?.value || 0);
+            } 
+            else if(type === 'dochieu') {
                 content.title = document.getElementById('lvl-read-title').value;
                 content.text = document.getElementById('lvl-read-text').value;
-                content.questions = document.getElementById('lvl-read-qs').value.split('\n').filter(x=>x.trim()).map(x=>({q:x}));
-            } else if(type === 'tracnghiem') {
-                content = JSON.parse(document.getElementById('lvl-content-json').value);
-            } else {
+                // Xử lý chuỗi [NEXT] thành mảng object
+                const qsRaw = document.getElementById('lvl-read-qs').value;
+                content.questions = qsRaw.split('[NEXT]').map(q => ({ q: q.trim() })).filter(x => x.q !== "");
+            } 
+            else {
                 content.topic = document.getElementById('lvl-essay-topic').value;
                 content.text = document.getElementById('lvl-essay-text').value;
                 content.hint = document.getElementById('lvl-essay-hint').value;
             }
-            const data = { level: parseInt(document.getElementById('lvl-num').value), type, title: document.getElementById('lvl-title').value, desc: document.getElementById('lvl-desc').value, content, updatedAt: serverTimestamp() };
-            if(id) await updateDoc(doc(db, "study_levels", id), data);
-            else await addDoc(collection(db, "study_levels"), { ...data, createdAt: serverTimestamp() });
-            showToast("Saved Level!"); loadLevelsList(); resetLevelForm(); loadStats();
-        } catch(e) { alert("Check JSON or Inputs"); }
+
+            const finalData = {
+                level: levelNum,
+                type: type,
+                title: document.getElementById('lvl-title').value,
+                desc: document.getElementById('lvl-desc').value,
+                content: content,
+                updatedAt: serverTimestamp()
+            };
+
+            if(id) {
+                await updateDoc(doc(db, "study_levels", id), finalData);
+                showToast("Đã cập nhật level thành công!");
+            } else {
+                finalData.createdAt = serverTimestamp();
+                await addDoc(collection(db, "study_levels"), finalData);
+                showToast("Đã tạo level mới!");
+            }
+
+            loadLevelsList();
+            resetLevelForm();
+            loadStats(); // Cập nhật lại số lượng ở Dashboard
+
+        } catch(e) {
+            console.error(e);
+            alert("Có lỗi xảy ra, vui lòng kiểm tra lại các ô nhập liệu!");
+        }
     };
 
-    window.deleteLevel = async () => { if(confirm("Delete?")) { await deleteDoc(doc(db, "study_levels", document.getElementById('lvl-id').value)); loadLevelsList(); resetLevelForm(); loadStats(); } };
+    window.deleteLevel = async () => {
+        const id = document.getElementById('lvl-id').value;
+        if(!id) return;
+        if(confirm("Bạn có chắc chắn muốn xóa Level này vĩnh viễn không?")) {
+            await deleteDoc(doc(db, "study_levels", id));
+            showToast("Đã xóa level!");
+            loadLevelsList();
+            resetLevelForm();
+            loadStats();
+        }
+    };
 
+    // --- HISTORY LOAD LOGIC (FIXED) ---
     window.loadSubmissions = async () => {
         const tbody = document.getElementById('history-list');
         tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center"><i class="fas fa-spinner fa-spin"></i></td></tr>';
         try {
             const snap = await getDocs(query(collection(db, "activities"), orderBy("timestamp", "desc"), limit(15)));
             tbody.innerHTML = "";
+            
+            if(snap.empty) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400">Chưa có hoạt động nào</td></tr>';
+                return;
+            }
+
             snap.forEach(d => {
                 const data = d.data();
+                // Fix lỗi không có timestamp thì crash
+                let timeStr = "N/A";
+                if (data.timestamp && data.timestamp.seconds) {
+                    timeStr = new Date(data.timestamp.seconds * 1000).toLocaleDateString('vi-VN');
+                }
+
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="font-bold text-gray-700">${data.userName||'User'}</td><td class="text-sm">${data.examTitle||'Bài tập'}</td><td class="font-black text-orange-500">${data.score}</td><td class="text-xs text-gray-400 font-mono">${new Date(data.timestamp.seconds*1000).toLocaleDateString('vi-VN')}</td>`;
+                tr.innerHTML = `
+                    <td class="font-bold text-gray-700">${data.userName || 'User'}</td>
+                    <td class="text-sm">${data.examTitle || 'Bài tập'}</td>
+                    <td class="font-black text-orange-500">${data.score != null ? data.score : '-'}</td>
+                    <td class="text-xs text-gray-400 font-mono">${timeStr}</td>
+                `;
                 tbody.appendChild(tr);
             });
-        } catch(e) { tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400">No Data</td></tr>'; }
+        } catch(e) { 
+            console.error("Lỗi tải lịch sử:", e);
+            tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-400">Lỗi tải dữ liệu: ${e.message}</td></tr>`; 
+        }
     };
 
     function showToast(msg) {
