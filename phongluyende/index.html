@@ -408,12 +408,11 @@
             </div>`;
     }
 
-    // --- 2. HÀM NỘP BÀI (GROQ VERSION) ---
-// --- 2. HÀM NỘP BÀI (ĐÃ SỬA LỖI TREO) ---
+// --- 2. HÀM NỘP BÀI (PHIÊN BẢN SỬA LỖI & BẮT LỖI) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
         
-        // Kiểm tra độ dài bài làm
+        // 1. Kiểm tra độ dài bài làm
         if(content.split(/\s+/).filter(x => x).length < 50) { 
             document.getElementById('short-essay-popup').style.display = 'flex'; 
             return; 
@@ -422,47 +421,46 @@
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex';
         
-        // SỬA LỖI QUAN TRỌNG: Lấy dữ liệu từ biến toàn cục đã lưu
-        const q = window.currentExamData;
-        
-        if (!q) {
-            showPopup("Lỗi", "Không tìm thấy dữ liệu đề bài. Vui lòng bấm 'Đổi đề' lại.", "error");
-            loading.style.display = 'none';
-            return;
-        }
-        
-        // PROMPT ĐA NĂNG CHO GROQ
-        const systemPrompt = `
-        BẠN LÀ: Giám khảo đa năng Hội đồng chấm thi THPT Quốc gia.
-        NHIỆM VỤ: Chấm bài dựa trên đề NGẪU NHIÊN học sinh bốc được.
-
-        THÔNG TIN ĐỀ BÀI:
-        - Loại đề: ${q.type}
-        - Yêu cầu: "${q.topic || q.title || "Không có tiêu đề"}"
-        - Ngữ liệu: "${q.text || "Không có ngữ liệu"}"
-        - Gợi ý chấm: "${q.hint || ''}"
-
-        TIÊU CHÍ CHẤM:
-        1. Tự nhận diện đây là bài Đọc hiểu hay Làm văn để chấm đúng thang điểm (4.0 hoặc 10.0).
-        2. Quy đổi điểm cuối cùng về thang 10.
-        3. Kiểm tra văn phong, phát hiện nếu giống AI viết.
-
-        YÊU CẦU TRẢ VỀ JSON DUY NHẤT (KHÔNG MARKDOWN):
-        {
-            "human_score": (int 0-100 đánh giá độ chân thực),
-            "ai_comment": "Nhận xét về văn phong (có giống máy không).",
-            "score": (số thực 0-10, lẻ 0.5),
-            "type_detected": "Loại đề nhận diện được",
-            "general_comment": "Lời phê tổng quát.",
-            "strengths": ["Điểm mạnh 1", "..."],
-            "weaknesses": ["Hạn chế 1", "..."],
-            "correction_html": "Bài làm gốc kèm các thẻ <span class='text-bad'>[Lỗi]</span><span class='text-fix'>[Sửa]</span> và <span class='text-good'>[Hay]</span>.",
-            "orientation": "Định hướng tư duy ngắn gọn."
-        }
-        `;
-
         try {
-            // GỬI API THEO CẤU TRÚC MESSAGES (CHUẨN GROQ)
+            // 2. Lấy dữ liệu đề bài an toàn
+            const q = window.currentExamData;
+            
+            // Nếu không có dữ liệu đề bài -> Báo lỗi ngay
+            if (!q || !q.id) {
+                throw new Error("DATA_MISSING");
+            }
+            
+            // 3. Chuẩn bị Prompt (Đã tối ưu cho Groq)
+            const systemPrompt = `
+            VAI TRÒ: Giáo viên Ngữ Văn chấm thi THPT Quốc gia.
+            NHIỆM VỤ: Chấm bài dựa trên đề NGẪU NHIÊN.
+
+            THÔNG TIN ĐỀ:
+            - Loại: ${q.type}
+            - Yêu cầu: "${(q.topic || q.title || '').replace(/"/g, "'")}"
+            - Gợi ý: "${(q.hint || '').replace(/"/g, "'")}"
+
+            TIÊU CHÍ:
+            1. Xác định đúng trọng tâm.
+            2. Phân tích sâu sắc, dẫn chứng phù hợp.
+            3. Chấm điểm thang 10.
+
+            YÊU CẦU OUTPUT JSON (KHÔNG MARKDOWN):
+            {
+                "human_score": (int 0-100),
+                "ai_comment": "Nhận xét văn phong.",
+                "score": (float 0-10),
+                "type_detected": "NLXH/NLVH/Đọc hiểu",
+                "general_comment": "Lời phê tổng quát.",
+                "strengths": ["Điểm mạnh 1", "..."],
+                "weaknesses": ["Điểm yếu 1", "..."],
+                "correction_html": "Bài làm gốc kèm thẻ <span class='text-bad'>[Lỗi]</span><span class='text-fix'>(Sửa)</span>.",
+                "orientation": "Định hướng tư duy."
+            }`;
+
+            console.log("Đang gửi yêu cầu tới AI..."); // Log kiểm tra
+
+            // 4. Gọi API
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
@@ -474,40 +472,59 @@
                 }) 
             });
 
-            if (!res.ok) throw new Error("SERVER_ERROR");
+            // 5. Kiểm tra phản hồi từ Server
+            if (!res.ok) {
+                const errText = await res.text();
+                console.error("Server Error Detail:", errText); // Xem lỗi chi tiết trong F12
+                throw new Error(`SERVER_ERROR_${res.status}`);
+            }
 
             const data = await res.json();
             
-            // XỬ LÝ KẾT QUẢ TỪ GROQ
+            // 6. Kiểm tra dữ liệu trả về từ AI
             if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                throw new Error("NO_CONTENT");
+                console.error("AI Response Error:", data);
+                throw new Error("EMPTY_RESPONSE");
             }
 
             let rawText = data.choices[0].message.content;
-            // Làm sạch JSON
+            // Làm sạch JSON (phòng trường hợp AI thêm markdown ```json)
             rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
             
-            const result = JSON.parse(rawText);
+            let result;
+            try {
+                result = JSON.parse(rawText);
+            } catch (jsonErr) {
+                console.error("JSON Parse Error:", rawText);
+                throw new Error("INVALID_JSON");
+            }
+
+            // 7. Hiển thị kết quả & Lưu
             renderAIResult(result);
 
-            // Lưu lịch sử
             if (auth.currentUser) { 
                 await addDoc(collection(db, "activities"), { 
                     uid: auth.currentUser.uid, 
                     type: "random", 
-                    subType: q.type, 
+                    subType: q.type || "unknown", 
                     score: result.score, 
                     time: document.getElementById('timer').innerText, 
                     timestamp: serverTimestamp() 
                 }); 
             }
+
         } catch(e) { 
-            console.error(e);
-            let msg = "Có lỗi xảy ra, vui lòng thử lại!";
-            if (e.message === "SERVER_ERROR") msg = "Server đang bận hoặc quá tải.";
-            if (e.message === "INVALID_FORMAT") msg = "AI trả về dữ liệu lỗi.";
-            showPopup("Lỗi AI", msg, "error"); 
+            console.error("Lỗi quy trình:", e);
+            let title = "Lỗi xử lý";
+            let msg = "Đã có lỗi xảy ra. Vui lòng thử lại.";
+
+            if (e.message === "DATA_MISSING") msg = "Dữ liệu đề bài bị lỗi. Hãy bấm nút 'Đổi đề' để lấy đề mới.";
+            if (e.message.includes("SERVER_ERROR")) msg = "Máy chủ AI đang bận hoặc cấu hình Proxy chưa khớp với Groq.";
+            if (e.message === "INVALID_JSON") msg = "AI trả về dữ liệu không đúng định dạng. Hãy thử nộp lại.";
+            
+            showPopup(title, msg, "error"); 
         } finally { 
+            // Luôn tắt loading dù thành công hay thất bại
             loading.style.display = 'none'; 
         }
     };
