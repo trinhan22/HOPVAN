@@ -69,41 +69,12 @@
         #output-section { flex: 1; min-height: 0; display: none; }
         #ai-correction-box { height: 100%; overflow-y: auto; }
 
-/* --- GLOBAL SCROLLBAR STYLE --- */
-
-/* 1. Thiết lập độ rộng/cao của thanh trượt */
-::-webkit-scrollbar {
-    width: 10px;  /* Độ rộng cho thanh dọc */
-    height: 10px; /* Độ cao cho thanh ngang */
-}
-
-/* 2. Thiết lập rãnh trượt (Track) - Nền chìm */
-::-webkit-scrollbar-track {
-    background: rgba(255, 143, 80, 0.05); /* Màu cam cực nhạt, gần như trong suốt */
-    border-radius: 10px;
-}
-
-/* 3. Thiết lập tay nắm (Thumb) - Phần di chuyển */
-::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 143, 80, 0.3); /* Mặc định là cam nhạt */
-    border-radius: 10px; /* Bo tròn mềm mại */
-    
-    /* Mẹo: Tạo viền trong suốt để thanh trượt trông nhỏ hơn và "lơ lửng" */
-    border: 2px solid transparent;
-    background-clip: content-box;
-    transition: background-color 0.3s ease;
-}
-
-/* 4. Hiệu ứng khi di chuột vào (Hover) */
-::-webkit-scrollbar-thumb:hover {
-    background-color: #FF8F50; /* Đổi sang màu cam chính thương hiệu */
-    border: 1px solid transparent; /* Làm thanh trượt to ra một chút khi hover */
-}
-
-/* 5. (Tùy chọn) Ẩn nút mũi tên 2 đầu (nếu trình duyệt hiển thị) */
-::-webkit-scrollbar-button {
-    display: none;
-}
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
+        ::-webkit-scrollbar-button { display: none; }
     </style>
 </head>
 <body>
@@ -117,6 +88,7 @@
 
     <div class="loading-overlay" id="loading-overlay">
         <div class="loader-robot"><i class="fas fa-robot"></i></div>
+        <div class="mt-4 font-bold text-gray-700">AI đang chấm bài...</div>
     </div>
 
     <div id="generic-popup" class="custom-modal">
@@ -272,7 +244,7 @@
             const randomDoc = docs[Math.floor(Math.random() * docs.length)];
             const data = randomDoc.data();
             
-            // Ép kiểu chuẩn để tránh lỗi undefined
+            // LƯU DATA VÀO BIẾN TOÀN CỤC ĐỂ DÙNG LẠI Ở HÀM SUBMIT
             window.currentExamData = { 
                 ...data, 
                 id: randomDoc.id, 
@@ -408,11 +380,10 @@
             </div>`;
     }
 
-// --- 2. HÀM NỘP BÀI (PHIÊN BẢN SỬA LỖI & BẮT LỖI) ---
+// --- 2. HÀM NỘP BÀI (ĐÃ TỐI ƯU PROMPT CHO GROQ) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
         
-        // 1. Kiểm tra độ dài bài làm
         if(content.split(/\s+/).filter(x => x).length < 50) { 
             document.getElementById('short-essay-popup').style.display = 'flex'; 
             return; 
@@ -421,46 +392,50 @@
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex';
         
+        // Lấy dữ liệu từ biến toàn cục
+        const q = window.currentExamData;
+        
+        if (!q) {
+            showPopup("Lỗi", "Dữ liệu đề bị trống. Hãy reload trang.", "error");
+            loading.style.display = 'none';
+            return;
+        }
+        
+        // --- PROMPT ĐÃ SỬA LẠI TÊN BIẾN (exam -> q) ---
+        const systemPrompt = `
+        BẠN LÀ: Giám khảo đa năng Hội đồng chấm thi THPT Quốc gia - Chuyên gia kiểm định chất lượng ngôn ngữ.
+        NHIỆM VỤ: Chấm bài dựa trên đề NGẪU NHIÊN học sinh bốc được.
+
+        === THÔNG TIN ĐỀ BÀI ===
+        1. Loại đề: ${q.type}
+        2. Yêu cầu: "${(q.topic || q.title || '').replace(/"/g, "'")}"
+        3. Ngữ liệu: "${(q.text || "Không có").replace(/"/g, "'")}"
+        4. Gợi ý chấm: "${(q.hint || "Không có").replace(/"/g, "'")}"
+
+        === CƠ CHẾ CHẤM ĐIỂM ===
+        1. Thang điểm: Quy đổi mọi kết quả về thang 10.0.
+        2. Nếu là Đọc hiểu: Tập trung vào độ chính xác, ngắn gọn.
+        3. Nếu là Làm văn (NLXH/NLVH): Tập trung vào lập luận, dẫn chứng, cảm xúc.
+
+        === KIỂM TRA AI (RĂN ĐE) ===
+        - human_score (0-100): Đánh giá độ "người". Nếu văn phong máy móc, liệt kê vô hồn -> điểm thấp.
+
+        YÊU CẦU TRẢ VỀ JSON DUY NHẤT (KHÔNG MARKDOWN, KHÔNG GIẢI THÍCH THÊM):
+        {
+            "human_score": (int 0-100),
+            "ai_comment": "Nhận xét về độ chân thực của văn phong.",
+            "score": (float thang 10, lẻ 0.5),
+            "type_detected": "Tên loại đề bạn nhận diện được",
+            "general_comment": "Lời phê tổng quát của Giám khảo.",
+            "strengths": ["Ưu điểm 1", "Ưu điểm 2"],
+            "weaknesses": ["Hạn chế 1", "Hạn chế 2"],
+            "correction_html": "Bài làm gốc của học sinh, chèn thêm các thẻ HTML sau vào chỗ cần sửa: <span class='text-bad'>[Lỗi]</span> <span class='text-fix'>(Sửa thành...)</span> hoặc <span class='text-good'>[Hay]</span>.",
+            "orientation": "Định hướng tư duy ngắn gọn."
+        }
+        `;
+
         try {
-            // 2. Lấy dữ liệu đề bài an toàn
-            const q = window.currentExamData;
-            
-            // Nếu không có dữ liệu đề bài -> Báo lỗi ngay
-            if (!q || !q.id) {
-                throw new Error("DATA_MISSING");
-            }
-            
-            // 3. Chuẩn bị Prompt (Đã tối ưu cho Groq)
-            const systemPrompt = `
-            VAI TRÒ: Giáo viên Ngữ Văn chấm thi THPT Quốc gia.
-            NHIỆM VỤ: Chấm bài dựa trên đề NGẪU NHIÊN.
-
-            THÔNG TIN ĐỀ:
-            - Loại: ${q.type}
-            - Yêu cầu: "${(q.topic || q.title || '').replace(/"/g, "'")}"
-            - Gợi ý: "${(q.hint || '').replace(/"/g, "'")}"
-
-            TIÊU CHÍ:
-            1. Xác định đúng trọng tâm.
-            2. Phân tích sâu sắc, dẫn chứng phù hợp.
-            3. Chấm điểm thang 10.
-
-            YÊU CẦU OUTPUT JSON (KHÔNG MARKDOWN):
-            {
-                "human_score": (int 0-100),
-                "ai_comment": "Nhận xét văn phong.",
-                "score": (float 0-10),
-                "type_detected": "NLXH/NLVH/Đọc hiểu",
-                "general_comment": "Lời phê tổng quát.",
-                "strengths": ["Điểm mạnh 1", "..."],
-                "weaknesses": ["Điểm yếu 1", "..."],
-                "correction_html": "Bài làm gốc kèm thẻ <span class='text-bad'>[Lỗi]</span><span class='text-fix'>(Sửa)</span>.",
-                "orientation": "Định hướng tư duy."
-            }`;
-
-            console.log("Đang gửi yêu cầu tới AI..."); // Log kiểm tra
-
-            // 4. Gọi API
+            // GỬI API
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
@@ -472,59 +447,35 @@
                 }) 
             });
 
-            // 5. Kiểm tra phản hồi từ Server
-            if (!res.ok) {
-                const errText = await res.text();
-                console.error("Server Error Detail:", errText); // Xem lỗi chi tiết trong F12
-                throw new Error(`SERVER_ERROR_${res.status}`);
-            }
+            if (!res.ok) throw new Error("SERVER_ERROR");
 
             const data = await res.json();
             
-            // 6. Kiểm tra dữ liệu trả về từ AI
             if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                console.error("AI Response Error:", data);
-                throw new Error("EMPTY_RESPONSE");
+                throw new Error("NO_CONTENT");
             }
 
             let rawText = data.choices[0].message.content;
-            // Làm sạch JSON (phòng trường hợp AI thêm markdown ```json)
             rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
             
-            let result;
-            try {
-                result = JSON.parse(rawText);
-            } catch (jsonErr) {
-                console.error("JSON Parse Error:", rawText);
-                throw new Error("INVALID_JSON");
-            }
-
-            // 7. Hiển thị kết quả & Lưu
+            const result = JSON.parse(rawText);
             renderAIResult(result);
 
+            // Lưu Firebase
             if (auth.currentUser) { 
                 await addDoc(collection(db, "activities"), { 
                     uid: auth.currentUser.uid, 
                     type: "random", 
-                    subType: q.type || "unknown", 
+                    subType: q.type, 
                     score: result.score, 
                     time: document.getElementById('timer').innerText, 
                     timestamp: serverTimestamp() 
                 }); 
             }
-
         } catch(e) { 
-            console.error("Lỗi quy trình:", e);
-            let title = "Lỗi xử lý";
-            let msg = "Đã có lỗi xảy ra. Vui lòng thử lại.";
-
-            if (e.message === "DATA_MISSING") msg = "Dữ liệu đề bài bị lỗi. Hãy bấm nút 'Đổi đề' để lấy đề mới.";
-            if (e.message.includes("SERVER_ERROR")) msg = "Máy chủ AI đang bận hoặc cấu hình Proxy chưa khớp với Groq.";
-            if (e.message === "INVALID_JSON") msg = "AI trả về dữ liệu không đúng định dạng. Hãy thử nộp lại.";
-            
-            showPopup(title, msg, "error"); 
+            console.error(e);
+            showPopup("Lỗi AI", "Hệ thống đang bận, vui lòng thử lại!", "error"); 
         } finally { 
-            // Luôn tắt loading dù thành công hay thất bại
             loading.style.display = 'none'; 
         }
     };
