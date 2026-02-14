@@ -177,7 +177,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // --- CONFIG FIREBASE ---
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
@@ -194,19 +194,12 @@
         const modal = document.getElementById('generic-popup');
         const box = modal.querySelector('.modal-box');
         const icon = document.getElementById('popup-icon');
-        
-        box.className = 'modal-box'; // Reset class
+        box.classList.remove('popup-error', 'popup-warning', 'popup-info');
+        document.getElementById('popup-title').innerText = title;
+        document.getElementById('popup-message').innerText = message;
         if (type === 'error') { box.classList.add('popup-error'); icon.innerHTML = '<i class="fas fa-exclamation-circle"></i>'; } 
         else if (type === 'warning') { box.classList.add('popup-warning'); icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>'; } 
         else { box.classList.add('popup-info'); icon.innerHTML = '<i class="fas fa-info-circle"></i>'; }
-        
-        document.getElementById('popup-title').innerText = title;
-        document.getElementById('popup-message').innerText = message;
-        
-        // Clear old buttons
-        const actions = modal.querySelector('.modal-actions');
-        actions.innerHTML = '<button onclick="closePopup()" class="modal-btn hover:opacity-90">Đã hiểu</button>';
-        
         modal.style.display = 'flex';
     };
     window.closePopup = () => document.getElementById('generic-popup').style.display = 'none';
@@ -223,11 +216,9 @@
     // --- LOAD DATA ---
     async function loadQuestions() {
         try {
-            // Lấy từ kho reading_bank thay vì random chung chung
             const querySnapshot = await getDocs(collection(db, "reading_bank"));
             questionsData = [];
             querySnapshot.forEach(doc => questionsData.push({ id: doc.id, ...doc.data() }));
-            
             if (questionsData.length === 0) {
                 document.getElementById('prompt-content').innerHTML = `<div class="text-center py-10 text-gray-400">Kho đề trống.</div>`;
                 return;
@@ -243,8 +234,7 @@
     window.randomizeQuestion = () => {
         if (!questionsData || questionsData.length === 0) return;
         const q = questionsData[Math.floor(Math.random() * questionsData.length)];
-        window.currentExamData = q; // Lưu vào biến toàn cục
-        
+        window.currentExamData = q;
         document.getElementById('exam-code').innerText = `MÃ: ${q.id.slice(0, 6).toUpperCase()}`;
         document.getElementById('student-essay').value = "";
         
@@ -267,19 +257,16 @@
                         </div>`).join('')}
                 </div>
             </div>`;
-        
-        // Reset font size
         promptFontSize = 17;
         document.querySelector('.prompt-body').style.fontSize = `17px`;
         setTimeout(setupHighlightEvent, 100);
     };
 
-    // --- HIGHLIGHT (FIX DOM) ---
+    // --- HIGHLIGHT ---
     function setupHighlightEvent() {
         const container = document.getElementById('reading-passage');
         const menu = document.getElementById('highlight-menu');
         if(!container || !menu) return;
-        
         container.onmouseup = () => {
             setTimeout(() => {
                 const sel = window.getSelection();
@@ -293,7 +280,6 @@
         };
         document.onmousedown = (e) => { if(!menu.contains(e.target) && !container.contains(e.target)) menu.style.display = 'none'; };
     }
-    
     window.applyHighlight = (cls) => {
         try {
             const sel = window.getSelection();
@@ -305,7 +291,6 @@
             document.getElementById('highlight-menu').style.display = 'none';
         } catch(e) { showPopup("Chú ý", "Không thể tô đè hoặc kéo qua nhiều đoạn văn!", "warning"); }
     };
-    
     window.removeHighlight = () => {
         const sel = window.getSelection();
         if (!sel.rangeCount) return;
@@ -336,7 +321,7 @@
                         ${result.reading_score}<span class="text-2xl text-gray-300">/4.0</span>
                     </div>
                     <div class="inline-block px-4 py-1.5 bg-orange-50 text-orange-600 rounded-full text-[10px] font-bold border border-orange-100">
-                        ${result.type_detected || "Đọc Hiểu Văn Bản"}
+                        ${result.type_detected}
                     </div>
                     <p class="text-gray-600 italic px-6 mt-4 leading-relaxed">"${result.general_comment}"</p>
                 </div>
@@ -350,6 +335,10 @@
                         <div style="width:${result.human_score}%; background:${barColor}" class="h-full"></div>
                     </div>
                     <p class="text-[11px] text-gray-400 mt-2 italic font-light">${result.ai_comment}</p>
+                </div>
+
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-6 text-sm text-blue-800 font-medium">
+                     <i class="fas fa-list-ol mr-2"></i> Chi tiết: ${result.detailed_breakdown}
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -377,7 +366,7 @@
             </div>`;
     }
 
-    // --- 2. HÀM NỘP BÀI (PHIÊN BẢN SANITIZE DATA - KHÔNG LO LỖI FIREBASE) ---
+    // --- 2. HÀM NỘP BÀI (VỆ SINH DỮ LIỆU ĐỂ TRÁNH LỖI) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
         if(content.split(/\s+/).filter(x => x).length < 20) { 
@@ -389,42 +378,40 @@
         
         const q = window.currentExamData;
         if (!q) {
-            showPopup("Lỗi", "Dữ liệu đề bị trống. Hãy reload trang.", "error");
+            showPopup("Lỗi", "Vui lòng reload trang và thử lại.", "error");
             loading.style.display = 'none';
             return;
         }
         
-        // PROMPT CHUẨN HÓA JSON OUTPUT
         const systemPrompt = `
-        BẠN LÀ: Giám khảo chấm thi ĐỌC HIỂU THPT Quốc gia (Chuyên gia ngôn ngữ).
-        NHIỆM VỤ: Chấm điểm bài làm của học sinh dựa trên ngữ liệu và câu hỏi đã cho.
+        BẠN LÀ: Giám khảo chấm thi ĐỌC HIỂU THPT Quốc gia.
+        NHIỆM VỤ: Chấm điểm bài làm của học sinh.
 
         THÔNG TIN ĐỀ:
         - Văn bản: "${(q.text || '').replace(/"/g, "'")}"
         - Câu hỏi: ${JSON.stringify(q.questions)}
 
-        TIÊU CHÍ CHẤM (Thang 4.0):
-        1. Trả lời đúng trọng tâm câu hỏi.
-        2. Dùng từ ngữ chính xác, không diễn xuôi lan man.
-        3. Hiểu đúng nội dung/nghệ thuật của văn bản.
+        TIÊU CHÍ (Thang 4.0):
+        1. Trả lời đúng trọng tâm. Sai thuật ngữ = 0 điểm.
+        2. Tổng điểm max là 4.0.
 
-        YÊU CẦU OUTPUT JSON DUY NHẤT (KHÔNG MARKDOWN):
+        YÊU CẦU OUTPUT JSON DUY NHẤT:
         {
-            "human_score": (int 0-100 đánh giá độ tự nhiên),
-            "ai_comment": "Nhận xét ngắn về văn phong.",
+            "human_score": (int 0-100),
+            "ai_comment": "Nhận xét ngắn.",
             "reading_score": (số thực 0-4.0, ví dụ: 3.5),
-            "score": (số thực 0-10.0, dùng cho database, ví dụ: 8.75),
+            "score": (số thực 0-10.0, dùng cho database),
+            "detailed_breakdown": "Câu 1: 0.5, Câu 2: 1.0...",
             "type_detected": "Đọc Hiểu Văn Bản",
             "general_comment": "Lời phê tổng quát.",
             "strengths": ["Ưu điểm 1", "Ưu điểm 2"],
             "weaknesses": ["Lỗi sai 1", "Lỗi sai 2"],
-            "correction_html": "Bài làm gốc kèm thẻ <span class='text-bad'>[Sai]</span> <span class='text-fix'>(Đáp án: ...)</span>.",
-            "orientation": "Lời khuyên để làm tốt dạng bài này lần sau."
+            "correction_html": "Bài làm gốc kèm thẻ <span class='text-bad'>[Sai]</span> <span class='text-fix'>(Đáp án)</span>.",
+            "orientation": "Lời khuyên."
         }
         `;
 
         try {
-            // GỬI SANG PROXY (Chuẩn Messages)
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
@@ -447,43 +434,48 @@
             
             const result = JSON.parse(rawText);
 
-            // --- VỆ SINH DỮ LIỆU (DATA SANITIZATION) ---
-            // Đảm bảo không bao giờ có undefined gửi lên Firebase
+            // --- QUAN TRỌNG: VỆ SINH DỮ LIỆU ĐỂ TRÁNH LỖI FIREBASE ---
             
-            // 1. Ép kiểu reading_score (Thang 4)
-            let safeReadingScore = parseFloat(result.reading_score);
-            if (isNaN(safeReadingScore)) {
-                // Nếu AI trả về chuỗi bẩn, thử tìm số
-                const match = String(result.reading_score).match(/[\d\.]+/);
+            // 1. Trích xuất số từ reading_score (nếu AI trả về chuỗi bẩn)
+            let rawRS = result.reading_score;
+            let safeReadingScore = 0;
+            if (typeof rawRS === 'number') {
+                safeReadingScore = rawRS;
+            } else if (typeof rawRS === 'string') {
+                const match = rawRS.match(/[\d\.]+/); // Tìm số trong chuỗi (vd: "3.5 điểm" -> 3.5)
                 safeReadingScore = match ? parseFloat(match[0]) : 0;
             }
-            if (safeReadingScore > 4) safeReadingScore = 4; // Cap max 4
+            if (isNaN(safeReadingScore)) safeReadingScore = 0;
+            if (safeReadingScore > 4) safeReadingScore = 4;
 
-            // 2. Ép kiểu score (Thang 10)
-            let safeScore = parseFloat(result.score);
-            if (isNaN(safeScore)) {
-                safeScore = safeReadingScore * 2.5; // Quy đổi nếu thiếu
+            // 2. Tính toán Score thang 10
+            let safeScore = 0;
+            // Ưu tiên dùng score do AI trả về nếu hợp lệ
+            if (result.score && typeof result.score === 'number' && !isNaN(result.score)) {
+                safeScore = result.score;
+            } else if (result.score && typeof result.score === 'string') {
+                 const matchS = result.score.match(/[\d\.]+/);
+                 safeScore = matchS ? parseFloat(matchS[0]) : (safeReadingScore * 2.5);
+            } else {
+                safeScore = safeReadingScore * 2.5; // Tự tính nếu AI không trả về
             }
             if (safeScore > 10) safeScore = 10;
 
-            // 3. Ép kiểu human_score
-            let safeHumanScore = parseInt(result.human_score);
-            if (isNaN(safeHumanScore)) safeHumanScore = 100;
-
-            // Cập nhật lại object để hiển thị
+            // 3. Gán ngược lại vào object result để hiển thị
             result.reading_score = safeReadingScore;
             result.score = safeScore;
-            result.human_score = safeHumanScore;
-            result.type_detected = result.type_detected || "Đọc Hiểu";
-            result.general_comment = result.general_comment || "Đã chấm xong.";
+            result.human_score = result.human_score || 100;
+            result.detailed_breakdown = result.detailed_breakdown || "Chi tiết điểm từng câu.";
 
+            // Render giao diện
             renderAIResult(result);
 
+            // Lưu vào Firebase
             if (auth.currentUser) {
                 await addDoc(collection(db, "activities"), {
                     uid: auth.currentUser.uid,
                     type: "reading",
-                    score: safeScore, // CHẮC CHẮN LÀ SỐ
+                    score: safeScore, // Đảm bảo luôn là số
                     timestamp: serverTimestamp(),
                     examId: q.id
                 });
@@ -493,7 +485,6 @@
             let msg = "Có lỗi xảy ra, vui lòng thử lại!";
             if (e.message === "SERVER_ERROR") msg = "Server đang bận. Bạn hãy bấm nộp lại nhé!";
             if (e.message === "NO_CONTENT") msg = "AI không phản hồi. Vui lòng bấm nộp lại!";
-            if (e.name === "SyntaxError") msg = "Dữ liệu trả về bị lỗi định dạng. Thử lại ngay!";
             showPopup("Lỗi AI", msg, "error");
         } finally { 
             loading.style.display = 'none'; 
