@@ -379,7 +379,7 @@
             </div>`;
     }
 
-// --- 2. HÀM NỘP BÀI (ĐÃ TỐI ƯU PROMPT CHO GROQ) ---
+// --- 2. HÀM NỘP BÀI (ĐÃ FIX KHỚP VỚI PROXY) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
         
@@ -391,7 +391,6 @@
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex';
         
-        // Lấy dữ liệu từ biến toàn cục
         const q = window.currentExamData;
         
         if (!q) {
@@ -400,9 +399,9 @@
             return;
         }
         
-        // --- PROMPT ĐÃ SỬA LẠI TÊN BIẾN (exam -> q) ---
+        // --- 1. Tạo System Prompt ---
         const systemPrompt = `
-        BẠN LÀ: Giám khảo đa năng Hội đồng chấm thi THPT Quốc gia - Chuyên gia kiểm định chất lượng ngôn ngữ.
+        BẠN LÀ: Giám khảo đa năng Hội đồng chấm thi THPT Quốc gia.
         NHIỆM VỤ: Chấm bài dựa trên đề NGẪU NHIÊN học sinh bốc được.
 
         === THÔNG TIN ĐỀ BÀI ===
@@ -419,7 +418,7 @@
         === KIỂM TRA AI (RĂN ĐE) ===
         - human_score (0-100): Đánh giá độ "người". Nếu văn phong máy móc, liệt kê vô hồn -> điểm thấp.
 
-        YÊU CẦU TRẢ VỀ JSON DUY NHẤT (KHÔNG MARKDOWN, KHÔNG GIẢI THÍCH THÊM):
+        YÊU CẦU TRẢ VỀ JSON DUY NHẤT (KHÔNG MARKDOWN):
         {
             "human_score": (int 0-100),
             "ai_comment": "Nhận xét về độ chân thực của văn phong.",
@@ -428,25 +427,29 @@
             "general_comment": "Lời phê tổng quát của Giám khảo.",
             "strengths": ["Ưu điểm 1", "Ưu điểm 2"],
             "weaknesses": ["Hạn chế 1", "Hạn chế 2"],
-            "correction_html": "Bài làm gốc của học sinh, chèn thêm các thẻ HTML sau vào chỗ cần sửa: <span class='text-bad'>[Lỗi]</span> <span class='text-fix'>(Sửa thành...)</span> hoặc <span class='text-good'>[Hay]</span>.",
+            "correction_html": "Bài làm gốc, chèn thêm thẻ: <span class='text-bad'>[Lỗi]</span> <span class='text-fix'>(Sửa thành...)</span> hoặc <span class='text-good'>[Hay]</span>.",
             "orientation": "Định hướng tư duy ngắn gọn."
         }
         `;
 
         try {
-            // GỬI API
+            // --- 2. Gửi API (Sửa lại cấu trúc body cho khớp với Proxy) ---
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ 
-                    messages: [
-                        { role: "system", content: systemPrompt },
-                        { role: "user", content: `BÀI LÀM CỦA HỌC SINH:\n${content}` }
-                    ]
+                    // Proxy của bạn yêu cầu tách riêng 2 biến này
+                    systemPrompt: systemPrompt,
+                    messages: `BÀI LÀM CỦA HỌC SINH:\n${content}` 
                 }) 
             });
 
-            if (!res.ok) throw new Error("SERVER_ERROR");
+            if (!res.ok) {
+                // Đọc lỗi chi tiết từ server nếu có
+                const errText = await res.text();
+                console.error("Server Error Log:", errText);
+                throw new Error("SERVER_ERROR");
+            }
 
             const data = await res.json();
             
@@ -473,7 +476,10 @@
             }
         } catch(e) { 
             console.error(e);
-            showPopup("Lỗi AI", "Hệ thống đang bận, vui lòng thử lại!", "error"); 
+            let msg = "Có lỗi xảy ra, vui lòng thử lại!";
+            if (e.message === "SERVER_ERROR") msg = "Server AI đang quá tải hoặc lỗi cấu trúc.";
+            if (e.message === "NO_CONTENT") msg = "AI không trả lời. Hãy thử lại.";
+            showPopup("Lỗi AI", msg, "error"); 
         } finally { 
             loading.style.display = 'none'; 
         }
