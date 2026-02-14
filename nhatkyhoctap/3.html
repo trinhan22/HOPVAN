@@ -22,7 +22,6 @@
                         #fff9f5;
         }
 
-        /* --- BACKGROUND --- */
         .bg-blob { position: fixed; filter: blur(80px); z-index: -1; opacity: 0.6; animation: float 25s infinite alternate ease-in-out; }
         .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #ffe4d3; animation-delay: -5s; }
         .blob-2 { bottom: 0%; right: -5%; width: 450px; height: 450px; background: #ffdec2; }
@@ -33,11 +32,11 @@
             padding: 20px; 
             min-height: 100vh; 
             position: relative; 
-            max-width: 850px; 
+            max-width: 850px; /* Nội dung gọn gàng ở giữa */
             margin: 0 auto;
         }
 
-        /* --- GLASS STYLES --- */
+        /* --- GLASS UI --- */
         .glass-header {
             background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 4px 30px rgba(0,0,0,0.05);
@@ -51,7 +50,6 @@
         }
 
         /* --- CONTENT STYLES --- */
-        /* Quote Box: Font thường, dễ đọc */
         .quote-box {
             font-family: 'Merriweather', serif; 
             color: #374151;
@@ -63,18 +61,21 @@
             position: relative;
             border: 1px solid #fed7aa;
             margin-bottom: 24px;
+            text-align: justify; /* Căn đều ngữ liệu */
         }
-        
-        /* Topic Display: Font thường, không in đậm quá mức */
+        .quote-box p { margin-bottom: 0.5rem; }
+        .quote-box strong { font-weight: 700; color: #1f2937; }
+
+        /* Đề bài: Font thường, căn đều */
         #display-topic {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 500; /* Medium weight, không phải Bold */
+            font-weight: 500; /* Vừa phải, không đậm */
             color: #1e293b;
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             line-height: 1.6;
+            text-align: justify; /* Căn đều đề bài */
         }
-        /* Xử lý các thẻ HTML bên trong đề bài để không bị đậm */
-        #display-topic strong, #display-topic b { font-weight: 600; color: #0f172a; }
+        #display-topic strong { font-weight: 600; }
 
         .glass-textarea {
             width: 100%; height: 450px;
@@ -84,6 +85,7 @@
             font-size: 1rem; line-height: 1.7; color: #334155;
             resize: none; outline: none; transition: 0.3s;
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+            text-align: justify;
         }
         .glass-textarea:focus {
             border-color: var(--primary);
@@ -106,8 +108,7 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* Highlight classes */
-        #ai-correction { white-space: pre-wrap; font-family: 'Merriweather', serif; font-size: 1rem; line-height: 1.8; }
+        #ai-correction { white-space: pre-wrap; font-family: 'Merriweather', serif; font-size: 1rem; line-height: 1.8; text-align: justify; }
         .text-good { background: #dcfce7; color: #166534; padding: 1px 4px; border-radius: 4px; font-weight: 600; }
         .text-bad { background: #fee2e2; color: #991b1b; text-decoration: line-through; padding: 1px 4px; border-radius: 4px; opacity: 0.8; }
         .text-fix { color: #2563eb; font-weight: 600; font-style: normal; margin-left: 4px; background: #eff6ff; padding: 1px 4px; border-radius: 4px; font-size: 0.9em; }
@@ -141,43 +142,7 @@
         .fa-circle-notch { animation: spin 1s linear infinite; margin-right: 8px; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        @media (max-width: 640px) { .main-content { padding: 16px; } }
-
-/* --- GLOBAL SCROLLBAR STYLE --- */
-
-/* 1. Thiết lập độ rộng/cao của thanh trượt */
-::-webkit-scrollbar {
-    width: 10px;  /* Độ rộng cho thanh dọc */
-    height: 10px; /* Độ cao cho thanh ngang */
-}
-
-/* 2. Thiết lập rãnh trượt (Track) - Nền chìm */
-::-webkit-scrollbar-track {
-    background: rgba(255, 143, 80, 0.05); /* Màu cam cực nhạt, gần như trong suốt */
-    border-radius: 10px;
-}
-
-/* 3. Thiết lập tay nắm (Thumb) - Phần di chuyển */
-::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 143, 80, 0.3); /* Mặc định là cam nhạt */
-    border-radius: 10px; /* Bo tròn mềm mại */
-    
-    /* Mẹo: Tạo viền trong suốt để thanh trượt trông nhỏ hơn và "lơ lửng" */
-    border: 2px solid transparent;
-    background-clip: content-box;
-    transition: background-color 0.3s ease;
-}
-
-/* 4. Hiệu ứng khi di chuột vào (Hover) */
-::-webkit-scrollbar-thumb:hover {
-    background-color: #FF8F50; /* Đổi sang màu cam chính thương hiệu */
-    border: 1px solid transparent; /* Làm thanh trượt to ra một chút khi hover */
-}
-
-/* 5. (Tùy chọn) Ẩn nút mũi tên 2 đầu (nếu trình duyệt hiển thị) */
-::-webkit-scrollbar-button {
-    display: none;
-}
+        @media (max-width: 1024px) { .main-content { padding: 16px; } }
     </style>
 </head>
 <body>
@@ -227,11 +192,11 @@
         </div>
 
         <div class="max-w-3xl mx-auto pb-20">
-            <div class="liquid-glass p-8 mb-8 relative overflow-hidden bg-gradient-to-br from-white/80 to-white/40">
+            <div class="liquid-glass p-8 mb-8 relative overflow-hidden bg-gradient-to-br from-white/90 to-white/60">
                 <div class="relative z-10">
                     <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Level 3</span>
-                    <h1 class="text-3xl font-bold text-gray-800 mt-4 mb-2">Nghị Luận Xã Hội</h1>
-                    <p class="text-gray-500 font-medium text-sm">Viết đoạn văn khoảng 200 chữ. Đạt <span class="text-orange-600 font-bold">6.0 điểm</span> để qua màn.</p>
+                    <h1 class="text-3xl font-bold text-gray-800 mt-3 mb-2">Nghị Luận Xã Hội</h1>
+                    <p class="text-gray-500 font-medium text-sm">Viết đoạn văn 200 chữ. Đạt tối thiểu <span class="text-orange-600 font-bold">6.0 điểm</span> để qua màn.</p>
                 </div>
                 <i class="fas fa-pen-nib absolute -right-6 -bottom-8 text-8xl text-orange-500/10 rotate-12"></i>
             </div>
@@ -256,7 +221,7 @@
                 </p>
 
                 <div class="relative">
-                    <textarea id="student-essay" class="glass-textarea" placeholder="Bắt đầu viết bài làm của bạn tại đây... (Tối thiểu 50 từ)"></textarea>
+                    <textarea id="student-essay" class="glass-textarea" placeholder="Bắt đầu viết đoạn văn của bạn tại đây... (Tối thiểu 50 từ)"></textarea>
                     <div class="absolute bottom-4 right-6 text-xs font-bold text-gray-400 bg-white/90 px-3 py-1 rounded-full border border-gray-200 backdrop-blur-sm">
                         <span id="word-count" class="text-orange-500">0</span> từ
                     </div>
@@ -280,16 +245,16 @@
                     </div>
                     <div class="text-center md:text-left mt-6 md:mt-0 md:ml-8 flex-1">
                         <h3 class="text-2xl font-bold text-gray-800 mb-2" id="result-title">Đang chấm...</h3>
-                        <p class="text-gray-500 text-sm italic" id="result-desc">Giáo viên AI đang đọc bài của bạn...</p>
+                        <p class="text-gray-500 text-sm italic" id="result-desc">AI đang đọc bài của bạn...</p>
                     </div>
                 </div>
 
                 <div class="space-y-8">
                     <div>
                         <h4 class="font-bold text-gray-700 uppercase text-xs tracking-widest mb-4 flex items-center gap-2">
-                            <i class="fas fa-highlighter text-orange-500"></i> Nhận xét chi tiết
+                            <i class="fas fa-highlighter text-orange-500"></i> Nhận xét chi tiết từ AI
                         </h4>
-                        <div id="ai-correction" class="bg-gray-50/80 p-6 rounded-2xl border border-gray-200 text-gray-700 text-base shadow-inner"></div>
+                        <div id="ai-correction" class="bg-gray-50/80 p-6 rounded-2xl border border-gray-200 text-gray-700 text-base shadow-inner leading-relaxed font-serif"></div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -305,8 +270,8 @@
                 </div>
 
                 <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onclick="nextLevel()" id="next-btn" class="hidden w-full sm:w-auto bg-green-500 text-white px-8 py-4 rounded-2xl font-black hover:bg-green-600 transition shadow-lg shadow-green-200">Mở Khóa Level 4 <i class="fas fa-lock-open ml-2"></i></button>
-                    <button onclick="location.reload()" id="retry-btn" class="hidden w-full sm:w-auto bg-gray-100 text-gray-600 px-8 py-4 rounded-2xl font-black hover:bg-gray-200 transition">Làm Lại Bài <i class="fas fa-redo ml-2"></i></button>
+                    <button onclick="nextLevel()" id="next-btn" class="hidden w-full sm:w-auto bg-green-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-600 transition shadow-lg shadow-green-200">Mở Khóa Level 4 <i class="fas fa-lock-open ml-2"></i></button>
+                    <button onclick="location.reload()" id="retry-btn" class="hidden w-full sm:w-auto bg-gray-100 text-gray-600 px-8 py-3 rounded-xl font-bold hover:bg-gray-200 transition">Làm Lại Bài <i class="fas fa-redo ml-2"></i></button>
                 </div>
             </div>
         </div>
@@ -322,7 +287,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const API_URL = `/.netlify/functions/gemini-proxy`;
+    const API_URL = `/.netlify/functions/gemini-proxy`; // Logic Groq
     let userUid = null;
     let levelData = null; 
 
@@ -349,7 +314,7 @@
             b2.innerText = "Nộp bài ngay"; b2.onclick = () => { modal.classList.remove('open'); confirmCallback(); };
             actions.append(b1, b2);
         } else {
-            const b = document.createElement('button'); b.className = "px-8 py-3 rounded-xl font-bold bg-gray-800 text-white hover:bg-gray-700 transition text-sm";
+            const b = document.createElement('button'); b.className = "px-8 py-3 rounded-xl font-bold bg-gray-900 text-white hover:bg-gray-800 transition text-sm";
             b.innerText = "Đã hiểu"; b.onclick = () => modal.classList.remove('open');
             actions.appendChild(b);
         }
@@ -361,7 +326,7 @@
         else { showPopup('info', 'Yêu cầu đăng nhập', 'Bạn cần đăng nhập để thực hiện thử thách.', () => window.location.href = "../log.html"); }
     });
 
-    // --- 1. TẢI ĐỀ TỪ FIREBASE ---
+    // --- 1. TẢI ĐỀ LEVEL 3 ---
     async function initLevel3() {
         try {
             const q = query(collection(db, "study_levels"), where("level", "==", 3));
@@ -374,9 +339,10 @@
             const docData = snap.docs[0].data();
             levelData = docData.content; 
 
-            // Dùng innerHTML để giữ format nhưng style CSS đã ép font-weight thường
+            // Render HTML từ Editor (Topic), hiển thị font thường, căn đều
             document.getElementById('display-topic').innerHTML = levelData.topic;
             
+            // Render HTML từ Editor (Ngữ liệu)
             if (levelData.text && levelData.text.trim() !== "") {
                 const quoteBox = document.getElementById('display-quote');
                 quoteBox.innerHTML = levelData.text;
@@ -391,46 +357,58 @@
         const content = document.getElementById('student-essay').value.trim();
         const words = content.split(/\s+/).filter(x => x).length;
 
-        if (words < 50) return showPopup('warning', 'Bài viết quá ngắn', 'Bạn cần viết ít nhất 50 từ để AI có thể chấm điểm chính xác.');
-        showPopup('warning', 'Xác nhận nộp bài', 'Bài văn của bạn sẽ được AI chấm điểm. Hành động này không thể hoàn tác.', handleRealSubmit);
+        if (words < 50) return showPopup('warning', 'Bài viết quá ngắn', 'Bạn cần viết ít nhất 50 từ để AI có thể phân tích nội dung.');
+        showPopup('warning', 'Xác nhận nộp bài', 'Bài làm sẽ được AI chấm điểm chi tiết.', handleRealSubmit);
     };
 
     const handleRealSubmit = async () => {
         const content = document.getElementById('student-essay').value.trim();
         document.getElementById('loading-overlay').style.display = 'flex';
 
-        // Prompt chuyên dụng cho Nghị Luận Xã Hội (Đoạn văn 200 chữ)
+        // PROMPT CHUYÊN DỤNG CHO NLXH (GROQ/LLAMA-3)
         const systemPrompt = `
-        VAI TRÒ: Giáo viên Ngữ Văn chấm thi THPT Quốc Gia (Câu NLXH 200 chữ).
+        VAI TRÒ: Giáo viên Ngữ Văn chuyên chấm thi THPT Quốc Gia.
+        NHIỆM VỤ: Chấm đoạn văn NGHỊ LUẬN XÃ HỘI (Khoảng 200 chữ).
         
         ĐỀ BÀI: "${document.getElementById('display-topic').innerText}"
-        NGỮ LIỆU: "${document.getElementById('display-quote').innerText}"
+        NGỮ LIỆU GỢI Ý: "${document.getElementById('display-quote').innerText}"
         BÀI LÀM: "${content}"
+        GỢI Ý CHẤM (HINT): "${levelData.hint || ''}"
 
         TIÊU CHÍ CHẤM (Thang 10):
-        1. Đúng vấn đề nghị luận, đúng hình thức đoạn văn.
+        1. Đúng vấn đề, đúng hình thức đoạn văn.
         2. Lập luận chặt chẽ, dẫn chứng thuyết phục.
-        3. Sáng tạo, giàu cảm xúc.
+        3. Phản biện sắc sảo, liên hệ bản thân tốt.
 
-        YÊU CẦU OUTPUT JSON (KHÔNG MARKDOWN):
+        YÊU CẦU OUTPUT JSON DUY NHẤT (KHÔNG CÓ MARKDOWN):
         {
             "score": (số thực 0-10, lẻ 0.5),
-            "title": "Nhận xét ngắn gọn (vd: Lập luận tốt, Cần thêm dẫn chứng...)",
+            "title": "Nhận xét ngắn gọn",
             "desc": "Lời khuyên tổng quát",
-            "correction_html": "Trả lại bài làm gốc, chèn thêm thẻ: <span class='text-bad'>lỗi sai</span><span class='text-fix'>(sửa)</span> và <span class='text-good'>ý hay</span>.",
-            "pros": ["Ưu điểm 1", "Ưu điểm 2"],
-            "cons": ["Hạn chế 1", "Hạn chế 2"]
+            "correction_html": "Trả lại bài làm gốc, nhưng chèn thêm thẻ: <span class='text-bad'>lỗi sai</span><span class='text-fix'>(gợi ý sửa)</span> và <span class='text-good'>ý hay</span>.",
+            "pros": ["Điểm mạnh 1", "Điểm mạnh 2"],
+            "cons": ["Điểm yếu 1", "Điểm yếu 2"]
         }
         `;
 
         try {
+            // GỌI API THEO CẤU TRÚC GROQ
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
+                body: JSON.stringify({ 
+                    messages: [
+                        { role: "system", content: "Bạn là trợ lý chấm thi văn học trả về định dạng JSON." },
+                        { role: "user", content: systemPrompt }
+                    ]
+                })
             });
             const data = await response.json();
-            const res = JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json|```/g, "").trim());
+            
+            // Parse kết quả từ choices[0].message.content
+            let rawText = data.choices[0].message.content;
+            rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+            const res = JSON.parse(rawText);
 
             renderResult(res);
 
@@ -445,6 +423,7 @@
                     timestamp: serverTimestamp() 
                 });
                 
+                // Score >= 6 thì mở level 4
                 if (res.score >= 6) {
                     await setDoc(doc(db, "users_progress", userUid), { currentLevel: 4, lastPassed: serverTimestamp() }, { merge: true });
                 }
@@ -470,15 +449,14 @@
 
         const ring = document.getElementById('score-ring');
         if (res.score >= 6) {
-            ring.style.background = `conic-gradient(#10B981 ${res.score*10}%, rgba(255,255,255,0.5) 0%)`;
+            ring.style.background = `conic-gradient(#10B981 ${res.score*10}%, #f1f5f9 0%)`;
             document.getElementById('next-btn').classList.remove('hidden');
         } else {
-            ring.style.background = `conic-gradient(#EF4444 ${res.score*10}%, rgba(255,255,255,0.5) 0%)`;
+            ring.style.background = `conic-gradient(#EF4444 ${res.score*10}%, #f1f5f9 0%)`;
             document.getElementById('retry-btn').classList.remove('hidden');
         }
     }
 
-    // Đếm từ
     document.getElementById('student-essay').oninput = function() {
         const words = this.value.trim().split(/\s+/).filter(x => x).length;
         document.getElementById('word-count').innerText = words;
@@ -499,7 +477,7 @@
             const s = totalSeconds % 60;
             timerText.innerText = `${m}:${s<10?'0'+s:s}`;
             timerMini.innerText = m;
-            const pct = (totalSeconds / 2700) * 100;
+            const pct = (totalSeconds / 3600) * 100;
             timerCircle.setAttribute('stroke-dasharray', `${pct}, 100`);
         } else {
             clearInterval(interval);

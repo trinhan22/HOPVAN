@@ -1,4 +1,4 @@
-// chatbot.js - Hopvan AI Assistant (Fix Avatar Border & Online Dot)
+// chatbot.js - Hopvan AI Assistant (Powered by Groq)
 
 const styles = `
     /* --- LAUNCHER BUTTON --- */
@@ -47,10 +47,7 @@ const styles = `
     }
     .bot-info { display: flex; align-items: center; gap: 12px; }
     
-    /* --- AVATAR & DOT FIX --- */
-    .bot-avatar-wrapper {
-        position: relative; width: 42px; height: 42px; flex-shrink: 0;
-    }
+    .bot-avatar-wrapper { position: relative; width: 42px; height: 42px; flex-shrink: 0; }
     .bot-avatar {
         width: 100%; height: 100%; background: white; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
@@ -58,16 +55,13 @@ const styles = `
     }
     .bot-avatar img {
         width: 100%; height: 100%; object-fit: cover;
-        border-radius: 50%; /* Bo tròn ảnh */
-        border: 2px solid white; /* Viền trắng */
-        box-sizing: border-box;
+        border-radius: 50%; border: 2px solid white; box-sizing: border-box;
     }
     .online-dot {
         position: absolute; bottom: -1px; right: -1px;
         width: 11px; height: 11px;
         background: #4ade80; border: 2px solid white; border-radius: 50%; z-index: 2;
     }
-    /* ------------------------ */
 
     #chat-close-btn {
         width: 32px; height: 32px; 
@@ -124,9 +118,7 @@ const styles = `
         padding: 8px 12px; background: #fff7ed; border-radius: 12px;
         font-size: 0.85rem; color: #ea580c; border: 1px solid #ffedd5;
     }
-    #remove-file-btn {
-        margin-left: auto; cursor: pointer; color: #ef4444; font-weight: bold;
-    }
+    #remove-file-btn { margin-left: auto; cursor: pointer; color: #ef4444; font-weight: bold; }
 
     .input-row { display: flex; gap: 8px; align-items: center; }
 
@@ -144,9 +136,7 @@ const styles = `
         transition: 0.3s;
     }
     
-    #chat-upload-btn {
-        background: #f3f4f6; color: #6b7280;
-    }
+    #chat-upload-btn { background: #f3f4f6; color: #6b7280; }
     #chat-upload-btn:hover { background: #e5e7eb; color: #374151; }
 
     #chat-send-btn {
@@ -167,7 +157,6 @@ const styles = `
     }
 `;
 
-// 2. Logic JS
 function initChatbot() {
     const styleSheet = document.createElement("style");
     styleSheet.innerText = styles;
@@ -245,7 +234,7 @@ function initChatbot() {
 
     let currentFile = null;
 
-    // Toggle Chat
+    // UI Logic
     function toggleChat() {
         const isActive = windowEl.classList.contains('active');
         if (isActive) {
@@ -261,7 +250,6 @@ function initChatbot() {
     launcher.addEventListener('click', toggleChat);
     closeBtn.addEventListener('click', toggleChat);
 
-    // File Upload Logic
     uploadBtn.addEventListener('click', () => fileInput.click());
 
     fileInput.addEventListener('change', (e) => {
@@ -279,7 +267,6 @@ function initChatbot() {
         filePreview.style.display = 'none';
     });
 
-    // Helper: Convert File to Base64 (for Images)
     const fileToBase64 = (file) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -289,7 +276,6 @@ function initChatbot() {
         });
     };
 
-    // Helper: Read Text File
     const readTextFile = (file) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -299,11 +285,12 @@ function initChatbot() {
         });
     };
 
-    // Send Message Logic
+    // --- LOGIC GỬI TIN NHẮN (GROQ) ---
     async function sendMessage() {
         const text = inputEl.value.trim();
         if (!text && !currentFile) return;
 
+        // 1. Hiển thị tin nhắn người dùng
         let userHtml = text;
         if (currentFile && currentFile.type.startsWith('image/')) {
             const objectUrl = URL.createObjectURL(currentFile);
@@ -314,6 +301,7 @@ function initChatbot() {
         
         appendMessage(userHtml, 'user');
         
+        // 2. Reset input
         inputEl.value = '';
         const fileToSend = currentFile;
         currentFile = null;
@@ -323,54 +311,74 @@ function initChatbot() {
         const loadingId = showLoading();
 
         try {
-            let parts = [];
-            if (text) parts.push({ text: `Câu hỏi: ${text}` });
+            // 3. Chuẩn bị Payload cho Groq
+            let messages = [
+                { role: "system", content: "Bạn là Trợ lý AI của Hopvan. Nhiệm vụ: Giải đáp thắc mắc Ngữ Văn, phân tích ảnh/tài liệu được gửi. Phong cách: Thân thiện, dùng emoji." }
+            ];
 
+            let contentPayload = [];
+
+            // Xử lý Text
+            if (text) {
+                contentPayload.push({ type: "text", text: text });
+            }
+
+            // Xử lý File
             if (fileToSend) {
                 if (fileToSend.type.startsWith('image/')) {
                     const base64Data = await fileToBase64(fileToSend);
-                    parts.push({
-                        inline_data: { mime_type: fileToSend.type, data: base64Data }
+                    contentPayload.push({
+                        type: "image_url",
+                        image_url: { url: `data:${fileToSend.type};base64,${base64Data}` }
                     });
                 } else {
                     try {
                         const fileContent = await readTextFile(fileToSend);
-                        parts.push({ text: `\n\nNội dung file đính kèm (${fileToSend.name}):\n${fileContent}` });
+                        contentPayload.push({ type: "text", text: `\n\nNội dung file đính kèm (${fileToSend.name}):\n${fileContent}` });
                     } catch (err) {
-                        parts.push({ text: `\n(Không đọc được file ${fileToSend.name})` });
+                        contentPayload.push({ type: "text", text: `\n(Lỗi đọc file ${fileToSend.name})` });
                     }
                 }
             }
 
-            const systemContext = `Bạn là Trợ lý AI của Hopvan. Nhiệm vụ: Giải đáp thắc mắc Ngữ Văn, phân tích ảnh/tài liệu được gửi. Phong cách: Thân thiện, dùng emoji.`;
+            // Nếu chỉ có text đơn thuần, Groq có thể nhận string trực tiếp, nhưng format array object an toàn cho cả vision.
+            // Tuy nhiên, để đảm bảo tương thích tốt nhất với Llama 3 (Text) và Llama 3.2 (Vision), ta gom lại.
             
-            if(parts.length > 0 && parts[0].text) {
-                parts[0].text = systemContext + "\n\n" + parts[0].text;
-            } else {
-                parts.unshift({ text: systemContext });
+            // Nếu payload có ảnh -> Bắt buộc dùng model Vision (nhưng ở đây ta gửi qua Proxy, Proxy sẽ tự xử lý hoặc model default là vision)
+            // Nếu model text-only gặp image_url sẽ lỗi. 
+            // Giả sử Proxy của bạn đã được cấu hình trỏ tới model Vision hoặc Text phù hợp.
+            
+            if (contentPayload.length > 0) {
+                messages.push({ role: "user", content: contentPayload });
             }
 
+            // 4. Gọi API
             const response = await fetch('/.netlify/functions/gemini-proxy', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: parts }] })
+                body: JSON.stringify({ messages: messages })
             });
 
             const data = await response.json();
             removeLoading(loadingId);
 
-            if (data.candidates && data.candidates.length > 0) {
-                let reply = data.candidates[0].content.parts[0].text;
+            // 5. Xử lý kết quả Groq (OpenAI Format)
+            if (data.choices && data.choices.length > 0) {
+                let reply = data.choices[0].message.content;
+                
+                // Format lại text cho đẹp
                 reply = reply
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/\n/g, '<br>')
                     .replace(/\* /g, '• ');
+                
                 appendMessage(reply, 'bot');
             } else {
-                appendMessage("Oop! AI không phản hồi được. Thử lại nhé.", 'bot');
+                appendMessage("Oop! AI đang ngủ gật. Thử lại sau nhé.", 'bot');
             }
 
         } catch (error) {
+            console.error(error);
             removeLoading(loadingId);
             appendMessage("Lỗi kết nối rồi. Kiểm tra mạng giúp mình nha!", 'bot');
         }

@@ -13,10 +13,7 @@
     <style>
         :root { --primary: #FF8F50; }
         body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            min-height: 100vh; 
-            display: block; 
-            color: #334155;
+            font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: block; color: #334155;
             background: radial-gradient(at 0% 0%, hsla(25,100%,95%,1) 0, transparent 50%), 
                         radial-gradient(at 100% 100%, hsla(15,100%,96%,1) 0, transparent 50%), 
                         #fff9f5;
@@ -29,29 +26,23 @@
         @keyframes float { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(40px, 40px) rotate(15deg); } }
 
         .main-content { 
-            width: 100%; 
-            padding: 20px; 
-            min-height: 100vh; 
-            position: relative; 
-            max-width: 850px; 
-            margin: 0 auto;
+            width: 100%; padding: 20px; min-height: 100vh; position: relative; max-width: 1000px; margin: 0 auto;
         }
 
-        /* --- GLASS STYLES --- */
+        /* --- GLASS UI --- */
         .glass-header {
-            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 4px 30px rgba(0,0,0,0.05);
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 4px 20px rgba(0,0,0,0.05);
             border-radius: 9999px; transition: all 0.3s;
         }
         .liquid-glass {
             background: rgba(255, 255, 255, 0.7);
-            box-shadow: 0 10px 40px -10px rgba(255, 130, 60, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px -5px rgba(255, 130, 60, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px; transition: transform 0.3s; margin-bottom: 2rem;
+            border-radius: 24px; transition: transform 0.3s;
         }
 
         /* --- CONTENT STYLES --- */
-        /* Quote Box: Hiển thị ngữ liệu văn học -> Căn đều (Justify) */
         .quote-box {
             font-family: 'Merriweather', serif; 
             color: #374151;
@@ -63,7 +54,7 @@
             position: relative;
             border: 1px solid #fed7aa;
             margin-bottom: 24px;
-            text-align: justify; /* Căn đều ngữ liệu */
+            text-align: justify; /* <--- CĂN ĐỀU */
         }
         .quote-box p { margin-bottom: 0.5rem; }
         .quote-box strong, .quote-box b { font-weight: 700; color: #1f2937; }
@@ -76,24 +67,17 @@
             color: #1e293b;
             font-size: 1.1rem;
             line-height: 1.6;
-            text-align: justify; /* Căn đều đề bài */
+            text-align: justify; /* <--- CĂN ĐỀU */
         }
         #display-topic strong { font-weight: 600; }
 
         .glass-textarea {
-            width: 100%; height: 500px;
-            background: #FFFFFF !important;
-            border: 1px solid #cbd5e1;
-            border-radius: 20px; padding: 25px;
-            font-size: 1rem; line-height: 1.7; color: #334155;
-            resize: none; outline: none; transition: 0.3s;
+            width: 100%; height: 500px; background: #FFFFFF !important;
+            border: 1px solid #cbd5e1; border-radius: 20px; padding: 25px;
+            font-size: 1rem; line-height: 1.7; color: #334155; resize: none; outline: none; transition: 0.3s;
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
-            text-align: justify; /* Căn đều bài làm của học sinh luôn cho đẹp */
         }
-        .glass-textarea:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(255, 143, 80, 0.15);
-        }
+        .glass-textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255, 143, 80, 0.15); }
 
         /* --- AI RESULT --- */
         .ai-result { display: none; margin-top: 40px; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -106,13 +90,9 @@
             position: relative; margin: 0 auto;
             box-shadow: 0 10px 20px rgba(0,0,0,0.05);
         }
-        .score-inner {
-            width: 90px; height: 90px; background: white; border-radius: 50%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
+        .score-inner { width: 90px; height: 90px; background: white; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-        /* Highlight classes */
-        #ai-correction { white-space: pre-wrap; font-family: 'Merriweather', serif; font-size: 1rem; line-height: 1.8; text-align: justify; }
+        #ai-correction { white-space: pre-wrap; font-family: 'Merriweather', serif; font-size: 1rem; line-height: 1.8; }
         .text-good { background: #dcfce7; color: #166534; padding: 1px 4px; border-radius: 4px; font-weight: 600; }
         .text-bad { background: #fee2e2; color: #991b1b; text-decoration: line-through; padding: 1px 4px; border-radius: 4px; opacity: 0.8; }
         .text-fix { color: #2563eb; font-weight: 600; font-style: normal; margin-left: 4px; background: #eff6ff; padding: 1px 4px; border-radius: 4px; font-size: 0.9em; }
@@ -132,10 +112,7 @@
         }
         .modal-overlay.open .modal-box { transform: scale(1); }
 
-        .icon-box {
-            width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 16px;
-            display: flex; align-items: center; justify-content: center; font-size: 2rem;
-        }
+        .icon-box { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
         .icon-warning { background: #ffedd5; color: #f97316; }
         .icon-error { background: #fee2e2; color: #ef4444; }
         .icon-info { background: #dbeafe; color: #3b82f6; }
@@ -143,10 +120,8 @@
         .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .loader-robot { font-size: 4rem; color: var(--primary); animation: robotBounce 1s infinite alternate; }
         @keyframes robotBounce { from { transform: translateY(0); } to { transform: translateY(-15px); } }
-        .fa-circle-notch { animation: spin 1s linear infinite; margin-right: 8px; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        @media (max-width: 1024px) { .main-content { padding: 16px; } }
+        @media (max-width: 1024px) { .main-content { padding: 20px; } }
     </style>
 </head>
 <body>
@@ -167,38 +142,36 @@
 
     <div id="loading-overlay" class="loading-overlay">
         <div class="loader-robot"><i class="fas fa-robot"></i></div>
-        <h3 class="font-bold text-xl mt-6 text-gray-800">AI ĐANG CHẤM BÀI...</h3>
-        <p class="text-gray-500 mt-2 text-sm">Đang phân tích sâu sắc nội dung và nghệ thuật</p>
     </div>
 
     <main class="main-content">
-        <div class="sticky top-4 z-50 mb-8 px-2">
-            <div class="max-w-6xl mx-auto glass-header px-6 py-3 flex justify-between items-center bg-white/80">
+        <div class="sticky top-6 z-50 mb-12 px-2">
+            <div class="max-w-5xl mx-auto glass-header px-6 py-3 flex justify-between items-center bg-white/90">
                 <a href="../dashboard/nhatkyhoctap.html" class="flex items-center gap-3 text-gray-600 font-bold hover:text-orange-500 transition group">
                     <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-orange-400 group-hover:scale-110 transition-transform">
                         <i class="fas fa-arrow-left"></i>
                     </div>
-                    <span class="hidden sm:inline">Quay lại lộ trình</span>
+                    <span class="hidden sm:inline text-sm">Quay lại lộ trình</span>
                 </a>
                 
                 <div class="flex items-center gap-4">
                     <div class="text-right hidden sm:block">
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Thời gian còn lại</p>
-                        <p class="text-base font-black text-gray-800" id="timer-text">90 phút 00 giây</p>
+                        <p class="text-base font-black text-gray-800" id="timer-text">60 phút 00 giây</p>
                     </div>
                     <div class="w-12 h-12 rounded-full flex items-center justify-center shadow-lg relative overflow-hidden bg-white">
                         <svg class="w-10 h-10 absolute" viewBox="0 0 36 36">
                             <path class="text-gray-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" />
                             <path class="text-orange-500 transition-all duration-1000 ease-linear" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" id="timer-circle" />
                         </svg>
-                        <span class="text-xs font-black relative z-10 text-gray-700" id="timer-mini">90</span>
+                        <span class="text-xs font-black relative z-10 text-gray-700" id="timer-mini">60</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="max-w-3xl mx-auto pb-20">
-            <div class="liquid-glass p-8 mb-8 relative overflow-hidden bg-gradient-to-br from-white/80 to-white/40">
+        <div class="pb-20">
+            <div class="liquid-glass p-10 mb-8 relative overflow-hidden bg-gradient-to-br from-white/90 to-white/60">
                 <div class="relative z-10">
                     <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Level 4</span>
                     <h1 class="text-3xl font-bold text-gray-800 mt-3 mb-2">Nghị Luận Văn Học</h1>
@@ -210,7 +183,7 @@
             <div class="liquid-glass p-8 md:p-10 mb-8 bg-white border border-orange-100">
                 <div class="mb-6">
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Đề bài:</label>
-                    <div id="display-topic">Đang tải chủ đề...</div>
+                    <div id="display-topic" class="text-lg font-medium text-gray-800 leading-relaxed">Đang tải chủ đề...</div>
                 </div>
                 
                 <div id="display-quote-container" class="quote-box hidden">
@@ -251,14 +224,14 @@
                     </div>
                     <div class="text-center md:text-left mt-6 md:mt-0 md:ml-8 flex-1">
                         <h3 class="text-2xl font-bold text-gray-800 mb-2" id="result-title">Đang chấm...</h3>
-                        <p class="text-gray-500 text-sm italic" id="result-desc">Giáo viên AI đang đọc bài của bạn...</p>
+                        <p class="text-gray-500 text-sm italic" id="result-desc">AI đang đọc bài của bạn...</p>
                     </div>
                 </div>
 
                 <div class="space-y-8">
                     <div>
                         <h4 class="font-bold text-gray-700 uppercase text-xs tracking-widest mb-4 flex items-center gap-2">
-                            <i class="fas fa-highlighter text-orange-500"></i> Nhận xét chi tiết
+                            <i class="fas fa-highlighter text-orange-500"></i> Nhận xét chi tiết từ AI
                         </h4>
                         <div id="ai-correction" class="bg-gray-50/80 p-6 rounded-2xl border border-gray-200 text-gray-700 text-base shadow-inner"></div>
                     </div>
@@ -275,13 +248,9 @@
                     </div>
                 </div>
 
-                <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onclick="nextLevel()" id="next-btn" class="hidden w-full sm:w-auto bg-green-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-600 transition shadow-lg shadow-green-500/30 hover:-translate-y-1">
-                        HOÀN THÀNH KHÓA HỌC <i class="fas fa-flag-checkered ml-2"></i>
-                    </button>
-                    <button onclick="location.reload()" id="retry-btn" class="hidden w-full sm:w-auto bg-white text-gray-600 px-8 py-3 rounded-xl font-bold hover:bg-gray-50 transition shadow-sm border border-gray-200">
-                        LÀM LẠI BÀI <i class="fas fa-redo ml-2"></i>
-                    </button>
+                <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="nextLevel()" id="next-btn" class="hidden w-full sm:w-auto bg-green-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-600 transition shadow-lg shadow-green-200">Mở Khóa Level 5 <i class="fas fa-lock-open ml-2"></i></button>
+                    <button onclick="location.reload()" id="retry-btn" class="hidden w-full sm:w-auto bg-gray-100 text-gray-600 px-8 py-3 rounded-xl font-bold hover:bg-gray-200 transition">Làm Lại Bài <i class="fas fa-redo ml-2"></i></button>
                 </div>
             </div>
         </div>
@@ -297,6 +266,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // API URL VẪN LÀ GEMINI-PROXY NHƯNG LOGIC BÊN TRONG LÀ GROQ
     const API_URL = `/.netlify/functions/gemini-proxy`;
     let userUid = null;
     let levelData = null; 
@@ -324,7 +294,7 @@
             b2.innerText = "Nộp bài ngay"; b2.onclick = () => { modal.classList.remove('open'); confirmCallback(); };
             actions.append(b1, b2);
         } else {
-            const b = document.createElement('button'); b.className = "px-8 py-3 rounded-xl font-bold bg-gray-900 text-white hover:bg-gray-800 transition text-sm";
+            const b = document.createElement('button'); b.className = "px-8 py-3 rounded-xl font-bold bg-gray-800 text-white hover:bg-gray-700 transition text-sm";
             b.innerText = "Đã hiểu"; b.onclick = () => modal.classList.remove('open');
             actions.appendChild(b);
         }
@@ -349,10 +319,10 @@
             const docData = snap.docs[0].data();
             levelData = docData.content; 
 
-            // Render HTML từ Editor (Topic)
+            // Hiển thị đề bài
             document.getElementById('display-topic').innerHTML = levelData.topic;
             
-            // Render HTML từ Editor (Ngữ liệu)
+            // Hiển thị ngữ liệu nếu có
             if (levelData.text && levelData.text.trim() !== "") {
                 const quoteBox = document.getElementById('display-quote');
                 quoteBox.innerHTML = levelData.text;
@@ -375,7 +345,7 @@
         const content = document.getElementById('student-essay').value.trim();
         document.getElementById('loading-overlay').style.display = 'flex';
 
-        // PROMPT DÀNH CHO GROQ/LLAMA-3
+        // PROMPT CHUYÊN DỤNG CHO GROQ (DẠNG OPENAI)
         const systemPrompt = `
         VAI TRÒ: Giáo viên Ngữ Văn chuyên chấm thi THPT Quốc Gia.
         NHIỆM VỤ: Chấm bài NGHỊ LUẬN VĂN HỌC (Phân tích tác phẩm/nhân vật/tình huống).
@@ -403,7 +373,7 @@
         `;
 
         try {
-            // GỌI API THEO CẤU TRÚC GROQ
+            // GỌI API QUA PROXY THEO CẤU TRÚC GROQ (MESSAGES)
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -416,10 +386,10 @@
             });
             
             const data = await response.json();
-            // Parse kết quả từ Groq
+            // Đọc kết quả từ choices[0].message.content
             let rawText = data.choices[0].message.content;
             
-            // Clean JSON string
+            // Làm sạch chuỗi JSON
             rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
             const res = JSON.parse(rawText);
 
@@ -437,7 +407,7 @@
                     timestamp: serverTimestamp() 
                 });
                 
-                // Score >= 6 coi như hoàn thành
+                // Score >= 6 thì mở khóa level tiếp theo
                 if (res.score >= 6) {
                     await setDoc(doc(db, "users_progress", userUid), { currentLevel: 5, lastPassed: serverTimestamp() }, { merge: true });
                 }
@@ -479,8 +449,8 @@
 
     window.nextLevel = () => window.location.href = "../dashboard/nhatkyhoctap.html";
 
-    // Timer (90 mins)
-    let totalSeconds = 5400; 
+    // Timer (60 mins)
+    let totalSeconds = 3600; 
     const timerText = document.getElementById('timer-text');
     const timerMini = document.getElementById('timer-mini');
     const timerCircle = document.getElementById('timer-circle');
