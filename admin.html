@@ -254,7 +254,7 @@
                     <div class="stat-card text-orange-500">
                         <div class="stat-card-content">
                             <h3 class="text-4xl font-black text-gray-800" id="stat-exams">0</h3>
-                            <p class="text-xs font-bold text-gray-400 uppercase mt-2">Tổng Câu Hỏi</p>
+                            <p class="text-xs font-bold text-gray-400 uppercase mt-2">Câu Hỏi / Đề Bài</p>
                         </div>
                         <i class="fas fa-file-signature watermark-icon"></i>
                     </div>
@@ -669,21 +669,29 @@
             if(snap.empty) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-400 font-bold">Trống rỗng.</td></tr>'; return; }
 
             snap.forEach(d => {
-                const data = d.data();
+            const data = d.data();
+                
+                // --- SỬA PHẦN BADGE COLOR ---
                 let badgeColor = "bg-gray-100 text-gray-500";
-                if (data.type === 'nlvh') badgeColor = "bg-orange-100 text-orange-600";
-                if (data.type === 'nlxh') badgeColor = "bg-green-100 text-green-600";
+                if (data.type === 'nlvh') badgeColor = "bg-orange-100 text-orange-600"; // Màu cam cho NLVH
+                if (data.type === 'nlxh') badgeColor = "bg-green-100 text-green-600";   // Màu xanh cho NLXH
                 if (data.type === 'dochieu') badgeColor = "bg-blue-100 text-blue-600";
                 if (data.type === 'tracnghiem') badgeColor = "bg-purple-100 text-purple-600";
                 if (data.type === 'fulltest') badgeColor = "bg-violet-100 text-violet-600";
 
-                let label = data.type === 'nlvh' ? `NLVH (${data.genre || ''})` : (data.type === 'nlxh' ? 'NL Xã Hội' : data.type.toUpperCase());
-                
+                // --- SỬA PHẦN LABEL HIỂN THỊ ---
+                let label = data.type ? data.type.toUpperCase() : 'KHÁC';
+                if (data.type === 'nlxh') label = 'NL Xã Hội';
+                if (data.type === 'nlvh') label = `NLVH - ${data.genre || 'Chung'}`; // Hiện: NLVH - Thơ
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="font-mono text-xs text-gray-400">#${d.id.slice(0,5)}</td>
-                    <td><span class="px-2 py-1 rounded-md text-[10px] font-black uppercase ${badgeColor}">${label}</span></td>
-                    <td class="font-bold text-gray-700 truncate max-w-xs">${data.title || data.topic || data.question || 'Đề thi tổng hợp'}</td>
+                    <td>
+                        <span class="px-2 py-1 rounded-md text-[10px] font-black uppercase ${badgeColor}">${label}</span>
+                        ${data.workName ? `<div class="text-[10px] text-gray-400 mt-1 italic">"${data.workName}"</div>` : ''}
+                    </td>
+                    <td class="font-bold text-gray-700 truncate max-w-xs">${data.title || data.topic || data.question || 'Nội dung đề thi'}</td>
                     <td class="text-right">
                         <button onclick="openModal('${d.id}', '${colName}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors"><i class="fas fa-pen"></i></button>
                         <button onclick="deleteItem('${colName}', '${d.id}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg ml-1 transition-colors"><i class="fas fa-trash"></i></button>
@@ -831,19 +839,22 @@
                     <div><label class="label-custom">CÂU HỎI (Dùng [NEXT] để tách dòng)</label><div id="edit-ex-qs"></div></div>
                 </div>`;
         } else {
+            // --- ĐÂY LÀ PHẦN SỬA CHO ESSAY_BANK ---
             const currentType = data.type || preSelectType || 'nlxh';
+            
             html = `
                 <div class="flex gap-4 mb-4">
                     <div class="flex-1">
                         <label class="label-custom">LOẠI ĐỀ</label>
-                        <select id="ex-type" class="glass-input font-bold" onchange="toggleGenreInput()">
-                            <option value="nlxh" ${currentType === 'nlxh' ? 'selected' : ''}>NL Xã Hội</option>
-                            <option value="nlvh" ${currentType === 'nlvh' ? 'selected' : ''}>NL Văn Học</option>
+                        <select id="ex-type" class="glass-input font-bold cursor-pointer" onchange="toggleGenreInput()">
+                            <option value="nlxh" ${currentType === 'nlxh' ? 'selected' : ''}>Nghị Luận Xã Hội</option>
+                            <option value="nlvh" ${currentType === 'nlvh' ? 'selected' : ''}>Nghị Luận Văn Học</option>
                         </select>
                     </div>
+                    
                     <div id="genre-wrapper" class="flex-1 ${currentType === 'nlvh' ? '' : 'hidden'}">
                         <label class="label-custom">THỂ LOẠI</label>
-                        <select id="ex-genre" class="glass-input">
+                        <select id="ex-genre" class="glass-input cursor-pointer">
                             <option value="Truyện" ${data.genre === 'Truyện' ? 'selected' : ''}>Truyện</option>
                             <option value="Thơ" ${data.genre === 'Thơ' ? 'selected' : ''}>Thơ</option>
                             <option value="Kịch" ${data.genre === 'Kịch' ? 'selected' : ''}>Kịch</option>
@@ -851,14 +862,25 @@
                         </select>
                     </div>
                 </div>
-                <div id="work-wrapper" class="${currentType === 'nlvh' ? '' : 'hidden'} mb-4">
-                    <label class="label-custom">TÁC PHẨM</label>
-                    <input id="ex-work" class="glass-input" value="${data.workName||''}" placeholder="Vd: Vợ chồng A Phủ">
+
+                <div id="work-wrapper" class="mb-4 ${currentType === 'nlvh' ? '' : 'hidden'}">
+                    <label class="label-custom">TÊN TÁC PHẨM (Nếu có)</label>
+                    <input id="ex-work" class="glass-input" value="${data.workName || ''}" placeholder="VD: Vợ chồng A Phủ, Sóng...">
                 </div>
+
                 <div class="space-y-6">
-                    <div><label class="label-custom">YÊU CẦU ĐỀ BÀI</label><div id="edit-ex-topic"></div></div>
-                    <div><label class="label-custom">NGỮ LIỆU PHỤ (NẾU CÓ)</label><div id="edit-ex-text"></div></div>
-                    <div><label class="label-custom">GỢI Ý CHẤM (AI)</label><div id="edit-ex-hint"></div></div>
+                    <div>
+                        <label class="label-custom">YÊU CẦU ĐỀ BÀI</label>
+                        <div id="edit-ex-topic"></div>
+                    </div>
+                    <div>
+                        <label class="label-custom">NGỮ LIỆU PHỤ / TRÍCH DẪN</label>
+                        <div id="edit-ex-text"></div>
+                    </div>
+                    <div class="bg-green-50/50 p-4 rounded-2xl border border-green-100">
+                        <label class="label-custom text-green-600"><i class="fas fa-robot"></i> GỢI Ý CHẤM (AI Prompt)</label>
+                        <div id="edit-ex-hint"></div>
+                    </div>
                 </div>`;
         }
         container.innerHTML = html;
@@ -894,10 +916,16 @@
 
     window.toggleGenreInput = () => {
         const type = document.getElementById('ex-type').value;
-        const gw = document.getElementById('genre-wrapper');
-        const ww = document.getElementById('work-wrapper');
-        if(type === 'nlvh') { gw.classList.remove('hidden'); ww.classList.remove('hidden'); } 
-        else { gw.classList.add('hidden'); ww.classList.add('hidden'); }
+        const genreDiv = document.getElementById('genre-wrapper');
+        const workDiv = document.getElementById('work-wrapper');
+        
+        if (type === 'nlvh') {
+            genreDiv.classList.remove('hidden');
+            workDiv.classList.remove('hidden');
+        } else {
+            genreDiv.classList.add('hidden');
+            workDiv.classList.add('hidden');
+        }
     };
 
     // 5. SAVE DATA
@@ -934,11 +962,14 @@
                 data.questions = editors.qs.root.innerHTML.split('[NEXT]').map(q => ({ q: q.replace(/<[^>]*>/g, '').trim() })).filter(x => x.q);
             } 
             else {
-                data.type = document.getElementById('ex-type').value;
+                // --- SỬA PHẦN NÀY ---
+                data.type = document.getElementById('ex-type').value; // nlxh hoặc nlvh
                 data.topic = editors.topic.root.innerHTML;
                 data.text = editors.text.root.innerHTML;
                 data.hint = editors.hint.root.innerHTML;
-                if(data.type === 'nlvh') {
+                
+                // Nếu là NLVH thì lưu thêm thể loại và tên tác phẩm
+                if (data.type === 'nlvh') {
                     data.genre = document.getElementById('ex-genre').value;
                     data.workName = document.getElementById('ex-work').value;
                 }

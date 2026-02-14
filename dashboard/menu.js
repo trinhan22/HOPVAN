@@ -4,6 +4,7 @@ import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.g
 // --- PHẦN 1: CSS GIAO DIỆN (ĐẸP & XỊN) ---
 const menuStyles = `
 <style>
+
     :root {
         --sb-w: 270px;
         --sb-primary: #FF8F50;
@@ -83,6 +84,7 @@ const menuStyles = `
 
 // --- PHẦN 2: HTML GIAO DIỆN ---
 const menuHTML = `
+
 <aside class="sidebar-comp" id="main-sidebar">
     <a href="../index.html" class="sb-logo">
         <img src="../LOGO.WEBP" alt="Logo">
