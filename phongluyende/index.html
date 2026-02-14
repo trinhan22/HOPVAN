@@ -177,7 +177,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // --- CONFIG FIREBASE ---
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
@@ -262,7 +262,7 @@
         setTimeout(setupHighlightEvent, 100);
     };
 
-    // --- HIGHLIGHT (FIX DOM) ---
+    // --- HIGHLIGHT ---
     function setupHighlightEvent() {
         const container = document.getElementById('reading-passage');
         const menu = document.getElementById('highlight-menu');
@@ -303,7 +303,7 @@
         }
     };
 
-    // --- 1. RENDER KẾT QUẢ (FIXED) ---
+    // --- 1. RENDER KẾT QUẢ (FIX LỖI HIỂN THỊ) ---
     function renderAIResult(result) {
         document.getElementById('input-section').classList.add('hidden');
         const out = document.getElementById('output-section');
@@ -311,8 +311,9 @@
         out.classList.remove('hidden');
         out.classList.add('flex-col', 'h-full');
 
-        // Fix lỗi hiển thị nếu AI không trả về human_score
-        const humanScore = result.human_score || 100;
+        // Ép kiểu an toàn để tránh lỗi hiển thị
+        const humanScore = parseInt(result.human_score) || 100;
+        const readingScore = parseFloat(result.reading_score) || 0;
         const barColor = humanScore > 75 ? '#22c55e' : (humanScore > 50 ? '#f59e0b' : '#ef4444');
 
         document.getElementById('ai-correction-box').innerHTML = `
@@ -320,12 +321,12 @@
                 <div class="text-center mb-8">
                     <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Kết quả từ AI</div>
                     <div class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2">
-                        ${result.reading_score}<span class="text-2xl text-gray-300">/4.0</span>
+                        ${readingScore}<span class="text-2xl text-gray-300">/4.0</span>
                     </div>
-                    <div class="inline-block px-4 py-1.5 bg-orange-50 text-orange-600 rounded-full text-[10px] font-bold border border-orange-100">
-                        ${result.detailed_breakdown || "Điểm chi tiết: " + result.reading_score}
+                    <div class="inline-block px-4 py-1.5 bg-orange-50 text-orange-600 rounded-full text-[10px] font-bold border border-orange-100 truncate max-w-full">
+                        ${result.type_detected || "Đọc Hiểu Văn Bản"}
                     </div>
-                    <p class="text-gray-600 italic px-6 mt-4 leading-relaxed">"${result.general_comment}"</p>
+                    <p class="text-gray-600 italic px-6 mt-4 leading-relaxed">"${result.general_comment || 'Bài làm khá tốt.'}"</p>
                 </div>
                 
                 <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm mb-6">
@@ -337,6 +338,10 @@
                         <div style="width:${humanScore}%; background:${barColor}" class="h-full"></div>
                     </div>
                     <p class="text-[11px] text-gray-400 mt-2 italic font-light">${result.ai_comment || "Văn phong tự nhiên."}</p>
+                </div>
+
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-6 text-sm text-blue-800 font-medium">
+                     <i class="fas fa-list-ol mr-2"></i> Chi tiết: ${result.detailed_breakdown || "Đang cập nhật..."}
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -364,129 +369,96 @@
             </div>`;
     }
 
-// --- 2. HÀM NỘP BÀI (PHIÊN BẢN GỠ LỖI & HIỂN THỊ CHI TIẾT) ---
+    // --- 2. HÀM NỘP BÀI (FIX LỖI FIREBASE UNDEFINED) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
-        
-        // 1. Kiểm tra độ dài
-        if(content.split(/\s+/).filter(x => x).length < 50) { 
-            document.getElementById('short-essay-popup').style.display = 'flex'; 
-            return; 
+        if(content.split(/\s+/).filter(x => x).length < 20) { 
+            document.getElementById('short-essay-popup').style.display = 'flex'; return; 
         }
 
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex';
+        const q = window.currentExamData;
         
+        // PROMPT CHUẨN HÓA JSON OUTPUT (YÊU CẦU TRẢ VỀ SỐ ĐỂ TRÁNH LỖI)
+        const systemPrompt = `
+        BẠN LÀ: Giám khảo chấm thi ĐỌC HIỂU THPT Quốc gia.
+        NHIỆM VỤ: Chấm điểm bài làm dựa trên ngữ liệu và câu hỏi.
+
+        THÔNG TIN ĐỀ:
+        - Văn bản: "${(q.text || '').replace(/"/g, "'")}"
+        - Câu hỏi: ${JSON.stringify(q.questions)}
+
+        TIÊU CHÍ (Thang 4.0):
+        1. Trả lời đúng trọng tâm. Sai thuật ngữ = 0 điểm.
+        2. Mỗi câu hỏi nhỏ có điểm riêng. Tổng max 4.0.
+
+        YÊU CẦU OUTPUT JSON DUY NHẤT (KHÔNG MARKDOWN):
+        {
+            "human_score": (int 0-100),
+            "ai_comment": "Nhận xét ngắn về văn phong.",
+            "reading_score": (số thực 0-4.0, ví dụ: 3.5),
+            "detailed_breakdown": "Câu 1: 0.5, Câu 2: 1.0...",
+            "type_detected": "Đọc Hiểu Văn Bản",
+            "general_comment": "Lời phê tổng quát.",
+            "strengths": ["Ưu điểm 1", "..."],
+            "weaknesses": ["Lỗi sai 1", "..."],
+            "correction_html": "Bài làm gốc kèm thẻ <span class='text-bad'>[Sai]</span> <span class='text-fix'>(Đáp án: ...)</span>.",
+            "orientation": "Lời khuyên."
+        }
+        `;
+
         try {
-            // 2. Lấy dữ liệu đề bài
-            const q = window.currentExamData;
-            
-            if (!q || !q.id) {
-                throw new Error("DATA_MISSING");
-            }
-            
-            // 3. Chuẩn bị Prompt (Cực kỳ chi tiết cho Groq)
-            const systemPrompt = `
-            BẠN LÀ: Giám khảo chấm thi THPT Quốc gia (Chuyên môn cao).
-            NHIỆM VỤ: Chấm bài làm của học sinh dựa trên đề bài được cung cấp.
-
-            THÔNG TIN ĐỀ BÀI:
-            - Loại đề: ${q.type}
-            - Yêu cầu: "${(q.topic || q.title || '').replace(/"/g, "'")}"
-            - Ngữ liệu: "${(q.text || "Không có").replace(/"/g, "'")}"
-            - Gợi ý chấm: "${(q.hint || '').replace(/"/g, "'")}"
-
-            TIÊU CHÍ CHẤM ĐIỂM (Thang 10):
-            1. Điểm nội dung (6.0): Hiểu đúng đề, phân tích sâu, ý tưởng sáng tạo.
-            2. Điểm hình thức (2.0): Bố cục rõ ràng, diễn đạt mạch lạc.
-            3. Điểm sáng tạo/cảm xúc (2.0): Văn phong có cảm xúc, dẫn chứng hay.
-
-            YÊU CẦU TRẢ VỀ JSON DUY NHẤT (KHÔNG MARKDOWN, KHÔNG GIẢI THÍCH):
-            {
-                "human_score": (int 0-100 đánh giá độ tự nhiên của văn phong),
-                "ai_comment": "Nhận xét ngắn về văn phong (có giống AI viết không).",
-                "score": (float thang 10, lẻ 0.25),
-                "type_detected": "NLXH hoặc NLVH hoặc Đọc Hiểu",
-                "general_comment": "Lời phê tổng quát của giáo viên.",
-                "strengths": ["Điểm mạnh 1", "Điểm mạnh 2"],
-                "weaknesses": ["Điểm yếu 1", "Điểm yếu 2"],
-                "correction_html": "Trích đoạn bài làm gốc và chèn thêm thẻ: <span class='text-bad'>[Lỗi]</span> <span class='text-fix'>(Sửa thành...)</span> hoặc <span class='text-good'>[Hay]</span> vào những chỗ cần thiết.",
-                "orientation": "Lời khuyên định hướng tư duy."
-            }
-            `;
-
-            // 4. Gửi Request (Cấu trúc khớp 100% với file Proxy bạn cung cấp)
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ 
-                    systemPrompt: systemPrompt, // Gửi riêng
-                    messages: `BÀI LÀM CỦA HỌC SINH:\n${content}` // Gửi riêng
+                    systemPrompt: systemPrompt, 
+                    messages: `BÀI LÀM CỦA HỌC SINH:\n${content}`
                 }) 
             });
 
-            // 5. Xử lý lỗi từ Server (Quan trọng)
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({})); // Cố đọc JSON lỗi
-                const errorMessage = errorData.error || res.statusText || "Server Error";
-                console.error("Lỗi Server:", errorMessage);
-                
-                if (errorMessage.includes("GROQ_API_KEY")) {
-                    throw new Error("MISSING_API_KEY");
-                }
-                throw new Error("SERVER_ERROR: " + errorMessage);
-            }
+            if (!res.ok) throw new Error("SERVER_ERROR");
 
             const data = await res.json();
             
-            // 6. Kiểm tra dữ liệu trả về
             if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                throw new Error("EMPTY_RESPONSE");
+                throw new Error("NO_CONTENT");
             }
 
             let rawText = data.choices[0].message.content;
-            // Làm sạch JSON
             rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
             
-            let result;
-            try {
-                result = JSON.parse(rawText);
-            } catch (e) {
-                console.error("Lỗi Parse JSON:", rawText);
-                throw new Error("INVALID_JSON");
-            }
+            const result = JSON.parse(rawText);
+            
+            // --- FIX QUAN TRỌNG: ÉP KIỂU SỐ TRƯỚC KHI LƯU ---
+            // Nếu reading_score là chuỗi hoặc null -> về 0.0
+            let safeReadingScore = parseFloat(result.reading_score);
+            if (isNaN(safeReadingScore)) safeReadingScore = 0.0;
+            
+            // Cập nhật lại vào object result để render UI cho đúng
+            result.reading_score = safeReadingScore;
 
-            // 7. Hiển thị & Lưu
+            // Quy đổi sang thang 10 cho Database (4.0 -> 10.0)
+            let safeDbScore = safeReadingScore * 2.5; 
+
             renderAIResult(result);
 
-            if (auth.currentUser) { 
-                await addDoc(collection(db, "activities"), { 
-                    uid: auth.currentUser.uid, 
-                    type: "random", 
-                    subType: q.type || "unknown", 
-                    score: result.score, 
-                    time: document.getElementById('timer').innerText, 
-                    timestamp: serverTimestamp() 
-                }); 
+            if (auth.currentUser) {
+                await addDoc(collection(db, "activities"), {
+                    uid: auth.currentUser.uid,
+                    type: "reading",
+                    score: safeDbScore, // Lưu điểm đã ép kiểu số (Number)
+                    timestamp: serverTimestamp(),
+                    examId: q.id
+                });
             }
-
         } catch(e) { 
-            console.error(e);
-            let title = "Lỗi Xử Lý";
-            let msg = "Có lỗi xảy ra. Vui lòng thử lại.";
-
-            if (e.message === "DATA_MISSING") msg = "Dữ liệu đề bài bị lỗi. Hãy bấm nút 'Đổi đề'!";
-            if (e.message === "MISSING_API_KEY") {
-                title = "Thiếu API Key";
-                msg = "Chưa cấu hình GROQ_API_KEY trong Netlify. Vui lòng kiểm tra cài đặt.";
-            } else if (e.message.startsWith("SERVER_ERROR")) {
-                title = "Lỗi Máy Chủ";
-                msg = e.message; // Hiển thị lỗi chi tiết từ server
-            } else if (e.message === "INVALID_JSON") {
-                msg = "AI trả về dữ liệu không đúng định dạng. Hãy thử nộp lại lần nữa.";
-            }
-            
-            showPopup(title, msg, "error"); 
+            console.error(e); 
+            let msg = "Có lỗi xảy ra, vui lòng thử lại!";
+            if (e.message === "SERVER_ERROR") msg = "Server đang bận. Bạn hãy bấm nộp lại nhé!";
+            if (e.message === "NO_CONTENT") msg = "AI không phản hồi. Vui lòng bấm nộp lại!";
+            showPopup("Lỗi AI", msg, "error");
         } finally { 
             loading.style.display = 'none'; 
         }
