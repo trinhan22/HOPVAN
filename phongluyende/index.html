@@ -366,11 +366,14 @@
             </div>`;
     }
 
-    // --- 2. HÀM NỘP BÀI (VỆ SINH DỮ LIỆU ĐỂ TRÁNH LỖI) ---
+// --- 2. HÀM NỘP BÀI (ĐÃ CẬP NHẬT PROMPT CHẤM ĐIỂM ĐỌC HIỂU) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
-        if(content.split(/\s+/).filter(x => x).length < 20) { 
-            document.getElementById('short-essay-popup').style.display = 'flex'; return; 
+        
+        // 1. Kiểm tra độ dài (Đọc hiểu có thể ngắn nên giảm xuống 10 từ cũng được)
+        if(content.split(/\s+/).filter(x => x).length < 10) { 
+            document.getElementById('short-essay-popup').style.display = 'flex'; 
+            return; 
         }
 
         const loading = document.getElementById('loading-overlay');
@@ -378,40 +381,44 @@
         
         const q = window.currentExamData;
         if (!q) {
-            showPopup("Lỗi", "Vui lòng reload trang và thử lại.", "error");
+            showPopup("Lỗi", "Dữ liệu đề bị trống. Hãy reload trang.", "error");
             loading.style.display = 'none';
             return;
         }
         
+        // --- 2. CẤU HÌNH PROMPT CHẤM ĐIỂM CHI TIẾT ---
         const systemPrompt = `
-        BẠN LÀ: Giám khảo chấm thi ĐỌC HIỂU THPT Quốc gia.
-        NHIỆM VỤ: Chấm điểm bài làm của học sinh.
+        BẠN LÀ: Giám khảo chấm thi ĐỌC HIỂU THPT Quốc gia (Chuyên gia ngôn ngữ).
+        NHIỆM VỤ: Chấm điểm bài làm dựa trên ngữ liệu và danh sách câu hỏi.
 
-        THÔNG TIN ĐỀ:
+        === THÔNG TIN ĐỀ BÀI ===
         - Văn bản: "${(q.text || '').replace(/"/g, "'")}"
-        - Câu hỏi: ${JSON.stringify(q.questions)}
+        - Danh sách câu hỏi: ${JSON.stringify(q.questions)}
 
-        TIÊU CHÍ (Thang 4.0):
-        1. Trả lời đúng trọng tâm. Sai thuật ngữ = 0 điểm.
-        2. Tổng điểm max là 4.0.
+        === BAREM ĐIỂM (TỔNG 4.0) ===
+        Hệ thống chấm điểm dựa trên số lượng câu hỏi thực tế:
+        1. Nếu có 4 câu: Câu 1,2 (0.75đ), Câu 3 (1.0đ), Câu 4 (1.5đ).
+        2. Nếu có 5 câu: Câu 1,2 (0.5đ/câu), Câu 3,4,5 (1.0đ/câu).
+        *Lưu ý: Sai chính tả hoặc trả lời sai trọng tâm = 0 điểm câu đó.*
 
-        YÊU CẦU OUTPUT JSON DUY NHẤT:
+        === YÊU CẦU ĐẦU RA JSON (TUYỆT ĐỐI KHÔNG CÓ MARKDOWN) ===
+        Trả về đúng 1 object JSON với cấu trúc sau:
         {
-            "human_score": (int 0-100),
-            "ai_comment": "Nhận xét ngắn.",
+            "human_score": (int 0-100: độ tự nhiên của văn phong),
+            "ai_comment": "Nhận xét ngắn về văn phong.",
             "reading_score": (số thực 0-4.0, ví dụ: 3.5),
-            "score": (số thực 0-10.0, dùng cho database),
-            "detailed_breakdown": "Câu 1: 0.5, Câu 2: 1.0...",
-            "type_detected": "Đọc Hiểu Văn Bản",
-            "general_comment": "Lời phê tổng quát.",
+            "detailed_breakdown": "C1: 0.5/0.5, C2: 0/0.5, C3: 1.0/1.0...",
+            "type_detected": "Đọc Hiểu",
+            "general_comment": "Lời phê tổng quát ngắn gọn.",
             "strengths": ["Ưu điểm 1", "Ưu điểm 2"],
             "weaknesses": ["Lỗi sai 1", "Lỗi sai 2"],
-            "correction_html": "Bài làm gốc kèm thẻ <span class='text-bad'>[Sai]</span> <span class='text-fix'>(Đáp án)</span>.",
-            "orientation": "Lời khuyên."
+            "correction_html": "Bài làm gốc, chèn thêm thẻ: <span class='text-bad'>[Sai]</span> <span class='text-fix'>(Đáp án:...)</span>.",
+            "orientation": "Lời khuyên để đạt điểm tối đa."
         }
         `;
 
         try {
+            // --- 3. GỬI API ---
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
@@ -430,61 +437,65 @@
             }
 
             let rawText = data.choices[0].message.content;
+            // Làm sạch JSON triệt để
             rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
-            
-            const result = JSON.parse(rawText);
-
-            // --- QUAN TRỌNG: VỆ SINH DỮ LIỆU ĐỂ TRÁNH LỖI FIREBASE ---
-            
-            // 1. Trích xuất số từ reading_score (nếu AI trả về chuỗi bẩn)
-            let rawRS = result.reading_score;
-            let safeReadingScore = 0;
-            if (typeof rawRS === 'number') {
-                safeReadingScore = rawRS;
-            } else if (typeof rawRS === 'string') {
-                const match = rawRS.match(/[\d\.]+/); // Tìm số trong chuỗi (vd: "3.5 điểm" -> 3.5)
-                safeReadingScore = match ? parseFloat(match[0]) : 0;
+            // Xóa bất kỳ ký tự nào trước dấu { đầu tiên và sau dấu } cuối cùng
+            const firstBrace = rawText.indexOf('{');
+            const lastBrace = rawText.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1) {
+                rawText = rawText.substring(firstBrace, lastBrace + 1);
             }
-            if (isNaN(safeReadingScore)) safeReadingScore = 0;
-            if (safeReadingScore > 4) safeReadingScore = 4;
 
-            // 2. Tính toán Score thang 10
-            let safeScore = 0;
-            // Ưu tiên dùng score do AI trả về nếu hợp lệ
-            if (result.score && typeof result.score === 'number' && !isNaN(result.score)) {
-                safeScore = result.score;
-            } else if (result.score && typeof result.score === 'string') {
-                 const matchS = result.score.match(/[\d\.]+/);
-                 safeScore = matchS ? parseFloat(matchS[0]) : (safeReadingScore * 2.5);
-            } else {
-                safeScore = safeReadingScore * 2.5; // Tự tính nếu AI không trả về
+            let result;
+            try {
+                result = JSON.parse(rawText);
+            } catch (e) {
+                console.error("Lỗi Parse JSON:", rawText);
+                throw new Error("INVALID_JSON");
             }
-            if (safeScore > 10) safeScore = 10;
 
-            // 3. Gán ngược lại vào object result để hiển thị
-            result.reading_score = safeReadingScore;
-            result.score = safeScore;
-            result.human_score = result.human_score || 100;
-            result.detailed_breakdown = result.detailed_breakdown || "Chi tiết điểm từng câu.";
+            // --- 4. DATA SANITIZATION (CHỐNG LỖI FIREBASE) ---
+            
+            // Ép kiểu reading_score (Thang 4)
+            let rs = parseFloat(result.reading_score);
+            if (isNaN(rs)) rs = 0;
+            if (rs > 4.0) rs = 4.0; // Cap trần
+
+            // Tính score (Thang 10) để lưu DB
+            let finalScore = (rs / 4.0) * 10; 
+            finalScore = parseFloat(finalScore.toFixed(2)); // Làm tròn 2 số thập phân
+
+            // Các trường khác (phòng hờ null)
+            result.reading_score = rs;
+            result.score = finalScore;
+            result.human_score = parseInt(result.human_score) || 100;
+            result.detailed_breakdown = result.detailed_breakdown || "Không có chi tiết";
+            result.general_comment = result.general_comment || "Đã chấm xong";
+            result.correction_html = result.correction_html || content;
 
             // Render giao diện
             renderAIResult(result);
 
-            // Lưu vào Firebase
+            // Lưu Firebase (An toàn tuyệt đối)
             if (auth.currentUser) {
                 await addDoc(collection(db, "activities"), {
                     uid: auth.currentUser.uid,
                     type: "reading",
-                    score: safeScore, // Đảm bảo luôn là số
+                    score: finalScore, // Chắc chắn là số
+                    raw_score: rs,     // Lưu thêm điểm thô thang 4
                     timestamp: serverTimestamp(),
                     examId: q.id
                 });
             }
+
         } catch(e) { 
             console.error(e); 
             let msg = "Có lỗi xảy ra, vui lòng thử lại!";
+            
             if (e.message === "SERVER_ERROR") msg = "Server đang bận. Bạn hãy bấm nộp lại nhé!";
             if (e.message === "NO_CONTENT") msg = "AI không phản hồi. Vui lòng bấm nộp lại!";
+            if (e.message === "INVALID_JSON") msg = "Dữ liệu trả về bị lỗi định dạng. Thử lại ngay!";
+            
             showPopup("Lỗi AI", msg, "error");
         } finally { 
             loading.style.display = 'none'; 
