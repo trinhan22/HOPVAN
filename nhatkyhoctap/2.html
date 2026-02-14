@@ -311,7 +311,7 @@
         actions.innerHTML = "";
         if (confirmCallback) {
             const b1 = document.createElement('button'); b1.className = "px-6 py-3 rounded-xl font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition text-sm";
-            b1.innerText = "Xem lại"; b1.onclick = () => modal.classList.remove('open');
+            b1.innerText = "Kiểm tra lại"; b1.onclick = () => modal.classList.remove('open');
             const b2 = document.createElement('button'); b2.className = "px-6 py-3 rounded-xl font-bold bg-orange-500 text-white shadow-lg hover:bg-orange-600 transition text-sm";
             b2.innerText = "Nộp bài"; b2.onclick = () => { modal.classList.remove('open'); confirmCallback(); };
             actions.append(b1, b2);
@@ -365,7 +365,7 @@
         } catch (e) { console.error(e); }
     }
 
-    // --- 2. CHẤM ĐIỂM AI (GROQ) ---
+    // --- 2. CHẤM ĐIỂM AI (ĐÃ FIX PROXY GROQ & SANITIZATION) ---
     window.confirmSubmission = () => {
         if(!levelData) return;
         let filledCount = 0;
@@ -382,59 +382,88 @@
     const handleRealSubmit = async () => {
         document.getElementById('loading-overlay').style.display = 'flex';
         
-        const studentAnswers = levelData.questions.map((q, i) => `Câu ${i+1} (Đề: ${q.q}):\nTrả lời: ${document.getElementById(`ans-${i}`).value}`).join('\n\n');
+        // Gom câu trả lời từ các ô textarea
+        const studentAnswers = levelData.questions.map((q, i) => 
+            `Câu ${i+1} (Đề: ${q.q}):\nTrả lời: ${document.getElementById(`ans-${i}`).value}`
+        ).join('\n\n');
 
-        // PROMPT DÀNH CHO GROQ (ĐỌC HIỂU)
+        // PROMPT CHUẨN JSON
         const systemPrompt = `
-        Đóng vai: Bạn là giáo viên Ngữ Văn chấm thi nghiêm túc.
-        Nhiệm vụ: Chấm điểm bài đọc hiểu dựa trên ngữ liệu sau.
+        BẠN LÀ: Giáo viên Ngữ Văn chấm thi nghiêm túc.
+        NHIỆM VỤ: Chấm điểm bài đọc hiểu (Thang 10).
         
-        NGỮ LIỆU GỐC: """${levelData.text}"""
+        NGỮ LIỆU GỐC: """${(levelData.text || '').replace(/"/g, "'")}"""
         
-        BÀI LÀM HỌC SINH:
-        ${studentAnswers}
-
         Yêu cầu Output JSON (DUY NHẤT, KHÔNG MARKDOWN):
         {
             "score": (số điểm thực trên thang 10, làm tròn 0.5),
             "feedback": [
-                { "q": "Câu 1", "status": "correct" (đúng) | "partial" (thiếu ý) | "wrong" (sai), "comment": "Nhận xét ngắn gọn lỗi sai hoặc ý hay" },
-                ...
+                { "q": "Câu 1", "status": "correct" (đúng) | "partial" (thiếu ý) | "wrong" (sai), "comment": "Nhận xét ngắn gọn lỗi sai hoặc ý hay" }
             ],
             "advice": "Lời khuyên chung ngắn gọn (tối đa 2 câu)"
         }
         `;
 
         try {
+            // Gửi API với cấu trúc Messages (Khớp với Proxy)
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    messages: [
-                        { role: "system", content: "Bạn là trợ lý giáo dục trả về JSON." },
-                        { role: "user", content: systemPrompt }
-                    ]
+                    systemPrompt: systemPrompt,
+                    messages: `BÀI LÀM HỌC SINH:\n${studentAnswers}`
                 })
             });
             
+            if (!response.ok) throw new Error("SERVER_ERROR");
+
             const data = await response.json();
+            
+            if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+                throw new Error("NO_CONTENT");
+            }
+
             let rawText = data.choices[0].message.content;
             rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+            
             const res = JSON.parse(rawText);
 
+            // --- VỆ SINH DỮ LIỆU (QUAN TRỌNG ĐỂ KHÔNG BỊ LỖI FIREBASE) ---
+            // Ép kiểu score về số
+            let safeScore = parseFloat(res.score);
+            if (isNaN(safeScore)) safeScore = 0;
+            if (safeScore > 10) safeScore = 10;
+            res.score = safeScore; // Gán lại giá trị chuẩn vào object
+
+            // Hiển thị kết quả
             showResultUI(res);
             
+            // Lưu vào Firebase
             if(userUid) {
                 await addDoc(collection(db, "activities"), { 
-                    uid: userUid, userName: auth.currentUser.displayName || "User",
-                    examTitle: levelData.title, action: `Đọc hiểu Level 2: ${res.score}đ`, type: "journal", score: res.score, timestamp: serverTimestamp() 
+                    uid: userUid, 
+                    userName: auth.currentUser.displayName || "User",
+                    examTitle: levelData.title, 
+                    action: `Đọc hiểu Level 2: ${safeScore}đ`, 
+                    type: "journal", 
+                    score: safeScore, // Chắc chắn là số
+                    timestamp: serverTimestamp() 
                 });
-                if(res.score >= 6) {
+                
+                // Logic mở khóa Level 3
+                if(safeScore >= 6) {
                     await setDoc(doc(db, "users_progress", userUid), { currentLevel: 3, lastPassed: serverTimestamp() }, { merge: true });
                 }
             }
-        } catch (e) { showPopup('error', 'Lỗi chấm bài', 'Vui lòng thử lại sau.'); } 
-        finally { document.getElementById('loading-overlay').style.display = 'none'; }
+        } catch (e) { 
+            console.error(e);
+            let msg = "Có lỗi xảy ra, vui lòng thử lại!";
+            if (e.message === "SERVER_ERROR") msg = "Server AI đang bận.";
+            if (e.name === "SyntaxError") msg = "Dữ liệu trả về bị lỗi. Hãy bấm nộp lại.";
+            showPopup('error', 'Lỗi chấm bài', msg); 
+        } finally { 
+            document.getElementById('loading-overlay').style.display = 'none'; 
+        }
     };
 
     function showResultUI(res) {
@@ -459,15 +488,15 @@
         const mapStatus = { "correct": "badge-correct", "partial": "badge-partial", "wrong": "badge-wrong" };
         const mapText = { "correct": "ĐÚNG", "partial": "THIẾU Ý", "wrong": "SAI" };
 
-        document.getElementById('feedback-content').innerHTML = res.feedback.map(f => `
+        document.getElementById('feedback-content').innerHTML = (res.feedback || []).map(f => `
             <div class="bg-white/60 rounded-2xl p-5 border border-white shadow-sm mb-3">
                 <div class="flex justify-between items-center mb-2">
-                    <span class="font-bold text-gray-800 text-sm">${f.q}</span>
-                    <span class="${mapStatus[f.status]}">${mapText[f.status]}</span>
+                    <span class="font-bold text-gray-800 text-sm">${f.q || "Câu hỏi"}</span>
+                    <span class="${mapStatus[f.status] || ''}">${mapText[f.status] || "Xem xét"}</span>
                 </div>
                 <p class="text-sm text-gray-600 italic">${f.comment}</p>
             </div>
-        `).join('') + `<div class="bg-orange-50 p-4 rounded-xl text-sm italic mt-4 text-gray-600 border border-orange-100">💡 ${res.advice}</div>`;
+        `).join('') + `<div class="bg-orange-50 p-4 rounded-xl text-sm italic mt-4 text-gray-600 border border-orange-100">💡 ${res.advice || "Cố gắng lên nhé!"}</div>`;
     }
 
     window.nextLevel = () => window.location.href = "../dashboard/nhatkyhoctap.html";
