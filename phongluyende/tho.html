@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HopVan - Luyện Đề Thơ</title>
+    
+    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
+    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh." />
+    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+    <meta property="og:url" content="https://hopvan.netlify.app" />
+    <meta property="og:type" content="article" />
+
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF8F50">
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+    <style>
+        :root { --primary: #FF8F50; --glass-bg: rgba(255, 255, 255, 0.95); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FFF5EC; height: 100vh; overflow: hidden; }
+        #menu-placeholder { display: none !important; }
+        .main-content { width: 100%; height: 100vh; background: var(--glass-bg); padding: 20px 40px; display: flex; flex-direction: column; }
+        .header-bar { flex-shrink: 0; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; flex: 1; overflow: hidden; padding-bottom: 20px; }
+        .column-card { background: white; border-radius: 24px; border: 1px solid rgba(255, 143, 80, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.03); display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+        .card-header { padding: 16px 24px; background: #fff7ed; border-bottom: 1px solid #fed7aa; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .prompt-body { padding: 30px; overflow-y: auto; flex: 1; background-color: #fffcf8; transition: font-size 0.2s ease; }
+        .passage-box { background: white; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); margin-bottom: 20px; position: relative; }
+        .exam-content { font-family: 'Merriweather', serif; font-weight: 300; font-size: 1.1rem; line-height: 2.0; color: #1e293b; text-align: justify; white-space: pre-wrap; }
+        .writing-area { width: 100%; height: 100%; padding: 24px; border: none; outline: none; resize: none; font-size: 1.1rem; line-height: 2.0; color: #334155; background: transparent; font-family: 'Merriweather', serif; background-image: linear-gradient(#f1f5f9 1px, transparent 1px); background-size: 100% 2.2rem; background-attachment: local; font-weight: 300; }
+        .footer-action { padding: 16px; border-top: 1px solid #f1f5f9; background: white; display: flex; justify-content: flex-end; flex-shrink: 0; }
+        .submit-btn { background: linear-gradient(135deg, #FF8F50, #FF5E62); color: white; padding: 12px 32px; border-radius: 50px; font-weight: 800; box-shadow: 0 4px 15px rgba(255, 143, 80, 0.3); transition: 0.2s; }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 143, 80, 0.4); }
+        .custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 20000; justify-content: center; align-items: center; animation: fadeIn 0.2s; }
+        .modal-box { background: white; padding: 30px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: scale(0.9); animation: zoomIn 0.2s forwards; }
+        .modal-icon { font-size: 3rem; margin-bottom: 15px; }
+        .modal-actions { margin-top: 25px; display: flex; gap: 10px; justify-content: center; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 12px; font-weight: 700; transition: 0.2s; }
+        .popup-error .modal-icon { color: #ef4444; } .popup-error button { background: #ef4444; color: white; }
+        .popup-warning .modal-icon { color: #f59e0b; } .popup-warning button { background: #f59e0b; color: white; }
+        .popup-info .modal-icon { color: #3b82f6; } .popup-info button { background: #3b82f6; color: white; }
+        ::selection { background: #fed7aa; color: #431407; }
+        .highlight-yellow { background-color: #fef08a; border-bottom: 2px solid #facc15; }
+        .highlight-green { background-color: #bbf7d0; border-bottom: 2px solid #4ade80; }
+        .highlight-pink { background-color: #fbcfe8; border-bottom: 2px solid #f472b6; }
+        #highlight-menu { position: absolute; display: none; background: white; border-radius: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); padding: 6px 10px; z-index: 1000; gap: 8px; border: 1px solid #f3f4f6; animation: popIn 0.15s ease; }
+        .hl-btn { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.1s; }
+        .hl-btn:hover { transform: scale(1.2); }
+        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .loader-robot { font-size: 4rem; color: var(--primary); animation: bounce 1s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomIn { from { transform: scale(0.9); } to { transform: scale(1); } }
+        .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 70px; background: white; z-index: 100; align-items: center; padding: 0 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        @media (max-width: 1024px) { body { overflow: auto; height: auto; } .mobile-header { display: flex; } .header-bar { display: none; } .main-content { padding: 80px 16px 20px; height: auto; } .workspace-grid { display: flex; flex-direction: column; height: auto; } .column-card { height: 600px; } }
+        #output-section { flex: 1; min-height: 0; display: none; }
+        #ai-correction-box { 
+            height: 100%; 
+            overflow-y: auto; 
+            padding: 0 20px; /* Thêm đệm trái phải */
+            scroll-behavior: smooth;
+        }
+
+/* --- GLOBAL SCROLLBAR STYLE --- */
+
+/* 1. Thiết lập độ rộng/cao của thanh trượt */
+::-webkit-scrollbar {
+    width: 10px;  /* Độ rộng cho thanh dọc */
+    height: 10px; /* Độ cao cho thanh ngang */
+}
+
+/* 2. Thiết lập rãnh trượt (Track) - Nền chìm */
+::-webkit-scrollbar-track {
+    background: rgba(255, 143, 80, 0.05); /* Màu cam cực nhạt, gần như trong suốt */
+    border-radius: 10px;
+}
+
+/* 3. Thiết lập tay nắm (Thumb) - Phần di chuyển */
+::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 143, 80, 0.3); /* Mặc định là cam nhạt */
+    border-radius: 10px; /* Bo tròn mềm mại */
+    
+    /* Mẹo: Tạo viền trong suốt để thanh trượt trông nhỏ hơn và "lơ lửng" */
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: background-color 0.3s ease;
+}
+
+/* 4. Hiệu ứng khi di chuột vào (Hover) */
+::-webkit-scrollbar-thumb:hover {
+    background-color: #FF8F50; /* Đổi sang màu cam chính thương hiệu */
+    border: 1px solid transparent; /* Làm thanh trượt to ra một chút khi hover */
+}
+
+/* 5. (Tùy chọn) Ẩn nút mũi tên 2 đầu (nếu trình duyệt hiển thị) */
+::-webkit-scrollbar-button {
+    display: none;
+}
+    </style>
+</head>
+<body>
+
+    <div id="highlight-menu">
+        <button class="hl-btn bg-yellow-200" onclick="applyHighlight('highlight-yellow')" title="Vàng"></button>
+        <button class="hl-btn bg-green-200" onclick="applyHighlight('highlight-green')" title="Xanh"></button>
+        <button class="hl-btn bg-pink-200" onclick="applyHighlight('highlight-pink')" title="Hồng"></button>
+        <button class="hl-btn bg-gray-100 text-gray-500 flex items-center justify-center" onclick="removeHighlight()" title="Xóa"><i class="fas fa-eraser text-xs"></i></button>
+    </div>
+
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loader-robot"><i class="fas fa-robot"></i></div>
+    </div>
+
+    <div id="generic-popup" class="custom-modal">
+        <div class="modal-box">
+            <div id="popup-icon" class="modal-icon"><i class="fas fa-info-circle"></i></div>
+            <h3 id="popup-title" class="font-bold text-xl mb-2 text-gray-800">Thông báo</h3>
+            <p id="popup-message" class="text-gray-600">Nội dung thông báo...</p>
+            <div class="modal-actions"><button onclick="closePopup()" class="modal-btn hover:opacity-90">Đã hiểu</button></div>
+        </div>
+    </div>
+
+    <div id="short-essay-popup" class="custom-modal">
+        <div class="modal-box popup-warning">
+            <div class="modal-icon"><i class="fas fa-pen-nib"></i></div>
+            <h3 class="font-bold text-xl mb-2">Bài Quá Ngắn</h3>
+            <p class="text-gray-600">Bài làm cần ít nhất <strong>50 từ</strong> để AI chấm chính xác. Hãy viết thêm chút nữa nhé!</p>
+            <div class="modal-actions"><button onclick="document.getElementById('short-essay-popup').style.display='none'" class="modal-btn bg-orange-100 !text-white-600 hover:bg-orange-200">Viết tiếp</button></div>
+        </div>
+    </div>
+
+    <div class="mobile-header lg:hidden">
+        <div class="flex items-center gap-2"><img src="../LOGO.WEBP" class="w-8 h-8"><span class="font-black text-orange-500 text-lg">HOPVAN</span></div>
+        <div class="ml-auto bg-gray-900 text-white px-3 py-1 rounded text-xs font-bold font-mono" id="timer-mobile">60:00</div>
+    </div>
+
+    <div class="dashboard-container">
+        <div id="menu-placeholder"></div>
+        <main class="main-content">
+            <div class="header-bar hidden lg:flex">
+                <div class="flex items-center gap-4">
+                    <a href="../dashboard/phongluyende.html" class="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-orange-500 transition shadow-sm"><i class="fas fa-arrow-left"></i></a>
+                    <h2 class="text-2xl font-black text-gray-800">Luyện Đề Thơ</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="bg-white rounded-xl border border-gray-200 flex items-center p-1 shadow-sm">
+                        <span class="text-xs font-bold text-gray-400 pl-3 pr-2 uppercase">Cỡ đề:</span>
+                        <button onclick="adjustPromptSize(-1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded text-gray-600"><i class="fas fa-minus text-xs"></i></button>
+                        <span class="w-px h-4 bg-gray-200 mx-1"></span>
+                        <button onclick="adjustPromptSize(1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded text-gray-600"><i class="fas fa-plus text-xs"></i></button>
+                    </div>
+                    <button onclick="randomizeQuestion()" class="bg-white px-4 py-2 rounded-xl font-bold text-gray-600 hover:text-orange-600 border border-gray-200 text-sm shadow-sm flex gap-2 items-center"><i class="fas fa-sync-alt"></i> Đổi đề</button>
+                    <div class="bg-gray-900 text-white px-5 py-2 rounded-xl font-mono font-bold flex items-center gap-2 shadow-lg"><i class="fas fa-clock text-orange-400"></i> <span id="timer">60:00</span></div>
+                </div>
+            </div>
+
+            <div class="workspace-grid">
+                <div class="column-card">
+                    <div class="card-header">
+                        <div class="flex items-center gap-2"><span class="font-bold text-orange-600 uppercase text-xs tracking-widest bg-white px-3 py-1 rounded-full border border-orange-100"><i class="fas fa-quote-left mr-1 text-[10px]"></i> Nghị luận văn học (Thơ)</span><span class="text-[10px] text-gray-400 italic">(Bôi đen để Highlight)</span></div>
+                        <span id="exam-code" class="text-xs font-bold text-gray-400">LOADING...</span>
+                    </div>
+                    <div class="scrollable-content prompt-body" id="prompt-content">
+                        <div class="animate-pulse space-y-4"><div class="h-4 bg-gray-200 rounded w-3/4"></div><div class="h-4 bg-gray-200 rounded w-full"></div></div>
+                    </div>
+                </div>
+
+                <div class="column-card relative">
+                    <div id="input-section" class="flex flex-col h-full">
+                        <div class="card-header bg-white">
+                            <span class="font-black text-xs text-gray-400 uppercase tracking-widest">BÀI LÀM CỦA BẠN</span>
+                            <div class="flex gap-2">
+                                <button onclick="document.getElementById('file-upload').click()" class="text-xs font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded hover:bg-blue-100 transition"><i class="fas fa-paperclip mr-1"></i> File</button>
+                                <input type="file" id="file-upload" class="hidden" accept=".txt, .docx">
+                                <span id="word-count" class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">0 TỪ</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 overflow-hidden relative">
+                            <textarea id="student-essay" class="writing-area" placeholder="Viết đoạn văn NLVH tại đây..."></textarea>
+                        </div>
+                        <div class="footer-action"><button onclick="handleAISubmission()" class="submit-btn flex items-center gap-2"><span>NỘP BÀI</span> <i class="fas fa-paper-plane"></i></button></div>
+                    </div>
+                    <div id="output-section" class="hidden h-full flex-col">
+                        <div class="card-header bg-gray-900 border-none text-white"><span class="font-bold text-sm uppercase"><i class="fas fa-robot mr-2 text-orange-400"></i>Kết quả chấm</span><button onclick="resetExam()" class="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded transition">Làm lại</button></div>
+                        <div id="ai-correction-box" class="ai-result-view"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- CONFIG FIREBASE ---
+    const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const API_URL = `/.netlify/functions/gemini-proxy`;
+    let questionsData = []; 
+    window.currentExamData = null;
+
+    // --- HELPER FUNCTIONS ---
+    window.showPopup = (title, message, type = 'info') => {
+        const modal = document.getElementById('generic-popup');
+        const box = modal.querySelector('.modal-box');
+        const icon = document.getElementById('popup-icon');
+        box.classList.remove('popup-error', 'popup-warning', 'popup-info');
+        document.getElementById('popup-title').innerText = title;
+        document.getElementById('popup-message').innerText = message;
+        if (type === 'error') { box.classList.add('popup-error'); icon.innerHTML = '<i class="fas fa-exclamation-circle"></i>'; } 
+        else if (type === 'warning') { box.classList.add('popup-warning'); icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>'; } 
+        else { box.classList.add('popup-info'); icon.innerHTML = '<i class="fas fa-info-circle"></i>'; }
+        modal.style.display = 'flex';
+    };
+    window.closePopup = () => document.getElementById('generic-popup').style.display = 'none';
+
+    let promptFontSize = 17;
+    window.adjustPromptSize = (amount) => {
+        promptFontSize += amount;
+        if(promptFontSize < 14) promptFontSize = 14;
+        if(promptFontSize > 26) promptFontSize = 26;
+        document.querySelector('.prompt-body').style.fontSize = `${promptFontSize}px`;
+        document.querySelectorAll('.exam-content').forEach(el => el.style.fontSize = `${promptFontSize}px`);
+    };
+
+// --- LOAD DATA (ĐÃ SỬA LẠI THÀNH THƠ) ---
+    async function loadQuestions() {
+        try {
+            // Lọc type = 'nlvh' VÀ genre = 'Thơ'
+            const q = query(
+                collection(db, "essay_bank"), 
+                where("type", "==", "nlvh"),
+                where("genre", "==", "Thơ") // <--- QUAN TRỌNG: Sửa chữ này
+            );
+
+            const querySnapshot = await getDocs(q);
+            questionsData = [];
+            querySnapshot.forEach(doc => questionsData.push({ id: doc.id, ...doc.data() }));
+            
+            if (questionsData.length === 0) {
+                document.getElementById('prompt-content').innerHTML = `<div class="text-center py-10 text-gray-400">Kho đề Thơ đang trống.</div>`;
+                return;
+            }
+            randomizeQuestion();
+        } catch (e) {
+            console.error("Lỗi:", e);
+            showPopup("Lỗi", "Không thể tải kho đề Thơ!", "error");
+        }
+    }
+
+    // --- RENDER EXAM ---
+    window.randomizeQuestion = () => {
+        if (!questionsData || questionsData.length === 0) return;
+        const q = questionsData[Math.floor(Math.random() * questionsData.length)];
+        window.currentExamData = q;
+        document.getElementById('exam-code').innerText = `MÃ: ${q.id.slice(0, 6).toUpperCase()}`;
+        document.getElementById('student-essay').value = "";
+        
+        setupHighlightEvent();
+        
+        document.getElementById('prompt-content').innerHTML = `
+            <div id="reading-passage" class="relative pb-10">
+                <div class="passage-box bg-white p-6 rounded-2xl border border-orange-100 shadow-sm mb-4">
+                    <span class="text-xs font-black text-orange-500 uppercase block mb-3 tracking-widest"><i class="fas fa-pen-nib mr-1"></i> Yêu cầu đề bài</span>
+                    
+                    <div class="exam-content text-lg font-normal text-gray-800 leading-relaxed text-justify">${q.topic}</div>
+                </div>
+
+                ${q.text ? `
+                <div class="passage-box bg-gray-50 p-6 rounded-2xl border border-gray-200">
+                    <span class="text-xs font-bold text-gray-400 uppercase block mb-3"><i class="fas fa-quote-left mr-1"></i> Trích đoạn / Tác phẩm</span>
+                    <div class="exam-content font-serif text-gray-700 leading-loose text-justify text-[1.05rem]">${q.text}</div>
+                </div>` : ''}
+
+                ${q.hint ? `
+                <div class="mt-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <div class="flex items-center gap-2 mb-2 text-blue-600">
+                        <i class="fas fa-lightbulb"></i> <span class="text-xs font-bold uppercase">Gợi ý AI</span>
+                    </div>
+                    <div class="text-sm text-blue-800 italic">${q.hint}</div>
+                </div>` : ''}
+            </div>`;
+            
+        promptFontSize = 17;
+        document.querySelector('.prompt-body').style.fontSize = `17px`;
+        setTimeout(setupHighlightEvent, 100);
+        startTimer();
+    };
+
+    // --- HIGHLIGHT (FIX DOM) ---
+    function setupHighlightEvent() {
+        const container = document.getElementById('reading-passage');
+        const menu = document.getElementById('highlight-menu');
+        if(!container || !menu) return;
+        container.onmouseup = () => {
+            setTimeout(() => {
+                const sel = window.getSelection();
+                if (sel.toString().trim().length > 0 && container.contains(sel.anchorNode)) {
+                    const rect = sel.getRangeAt(0).getBoundingClientRect();
+                    menu.style.top = `${rect.top + window.scrollY - 45}px`;
+                    menu.style.left = `${rect.left + (rect.width / 2) - 60}px`;
+                    menu.style.display = 'flex';
+                } else { menu.style.display = 'none'; }
+            }, 10);
+        };
+        document.onmousedown = (e) => { if(!menu.contains(e.target) && !container.contains(e.target)) menu.style.display = 'none'; };
+    }
+    window.applyHighlight = (cls) => {
+        try {
+            const sel = window.getSelection();
+            if (!sel.rangeCount) return;
+            const span = document.createElement('span');
+            span.className = cls;
+            sel.getRangeAt(0).surroundContents(span);
+            sel.removeAllRanges();
+            document.getElementById('highlight-menu').style.display = 'none';
+        } catch(e) { showPopup("Chú ý", "Không thể tô đè hoặc kéo qua nhiều đoạn văn!", "warning"); }
+    };
+    window.removeHighlight = () => {
+        const sel = window.getSelection();
+        if (!sel.rangeCount) return;
+        let node = sel.anchorNode;
+        if (node.nodeType === 3) node = node.parentElement;
+        if (node.tagName === 'SPAN' && node.className.includes('highlight-')) {
+            node.replaceWith(document.createTextNode(node.innerText));
+            document.getElementById('highlight-menu').style.display = 'none';
+            sel.removeAllRanges();
+        }
+    };
+
+    // --- 1. RENDER KẾT QUẢ (GIAO DIỆN THOÁNG) ---
+    function renderAIResult(result) {
+        document.getElementById('input-section').classList.add('hidden');
+        const out = document.getElementById('output-section');
+        out.style.display = 'flex';
+        out.classList.remove('hidden');
+        out.classList.add('flex-col', 'h-full');
+
+        const barColor = result.human_score > 75 ? '#22c55e' : (result.human_score > 50 ? '#f59e0b' : '#ef4444');
+
+        document.getElementById('ai-correction-box').innerHTML = `
+            <div class="max-w-3xl mx-auto py-12 custom-scrollbar" style="font-family: 'Merriweather', serif; font-weight: 300;">
+                
+                <div class="text-center mb-10">
+                    <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Kết quả từ AI</div>
+                    <div class="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-4">${result.score}</div>
+                    <div class="inline-block px-4 py-1.5 bg-orange-50 rounded-full text-[11px] font-bold text-orange-600 uppercase tracking-wider border border-orange-100">Dạng bài: ${result.essay_type}</div>
+                    <p class="text-gray-600 italic px-8 mt-6 font-light text-lg leading-relaxed">"${result.general_comment}"</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm mb-8">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Độ chân thực</span>
+                        <span class="font-bold text-base" style="color:${barColor}">${result.human_score}%</span>
+                    </div>
+                    <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div style="width:${result.human_score}%; background:${barColor}" class="h-full"></div></div>
+                    <p class="text-xs text-gray-400 mt-3 italic font-light">${result.ai_comment}</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                    <div class="bg-green-50/50 p-6 rounded-3xl border border-green-100">
+                        <h4 class="text-green-700 font-bold text-xs uppercase mb-4 flex items-center gap-2"><i class="fas fa-check-circle"></i> Điểm tốt</h4>
+                        <ul class="text-sm text-green-800 space-y-3 font-medium leading-relaxed">${result.strengths.map(s => `<li>• ${s}</li>`).join('')}</ul>
+                    </div>
+                    <div class="bg-red-50/50 p-6 rounded-3xl border border-red-100">
+                        <h4 class="text-red-700 font-bold text-xs uppercase mb-4 flex items-center gap-2"><i class="fas fa-exclamation-circle"></i> Hạn chế</h4>
+                        <ul class="text-sm text-red-800 space-y-3 font-medium leading-relaxed">${result.weaknesses.map(w => `<li>• ${w}</li>`).join('')}</ul>
+                    </div>
+                </div>
+
+                <div class="bg-white p-10 rounded-[30px] border border-gray-100 shadow-lg mb-10">
+                    <h4 class="font-black text-gray-800 border-b pb-6 mb-8 text-sm uppercase tracking-widest flex items-center gap-2">
+                        <i class="fas fa-highlighter text-orange-500"></i> Phân tích lỗi & Sửa chi tiết
+                    </h4>
+                    <div class="leading-9 text-gray-700 font-light text-lg space-y-6 text-justify">
+                        ${result.correction_html}
+                    </div>
+                </div>
+
+                <div class="bg-gray-900 text-white p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-10 opacity-10 text-9xl"><i class="fas fa-compass"></i></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-3 mb-4 text-orange-400">
+                            <i class="fas fa-compass text-xl"></i>
+                            <span class="text-xs font-black uppercase tracking-widest">Lời khuyên từ Giám khảo</span>
+                        </div>
+                        <p class="text-base text-gray-300 leading-loose font-light italic">"${result.orientation}"</p>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    // --- 2. HÀM NỘP BÀI (PROMPT CHUYÊN VỀ THƠ) ---
+    window.handleAISubmission = async () => {
+        const content = document.getElementById('student-essay').value.trim();
+        if(content.split(/\s+/).filter(x => x).length < 100) { 
+            document.getElementById('short-essay-popup').style.display = 'flex'; return; 
+        }
+        
+        const loading = document.getElementById('loading-overlay');
+        loading.style.display = 'flex'; 
+        clearInterval(timerInterval); 
+
+        const q = window.currentExamData;
+        
+        // --- PROMPT: CHUYÊN GIA THƠ CA ---
+        const systemPrompt = `
+        BẠN LÀ: Giáo viên Ngữ văn lớp 12 - Chuyên gia thẩm bình văn học Trữ tình (Thơ ca).
+        NHIỆM VỤ: Chấm bài Nghị luận văn học về một đoạn trích/bài thơ.
+
+        THÔNG TIN ĐỀ BÀI:
+        - Yêu cầu: "${q.topic}"
+        - Đoạn thơ/Bài thơ: "${(q.text || 'Học sinh tự vận dụng').replace(/"/g, "'")}"
+        - Gợi ý: "${q.hint || ''}"
+
+        TIÊU CHÍ CHẤM (Thang 10):
+        1. Mở bài (0.5đ): Giới thiệu tác giả, phong cách nghệ thuật, bài thơ và đoạn trích.
+        2. Thân bài (7.0đ): 
+           - Cảm nhận sâu sắc về hình tượng thơ, tâm trạng nhân vật trữ tình.
+           - Phân tích đặc sắc nghệ thuật: Thể thơ, nhịp điệu, hình ảnh, các biện pháp tu từ (ẩn dụ, hoán dụ...).
+           - Tuyệt đối không "diễn xuôi" ý thơ (dịch thơ sang văn xuôi một cách thô thiển).
+        3. Kết bài (0.5đ): Đánh giá lại giá trị tư tưởng và nghệ thuật.
+        4. Sáng tạo & Hình thức (2.0đ): Văn phong giàu cảm xúc, ngôn ngữ mượt mà.
+
+        YÊU CẦU OUTPUT JSON DUY NHẤT:
+        {
+            "human_score": (int 0-100),
+            "ai_comment": "Nhận xét về độ cảm xúc và sự tự nhiên trong văn phong.",
+            "score": (số thực 0-10.0, lẻ 0.25),
+            "essay_type": "Nghị luận Văn học (Thơ)",
+            "general_comment": "Nhận xét tổng quát về khả năng cảm thụ thơ.",
+            "strengths": ["Phát hiện tinh tế 1", "Phân tích nghệ thuật tốt..."],
+            "weaknesses": ["Còn diễn xuôi thơ", "Thiếu liên hệ mở rộng..."],
+            "correction_html": "Bài làm đã chấm (dùng <span class='text-bad'>[Lỗi]</span>, <span class='text-fix'>[Sửa]</span>, <span class='text-good'>[Hay]</span>).",
+            "orientation": "Gợi ý để viết văn cảm xúc hơn."
+        }
+        `;
+
+        try {
+            const res = await fetch(API_URL, { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({ systemPrompt: systemPrompt, messages: `BÀI LÀM:\n${content}` }) 
+            });
+
+            if (!res.ok) throw new Error("SERVER_ERROR");
+            const data = await res.json();
+            
+            if (!data.choices || !data.choices[0]) throw new Error("NO_CONTENT");
+
+            let rawText = data.choices[0].message.content.replace(/```json/g, "").replace(/```/g, "").trim();
+            const result = JSON.parse(rawText.match(/\{[\s\S]*\}/)[0]);
+            
+            // Ép điểm
+            let safeScore = parseFloat(result.score);
+            if(isNaN(safeScore)) safeScore = 0; if(safeScore > 10) safeScore = 10;
+            result.score = safeScore;
+
+            renderAIResult(result);
+
+            if (auth.currentUser) { 
+                await addDoc(collection(db, "activities"), { 
+                    uid: auth.currentUser.uid, 
+                    type: "nlvh", 
+                    genre: "Thơ", // <--- QUAN TRỌNG: Lưu đúng thể loại Thơ
+                    score: safeScore, 
+                    timeSpent: document.getElementById('timer').innerText, 
+                    timestamp: serverTimestamp(),
+                    examId: q.id
+                }); 
+            }
+        } catch(e) { 
+            console.error(e); 
+            showPopup("Lỗi AI", "Có lỗi xử lý, vui lòng nộp lại.", "error");
+        } finally { 
+            loading.style.display = 'none'; 
+        }
+    };
+
+    window.resetExam = () => { 
+        document.getElementById('input-section').classList.remove('hidden'); 
+        document.getElementById('output-section').classList.add('hidden'); 
+        document.getElementById('output-section').style.display = 'none'; 
+        startTimer(); // Reset đồng hồ về 60p
+    };
+
+    // --- ĐỒNG HỒ ĐẾM NGƯỢC 60 PHÚT ---
+    let timerInterval; 
+    let timeLeft = 3600; // 60 phút * 60 giây
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timeLeft = 3600; // Reset về 60 phút
+        
+        // Cập nhật ngay lập tức
+        updateTimerDisplay(timeLeft);
+
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft < 0) {
+                clearInterval(timerInterval);
+                showPopup("Hết giờ", "Đã hết thời gian làm bài!", "warning");
+                return;
+            }
+            updateTimerDisplay(timeLeft);
+        }, 1000);
+    }
+
+    function updateTimerDisplay(t) {
+        const m = Math.floor(t / 60).toString().padStart(2, '0');
+        const s = (t % 60).toString().padStart(2, '0');
+        const txt = `${m}:${s}`;
+        if(document.getElementById('timer')) document.getElementById('timer').innerText = txt;
+        if(document.getElementById('timer-mobile')) document.getElementById('timer-mobile').innerText = txt;
+    }
+
+    onAuthStateChanged(auth, u => { if(u) { loadQuestions(); } else window.location.href="../log.html"; });
+    document.getElementById('file-upload').addEventListener('change', (e) => { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); if(f.name.endsWith('.docx')) { r.onload = (ev) => mammoth.extractRawText({arrayBuffer: ev.target.result}).then(res => document.getElementById('student-essay').value = res.value); r.readAsArrayBuffer(f); } else showPopup("Lỗi", "Chỉ nhận file .docx", "error"); });
+    document.getElementById('student-essay').oninput = function() { document.getElementById('word-count').innerText = `${this.value.trim().split(/\s+/).filter(x => x).length} TỪ`; };
+</script>
+</body>
+</html>
