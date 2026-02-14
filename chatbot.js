@@ -1,4 +1,4 @@
-// chatbot.js - Hopvan AI Assistant (Powered by Groq)
+// chatbot.js - Hopvan AI Assistant (Fix for Groq Proxy)
 
 const styles = `
     /* --- LAUNCHER BUTTON --- */
@@ -197,7 +197,7 @@ function initChatbot() {
             <div class="chat-messages" id="chat-messages">
                 <div class="msg msg-bot">
                     Chào bạn!<br>
-                    Bạn cần tìm dẫn chứng, sửa mở bài, hay muốn mình "đọc" giúp tài liệu nào không?
+                    Mình là trợ lý AI. Bạn cần giúp gì về Văn học không?
                 </div>
             </div>
             
@@ -208,8 +208,8 @@ function initChatbot() {
                     <i class="fas fa-times" id="remove-file-btn" title="Xóa file"></i>
                 </div>
                 <div class="input-row">
-                    <input type="file" id="chat-file-input" hidden accept="image/*, .txt, .js, .html, .css, .json">
-                    <button id="chat-upload-btn" class="action-btn" title="Gửi ảnh/file"><i class="fas fa-paperclip"></i></button>
+                    <input type="file" id="chat-file-input" hidden accept=".txt, .js, .html, .css, .json, .docx">
+                    <button id="chat-upload-btn" class="action-btn" title="Gửi file (Code/Text)"><i class="fas fa-paperclip"></i></button>
                     <input type="text" id="chat-input" placeholder="Nhập câu hỏi..." autocomplete="off">
                     <button id="chat-send-btn" class="action-btn"><i class="fas fa-paper-plane"></i></button>
                 </div>
@@ -234,7 +234,7 @@ function initChatbot() {
 
     let currentFile = null;
 
-    // UI Logic
+    // Toggle Chat
     function toggleChat() {
         const isActive = windowEl.classList.contains('active');
         if (isActive) {
@@ -267,15 +267,6 @@ function initChatbot() {
         filePreview.style.display = 'none';
     });
 
-    const fileToBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result.split(',')[1]);
-            reader.onerror = error => reject(error);
-        });
-    };
-
     const readTextFile = (file) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -285,23 +276,27 @@ function initChatbot() {
         });
     };
 
-    // --- LOGIC GỬI TIN NHẮN (GROQ) ---
+    // --- LOGIC GỬI TIN NHẮN (FIXED) ---
     async function sendMessage() {
         const text = inputEl.value.trim();
         if (!text && !currentFile) return;
 
-        // 1. Hiển thị tin nhắn người dùng
         let userHtml = text;
-        if (currentFile && currentFile.type.startsWith('image/')) {
-            const objectUrl = URL.createObjectURL(currentFile);
-            userHtml += `<br><img src="${objectUrl}" class="msg-img-preview">`;
-        } else if (currentFile) {
+        let contentToSend = text;
+
+        if (currentFile) {
             userHtml += `<br><small>📎 <em>${currentFile.name}</em></small>`;
+            try {
+                // Đọc nội dung file text
+                const fileContent = await readTextFile(currentFile);
+                contentToSend += `\n\n[Nội dung file đính kèm ${currentFile.name}]:\n${fileContent}`;
+            } catch(e) {
+                console.warn("Không đọc được file");
+            }
         }
         
         appendMessage(userHtml, 'user');
         
-        // 2. Reset input
         inputEl.value = '';
         const fileToSend = currentFile;
         currentFile = null;
@@ -311,76 +306,57 @@ function initChatbot() {
         const loadingId = showLoading();
 
         try {
-            // 3. Chuẩn bị Payload cho Groq
-            let messages = [
-                { role: "system", content: "Bạn là Trợ lý AI của Hopvan. Nhiệm vụ: Giải đáp thắc mắc Ngữ Văn, phân tích ảnh/tài liệu được gửi. Phong cách: Thân thiện, dùng emoji." }
-            ];
-
-            let contentPayload = [];
-
-            // Xử lý Text
-            if (text) {
-                contentPayload.push({ type: "text", text: text });
-            }
-
-            // Xử lý File
-            if (fileToSend) {
-                if (fileToSend.type.startsWith('image/')) {
-                    const base64Data = await fileToBase64(fileToSend);
-                    contentPayload.push({
-                        type: "image_url",
-                        image_url: { url: `data:${fileToSend.type};base64,${base64Data}` }
-                    });
-                } else {
-                    try {
-                        const fileContent = await readTextFile(fileToSend);
-                        contentPayload.push({ type: "text", text: `\n\nNội dung file đính kèm (${fileToSend.name}):\n${fileContent}` });
-                    } catch (err) {
-                        contentPayload.push({ type: "text", text: `\n(Lỗi đọc file ${fileToSend.name})` });
-                    }
-                }
-            }
-
-            // Nếu chỉ có text đơn thuần, Groq có thể nhận string trực tiếp, nhưng format array object an toàn cho cả vision.
-            // Tuy nhiên, để đảm bảo tương thích tốt nhất với Llama 3 (Text) và Llama 3.2 (Vision), ta gom lại.
+            // CẤU TRÚC PROMPT ĐẶC BIỆT ĐỂ "LỪA" PROXY (VÌ PROXY BẮT BUỘC TRẢ JSON)
+            const systemPrompt = `
+            BẠN LÀ: Trợ lý AI của Hopvan (Gia sư văn học).
+            NHIỆM VỤ: Trả lời câu hỏi của người dùng một cách thân thiện, ngắn gọn, dễ hiểu.
             
-            // Nếu payload có ảnh -> Bắt buộc dùng model Vision (nhưng ở đây ta gửi qua Proxy, Proxy sẽ tự xử lý hoặc model default là vision)
-            // Nếu model text-only gặp image_url sẽ lỗi. 
-            // Giả sử Proxy của bạn đã được cấu hình trỏ tới model Vision hoặc Text phù hợp.
-            
-            if (contentPayload.length > 0) {
-                messages.push({ role: "user", content: contentPayload });
-            }
+            ⚠️ QUAN TRỌNG: 
+            Do hệ thống yêu cầu output JSON, bạn BẮT BUỘC phải trả lời theo định dạng JSON sau:
+            { "reply": "Nội dung câu trả lời của bạn viết ở đây (dùng markdown nếu cần)" }
+            `;
 
-            // 4. Gọi API
-            const response = await fetch('/.netlify/functions/gemini-proxy', {
+            const res = await fetch('/.netlify/functions/gemini-proxy', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages: messages })
+                body: JSON.stringify({ 
+                    systemPrompt: systemPrompt,  // Gửi riêng systemPrompt
+                    messages: contentToSend      // Gửi nội dung user (Text + File Content)
+                })
             });
 
-            const data = await response.json();
+            if(!res.ok) throw new Error("SERVER_ERROR");
+
+            const data = await res.json();
             removeLoading(loadingId);
 
-            // 5. Xử lý kết quả Groq (OpenAI Format)
             if (data.choices && data.choices.length > 0) {
-                let reply = data.choices[0].message.content;
+                let rawText = data.choices[0].message.content;
                 
-                // Format lại text cho đẹp
-                reply = reply
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\n/g, '<br>')
-                    .replace(/\* /g, '• ');
-                
-                appendMessage(reply, 'bot');
+                // Parse JSON từ phản hồi của AI
+                try {
+                    rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+                    const jsonRes = JSON.parse(rawText);
+                    
+                    // Chỉ lấy phần 'reply' để hiển thị
+                    let reply = jsonRes.reply || "AI không trả lời đúng định dạng.";
+                    
+                    // Format Markdown cơ bản sang HTML
+                    reply = reply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+                    
+                    appendMessage(reply, 'bot');
+                } catch(e) {
+                    // Fallback nếu AI lỡ quên format JSON (hiện text thô)
+                    appendMessage(rawText, 'bot');
+                }
             } else {
-                appendMessage("Oop! AI đang ngủ gật. Thử lại sau nhé.", 'bot');
+                appendMessage("AI đang bận, thử lại sau nhé!", 'bot');
             }
 
         } catch (error) {
             console.error(error);
             removeLoading(loadingId);
-            appendMessage("Lỗi kết nối rồi. Kiểm tra mạng giúp mình nha!", 'bot');
+            appendMessage("Lỗi kết nối. Vui lòng thử lại!", 'bot');
         }
     }
 
