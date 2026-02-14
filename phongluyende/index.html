@@ -213,56 +213,91 @@
         document.querySelectorAll('.exam-content').forEach(el => el.style.fontSize = `${promptFontSize}px`);
     };
 
-    // --- LOAD DATA ---
-    async function loadQuestions() {
+    // --- RANDOM LOGIC ---
+    window.randomizeQuestion = async () => {
+        const typeSelect = document.getElementById('topic-select').value;
+        const loader = document.getElementById('loading-overlay');
+        loader.style.display = 'flex';
+
         try {
-            const querySnapshot = await getDocs(collection(db, "reading_bank"));
-            questionsData = [];
-            querySnapshot.forEach(doc => questionsData.push({ id: doc.id, ...doc.data() }));
-            if (questionsData.length === 0) {
-                document.getElementById('prompt-content').innerHTML = `<div class="text-center py-10 text-gray-400">Kho đề trống.</div>`;
+            let colName;
+            if (typeSelect === 'random') colName = Math.random() > 0.5 ? 'reading_bank' : 'essay_bank';
+            else if (typeSelect === 'dochieu') colName = 'reading_bank';
+            else colName = 'essay_bank';
+
+            let q;
+            if (colName === 'reading_bank') q = collection(db, "reading_bank");
+            else {
+                if (typeSelect === 'random') q = collection(db, "essay_bank");
+                else q = query(collection(db, "essay_bank"), where("type", "==", typeSelect));
+            }
+
+            const snapshot = await getDocs(q);
+            if (snapshot.empty) {
+                showPopup("Thông báo", "Kho đề này hiện đang trống!", "warning");
+                loader.style.display = 'none';
                 return;
             }
-            randomizeQuestion();
-        } catch (e) {
-            console.error("Lỗi:", e);
-            showPopup("Lỗi Kết Nối", "Không thể tải đề thi: " + e.message, "error");
-        }
-    }
 
-    // --- RENDER EXAM ---
-    window.randomizeQuestion = () => {
-        if (!questionsData || questionsData.length === 0) return;
-        const q = questionsData[Math.floor(Math.random() * questionsData.length)];
-        window.currentExamData = q;
-        document.getElementById('exam-code').innerText = `MÃ: ${q.id.slice(0, 6).toUpperCase()}`;
-        document.getElementById('student-essay').value = "";
-        
-        setupHighlightEvent();
-        
-        document.getElementById('prompt-content').innerHTML = `
-            <div id="reading-passage" class="relative pb-10">
-                <div class="mb-4">
-                    <h3 class="font-bold text-lg text-gray-800 mb-2">${q.title || "Văn bản Đọc Hiểu"}</h3>
-                    <div class="passage-box">
-                        <div class="exam-content highlight-text" id="text-content">${q.text || "Đang cập nhật..."}</div>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <h4 class="font-black text-gray-700 border-b pb-2 uppercase text-sm">Câu hỏi:</h4>
-                    ${(q.questions || []).map((item, idx) => `
-                        <div class="question-box">
-                            <span class="font-black text-orange-500 block mb-2 text-sm uppercase">Câu ${idx + 1}</span>
-                            <div class="text-gray-800 font-medium leading-relaxed">${item.q}</div>
-                        </div>`).join('')}
-                </div>
-            </div>`;
-        promptFontSize = 17;
-        document.querySelector('.prompt-body').style.fontSize = `17px`;
-        setTimeout(setupHighlightEvent, 100);
+            const docs = snapshot.docs;
+            const randomDoc = docs[Math.floor(Math.random() * docs.length)];
+            const data = randomDoc.data();
+            
+            // LƯU DATA VÀO BIẾN TOÀN CỤC ĐỂ DÙNG LẠI Ở HÀM SUBMIT
+            window.currentExamData = { 
+                ...data, 
+                id: randomDoc.id, 
+                type: colName === 'reading_bank' ? 'dochieu' : data.type 
+            };
+            
+            renderExam(window.currentExamData);
+            startTimer();
+        } catch (e) { 
+            console.error(e);
+            showPopup("Lỗi", "Không thể bốc đề, vui lòng thử lại.", "error"); 
+        } finally { loader.style.display = 'none'; }
     };
 
-    // --- HIGHLIGHT ---
+    function renderExam(data) {
+        const container = document.getElementById('prompt-content');
+        const badge = document.getElementById('exam-type-badge');
+        document.getElementById('exam-code').innerText = `MÃ: ${data.id.slice(0, 6).toUpperCase()}`;
+        document.getElementById('student-essay').value = "";
+        
+        if (data.type === 'dochieu') {
+            badge.innerText = "ĐỌC HIỂU"; badge.className = "type-badge badge-dochieu";
+            container.innerHTML = `
+                <div id="reading-passage">
+                    <div class="passage-box">
+                        <h3 class="font-bold text-lg mb-3 text-gray-800 border-b pb-2">${data.title || "Ngữ liệu"}</h3>
+                        <div class="exam-content font-light" id="text-content">${data.text}</div>
+                    </div>
+                    <div class="space-y-3">
+                        ${(data.questions || []).map((q, i) => `
+                            <div class="question-box">
+                                <span class="font-bold text-blue-600 block mb-1 text-sm uppercase">Câu ${i+1}</span>
+                                <div class="text-gray-800 text-sm font-light leading-relaxed">${q.q}</div>
+                            </div>`).join('')}
+                    </div>
+                </div>`;
+        } else {
+            const isNLXH = data.type === 'nlxh';
+            badge.innerText = isNLXH ? "NL XÃ HỘI" : "NL VĂN HỌC"; 
+            badge.className = `type-badge ${isNLXH ? 'badge-nlxh' : 'badge-nlvh'}`;
+            container.innerHTML = `
+                <div id="reading-passage">
+                    <div class="passage-box">
+                        <span class="text-xs font-bold text-gray-400 uppercase block mb-2">Yêu cầu đề bài</span>
+                        <div class="exam-content font-light text-gray-800">${data.topic}</div>
+                    </div>
+                    ${data.text ? `<div class="passage-box"><span class="text-xs font-bold text-gray-400 uppercase block mb-2">Ngữ liệu</span><div class="exam-content font-light">${data.text}</div></div>` : ''}
+                    ${data.hint ? `<div class="mt-4 bg-yellow-50 p-4 rounded-xl border border-yellow-100 text-sm text-gray-600 italic font-light">Gợi ý: ${data.hint}</div>` : ''}
+                </div>`;
+        }
+        setupHighlightEvent();
+    }
+
+    // --- HIGHLIGHT (FIX DOM) ---
     function setupHighlightEvent() {
         const container = document.getElementById('reading-passage');
         const menu = document.getElementById('highlight-menu');
@@ -303,7 +338,7 @@
         }
     };
 
-    // --- 1. RENDER KẾT QUẢ (FIX LỖI HIỂN THỊ) ---
+    // --- 1. RENDER KẾT QUẢ ---
     function renderAIResult(result) {
         document.getElementById('input-section').classList.add('hidden');
         const out = document.getElementById('output-section');
@@ -311,114 +346,110 @@
         out.classList.remove('hidden');
         out.classList.add('flex-col', 'h-full');
 
-        // Ép kiểu an toàn để tránh lỗi hiển thị
-        const humanScore = parseInt(result.human_score) || 100;
-        const readingScore = parseFloat(result.reading_score) || 0;
-        const barColor = humanScore > 75 ? '#22c55e' : (humanScore > 50 ? '#f59e0b' : '#ef4444');
+        const barColor = result.human_score > 75 ? '#22c55e' : (result.human_score > 50 ? '#f59e0b' : '#ef4444');
 
         document.getElementById('ai-correction-box').innerHTML = `
             <div class="max-w-2xl mx-auto pb-10 custom-scrollbar" style="font-family: 'Merriweather', serif; font-weight: 300;">
                 <div class="text-center mb-8">
                     <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Kết quả từ AI</div>
-                    <div class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2">
-                        ${readingScore}<span class="text-2xl text-gray-300">/4.0</span>
-                    </div>
-                    <div class="inline-block px-4 py-1.5 bg-orange-50 text-orange-600 rounded-full text-[10px] font-bold border border-orange-100 truncate max-w-full">
-                        ${result.type_detected || "Đọc Hiểu Văn Bản"}
-                    </div>
-                    <p class="text-gray-600 italic px-6 mt-4 leading-relaxed">"${result.general_comment || 'Bài làm khá tốt.'}"</p>
+                    <div class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2">${result.score}</div>
+                    <div class="inline-block px-3 py-1 bg-gray-100 rounded-full text-[10px] font-bold text-gray-500 uppercase tracking-tighter">Phân loại: ${result.type_detected}</div>
+                    <p class="text-gray-600 italic px-4 mt-4 font-light">"${result.general_comment}"</p>
                 </div>
-                
                 <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm mb-6">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Độ chân thực (AI Check)</span>
-                        <span class="font-bold text-sm" style="color:${barColor}">${humanScore}%</span>
+                        <span class="font-bold text-sm" style="color:${barColor}">${result.human_score}%</span>
                     </div>
-                    <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div style="width:${humanScore}%; background:${barColor}" class="h-full"></div>
-                    </div>
-                    <p class="text-[11px] text-gray-400 mt-2 italic font-light">${result.ai_comment || "Văn phong tự nhiên."}</p>
+                    <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div style="width:${result.human_score}%; background:${barColor}" class="h-full"></div></div>
+                    <p class="text-[11px] text-gray-400 mt-2 italic font-light">${result.ai_comment}</p>
                 </div>
-
-                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-6 text-sm text-blue-800 font-medium">
-                     <i class="fas fa-list-ol mr-2"></i> Chi tiết: ${result.detailed_breakdown || "Đang cập nhật..."}
-                </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    <div class="bg-green-50/50 p-5 rounded-2xl border border-green-100">
-                        <h4 class="text-green-700 font-bold text-[10px] uppercase mb-3"><i class="fas fa-check-circle mr-1"></i> Điểm tốt</h4>
-                        <ul class="text-xs text-green-800 space-y-2 font-medium">${(result.strengths || []).map(s => `<li>• ${s}</li>`).join('')}</ul>
-                    </div>
-                    <div class="bg-red-50/50 p-5 rounded-2xl border border-red-100">
-                        <h4 class="text-red-700 font-bold text-[10px] uppercase mb-3"><i class="fas fa-exclamation-triangle mr-1"></i> Hạn chế</h4>
-                        <ul class="text-xs text-red-800 space-y-2 font-medium">${(result.weaknesses || []).map(w => `<li>• ${w}</li>`).join('')}</ul>
-                    </div>
+                    <div class="bg-green-50/50 p-5 rounded-2xl border border-green-100"><h4 class="text-green-700 font-bold text-[10px] uppercase mb-3">Điểm sáng</h4><ul class="text-xs text-green-800 space-y-2 font-medium">${result.strengths.map(s => `<li>• ${s}</li>`).join('')}</ul></div>
+                    <div class="bg-red-50/50 p-5 rounded-2xl border border-red-100"><h4 class="text-red-700 font-bold text-[10px] uppercase mb-3">Hạn chế</h4><ul class="text-xs text-red-800 space-y-2 font-medium">${result.weaknesses.map(w => `<li>• ${w}</li>`).join('')}</ul></div>
                 </div>
-
                 <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm mb-8">
-                    <h4 class="font-black text-gray-800 border-b pb-4 mb-6 text-xs uppercase tracking-widest">Chi tiết đáp án & Sửa lỗi</h4>
-                    <div class="leading-loose text-gray-700 font-light text-lg space-y-4 text-justify">
-                        ${result.correction_html}
-                    </div>
+                    <h4 class="font-black text-gray-800 border-b pb-4 mb-6 text-xs uppercase tracking-widest">Chi tiết bài sửa</h4>
+                    <div class="leading-loose text-gray-700 font-light text-lg space-y-4 text-justify">${result.correction_html}</div>
                 </div>
-
                 <div class="bg-gray-900 text-white p-6 rounded-2xl shadow-xl">
-                    <div class="flex items-center gap-2 mb-2 text-orange-400"><i class="fas fa-lightbulb"></i><span class="text-[10px] font-black uppercase tracking-widest">Định hướng kĩ năng</span></div>
+                    <div class="flex items-center gap-2 mb-2 text-orange-400"><i class="fas fa-compass"></i><span class="text-[10px] font-black uppercase tracking-widest">Định hướng tư duy</span></div>
                     <p class="text-sm text-gray-300 leading-relaxed font-light italic">${result.orientation}</p>
                 </div>
             </div>`;
     }
 
-    // --- 2. HÀM NỘP BÀI (FIX LỖI FIREBASE UNDEFINED) ---
+// --- 2. HÀM NỘP BÀI (ĐÃ FIX KHỚP VỚI PROXY GROQ) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
-        if(content.split(/\s+/).filter(x => x).length < 20) { 
-            document.getElementById('short-essay-popup').style.display = 'flex'; return; 
+        
+        // Kiểm tra độ dài bài làm
+        if(content.split(/\s+/).filter(x => x).length < 50) { 
+            document.getElementById('short-essay-popup').style.display = 'flex'; 
+            return; 
         }
 
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex';
+        
+        // Lấy dữ liệu đề bài
         const q = window.currentExamData;
         
-        // PROMPT CHUẨN HÓA JSON OUTPUT (YÊU CẦU TRẢ VỀ SỐ ĐỂ TRÁNH LỖI)
+        if (!q) {
+            showPopup("Lỗi", "Dữ liệu đề bị trống. Hãy reload trang.", "error");
+            loading.style.display = 'none';
+            return;
+        }
+        
+        // --- 1. Tạo System Prompt (Hướng dẫn chấm) ---
         const systemPrompt = `
-        BẠN LÀ: Giám khảo chấm thi ĐỌC HIỂU THPT Quốc gia.
-        NHIỆM VỤ: Chấm điểm bài làm dựa trên ngữ liệu và câu hỏi.
+        BẠN LÀ: Giám khảo đa năng Hội đồng chấm thi THPT Quốc gia.
+        NHIỆM VỤ: Chấm bài dựa trên đề NGẪU NHIÊN học sinh bốc được.
 
-        THÔNG TIN ĐỀ:
-        - Văn bản: "${(q.text || '').replace(/"/g, "'")}"
-        - Câu hỏi: ${JSON.stringify(q.questions)}
+        === THÔNG TIN ĐỀ BÀI ===
+        1. Loại đề: ${q.type}
+        2. Yêu cầu: "${(q.topic || q.title || '').replace(/"/g, "'")}"
+        3. Ngữ liệu: "${(q.text || "Không có").replace(/"/g, "'")}"
+        4. Gợi ý chấm: "${(q.hint || "Không có").replace(/"/g, "'")}"
 
-        TIÊU CHÍ (Thang 4.0):
-        1. Trả lời đúng trọng tâm. Sai thuật ngữ = 0 điểm.
-        2. Mỗi câu hỏi nhỏ có điểm riêng. Tổng max 4.0.
+        === CƠ CHẾ CHẤM ĐIỂM ===
+        1. Thang điểm: Quy đổi mọi kết quả về thang 10.0.
+        2. Nếu là Đọc hiểu: Tập trung vào độ chính xác, ngắn gọn.
+        3. Nếu là Làm văn (NLXH/NLVH): Tập trung vào lập luận, dẫn chứng, cảm xúc.
 
-        YÊU CẦU OUTPUT JSON DUY NHẤT (KHÔNG MARKDOWN):
+        === KIỂM TRA AI (RĂN ĐE) ===
+        - human_score (0-100): Đánh giá độ "người". Nếu văn phong máy móc, liệt kê vô hồn -> điểm thấp.
+
+        YÊU CẦU TRẢ VỀ JSON DUY NHẤT (KHÔNG MARKDOWN):
         {
             "human_score": (int 0-100),
-            "ai_comment": "Nhận xét ngắn về văn phong.",
-            "reading_score": (số thực 0-4.0, ví dụ: 3.5),
-            "detailed_breakdown": "Câu 1: 0.5, Câu 2: 1.0...",
-            "type_detected": "Đọc Hiểu Văn Bản",
-            "general_comment": "Lời phê tổng quát.",
-            "strengths": ["Ưu điểm 1", "..."],
-            "weaknesses": ["Lỗi sai 1", "..."],
-            "correction_html": "Bài làm gốc kèm thẻ <span class='text-bad'>[Sai]</span> <span class='text-fix'>(Đáp án: ...)</span>.",
-            "orientation": "Lời khuyên."
+            "ai_comment": "Nhận xét về độ chân thực của văn phong.",
+            "score": (float thang 10, lẻ 0.5),
+            "type_detected": "Tên loại đề bạn nhận diện được",
+            "general_comment": "Lời phê tổng quát của Giám khảo.",
+            "strengths": ["Ưu điểm 1", "Ưu điểm 2"],
+            "weaknesses": ["Hạn chế 1", "Hạn chế 2"],
+            "correction_html": "Bài làm gốc, chèn thêm thẻ: <span class='text-bad'>[Lỗi]</span> <span class='text-fix'>(Sửa thành...)</span> hoặc <span class='text-good'>[Hay]</span>.",
+            "orientation": "Định hướng tư duy ngắn gọn."
         }
         `;
 
         try {
+            // --- 2. Gửi API (QUAN TRỌNG: Tách riêng systemPrompt và messages) ---
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ 
-                    systemPrompt: systemPrompt, 
-                    messages: `BÀI LÀM CỦA HỌC SINH:\n${content}`
+                    systemPrompt: systemPrompt,  // Gửi riêng theo yêu cầu của Proxy
+                    messages: `BÀI LÀM CỦA HỌC SINH:\n${content}` // Nội dung bài làm
                 }) 
             });
 
-            if (!res.ok) throw new Error("SERVER_ERROR");
+            if (!res.ok) {
+                const errText = await res.text();
+                console.error("Server Error Log:", errText);
+                throw new Error("SERVER_ERROR");
+            }
 
             const data = await res.json();
             
@@ -427,53 +458,55 @@
             }
 
             let rawText = data.choices[0].message.content;
+            // Làm sạch JSON (xóa markdown ```json nếu có)
             rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
             
             const result = JSON.parse(rawText);
-            
-            // --- FIX QUAN TRỌNG: ÉP KIỂU SỐ TRƯỚC KHI LƯU ---
-            // Nếu reading_score là chuỗi hoặc null -> về 0.0
-            let safeReadingScore = parseFloat(result.reading_score);
-            if (isNaN(safeReadingScore)) safeReadingScore = 0.0;
-            
-            // Cập nhật lại vào object result để render UI cho đúng
-            result.reading_score = safeReadingScore;
-
-            // Quy đổi sang thang 10 cho Database (4.0 -> 10.0)
-            let safeDbScore = safeReadingScore * 2.5; 
-
             renderAIResult(result);
 
-            if (auth.currentUser) {
-                await addDoc(collection(db, "activities"), {
-                    uid: auth.currentUser.uid,
-                    type: "reading",
-                    score: safeDbScore, // Lưu điểm đã ép kiểu số (Number)
-                    timestamp: serverTimestamp(),
-                    examId: q.id
-                });
+            // Lưu lịch sử vào Firebase
+            if (auth.currentUser) { 
+                await addDoc(collection(db, "activities"), { 
+                    uid: auth.currentUser.uid, 
+                    type: "random", 
+                    subType: q.type, 
+                    score: result.score, 
+                    time: document.getElementById('timer').innerText, 
+                    timestamp: serverTimestamp() 
+                }); 
             }
         } catch(e) { 
-            console.error(e); 
+            console.error(e);
             let msg = "Có lỗi xảy ra, vui lòng thử lại!";
-            if (e.message === "SERVER_ERROR") msg = "Server đang bận. Bạn hãy bấm nộp lại nhé!";
-            if (e.message === "NO_CONTENT") msg = "AI không phản hồi. Vui lòng bấm nộp lại!";
-            showPopup("Lỗi AI", msg, "error");
+            if (e.message === "SERVER_ERROR") msg = "Server AI đang quá tải hoặc lỗi cấu trúc.";
+            if (e.message === "NO_CONTENT") msg = "AI không trả lời. Hãy thử lại.";
+            showPopup("Lỗi AI", msg, "error"); 
         } finally { 
             loading.style.display = 'none'; 
         }
     };
 
-    window.resetExam = () => {
-        document.getElementById('input-section').classList.remove('hidden');
-        document.getElementById('output-section').classList.add('hidden');
-        document.getElementById('output-section').style.display = 'none';
+    window.resetExam = () => { 
+        document.getElementById('input-section').classList.remove('hidden'); 
+        document.getElementById('output-section').classList.add('hidden'); 
+        document.getElementById('output-section').style.display = 'none'; 
+        startTimer(); 
     };
 
-    let timeLeft = 1800; 
-    function startTimer() { setInterval(() => { if(timeLeft > 0) { timeLeft--; const m = Math.floor(timeLeft / 60); const s = timeLeft % 60; document.getElementById('timer').innerText = `${Math.floor(m/60)}:${(m%60).toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; if(document.getElementById('timer-mobile')) document.getElementById('timer-mobile').innerText = document.getElementById('timer').innerText; } else if (timeLeft === 0) { timeLeft = -1; showPopup("Hết Giờ", "Đã hết thời gian làm bài Đọc Hiểu!", "warning"); } }, 1000); }
+    let timerInterval; let secondsElapsed = 0;
+    function startTimer() {
+        clearInterval(timerInterval); secondsElapsed = 0;
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            const m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+            const s = (secondsElapsed % 60).toString().padStart(2, '0');
+            const txt = `${m}:${s}`;
+            if(document.getElementById('timer')) document.getElementById('timer').innerText = txt;
+            if(document.getElementById('timer-mobile')) document.getElementById('timer-mobile').innerText = txt;
+        }, 1000);
+    }
 
-    onAuthStateChanged(auth, u => { if(u) { startTimer(); loadQuestions(); } else window.location.href="../log.html"; });
+    onAuthStateChanged(auth, u => { if(!u) window.location.href="../log.html"; });
     document.getElementById('file-upload').addEventListener('change', (e) => { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); if(f.name.endsWith('.docx')) { r.onload = (ev) => mammoth.extractRawText({arrayBuffer: ev.target.result}).then(res => document.getElementById('student-essay').value = res.value); r.readAsArrayBuffer(f); } else showPopup("Lỗi", "Chỉ nhận file .docx", "error"); });
     document.getElementById('student-essay').oninput = function() { document.getElementById('word-count').innerText = `${this.value.trim().split(/\s+/).filter(x => x).length} TỪ`; };
 </script>
