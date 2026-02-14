@@ -178,15 +178,16 @@
     </div>
 
     <aside class="w-[280px] sidebar hidden md:flex flex-col z-50 h-full shadow-xl">
-        <div class="p-8 flex items-center gap-4">
+        <a href="index.html" class="p-8 flex items-center gap-4 hover:opacity-80 transition-opacity cursor-pointer text-decoration-none group">
             <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20 border border-orange-50 overflow-hidden">
-                <img src="../LOGO.WEBP" alt="HopVan Logo" class="w-10 h-10 object-contain">
+                <img src="../LOGO.WEBP" alt="HopVan Logo" class="w-12 h-12 object-contain drop-shadow-md bg-white rounded-xl p-1 group-hover:scale-105 transition-transform">
             </div>
             <div>
-                <h1 class="text-2xl font-black text-gray-800 tracking-tight">HOPVAN</h1>
-                <p class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Admin Studio</p>
+                <h1 class="block text-2xl font-black text-gray-800 tracking-tight leading-none group-hover:text-orange-500 transition-colors">HOPVAN</h1>
+                <p class="text-[12px] font-bold text-orange-500 uppercase tracking-widest">Admin Studio</p>
             </div>
         </div>
+        </a>
 
         <nav class="flex-1 py-4 overflow-y-auto">
             <div class="nav-item active" onclick="switchView('dashboard', this)">
