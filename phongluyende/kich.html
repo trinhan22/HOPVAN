@@ -249,13 +249,13 @@
             querySnapshot.forEach(doc => questionsData.push({ id: doc.id, ...doc.data() }));
             
             if (questionsData.length === 0) {
-                document.getElementById('prompt-content').innerHTML = `<div class="text-center py-10 text-gray-400">Kho đề Thơ đang trống.</div>`;
+                document.getElementById('prompt-content').innerHTML = `<div class="text-center py-10 text-gray-400">Kho đề Kịch đang trống.</div>`;
                 return;
             }
             randomizeQuestion();
         } catch (e) {
             console.error("Lỗi:", e);
-            showPopup("Lỗi", "Không thể tải kho đề Thơ!", "error");
+            showPopup("Lỗi", "Không thể tải kho đề Kịch!", "error");
         }
     }
 
