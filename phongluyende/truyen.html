@@ -60,12 +60,7 @@
         .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 70px; background: white; z-index: 100; align-items: center; padding: 0 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         @media (max-width: 1024px) { body { overflow: auto; height: auto; } .mobile-header { display: flex; } .header-bar { display: none; } .main-content { padding: 80px 16px 20px; height: auto; } .workspace-grid { display: flex; flex-direction: column; height: auto; } .column-card { height: 600px; } }
         #output-section { flex: 1; min-height: 0; display: none; }
-        #ai-correction-box { 
-            height: 100%; 
-            overflow-y: auto; 
-            padding: 0 20px; /* Thêm đệm trái phải để thanh cuộn không che chữ */
-            scroll-behavior: smooth;
-        }
+        #ai-correction-box { height: 100%; overflow-y: auto; }
 
 /* --- GLOBAL SCROLLBAR STYLE --- */
 
@@ -342,7 +337,7 @@
         }
     };
 
-    // --- 1. RENDER KẾT QUẢ (FIX GIAO DIỆN: RỘNG & THOÁNG HƠN) ---
+    // --- 1. RENDER KẾT QUẢ ---
     function renderAIResult(result) {
         document.getElementById('input-section').classList.add('hidden');
         const out = document.getElementById('output-section');
@@ -353,61 +348,32 @@
         const barColor = result.human_score > 75 ? '#22c55e' : (result.human_score > 50 ? '#f59e0b' : '#ef4444');
 
         document.getElementById('ai-correction-box').innerHTML = `
-            <div class="max-w-3xl mx-auto py-12 custom-scrollbar" style="font-family: 'Merriweather', serif; font-weight: 300;">
-                
-                <div class="text-center mb-10">
+            <div class="max-w-2xl mx-auto pb-10 custom-scrollbar" style="font-family: 'Merriweather', serif; font-weight: 300;">
+                <div class="text-center mb-8">
                     <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Kết quả từ AI</div>
-                    
-                    <div class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2">
-                        ${result.reading_score}<span class="text-2xl text-gray-400">/4.0</span>
-                    </div>
-                    
-                    <div class="inline-block px-4 py-1.5 bg-orange-50 text-orange-600 rounded-full text-[11px] font-bold border border-orange-100 font-sans">
-                        ${result.detailed_breakdown || "Chi tiết điểm thành phần"}
-                    </div>
-                    <p class="text-gray-600 italic px-6 mt-4 leading-relaxed text-lg">"${result.general_comment}"</p>
+                    <div class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2">${result.score}</div>
+                    <div class="inline-block px-3 py-1 bg-gray-100 rounded-full text-[10px] font-bold text-gray-500 uppercase tracking-tighter">Dạng bài: ${result.essay_type}</div>
+                    <p class="text-gray-600 italic px-4 mt-4 font-light">"${result.general_comment}"</p>
                 </div>
-
-                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm mb-8">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-xs font-black text-gray-400 uppercase tracking-widest font-sans">Độ chân thực (AI Check)</span>
-                        <span class="font-bold text-sm font-sans" style="color:${barColor}">${result.human_score}%</span>
+                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Độ chân thực (AI Check)</span>
+                        <span class="font-bold text-sm" style="color:${barColor}">${result.human_score}%</span>
                     </div>
-                    <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div style="width:${result.human_score}%; background:${barColor}" class="h-full"></div>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-3 italic font-light font-sans">${result.ai_comment}</p>
+                    <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div style="width:${result.human_score}%; background:${barColor}" class="h-full"></div></div>
+                    <p class="text-[11px] text-gray-400 mt-2 italic font-light">${result.ai_comment}</p>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 font-sans">
-                    <div class="bg-green-50/50 p-6 rounded-3xl border border-green-100">
-                        <h4 class="text-green-700 font-bold text-xs uppercase mb-4 flex items-center gap-2"><i class="fas fa-check-circle"></i> Điểm tốt</h4>
-                        <ul class="text-sm text-green-800 space-y-3 font-medium leading-relaxed">${result.strengths.map(s => `<li>• ${s}</li>`).join('')}</ul>
-                    </div>
-                    <div class="bg-red-50/50 p-6 rounded-3xl border border-red-100">
-                        <h4 class="text-red-700 font-bold text-xs uppercase mb-4 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i> Hạn chế</h4>
-                        <ul class="text-sm text-red-800 space-y-3 font-medium leading-relaxed">${result.weaknesses.map(w => `<li>• ${w}</li>`).join('')}</ul>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <div class="bg-green-50/50 p-5 rounded-2xl border border-green-100"><h4 class="text-green-700 font-bold text-[10px] uppercase mb-3">Điểm tích cực</h4><ul class="text-xs text-green-800 space-y-2 font-medium">${result.strengths.map(s => `<li>• ${s}</li>`).join('')}</ul></div>
+                    <div class="bg-red-50/50 p-5 rounded-2xl border border-red-100"><h4 class="text-red-700 font-bold text-[10px] uppercase mb-3">Hạn chế</h4><ul class="text-xs text-red-800 space-y-2 font-medium">${result.weaknesses.map(w => `<li>• ${w}</li>`).join('')}</ul></div>
                 </div>
-
-                <div class="bg-white p-10 rounded-[30px] border border-gray-100 shadow-lg mb-10">
-                    <h4 class="font-black text-gray-800 border-b pb-6 mb-8 text-sm uppercase tracking-widest flex items-center gap-2 font-sans">
-                        <i class="fas fa-highlighter text-orange-500"></i> Gợi ý sửa bài
-                    </h4>
-                    <div class="leading-9 text-gray-700 font-light text-lg space-y-6 text-justify">
-                        ${result.correction_html}
-                    </div>
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm mb-8">
+                    <h4 class="font-black text-gray-800 border-b pb-4 mb-6 text-xs uppercase tracking-widest">Phân tích lỗi & Sửa chi tiết</h4>
+                    <div class="leading-loose text-gray-700 font-light text-lg space-y-4 text-justify">${result.correction_html}</div>
                 </div>
-
-                <div class="bg-gray-900 text-white p-8 rounded-3xl shadow-2xl relative overflow-hidden font-sans">
-                    <div class="absolute top-0 right-0 p-10 opacity-10 text-9xl"><i class="fas fa-compass"></i></div>
-                    <div class="relative z-10">
-                        <div class="flex items-center gap-3 mb-4 text-orange-400">
-                            <i class="fas fa-compass text-xl"></i>
-                            <span class="text-xs font-black uppercase tracking-widest">Định hướng kĩ năng</span>
-                        </div>
-                        <p class="text-base text-gray-300 leading-loose font-light italic">"${result.orientation}"</p>
-                    </div>
+                <div class="bg-gray-900 text-white p-6 rounded-2xl shadow-xl">
+                    <div class="flex items-center gap-2 mb-2 text-orange-400"><i class="fas fa-compass"></i><span class="text-[10px] font-black uppercase tracking-widest">Lời khuyên từ Giám khảo</span></div>
+                    <p class="text-sm text-gray-300 leading-relaxed font-light italic">${result.orientation}</p>
                 </div>
             </div>`;
     }
