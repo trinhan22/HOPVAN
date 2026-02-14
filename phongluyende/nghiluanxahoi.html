@@ -247,7 +247,7 @@
         }
     }
 
-    // --- RENDER EXAM (ĐÃ FIX GIAO DIỆN & FONT CHỮ) ---
+// --- RENDER EXAM (GIAO DIỆN CŨ - ĐÃ FIX LỖI IN ĐẬM) ---
     window.randomizeQuestion = () => {
         if (!questionsData || questionsData.length === 0) return;
         const q = questionsData[Math.floor(Math.random() * questionsData.length)];
@@ -259,40 +259,32 @@
         
         document.getElementById('prompt-content').innerHTML = `
             <div id="reading-passage" class="relative pb-10">
-                <div class="passage-box bg-white p-6 rounded-2xl border border-orange-100 shadow-sm mb-4">
-                    <span class="text-xs font-black text-orange-500 uppercase block mb-3 tracking-widest">
-                        <i class="fas fa-pen-nib mr-1"></i> Vấn đề nghị luận
-                    </span>
-                    <div class="exam-content text-lg font-normal text-gray-800 leading-relaxed text-justify">
-                        ${q.topic}
-                    </div>
+                
+                <div class="passage-box">
+                    <span class="text-xs font-bold text-gray-400 uppercase block mb-3 italic">Yêu cầu đề bài:</span>
+                    <div class="exam-content font-normal text-gray-800 text-justify" id="text-content">${q.topic}</div>
                 </div>
 
                 ${q.text ? `
-                <div class="passage-box bg-gray-50 p-6 rounded-2xl border border-gray-200 mb-4">
-                    <span class="text-xs font-bold text-gray-400 uppercase block mb-3">
-                        <i class="fas fa-quote-left mr-1"></i> Trích dẫn / Ngữ liệu
-                    </span>
-                    <div class="exam-content font-serif text-gray-700 leading-loose text-justify text-[1.05rem] italic">
-                        "${q.text}"
-                    </div>
+                <div class="passage-box mt-4"> <span class="text-xs font-bold text-gray-400 uppercase block mb-2 italic">Ngữ liệu tham khảo:</span>
+                    <div class="exam-content highlight-text font-normal text-justify">${q.text}</div>
                 </div>` : ''}
 
-                <div class="mt-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
-                    <div class="flex items-center gap-2 mb-2 text-blue-600">
-                        <i class="fas fa-lightbulb"></i> 
-                        <span class="text-xs font-bold uppercase">Gợi ý AI</span>
+                <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100 mt-6">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-lightbulb text-blue-500 text-sm"></i>
+                        <span class="text-xs font-black text-blue-600 uppercase tracking-widest">Gợi ý làm bài</span>
                     </div>
-                    <div class="text-sm text-blue-800 leading-relaxed">
-                        ${q.hint || "Hãy tập trung phân tích: Giải thích, Biểu hiện, Nguyên nhân, Ý nghĩa, Phản đề và Bài học liên hệ bản thân."}
-                    </div>
+                    <p class="text-sm text-blue-800 leading-relaxed italic font-normal text-justify">
+                        ${q.hint || "Phân tích các khía cạnh: Biểu hiện, Nguyên nhân, Ý nghĩa, Phản đề và Bài học."}
+                    </p>
                 </div>
             </div>`;
             
         promptFontSize = 17;
         document.querySelector('.prompt-body').style.fontSize = `17px`;
         setTimeout(setupHighlightEvent, 100);
-        startTimer();
+        startTimer(); 
     };
 
     // --- HIGHLIGHT (FIX DOM) ---
