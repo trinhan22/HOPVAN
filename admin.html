@@ -59,7 +59,7 @@
         /* --- NAVIGATION --- */
         .nav-item {
             display: flex; align-items: center; gap: 14px;
-            padding: 16px 24px; margin: 8px 16px; border-radius: 16px;
+            padding: 14px 24px; margin: 4px 16px; border-radius: 16px;
             color: #64748B; font-weight: 700; font-size: 0.95rem;
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             cursor: pointer; position: relative; overflow: hidden;
@@ -208,6 +208,9 @@
             <div class="px-6 mt-8 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Dữ Liệu</div>
             <div class="nav-item" onclick="switchView('history', this)">
                 <i class="fas fa-chart-line w-6"></i> Kết Quả Thi
+            </div>
+            <div class="nav-item" onclick="switchView('feedbacks', this)">
+                <i class="fas fa-comment-dots w-6"></i> Góp Ý & Phản Hồi
             </div>
         </nav>
 
@@ -514,6 +517,21 @@
                 </div>
             </div>
 
+<div id="view-feedbacks" class="view-section hidden">
+    <div class="glass-panel rounded-3xl p-8">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h3 class="font-black text-2xl text-gray-800">Hộp Thư Góp Ý</h3>
+                <p class="text-xs text-gray-400 font-bold mt-1 uppercase">Phản hồi từ người dùng</p>
+            </div>
+            <button onclick="loadFeedbacks()" class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 hover:rotate-180 transition"><i class="fas fa-sync"></i></button>
+        </div>
+        
+        <div id="feedback-list" class="grid grid-cols-1 gap-4">
+            </div>
+    </div>
+</div>
+
         </main>
     </div>
 
@@ -598,6 +616,7 @@
         if(viewId === 'journal') loadLevelsList();
         if(viewId === 'history') loadSubmissions();
         if(viewId === 'news') loadNews(currentNewsFilter);
+        if(viewId === 'feedbacks') loadFeedbacks();
     };
 
     window.closeModal = () => document.querySelector('.modal-overlay').classList.remove('show');
@@ -1220,6 +1239,72 @@
         } catch(e) { 
             console.error("Lỗi tải lịch sử:", e);
             tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-400">Lỗi tải dữ liệu: ${e.message}</td></tr>`; 
+        }
+    };
+
+// --- 7. QUẢN LÝ GÓP Ý (FEEDBACK LOGIC) ---
+    window.loadFeedbacks = async () => {
+        const container = document.getElementById('feedback-list');
+        container.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-orange-500 text-2xl"></i></div>';
+
+        try {
+            // Lấy dữ liệu từ collection 'feedbacks', sắp xếp mới nhất lên đầu
+            const q = query(collection(db, "feedbacks"), orderBy("timestamp", "desc"));
+            const snap = await getDocs(q);
+            
+            container.innerHTML = "";
+            if (snap.empty) {
+                container.innerHTML = '<div class="text-center py-10 text-gray-400 font-bold border-2 border-dashed border-gray-200 rounded-2xl">Chưa có góp ý nào.</div>';
+                return;
+            }
+
+            snap.forEach(d => {
+                const data = d.data();
+                const timeStr = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString('vi-VN') : 'N/A';
+                
+                // Tạo thẻ hiển thị từng góp ý
+                const div = document.createElement('div');
+                div.className = "bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition relative group";
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center font-bold text-sm">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-sm">${data.email || 'Ẩn danh'}</h4>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">${timeStr}</p>
+                            </div>
+                        </div>
+                        <button onclick="deleteFeedback('${d.id}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-400 hover:bg-red-500 hover:text-white flex items-center justify-center transition opacity-0 group-hover:opacity-100">
+                            <i class="fas fa-trash-alt text-xs"></i>
+                        </button>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-xl text-gray-700 text-sm leading-relaxed font-medium">
+                        "${data.content}"
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-400 font-mono">
+                        <i class="fas fa-link"></i> Gửi từ trang: <span class="text-blue-400 truncate max-w-[200px]">${data.page || 'N/A'}</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        } catch (e) {
+            console.error("Lỗi tải feedback:", e);
+            container.innerHTML = `<div class="text-center text-red-500 py-4">Lỗi: ${e.message}</div>`;
+        }
+    };
+
+    // Hàm xóa góp ý
+    window.deleteFeedback = async (id) => {
+        if(confirm("Bạn có chắc muốn xóa góp ý này không?")) {
+            try {
+                await deleteDoc(doc(db, "feedbacks", id));
+                showToast("Đã xóa góp ý!");
+                loadFeedbacks(); // Tải lại danh sách
+            } catch (e) {
+                alert("Lỗi xóa: " + e.message);
+            }
         }
     };
 
