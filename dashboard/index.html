@@ -656,17 +656,9 @@
     window.closeActivityModal = () => document.getElementById('activityFullModal').style.display = "none";
     window.closeStatsModal = () => document.getElementById('statsFullModal').style.display = "none";
 
-    // Load menu sidebar
-    fetch('menu.html').then(res => res.text()).then(html => {
-        const placeholder = document.getElementById('menu-placeholder');
-        placeholder.innerHTML = html;
-        const scripts = placeholder.querySelectorAll('script');
-        scripts.forEach(oldScript => {
-            const newScript = document.createElement('script');
-            newScript.text = oldScript.text;
-            document.body.appendChild(newScript);
-        });
-    }).catch(err => console.error("Lỗi tải menu:", err));
+    import { initMenu } from "./menu.js";
+    initMenu(app);
+
 </script>
 </body>
 </html>

@@ -292,27 +292,6 @@
                 }
             }
         };
-
-        fetch('menu.html')
-            .then(res => res.text())
-            .then(html => {
-                const ph = document.getElementById('menu-placeholder');
-                ph.innerHTML = html;
-                ph.querySelectorAll('script').forEach(s => eval(s.innerText));
-                
-                setTimeout(() => {
-                    const links = ph.querySelectorAll('.sb-link');
-                    links.forEach(l => {
-                        if(l.getAttribute('href') && l.getAttribute('href').includes('community')) l.classList.add('active');
-                        else l.classList.remove('active');
-                    });
-                }, 100);
-
-                document.addEventListener('request-logout', () => {
-                    if(confirm("Bạn muốn đăng xuất?")) window.dispatchEvent(new Event('perform-logout'));
-                });
-            })
-            .catch(err => console.error("Lỗi Menu:", err));
     </script>
 
 <script type="module">
@@ -375,27 +354,8 @@
             });
         }
 
-    fetch('menu.html')
-    .then(res => res.text())
-    .then(html => {
-        const placeholder = document.getElementById('menu-placeholder');
-        placeholder.innerHTML = html;
-        
-        // --- QUAN TRỌNG: Ép chạy lại script của menu ---
-        const scripts = placeholder.querySelectorAll('script');
-        scripts.forEach(oldScript => {
-            const newScript = document.createElement('script');
-            newScript.text = oldScript.text;
-            document.body.appendChild(newScript);
-        });
-
-        // --- BƯỚC QUYẾT ĐỊNH: Ra lệnh highlight mục Cộng đồng ---
-        setTimeout(() => {
-            if (typeof window.forceActiveMenu === 'function') {
-                window.forceActiveMenu('community');
-            }
-        }, 100); // Đợi 100ms để đảm bảo DOM đã render xong
-    });
+    import { initMenu } from "./menu.js";
+    initMenu(app);
     </script>
 </body>
 </html>

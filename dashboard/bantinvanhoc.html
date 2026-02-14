@@ -482,13 +482,8 @@
     loadData();
 
     // LOAD MENU
-    fetch('menu.html').then(r => r.text()).then(html => {
-        const ph = document.getElementById('menu-placeholder');
-        ph.innerHTML = html;
-        ph.querySelectorAll('script').forEach(s => {
-            const ns = document.createElement('script'); ns.text = s.text; document.body.appendChild(ns);
-        });
-    });
+    import { initMenu } from "./menu.js";
+    initMenu(app);
 
     window.addEventListener('trigger-firebase-signout', async () => { await signOut(auth); window.location.href = "../index.html"; });
 </script>

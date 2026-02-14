@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Level 1: Trắc Nghiệm Văn Học</title>
+    <title>Level 9: Trắc Nghiệm Văn Học</title>
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -256,7 +256,7 @@
         <div class="max-w-3xl mx-auto pb-20">
             <div class="liquid-glass p-8 mb-10 relative overflow-hidden bg-gradient-to-br from-white/80 to-white/40">
                 <div class="relative z-10">
-                    <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Level 1</span>
+                    <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Level 9</span>
                     <h1 class="text-4xl font-black text-gray-800 mt-4 mb-2">Trắc Nghiệm Văn Học</h1>
                     <p class="text-gray-500 font-medium">Trả lời đúng tối thiểu <span class="text-orange-600 font-bold">60%</span> để mở khóa màn tiếp theo.</p>
                 </div>
@@ -287,7 +287,7 @@
                 </div>
                 
                 <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onclick="nextLevel()" id="next-btn" class="hidden w-full sm:w-auto bg-green-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-600 transition shadow-lg shadow-green-200">Mở Khóa Level 2 <i class="fas fa-lock-open ml-2"></i></button>
+                    <button onclick="nextLevel()" id="next-btn" class="hidden w-full sm:w-auto bg-green-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-600 transition shadow-lg shadow-green-200">Mở Khóa Level 10 <i class="fas fa-lock-open ml-2"></i></button>
                     <button onclick="location.reload()" id="retry-btn" class="hidden w-full sm:w-auto bg-gray-100 text-gray-600 px-8 py-3 rounded-xl font-bold hover:bg-gray-200 transition">Làm Lại Bài <i class="fas fa-redo ml-2"></i></button>
                 </div>
             </div>
@@ -358,11 +358,11 @@
         
         try {
             // Lấy tất cả các doc có level == 1 và type == 'tracnghiem'
-            const q = query(collection(db, "study_levels"), where("level", "==", 1), where("type", "==", "tracnghiem"));
+            const q = query(collection(db, "study_levels"), where("level", "==", 9), where("type", "==", "tracnghiem"));
             const snap = await getDocs(q);
 
             if (snap.empty) {
-                form.innerHTML = '<p class="text-center text-red-500 font-black py-20 bg-white rounded-3xl">Chưa tạo nội dung cho Level 1</p>';
+                form.innerHTML = '<p class="text-center text-red-500 font-black py-20 bg-white rounded-3xl">Chưa tạo nội dung cho Level 9</p>';
                 return;
             }
 
@@ -448,15 +448,15 @@
                 await addDoc(collection(db, "activities"), {
                     uid: userUid,
                     userName: auth.currentUser.displayName || "User", 
-                    examTitle: "Trắc nghiệm Level 1",
-                    action: `Vượt ải Level 1: ${totalScore} điểm`,
+                    examTitle: "Trắc nghiệm Level 9",
+                    action: `Vượt ải Level 9: ${totalScore} điểm`,
                     type: "journal",
                     score: totalScore,
                     timestamp: serverTimestamp()
                 });
                 if(pass) {
                     const userRef = doc(db, "users_progress", userUid);
-                    await setDoc(userRef, { currentLevel: 2, lastPassed: serverTimestamp() }, { merge: true });
+                    await setDoc(userRef, { currentLevel: 10, lastPassed: serverTimestamp() }, { merge: true });
                 }
             } catch (e) { console.error("Firebase Error:", e); }
         }

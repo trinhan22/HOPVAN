@@ -257,10 +257,26 @@
     const db = getFirestore(app);
 
     const courseMap = [
-        { id: 1, title: 'Trắc Nghiệm' }, { id: 2, title: 'Đọc Hiểu' },
-        { id: 3, title: 'NLXH' }, { id: 4, title: 'NLVH' },
-        { id: 5, title: 'Trắc Nghiệm' }, { id: 6, title: 'Đọc Hiểu' },
-        { id: 7, title: 'NLXH' }, { id: 8   , title: 'NLVH' }
+        { id: 1, title: 'Trắc Nghiệm' }, 
+        { id: 2, title: 'Đọc Hiểu' },
+        { id: 3, title: 'NLXH' }, 
+        { id: 4, title: 'NLVH' },
+        { id: 5, title: 'Trắc Nghiệm' }, 
+        { id: 6, title: 'Đọc Hiểu' },
+        { id: 7, title: 'NLXH' }, 
+        { id: 8, title: 'NLVH' },
+        { id: 9, title: 'Trắc Nghiệm' }, 
+        { id: 10, title: 'Đọc Hiểu' },
+        { id: 11, title: 'NLXH' }, 
+        { id: 12, title: 'NLVH' },
+        { id: 13, title: 'Trắc Nghiệm' }, 
+        { id: 14, title: 'Đọc Hiểu' },
+        { id: 15, title: 'NLXH' }, 
+        { id: 16, title: 'NLVH' },
+        { id: 17, title: 'Trắc Nghiệm' }, 
+        { id: 18, title: 'Đọc Hiểu' },
+        { id: 19, title: 'NLXH' }, 
+        { id: 20, title: 'NLVH' }
     ];
 
     // --- LOGIC SIDEBAR TOGGLE (MỚI) ---
@@ -415,28 +431,9 @@
     }
 
     // Nạp Menu
-    fetch('menu.html')
-        .then(res => res.text())
-        .then(html => {
-            const placeholder = document.getElementById('menu-placeholder');
-            placeholder.innerHTML = html;
-            const scripts = placeholder.querySelectorAll('script');
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement('script');
-                newScript.text = oldScript.text; 
-                document.body.appendChild(newScript); 
-            });
-            
-            // Highlight menu item
-            setTimeout(() => {
-                const links = placeholder.querySelectorAll('.sb-link');
-                links.forEach(l => {
-                    if(l.getAttribute('href') && l.getAttribute('href').includes('nhatkyhoctap')) l.classList.add('active');
-                    else l.classList.remove('active');
-                });
-            }, 100);
-        })
-        .catch(err => console.error("Lỗi tải menu:", err));
+    import { initMenu } from "./menu.js";
+    initMenu(app);
+
 
     window.addEventListener('resize', drawCurvedPath);
 </script>

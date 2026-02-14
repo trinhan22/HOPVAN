@@ -369,7 +369,7 @@
             const q = query(collection(db, "study_levels"), where("level", "==", 3));
             const snap = await getDocs(q);
             if (snap.empty) {
-                document.getElementById('display-topic').innerText = "Level 3 chưa được thiết lập!";
+                document.getElementById('display-topic').innerText = "Chưa tạo nội dung cho Level 3";
                 return;
             }
             

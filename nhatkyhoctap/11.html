@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Level 4: Nghị Luận Văn Học</title>
+    <title>Level 11: Nghị Luận Xã Hội</title>
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -32,11 +32,11 @@
             padding: 20px; 
             min-height: 100vh; 
             position: relative; 
-            max-width: 850px; 
+            max-width: 850px; /* Nội dung gọn gàng ở giữa */
             margin: 0 auto;
         }
 
-        /* --- GLASS STYLES --- */
+        /* --- GLASS UI --- */
         .glass-header {
             background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 4px 30px rgba(0,0,0,0.05);
@@ -66,10 +66,10 @@
         .quote-box p { margin-bottom: 0.5rem; }
         .quote-box strong { font-weight: 700; color: #1f2937; }
 
-        /* Topic Display */
+        /* Đề bài: Font thường, căn đều */
         #display-topic {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 500; 
+            font-weight: 500; /* Vừa phải, không đậm */
             color: #1e293b;
             font-size: 1.1rem;
             line-height: 1.6;
@@ -78,7 +78,7 @@
         #display-topic strong { font-weight: 600; }
 
         .glass-textarea {
-            width: 100%; height: 500px; /* Cao hơn lv3 vì bài viết dài hơn */
+            width: 100%; height: 450px;
             background: #FFFFFF !important;
             border: 1px solid #cbd5e1;
             border-radius: 20px; padding: 25px;
@@ -143,6 +143,43 @@
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         @media (max-width: 1024px) { .main-content { padding: 16px; } }
+
+
+/* --- GLOBAL SCROLLBAR STYLE --- */
+
+/* 1. Thiết lập độ rộng/cao của thanh trượt */
+::-webkit-scrollbar {
+    width: 10px;  /* Độ rộng cho thanh dọc */
+    height: 10px; /* Độ cao cho thanh ngang */
+}
+
+/* 2. Thiết lập rãnh trượt (Track) - Nền chìm */
+::-webkit-scrollbar-track {
+    background: rgba(255, 143, 80, 0.05); /* Màu cam cực nhạt, gần như trong suốt */
+    border-radius: 10px;
+}
+
+/* 3. Thiết lập tay nắm (Thumb) - Phần di chuyển */
+::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 143, 80, 0.3); /* Mặc định là cam nhạt */
+    border-radius: 10px; /* Bo tròn mềm mại */
+    
+    /* Mẹo: Tạo viền trong suốt để thanh trượt trông nhỏ hơn và "lơ lửng" */
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: background-color 0.3s ease;
+}
+
+/* 4. Hiệu ứng khi di chuột vào (Hover) */
+::-webkit-scrollbar-thumb:hover {
+    background-color: #FF8F50; /* Đổi sang màu cam chính thương hiệu */
+    border: 1px solid transparent; /* Làm thanh trượt to ra một chút khi hover */
+}
+
+/* 5. (Tùy chọn) Ẩn nút mũi tên 2 đầu (nếu trình duyệt hiển thị) */
+::-webkit-scrollbar-button {
+    display: none;
+}
     </style>
 </head>
 <body>
@@ -178,7 +215,7 @@
                 <div class="flex items-center gap-4">
                     <div class="text-right hidden sm:block">
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Thời gian còn lại</p>
-                        <p class="text-base font-black text-gray-800" id="timer-text">60 phút 00 giây</p>
+                        <p class="text-base font-black text-gray-800" id="timer-text">60:00</p>
                     </div>
                     <div class="w-12 h-12 rounded-full flex items-center justify-center shadow-lg relative overflow-hidden bg-white">
                         <svg class="w-10 h-10 absolute" viewBox="0 0 36 36">
@@ -192,13 +229,13 @@
         </div>
 
         <div class="max-w-3xl mx-auto pb-20">
-            <div class="liquid-glass p-8 mb-8 relative overflow-hidden bg-gradient-to-br from-white/80 to-white/40">
+            <div class="liquid-glass p-8 mb-8 relative overflow-hidden bg-gradient-to-br from-white/90 to-white/60">
                 <div class="relative z-10">
-                    <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Level 4</span>
-                    <h1 class="text-3xl font-bold text-gray-800 mt-3 mb-2">Nghị Luận Văn Học</h1>
-                    <p class="text-gray-500 font-medium text-sm">Phân tích tác phẩm. Đạt <span class="text-orange-600 font-bold">6.0 điểm</span> để hoàn thành.</p>
+                    <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/30">Level 11</span>
+                    <h1 class="text-3xl font-bold text-gray-800 mt-3 mb-2">Nghị Luận Xã Hội</h1>
+                    <p class="text-gray-500 font-medium text-sm">Viết đoạn văn 200 chữ. Đạt tối thiểu <span class="text-orange-600 font-bold">6.0 điểm</span> để qua màn.</p>
                 </div>
-                <i class="fas fa-book-reader absolute -right-6 -bottom-8 text-8xl text-orange-500/10 rotate-12"></i>
+                <i class="fas fa-pen-nib absolute -right-6 -bottom-8 text-8xl text-orange-500/10 rotate-12"></i>
             </div>
 
             <div class="liquid-glass p-8 md:p-10 mb-8 bg-white border border-orange-100">
@@ -217,11 +254,11 @@
 
                 <p class="text-gray-600 mb-6 text-sm flex items-center gap-2">
                     <i class="fas fa-info-circle text-blue-400"></i>
-                    <span>Yêu cầu: Phân tích sâu sắc về nội dung và nghệ thuật của tác phẩm/đoạn trích trên.</span>
+                    <span>Yêu cầu: Viết một đoạn văn (khoảng 200 chữ) trình bày suy nghĩ của anh/chị về vấn đề trên.</span>
                 </p>
 
                 <div class="relative">
-                    <textarea id="student-essay" class="glass-textarea" placeholder="Bắt đầu viết bài phân tích của bạn tại đây... (Tối thiểu 100 từ)"></textarea>
+                    <textarea id="student-essay" class="glass-textarea" placeholder="Bắt đầu viết đoạn văn của bạn tại đây... (Tối thiểu 50 từ)"></textarea>
                     <div class="absolute bottom-4 right-6 text-xs font-bold text-gray-400 bg-white/90 px-3 py-1 rounded-full border border-gray-200 backdrop-blur-sm">
                         <span id="word-count" class="text-orange-500">0</span> từ
                     </div>
@@ -245,16 +282,16 @@
                     </div>
                     <div class="text-center md:text-left mt-6 md:mt-0 md:ml-8 flex-1">
                         <h3 class="text-2xl font-bold text-gray-800 mb-2" id="result-title">Đang chấm...</h3>
-                        <p class="text-gray-500 text-sm italic" id="result-desc">Giáo viên AI đang đọc bài của bạn...</p>
+                        <p class="text-gray-500 text-sm italic" id="result-desc">AI đang đọc bài của bạn...</p>
                     </div>
                 </div>
 
                 <div class="space-y-8">
                     <div>
                         <h4 class="font-bold text-gray-700 uppercase text-xs tracking-widest mb-4 flex items-center gap-2">
-                            <i class="fas fa-highlighter text-orange-500"></i> Nhận xét chi tiết
+                            <i class="fas fa-highlighter text-orange-500"></i> Nhận xét chi tiết từ AI
                         </h4>
-                        <div id="ai-correction" class="bg-gray-50/80 p-6 rounded-2xl border border-gray-200 text-gray-700 text-base shadow-inner"></div>
+                        <div id="ai-correction" class="bg-gray-50/80 p-6 rounded-2xl border border-gray-200 text-gray-700 text-base shadow-inner leading-relaxed font-serif"></div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -270,7 +307,7 @@
                 </div>
 
                 <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onclick="nextLevel()" id="next-btn" class="hidden w-full sm:w-auto bg-green-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-600 transition shadow-lg shadow-green-200">Mở Khóa Level 5 <i class="fas fa-lock-open ml-2"></i></button>
+                    <button onclick="nextLevel()" id="next-btn" class="hidden w-full sm:w-auto bg-green-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-600 transition shadow-lg shadow-green-200">Mở Khóa Level 12 <i class="fas fa-lock-open ml-2"></i></button>
                     <button onclick="location.reload()" id="retry-btn" class="hidden w-full sm:w-auto bg-gray-100 text-gray-600 px-8 py-3 rounded-xl font-bold hover:bg-gray-200 transition">Làm Lại Bài <i class="fas fa-redo ml-2"></i></button>
                 </div>
             </div>
@@ -280,7 +317,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
@@ -322,17 +359,17 @@
     };
 
     onAuthStateChanged(auth, (u) => {
-        if (u) { userUid = u.uid; initLevel4(); }
+        if (u) { userUid = u.uid; initLevel3(); }
         else { showPopup('info', 'Yêu cầu đăng nhập', 'Bạn cần đăng nhập để thực hiện thử thách.', () => window.location.href = "../log.html"); }
     });
 
-    // --- 1. TẢI ĐỀ LEVEL 4 ---
-    async function initLevel4() {
+    // --- 1. TẢI ĐỀ LEVEL 3 ---
+    async function initLevel3() {
         try {
-            const q = query(collection(db, "study_levels"), where("level", "==", 4));
+            const q = query(collection(db, "study_levels"), where("level", "==", 11));
             const snap = await getDocs(q);
             if (snap.empty) {
-                document.getElementById('display-topic').innerText = "Chưa tạo nội dung cho Level 4";
+                document.getElementById('display-topic').innerText = "Chưa tạo nội dung cho Level 11";
                 return;
             }
             
@@ -355,7 +392,7 @@
         const content = document.getElementById('student-essay').value.trim();
         const words = content.split(/\s+/).filter(x => x).length;
 
-        if (words < 100) return showPopup('warning', 'Bài viết quá ngắn', 'Bạn cần viết ít nhất 100 từ để đảm bảo chiều sâu phân tích.');
+        if (words < 50) return showPopup('warning', 'Bài viết quá ngắn', 'Bạn cần viết ít nhất 50 từ để AI có thể phân tích nội dung.');
         showPopup('warning', 'Xác nhận nộp bài', 'Bài làm sẽ được AI chấm điểm chi tiết.', handleRealSubmit);
     };
 
@@ -363,20 +400,19 @@
         const content = document.getElementById('student-essay').value.trim();
         document.getElementById('loading-overlay').style.display = 'flex';
 
-        // PROMPT CHUYÊN DỤNG CHO NLVH (GROQ/LLAMA-3)
+        // PROMPT CHUYÊN DỤNG CHO NLXH (GROQ/LLAMA-3)
         const systemPrompt = `
-        BẠN LÀ: Giám khảo chấm thi THPT Quốc Gia môn Ngữ Văn (Phần Nghị Luận Văn Học).
-        NHIỆM VỤ: Chấm điểm bài làm phân tích tác phẩm văn học.
+        BẠN LÀ: Giám khảo chấm thi THPT Quốc Gia môn Ngữ Văn (Phần Nghị Luận Xã Hội).
+        NHIỆM VỤ: Chấm điểm đoạn văn 200 chữ của học sinh.
         
         ĐỀ BÀI: "${document.getElementById('display-topic').innerText}"
-        NGỮ LIỆU TÁC PHẨM: "${document.getElementById('display-quote').innerText}"
+        NGỮ LIỆU GỢI Ý: "${document.getElementById('display-quote').innerText}"
         GỢI Ý CHẤM (HINT): "${levelData.hint || ''}"
 
         TIÊU CHÍ CHẤM (Thang 10):
-        1. Hiểu đúng tác phẩm, vấn đề nghị luận (2.0đ).
-        2. Phân tích sâu sắc nội dung & nghệ thuật (4.0đ).
-        3. Dẫn chứng phù hợp, lập luận chặt chẽ (2.0đ).
-        4. Sáng tạo, văn phong cảm xúc (2.0đ).
+        1. Đúng vấn đề, đúng hình thức đoạn văn (không xuống dòng).
+        2. Lập luận chặt chẽ, dẫn chứng thuyết phục.
+        3. Phản biện sắc sảo, liên hệ bản thân tốt.
 
         YÊU CẦU OUTPUT JSON DUY NHẤT (KHÔNG MARKDOWN):
         {
@@ -390,13 +426,13 @@
         `;
 
         try {
-            // --- GỬI API CHUẨN (Tách System Prompt & Messages) ---
+            // GỬI SANG PROXY (Chuẩn Messages + Tách System Prompt)
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    systemPrompt: systemPrompt,  // Gửi riêng cho Proxy
-                    messages: `BÀI LÀM CỦA HỌC SINH:\n${content}` // Gửi riêng
+                    systemPrompt: systemPrompt,  // Gửi riêng
+                    messages: `BÀI LÀM CỦA HỌC SINH:\n${content}`
                 })
             });
 
@@ -410,7 +446,7 @@
             }
 
             let rawText = data.choices[0].message.content;
-            // Làm sạch JSON (Xóa markdown ```json ... ```)
+            // Làm sạch JSON
             rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
             const firstBrace = rawText.indexOf('{');
             const lastBrace = rawText.lastIndexOf('}');
@@ -430,7 +466,7 @@
             let safeScore = parseFloat(res.score);
             if (isNaN(safeScore)) safeScore = 0;
             if (safeScore > 10) safeScore = 10;
-            res.score = safeScore; // Gán lại giá trị chuẩn vào object
+            res.score = safeScore; // Gán lại giá trị chuẩn
 
             // Hiển thị kết quả
             renderResult(res);
@@ -440,16 +476,16 @@
                 await addDoc(collection(db, "activities"), { 
                     uid: userUid, 
                     userName: auth.currentUser.displayName || "User",
-                    examTitle: "NLVH Level 4",
-                    action: `Level 4: ${safeScore} điểm`, 
+                    examTitle: "NLXH Level 11",
+                    action: `Level 11: ${safeScore} điểm`, 
                     type: "journal",
                     score: safeScore, 
                     timestamp: serverTimestamp() 
                 });
                 
-                // Hoàn thành Level 4 -> Coi như xong khóa cơ bản (Level 5)
+                // Mở khóa level 4 nếu điểm >= 6
                 if (safeScore >= 6) {
-                    await setDoc(doc(db, "users_progress", userUid), { currentLevel: 5, lastPassed: serverTimestamp() }, { merge: true });
+                    await setDoc(doc(db, "users_progress", userUid), { currentLevel: 12, lastPassed: serverTimestamp() }, { merge: true });
                 }
             }
         } catch (e) { 
@@ -491,8 +527,8 @@
 
     window.nextLevel = () => window.location.href = "../dashboard/nhatkyhoctap.html";
 
-    // Timer (90 mins)
-    let totalSeconds = 5400; 
+    // Timer (60 mins)
+    let totalSeconds = 3600; 
     const timerText = document.getElementById('timer-text');
     const timerMini = document.getElementById('timer-mini');
     const timerCircle = document.getElementById('timer-circle');
@@ -504,7 +540,7 @@
             const s = totalSeconds % 60;
             timerText.innerText = `${m}:${s<10?'0'+s:s}`;
             timerMini.innerText = m;
-            const pct = (totalSeconds / 5400) * 100;
+            const pct = (totalSeconds / 3600) * 100;
             timerCircle.setAttribute('stroke-dasharray', `${pct}, 100`);
         } else {
             clearInterval(interval);
