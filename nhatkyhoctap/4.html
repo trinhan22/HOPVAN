@@ -287,7 +287,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const API_URL = `/.netlify/functions/gemini-proxy`; // Sử dụng Logic Groq trong Proxy
+    const API_URL = `/.netlify/functions/gemini-proxy`; // Logic Groq
     let userUid = null;
     let levelData = null; 
 
@@ -339,10 +339,8 @@
             const docData = snap.docs[0].data();
             levelData = docData.content; 
 
-            // Hiển thị đề bài
             document.getElementById('display-topic').innerHTML = levelData.topic;
             
-            // Hiển thị ngữ liệu nếu có
             if (levelData.text && levelData.text.trim() !== "") {
                 const quoteBox = document.getElementById('display-quote');
                 quoteBox.innerHTML = levelData.text;
@@ -368,16 +366,17 @@
         // PROMPT CHUYÊN DỤNG CHO NLVH (GROQ/LLAMA-3)
         const systemPrompt = `
         BẠN LÀ: Giám khảo chấm thi THPT Quốc Gia môn Ngữ Văn (Phần Nghị Luận Văn Học).
-        NHIỆM VỤ: Chấm điểm bài làm phân tích tác phẩm văn học của học sinh.
+        NHIỆM VỤ: Chấm điểm bài làm phân tích tác phẩm văn học.
         
         ĐỀ BÀI: "${document.getElementById('display-topic').innerText}"
         NGỮ LIỆU TÁC PHẨM: "${document.getElementById('display-quote').innerText}"
         GỢI Ý CHẤM (HINT): "${levelData.hint || ''}"
 
         TIÊU CHÍ CHẤM (Thang 10):
-        1. Hiểu đúng tác phẩm, vấn đề nghị luận.
-        2. Phân tích sâu sắc (nội dung & nghệ thuật).
-        3. Dẫn chứng phù hợp, văn phong cảm xúc.
+        1. Hiểu đúng tác phẩm, vấn đề nghị luận (2.0đ).
+        2. Phân tích sâu sắc nội dung & nghệ thuật (4.0đ).
+        3. Dẫn chứng phù hợp, lập luận chặt chẽ (2.0đ).
+        4. Sáng tạo, văn phong cảm xúc (2.0đ).
 
         YÊU CẦU OUTPUT JSON DUY NHẤT (KHÔNG MARKDOWN):
         {
@@ -391,17 +390,17 @@
         `;
 
         try {
-            // GỬI SANG PROXY (Chuẩn Messages + Tách System Prompt)
+            // --- GỬI API CHUẨN (Tách System Prompt & Messages) ---
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    systemPrompt: systemPrompt,  // Gửi riêng
-                    messages: `BÀI LÀM CỦA HỌC SINH:\n${content}`
+                    systemPrompt: systemPrompt,  // Gửi riêng cho Proxy
+                    messages: `BÀI LÀM CỦA HỌC SINH:\n${content}` // Gửi riêng
                 })
             });
 
-            if (!res.ok) throw new Error("SERVER_ERROR");
+            if (!response.ok) throw new Error("SERVER_ERROR");
 
             const data = await response.json();
             
@@ -411,7 +410,7 @@
             }
 
             let rawText = data.choices[0].message.content;
-            // Làm sạch JSON
+            // Làm sạch JSON (Xóa markdown ```json ... ```)
             rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
             const firstBrace = rawText.indexOf('{');
             const lastBrace = rawText.lastIndexOf('}');
@@ -431,7 +430,7 @@
             let safeScore = parseFloat(res.score);
             if (isNaN(safeScore)) safeScore = 0;
             if (safeScore > 10) safeScore = 10;
-            res.score = safeScore; // Gán lại giá trị chuẩn
+            res.score = safeScore; // Gán lại giá trị chuẩn vào object
 
             // Hiển thị kết quả
             renderResult(res);
@@ -448,7 +447,7 @@
                     timestamp: serverTimestamp() 
                 });
                 
-                // Mở khóa level 5 hoặc hoàn thành khóa học nếu điểm >= 6
+                // Hoàn thành Level 4 -> Coi như xong khóa cơ bản (Level 5)
                 if (safeScore >= 6) {
                     await setDoc(doc(db, "users_progress", userUid), { currentLevel: 5, lastPassed: serverTimestamp() }, { merge: true });
                 }
@@ -492,8 +491,8 @@
 
     window.nextLevel = () => window.location.href = "../dashboard/nhatkyhoctap.html";
 
-    // Timer (60 mins)
-    let totalSeconds = 3600; 
+    // Timer (90 mins)
+    let totalSeconds = 5400; 
     const timerText = document.getElementById('timer-text');
     const timerMini = document.getElementById('timer-mini');
     const timerCircle = document.getElementById('timer-circle');
