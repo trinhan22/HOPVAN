@@ -6,7 +6,7 @@ const menuStyles = `
 <style>
 
     :root {
-        --sb-w: 270px;
+        --sb-w: 280px;
         --sb-primary: #FF8F50;
         --sb-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
         --sb-glass: rgba(255, 255, 255, 0.85);
@@ -18,19 +18,75 @@ const menuStyles = `
         width: var(--sb-w); height: 100vh;
         background: var(--sb-glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
         border-right: var(--sb-border); box-shadow: var(--sb-shadow);
-        display: flex; flex-direction: column; padding: 30px 20px;
+        display: flex; flex-direction: column; padding: 0; /* Để logo-link tự quản lý padding */
         position: fixed; top: 0; left: 0; z-index: 9999;
         font-family: 'Plus Jakarta Sans', sans-serif;
         transition: transform 0.3s ease;
     }
 
-    /* Logo */
-    .sb-logo { display: flex; align-items: center; gap: 14px; margin-bottom: 40px; padding-left: 10px; text-decoration: none; }
-    .sb-logo img { width: 42px; filter: drop-shadow(0 4px 6px rgba(255,143,80,0.3)); }
-    .sb-logo span { font-size: 1.5rem; font-weight: 900; background: var(--sb-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    /* --- LOGO CHUYỂN HÓA (ĐÃ FIX KÍCH THƯỚC & VỊ TRÍ) --- */
+    .sb-logo-link {
+        padding: 35px 35px 30px; /* Vị trí logo thoáng đãng */
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
 
-    /* Menu List */
-    .sb-list { list-style: none; padding: 0; margin: 0; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    /* Hộp trắng chứa icon */
+    .logo-card-box {
+        width: 52px; 
+        height: 52px;
+        background: white;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px rgba(255, 143, 80, 0.15);
+        border: 1px solid rgba(255, 143, 80, 0.1);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .logo-card-box img {
+        width: 42px; 
+        height: 42px;
+        object-fit: contain;
+    }
+
+    /* Chữ HOPVAN mặc định là Gradient */
+    .sb-logo-link h1 {
+        font-size: 1.5rem;
+        font-weight: 900;
+        line-height: 1;
+        margin: 0;
+        background: var(--sb-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        transition: all 0.3s ease;
+        letter-spacing: -0.5px;
+    }
+
+    /* KHI HOVER: Chữ đổi sang màu CAM chuẩn */
+    .sb-logo-link:hover h1 {
+        background: none; /* Tắt gradient */
+        -webkit-text-fill-color: #FF8F50; /* Hiện màu Cam chuẩn */
+        color: #FF8F50;
+        transition: all 0.3s ease;
+    }
+
+    .sb-logo-link:hover {
+        opacity: 0.9;
+    }
+
+    .sb-logo-link:hover .logo-card-box {
+        transform: scale(1.05); /* Phóng to nhẹ */
+        box-shadow: 0 15px 35px rgba(255, 143, 80, 0.25); /* Bóng đổ nổi bật hơn */
+        border-color: rgba(255, 143, 80, 0.3);
+    }
+
+    /* Các phần menu list giữ nguyên từ code trước của bạn... */
+    .sb-list { list-style: none; padding: 0 15px; margin: 0; flex: 1; display: flex; flex-direction: column; gap: 8px; }
     .sb-link {
         display: flex; align-items: center; gap: 16px; padding: 14px 18px;
         border-radius: 16px; color: #64748b; font-weight: 700; font-size: 0.95rem;
@@ -39,19 +95,11 @@ const menuStyles = `
     .sb-link:hover { background: #fff7ed; color: var(--sb-primary); transform: translateX(5px); }
     .sb-link.active { background: var(--sb-gradient); color: white !important; box-shadow: 0 8px 20px rgba(255, 94, 98, 0.25); }
 
-    /* Footer Buttons */
-    .sb-footer { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px; }
-    
-    .menu-btn {
-        width: 100%; padding: 12px; border-radius: 14px; font-weight: 700; cursor: pointer;
-        display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.9rem;
-        transition: 0.2s; border: none; font-family: inherit;
-    }
+    .sb-footer { padding: 20px; border-top: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 12px; }
+    .menu-btn { width: 100%; padding: 12px; border-radius: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.9rem; transition: 0.2s; border: none; font-family: inherit; }
     .btn-feedback { background: white; border: 1.5px solid #fed7aa; color: #f97316; }
-    .btn-feedback:hover { background: #fff7ed; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(249, 115, 22, 0.1); }
     .btn-logout { background: #fef2f2; color: #ef4444; }
-    .btn-logout:hover { background: #fee2e2; transform: translateY(-2px); }
-
+    
     /* Modal Overlay */
     .menu-modal-overlay {
         position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px);
@@ -86,10 +134,15 @@ const menuStyles = `
 const menuHTML = `
 
 <aside class="sidebar-comp" id="main-sidebar">
-    <a href="../index.html" class="sb-logo">
-        <img src="../LOGO.WEBP" alt="Logo">
-        <span>HOPVAN</span>
+    <a href="../index.html" class="sb-logo-link group">
+        <div class="logo-card-box shadow-lg">
+            <img src="../LOGO.WEBP" alt="HopVan Logo" class="drop-shadow-md">
+        </div>
+        <div>
+            <h1 class="block">HOPVAN</h1>
+        </div>
     </a>
+
     <nav class="sb-list">
         <a href="index.html" class="sb-link" data-page="index"><i class="fas fa-home"></i> Tổng quan</a>
         <a href="phongluyende.html" class="sb-link" data-page="phongluyende"><i class="fas fa-pen-nib"></i> Phòng luyện đề</a>
