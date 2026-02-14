@@ -364,96 +364,129 @@
             </div>`;
     }
 
-    // --- 2. HÀM NỘP BÀI (GROQ VERSION - FIXED JSON) ---
+// --- 2. HÀM NỘP BÀI (PHIÊN BẢN GỠ LỖI & HIỂN THỊ CHI TIẾT) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
-        if(content.split(/\s+/).filter(x => x).length < 20) { 
-            document.getElementById('short-essay-popup').style.display = 'flex'; return; 
+        
+        // 1. Kiểm tra độ dài
+        if(content.split(/\s+/).filter(x => x).length < 50) { 
+            document.getElementById('short-essay-popup').style.display = 'flex'; 
+            return; 
         }
 
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex';
         
-        const q = window.currentExamData;
-        if (!q) {
-            showPopup("Lỗi", "Vui lòng reload trang và thử lại.", "error");
-            loading.style.display = 'none';
-            return;
-        }
-        
-        // PROMPT CHUẨN HÓA JSON OUTPUT
-        const systemPrompt = `
-        BẠN LÀ: Giám khảo chấm thi ĐỌC HIỂU THPT Quốc gia (Chuyên gia ngôn ngữ).
-        NHIỆM VỤ: Chấm điểm bài làm của học sinh dựa trên ngữ liệu và câu hỏi đã cho.
-
-        THÔNG TIN ĐỀ:
-        - Văn bản: "${(q.text || '').replace(/"/g, "'")}"
-        - Câu hỏi: ${JSON.stringify(q.questions)}
-
-        TIÊU CHÍ CHẤM (Thang 4.0):
-        1. Trả lời đúng trọng tâm. Sai thuật ngữ = 0 điểm.
-        2. Mỗi câu hỏi nhỏ có điểm riêng. Tổng điểm max là 4.0.
-
-        YÊU CẦU OUTPUT JSON DUY NHẤT (KHÔNG MARKDOWN):
-        {
-            "human_score": (int 0-100),
-            "ai_comment": "Nhận xét ngắn về văn phong.",
-            "score": (float thang 10, để lưu database),
-            "reading_score": (float thang 4.0, để hiển thị),
-            "detailed_breakdown": "Chuỗi text mô tả điểm từng câu (VD: C1: 0.5, C2: 1.0...)",
-            "type_detected": "Đọc Hiểu Văn Bản",
-            "general_comment": "Lời phê tổng quát.",
-            "strengths": ["Ưu điểm 1", "Ưu điểm 2"],
-            "weaknesses": ["Lỗi sai 1", "Lỗi sai 2"],
-            "correction_html": "Bài làm gốc kèm thẻ <span class='text-bad'>[Sai]</span> <span class='text-fix'>(Đáp án: ...)</span>.",
-            "orientation": "Lời khuyên để làm tốt dạng bài này lần sau."
-        }
-        `;
-
         try {
-            // GỬI SANG PROXY (Chuẩn Messages)
+            // 2. Lấy dữ liệu đề bài
+            const q = window.currentExamData;
+            
+            if (!q || !q.id) {
+                throw new Error("DATA_MISSING");
+            }
+            
+            // 3. Chuẩn bị Prompt (Cực kỳ chi tiết cho Groq)
+            const systemPrompt = `
+            BẠN LÀ: Giám khảo chấm thi THPT Quốc gia (Chuyên môn cao).
+            NHIỆM VỤ: Chấm bài làm của học sinh dựa trên đề bài được cung cấp.
+
+            THÔNG TIN ĐỀ BÀI:
+            - Loại đề: ${q.type}
+            - Yêu cầu: "${(q.topic || q.title || '').replace(/"/g, "'")}"
+            - Ngữ liệu: "${(q.text || "Không có").replace(/"/g, "'")}"
+            - Gợi ý chấm: "${(q.hint || '').replace(/"/g, "'")}"
+
+            TIÊU CHÍ CHẤM ĐIỂM (Thang 10):
+            1. Điểm nội dung (6.0): Hiểu đúng đề, phân tích sâu, ý tưởng sáng tạo.
+            2. Điểm hình thức (2.0): Bố cục rõ ràng, diễn đạt mạch lạc.
+            3. Điểm sáng tạo/cảm xúc (2.0): Văn phong có cảm xúc, dẫn chứng hay.
+
+            YÊU CẦU TRẢ VỀ JSON DUY NHẤT (KHÔNG MARKDOWN, KHÔNG GIẢI THÍCH):
+            {
+                "human_score": (int 0-100 đánh giá độ tự nhiên của văn phong),
+                "ai_comment": "Nhận xét ngắn về văn phong (có giống AI viết không).",
+                "score": (float thang 10, lẻ 0.25),
+                "type_detected": "NLXH hoặc NLVH hoặc Đọc Hiểu",
+                "general_comment": "Lời phê tổng quát của giáo viên.",
+                "strengths": ["Điểm mạnh 1", "Điểm mạnh 2"],
+                "weaknesses": ["Điểm yếu 1", "Điểm yếu 2"],
+                "correction_html": "Trích đoạn bài làm gốc và chèn thêm thẻ: <span class='text-bad'>[Lỗi]</span> <span class='text-fix'>(Sửa thành...)</span> hoặc <span class='text-good'>[Hay]</span> vào những chỗ cần thiết.",
+                "orientation": "Lời khuyên định hướng tư duy."
+            }
+            `;
+
+            // 4. Gửi Request (Cấu trúc khớp 100% với file Proxy bạn cung cấp)
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ 
-                    systemPrompt: systemPrompt, 
-                    messages: `BÀI LÀM CỦA HỌC SINH:\n${content}`
+                    systemPrompt: systemPrompt, // Gửi riêng
+                    messages: `BÀI LÀM CỦA HỌC SINH:\n${content}` // Gửi riêng
                 }) 
             });
 
-            if (!res.ok) throw new Error("SERVER_ERROR");
+            // 5. Xử lý lỗi từ Server (Quan trọng)
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({})); // Cố đọc JSON lỗi
+                const errorMessage = errorData.error || res.statusText || "Server Error";
+                console.error("Lỗi Server:", errorMessage);
+                
+                if (errorMessage.includes("GROQ_API_KEY")) {
+                    throw new Error("MISSING_API_KEY");
+                }
+                throw new Error("SERVER_ERROR: " + errorMessage);
+            }
 
             const data = await res.json();
             
+            // 6. Kiểm tra dữ liệu trả về
             if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                throw new Error("NO_CONTENT");
+                throw new Error("EMPTY_RESPONSE");
             }
 
             let rawText = data.choices[0].message.content;
+            // Làm sạch JSON
             rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
             
-            const result = JSON.parse(rawText);
-            
-            // Xử lý dữ liệu hiển thị
+            let result;
+            try {
+                result = JSON.parse(rawText);
+            } catch (e) {
+                console.error("Lỗi Parse JSON:", rawText);
+                throw new Error("INVALID_JSON");
+            }
+
+            // 7. Hiển thị & Lưu
             renderAIResult(result);
 
-            if (auth.currentUser) {
-                await addDoc(collection(db, "activities"), {
-                    uid: auth.currentUser.uid,
-                    type: "reading",
-                    // Fix: Dùng result.score (thang 10) để lưu DB cho đồng bộ
-                    score: result.score || (result.reading_score * 2.5), 
-                    timestamp: serverTimestamp(),
-                    examId: q.id
-                });
+            if (auth.currentUser) { 
+                await addDoc(collection(db, "activities"), { 
+                    uid: auth.currentUser.uid, 
+                    type: "random", 
+                    subType: q.type || "unknown", 
+                    score: result.score, 
+                    time: document.getElementById('timer').innerText, 
+                    timestamp: serverTimestamp() 
+                }); 
             }
+
         } catch(e) { 
-            console.error(e); 
-            let msg = "Có lỗi xảy ra, vui lòng thử lại!";
-            if (e.message === "SERVER_ERROR") msg = "Server đang bận. Bạn hãy bấm nộp lại nhé!";
-            if (e.message === "NO_CONTENT") msg = "AI không phản hồi. Vui lòng bấm nộp lại!";
-            if (e.name === "SyntaxError") msg = "Dữ liệu trả về bị lỗi định dạng. Thử lại ngay!";
-            showPopup("Lỗi AI", msg, "error");
+            console.error(e);
+            let title = "Lỗi Xử Lý";
+            let msg = "Có lỗi xảy ra. Vui lòng thử lại.";
+
+            if (e.message === "DATA_MISSING") msg = "Dữ liệu đề bài bị lỗi. Hãy bấm nút 'Đổi đề'!";
+            if (e.message === "MISSING_API_KEY") {
+                title = "Thiếu API Key";
+                msg = "Chưa cấu hình GROQ_API_KEY trong Netlify. Vui lòng kiểm tra cài đặt.";
+            } else if (e.message.startsWith("SERVER_ERROR")) {
+                title = "Lỗi Máy Chủ";
+                msg = e.message; // Hiển thị lỗi chi tiết từ server
+            } else if (e.message === "INVALID_JSON") {
+                msg = "AI trả về dữ liệu không đúng định dạng. Hãy thử nộp lại lần nữa.";
+            }
+            
+            showPopup(title, msg, "error"); 
         } finally { 
             loading.style.display = 'none'; 
         }
