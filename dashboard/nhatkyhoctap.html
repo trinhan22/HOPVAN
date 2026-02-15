@@ -15,97 +15,49 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
 
-<style>
-        :root {
-        --primary: #FF8F50;
-        --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
-        --sidebar-width: 280px; }
+    <style>
+        :root { --primary: #FF8F50; --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62); --sidebar-width: 280px; }
         * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
-        
         body { background-color: #fff8f3; min-height: 100vh; display: flex; overflow-x: hidden; }
-
-        /* --- BACKGROUND --- */
-        .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
+        
+        /* Background */
+        .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
         .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; animation: floatBlob 10s infinite alternate; }
         .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
-        .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
-        .blob-3 { width: 300px; height: 300px; background: #FFD1D1; top: 40%; left: 40%; animation-delay: -2s; }
         @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
-
-        /* --- LAYOUT CƠ BẢN --- */
-        #menu-placeholder { 
-            width: var(--sidebar-width); 
-            flex-shrink: 0; 
-            z-index: 10001; 
-            position: relative;
-        }
-        .main-content { flex-grow: 1; padding: 40px; position: relative; min-height: 100vh; transition: all 0.4s ease; }
-
-        /* --- MOBILE HEADER & OVERLAY --- */
-        .mobile-header {
-            display: none; position: fixed; top: 0; left: 0; right: 0;
-            height: 60px; background: white; 
-            z-index: 1000; 
-            align-items: center; padding: 0 20px; border-bottom: 1px solid #eee;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
         
-        #sidebar-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.5); 
-            backdrop-filter: blur(4px);
-            z-index: 9999; 
-        }
+        #menu-placeholder { width: var(--sidebar-width); flex-shrink: 0; z-index: 10001; position: relative; }
+        .main-content { flex-grow: 1; padding: 40px; position: relative; min-height: 100vh; }
+        .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 60px; background: white; z-index: 1000; align-items: center; padding: 0 20px; border-bottom: 1px solid #eee; }
+        #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 9999; }
 
-        /* --- HEADER CARD --- */
+        /* HEADER CARD */
         .welcome-card {
             background: linear-gradient(135deg, #FF9F68 0%, #FF5E62 100%);
             border-radius: 35px; padding: 40px; color: #ffffff;
             box-shadow: 0 20px 40px rgba(255, 94, 98, 0.3); 
             position: relative; overflow: hidden; margin-bottom: 80px; 
             border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: slideDown 0.8s ease;
         }
-        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* --- PATH SYSTEM --- */
-        .path-wrapper { 
-            position: relative; width: 100%; max-width: 450px; margin: 0 auto; 
-            padding-top: 20px; padding-bottom: 100px; min-height: 1500px; 
-            display: flex; justify-content: center;
-        }
-        .path-container { 
-            position: relative; display: flex; flex-direction: column; 
-            align-items: center; gap: 140px; z-index: 10; width: 100%;
-        }
+        /* PATH SYSTEM */
+        .path-wrapper { position: relative; width: 100%; max-width: 450px; margin: 0 auto; padding: 20px 0 100px; min-height: 1500px; display: flex; justify-content: center; }
+        .path-container { position: relative; display: flex; flex-direction: column; align-items: center; gap: 140px; z-index: 10; width: 100%; }
         
         .level-node {
             width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-weight: 900; font-size: 2rem; cursor: pointer; position: relative;
-            background: white; z-index: 20;
-            box-shadow: 0 10px 0 #eee, 0 15px 30px rgba(0,0,0,0.05);
-            opacity: 0; transform: scale(0.3) translateY(50px);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: white; z-index: 20; box-shadow: 0 10px 0 #eee, 0 15px 30px rgba(0,0,0,0.05);
+            transition: all 0.3s;
         }
-        
-        .node-left { transform: translateX(-80px); }
-        .node-right { transform: translateX(80px); }
+        .node-left { transform: translateX(-80px); } .node-right { transform: translateX(80px); }
+        .level-node:hover { transform: translateY(-12px) scale(1.1); }
+        .node-left:hover { transform: translateX(-80px) translateY(-12px) scale(1.1); }
+        .node-right:hover { transform: translateX(80px) translateY(-12px) scale(1.1); }
 
-        .level-node.node-appear { opacity: 1; transform: scale(1) translateY(0); }
-        .level-node.node-left.node-appear { transform: translateX(-80px) scale(1) translateY(0); }
-        .level-node.node-right.node-appear { transform: translateX(80px) scale(1) translateY(0); }
-
-        .level-node:hover { transform: translateY(-12px) scale(1.1); box-shadow: 0 15px 0 #eee, 0 25px 40px rgba(255, 143, 80, 0.2); }
-        .level-node.node-left:hover { transform: translateX(-80px) translateY(-12px) scale(1.1); }
-        .level-node.node-right:hover { transform: translateX(80px) translateY(-12px) scale(1.1); }
-
-        .level-passed { background: linear-gradient(135deg, #58cc02, #46a302); color: white; border-bottom: 8px solid #3b8a02; box-shadow: 0 10px 20px rgba(88, 204, 2, 0.3); }
-        .level-current { 
-            background: white; color: var(--primary); border: 6px solid var(--primary); 
-            animation: bounce 2s infinite; 
-            box-shadow: 0 0 30px rgba(255, 143, 80, 0.5);
-        }
-        .level-locked { background: #e5e5e5; color: #afafaf; cursor: not-allowed; pointer-events: none; border-bottom: 8px solid #ccc; }
+        .level-passed { background: linear-gradient(135deg, #58cc02, #46a302); color: white; border-bottom: 8px solid #3b8a02; }
+        .level-current { background: white; color: var(--primary); border: 6px solid var(--primary); animation: bounce 2s infinite; box-shadow: 0 0 30px rgba(255, 143, 80, 0.5); }
+        .level-locked { background: #e5e5e5; color: #afafaf; border-bottom: 8px solid #ccc; cursor: pointer; }
         
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
         .node-left.level-current { animation: bounceLeft 2s infinite; }
@@ -113,65 +65,63 @@
         @keyframes bounceLeft { 0%, 100% { transform: translateX(-80px) translateY(0); } 50% { transform: translateX(-80px) translateY(-15px); } }
         @keyframes bounceRight { 0%, 100% { transform: translateX(80px) translateY(0); } 50% { transform: translateX(80px) translateY(-15px); } }
 
-        .completed-medal { font-size: 1.8rem; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2)); animation: medalPop 0.5s ease; }
-        @keyframes medalPop { from { transform: scale(0) rotate(-45deg); } to { transform: scale(1) rotate(0); } }
-
         .node-label {
             position: absolute; top: 105px; left: 50%; transform: translateX(-50%); 
             background: white; padding: 8px 18px; border-radius: 14px;
             box-shadow: 0 6px 15px rgba(0,0,0,0.06); font-size: 13px; font-weight: 800; color: #5d4037;
             white-space: nowrap; border: 2px solid #fff; pointer-events: none; z-index: 30;
         }
-        .level-node:hover .node-label { background: var(--primary); color: white; transform: translate(-50%, 8px); }
-
-        #path-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
         
-        .path-line { stroke: #e5e7eb; stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+        #path-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
+        .path-line { stroke: #e5e7eb; stroke-width: 12; stroke-linecap: round; fill: none; }
+        .path-draw-anim { stroke: #FF8F50; stroke-width: 12; stroke-linecap: round; fill: none; stroke-dasharray: 3000; stroke-dashoffset: 0; transition: stroke-dashoffset 1s; }
 
-        .path-draw-anim {
-            stroke: #FF8F50; stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; fill: none;
-            stroke-dasharray: 3000; stroke-dashoffset: 3000; animation: drawLine 2.5s ease-out forwards;
+        /* --- CUSTOM MODAL STYLES (NEW) --- */
+        .hv-modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            z-index: 20000; display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease;
         }
-        @keyframes drawLine { to { stroke-dashoffset: 0; } }
+        .hv-modal-overlay.active { display: flex; opacity: 1; }
+        
+        .hv-modal-box {
+            background: white; width: 90%; max-width: 400px;
+            border-radius: 30px; padding: 30px; text-align: center;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; overflow: hidden;
+        }
+        .hv-modal-overlay.active .hv-modal-box { transform: scale(1); }
 
-        /* --- MOBILE OPTIMIZATION --- */
+        .hv-modal-icon {
+            width: 80px; height: 80px; margin: 0 auto 20px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem;
+        }
+        .icon-lock { background: #fee2e2; color: #ef4444; }
+        .icon-unlock { background: #fff7ed; color: #FF8F50; }
+        .icon-success { background: #dcfce7; color: #22c55e; }
+
+        .hv-modal-title { font-size: 1.5rem; font-weight: 900; color: #2d3436; margin-bottom: 10px; }
+        .hv-modal-desc { font-size: 1rem; color: #636e72; margin-bottom: 25px; line-height: 1.5; }
+        
+        .hv-modal-actions { display: flex; gap: 10px; }
+        .hv-btn {
+            flex: 1; padding: 12px; border-radius: 15px; font-weight: 800; cursor: pointer; border: none; font-size: 1rem; transition: 0.2s;
+        }
+        .hv-btn-gray { background: #f1f5f9; color: #64748b; }
+        .hv-btn-gray:hover { background: #e2e8f0; }
+        
+        .hv-btn-primary { background: var(--primary-gradient); color: white; box-shadow: 0 5px 15px rgba(255, 143, 80, 0.3); }
+        .hv-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 143, 80, 0.4); }
+
         @media (max-width: 768px) { 
-            .mobile-header { display: flex; }
-            #sidebar-overlay.active { display: block; }
-
-            #menu-placeholder { 
-                width: 0; display: block; 
-                position: static; 
-            }
-            
-            aside {
-                position: fixed !important; 
-                left: 0 !important; top: 0 !important; bottom: 0 !important;
-                transform: translateX(-100%); 
-                z-index: 10002 !important; 
-                width: 280px !important; 
-                background: white !important; 
-                transition: transform 0.3s ease-in-out !important;
-                box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important;
-                opacity: 1 !important; 
-            }
+            .mobile-header { display: flex; } #sidebar-overlay.active { display: block; }
+            #menu-placeholder { width: 0; display: block; }
+            aside { position: fixed !important; transform: translateX(-100%); z-index: 10002 !important; width: 280px !important; }
             aside.open { transform: translateX(0) !important; }
-
-            .main-content { padding: 90px 20px 40px !important; width: 100%; }
-
-            /* MỚI THÊM: Ẩn Avatar ở Mobile */
-            #avatar-initial { display: none !important; }
-
-            .welcome-card { padding: 30px 20px; margin-bottom: 50px; }
-            .node-label { font-size: 11px; padding: 6px 12px; }
-            .path-wrapper { max-width: 100%; }
-            
-            .node-left { transform: translateX(-50px); }
-            .node-right { transform: translateX(50px); }
-            
-            .level-node.node-left.node-appear { transform: translateX(-50px) scale(1) translateY(0); }
-            .level-node.node-right.node-appear { transform: translateX(50px) scale(1) translateY(0); }
-            
+            .main-content { padding: 90px 20px 40px !important; }
+            .node-left { transform: translateX(-50px); } .node-right { transform: translateX(50px); }
             @keyframes bounceLeft { 0%, 100% { transform: translateX(-50px) translateY(0); } 50% { transform: translateX(-50px) translateY(-15px); } }
             @keyframes bounceRight { 0%, 100% { transform: translateX(50px) translateY(0); } 50% { transform: translateX(50px) translateY(-15px); } }
         }
@@ -215,22 +165,54 @@
 </head>
 <body>
 
-    <div class="background-blobs">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-    </div>
+    <div class="background-blobs"><div class="blob blob-1"></div></div>
 
-    <div class="mobile-header lg:hidden">
-        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl mr-4 focus:outline-none">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="flex items-center gap-2">
-            <img src="../LOGO.WEBP" alt="Logo" class="w-8 h-8">
-            <span class="font-black text-orange-500 text-lg">HOPVAN</span>
+    <div id="modal-confirm-unlock" class="hv-modal-overlay">
+        <div class="hv-modal-box">
+            <div class="hv-modal-icon icon-unlock"><i class="fas fa-lock-open"></i></div>
+            <h3 class="hv-modal-title">Mở khoá bài học?</h3>
+            <p class="hv-modal-desc">
+                Bạn cần <strong class="text-orange-500">2 Keys</strong> để mở khoá level này.<br>
+                Bạn có muốn dùng ngay không?
+            </p>
+            <div class="hv-modal-actions">
+                <button class="hv-btn hv-btn-gray" onclick="closeAllModals()">Để sau</button>
+                <button class="hv-btn hv-btn-primary" id="btn-confirm-action">Mở ngay</button>
+            </div>
         </div>
     </div>
 
+    <div id="modal-no-keys" class="hv-modal-overlay">
+        <div class="hv-modal-box">
+            <div class="hv-modal-icon icon-lock"><i class="fas fa-key"></i></div>
+            <h3 class="hv-modal-title">Thiếu Keys rồi!</h3>
+            <p class="hv-modal-desc">
+                Bạn cần 2 Keys nhưng hiện tại chỉ có <span id="modal-current-keys" class="font-bold text-red-500">0</span> Keys.<br>
+                Hãy làm nhiệm vụ hoặc điểm danh nhé!
+            </p>
+            <div class="hv-modal-actions">
+                <button class="hv-btn hv-btn-primary" onclick="closeAllModals()">Đã hiểu</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-success" class="hv-modal-overlay">
+        <div class="hv-modal-box">
+            <div class="hv-modal-icon icon-success"><i class="fas fa-check"></i></div>
+            <h3 class="hv-modal-title">Thành công!</h3>
+            <p class="hv-modal-desc">
+                Bài học đã được mở khoá.<br>Chúc bạn học tập thật tốt!
+            </p>
+            <div class="hv-modal-actions">
+                <button class="hv-btn hv-btn-primary" onclick="closeAllModals()">Bắt đầu thôi</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mobile-header lg:hidden">
+        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl mr-4"><i class="fas fa-bars"></i></button>
+        <div class="flex items-center gap-2"><img src="../LOGO.WEBP" class="w-8 h-8"><span class="font-black text-orange-500 text-lg">HOPVAN</span></div>
+    </div>
     <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <div id="menu-placeholder"></div>
@@ -239,15 +221,18 @@
         <div class="welcome-card">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div class="z-10">
-                    <h1 class="text-4xl font-black mb-2 tracking-tight">Xin chào, <span id="user-display-name"></span></h1>
-                    <p class="font-bold text-white/90 text-lg">Hãy cùng bắt đầu học tập cùng với HopVan nhé!</p>
+                    <h1 class="text-4xl font-black mb-2 tracking-tight">Xin chào, <span id="user-display-name">...</span></h1>
+                    <p class="font-bold text-white/90 text-lg">Hành trình chinh phục Ngữ Văn.</p>
                     
-                    <div class="flex gap-4 mt-6">
-                        <div class="bg-white/20 backdrop-blur-md px-5 py-3 rounded-[22px] flex items-center gap-3 font-black text-white border border-white/30 shadow-lg">
-                            <i class="fas fa-fire text-yellow-300"></i> Chuỗi: <span id="streak-val">0</span>
+                    <div class="flex gap-3 mt-6 flex-wrap">
+                        <div class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-2xl flex items-center gap-2 font-black text-white border border-white/30 shadow-lg">
+                            <i class="fas fa-fire text-yellow-300"></i> Streak: <span id="streak-val">0</span>
                         </div>
-                        <div class="bg-white/20 backdrop-blur-md px-5 py-3 rounded-2xl flex items-center gap-3 font-black text-white border border-white/30 shadow-lg">
-                            <i class="fas fa-crown text-yellow-400"></i> Level: <span id="level-val">0</span>
+                        <div class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-2xl flex items-center gap-2 font-black text-white border border-white/30 shadow-lg">
+                            <i class="fas fa-crown text-yellow-300"></i> Level: <span id="level-val">0</span>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-2xl flex items-center gap-2 font-black text-white border border-white/30 shadow-lg">
+                            <i class="fas fa-key text-yellow-300"></i> Keys: <span id="keys-val">0</span>
                         </div>
                     </div>
                 </div>
@@ -261,199 +246,222 @@
         </div>
     </main>
 
-<script src="../chatbot.js"></script>
+    <script type="module" src="gam.js"></script>
+    <script src="../chatbot.js"></script>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-    const courseMap = [
-        { id: 1, title: 'Trắc Nghiệm' }, 
-        { id: 2, title: 'Đọc Hiểu' },
-        { id: 3, title: 'NLXH' }, 
-        { id: 4, title: 'NLVH' },
-        { id: 5, title: 'Trắc Nghiệm' }, 
-        { id: 6, title: 'Đọc Hiểu' },
-        { id: 7, title: 'NLXH' }, 
-        { id: 8, title: 'NLVH' },
-        { id: 9, title: 'Trắc Nghiệm' }, 
-        { id: 10, title: 'Đọc Hiểu' },
-        { id: 11, title: 'NLXH' }, 
-        { id: 12, title: 'NLVH' },
-        { id: 13, title: 'Trắc Nghiệm' }, 
-        { id: 14, title: 'Đọc Hiểu' },
-        { id: 15, title: 'NLXH' }, 
-        { id: 16, title: 'NLVH' },
-        { id: 17, title: 'Trắc Nghiệm' }, 
-        { id: 18, title: 'Đọc Hiểu' },
-        { id: 19, title: 'NLXH' }, 
-        { id: 20, title: 'NLVH' }
-    ];
+        // Danh sách 20 level
+        const courseMap = [
+            { id: 1, title: 'Trắc Nghiệm' }, { id: 2, title: 'Đọc Hiểu' }, { id: 3, title: 'NLXH' }, { id: 4, title: 'NLVH' },
+            { id: 5, title: 'Trắc Nghiệm' }, { id: 6, title: 'Đọc Hiểu' }, { id: 7, title: 'NLXH' }, { id: 8, title: 'NLVH' },
+            { id: 9, title: 'Trắc Nghiệm' }, { id: 10, title: 'Đọc Hiểu' }, { id: 11, title: 'NLXH' }, { id: 12, title: 'NLVH' },
+            { id: 13, title: 'Trắc Nghiệm' }, { id: 14, title: 'Đọc Hiểu' }, { id: 15, title: 'NLXH' }, { id: 16, title: 'NLVH' },
+            { id: 17, title: 'Trắc Nghiệm' }, { id: 18, title: 'Đọc Hiểu' }, { id: 19, title: 'NLXH' }, { id: 20, title: 'NLVH' }
+        ];
 
-    // --- LOGIC SIDEBAR TOGGLE (MỚI) ---
-    window.toggleSidebar = () => {
-        const sidebar = document.querySelector('aside');
-        const overlay = document.getElementById('sidebar-overlay');
-        
-        if (sidebar && overlay) {
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-            
-            if (sidebar.classList.contains('open')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = 'auto';
+        let currentUserKeys = 0;
+        let currentUserLevel = 1;
+
+        window.toggleSidebar = () => {
+            const sidebar = document.querySelector('aside');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
             }
-        }
-    };
+        };
 
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            const name = user.displayName || user.email.split('@')[0];
-            document.getElementById('user-display-name').innerText = name;
-            document.getElementById('avatar-initial').innerText = name[0].toUpperCase();
+        // --- HELPER POPUP ---
+        window.closeAllModals = () => {
+            document.querySelectorAll('.hv-modal-overlay').forEach(el => el.classList.remove('active'));
+        };
 
-            try {
-                // --- ĐỒNG BỘ STREAK ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const name = user.displayName || user.email.split('@')[0];
+                document.getElementById('user-display-name').innerText = name;
+                document.getElementById('avatar-initial').innerText = name[0].toUpperCase();
+
+                // Lấy Keys
                 const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef);
-                const todayStr = new Date().toLocaleDateString('en-CA');
-                const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-                const yesterdayStr = yesterday.toLocaleDateString('en-CA');
-
-                let streakValue = 0;
                 if (userSnap.exists()) {
-                    const userData = userSnap.data();
-                    streakValue = userData.streak || 1;
-                    if (userData.lastLoginDate !== todayStr) {
-                        streakValue = (userData.lastLoginDate === yesterdayStr) ? streakValue + 1 : 1;
-                        await updateDoc(userRef, { lastLoginDate: todayStr, streak: streakValue });
-                    }
+                    const data = userSnap.data();
+                    currentUserKeys = data.keys || 0;
+                    document.getElementById('streak-val').innerText = data.streak || 0;
+                    document.getElementById('keys-val').innerText = currentUserKeys;
                 } else {
-                    streakValue = 1;
-                    await setDoc(userRef, { lastLoginDate: todayStr, streak: 1, email: user.email });
+                    await setDoc(userRef, { keys: 0, streak: 0, email: user.email });
                 }
-                document.getElementById('streak-val').innerText = streakValue;
 
-                // --- LẤY LEVEL ---
+                // Lấy Level
                 const progressRef = doc(db, "users_progress", user.uid);
                 const progressSnap = await getDoc(progressRef);
-                let currentLevel = progressSnap.exists() ? progressSnap.data().currentLevel : 1;
+                currentUserLevel = progressSnap.exists() ? progressSnap.data().currentLevel : 1;
                 
-                document.getElementById('level-val').innerText = currentLevel;
-                renderJourney(currentLevel);
+                document.getElementById('level-val').innerText = currentUserLevel;
+                renderJourney(currentUserLevel);
 
-            } catch (error) { renderJourney(1); }
-        } else { window.location.href = "../log.html"; }
-    });
+            } else { window.location.href = "../log.html"; }
+        });
 
-    function renderJourney(userLevel) {
-        const container = document.getElementById('path-render');
-        container.innerHTML = "";
+        function renderJourney(userLevel) {
+            const container = document.getElementById('path-render');
+            container.innerHTML = "";
 
-        courseMap.forEach((lvl, index) => {
-            const node = document.createElement('div');
-            let status = 'level-locked';
-            if (lvl.id < userLevel) status = 'level-passed';
-            else if (lvl.id === userLevel) status = 'level-current';
+            courseMap.forEach((lvl, index) => {
+                const node = document.createElement('div');
+                let status = 'level-locked';
+                
+                if (lvl.id < userLevel) status = 'level-passed';
+                else if (lvl.id === userLevel) status = 'level-current';
 
-            // Logic Zigzag: Giữa (0) -> Trái (1) -> Giữa (2) -> Phải (3)
-            let posClass = '';
-            const posIndex = index % 4;
-            if (posIndex === 1) posClass = 'node-left';
-            if (posIndex === 3) posClass = 'node-right';
+                let posClass = '';
+                const posIndex = index % 4;
+                if (posIndex === 1) posClass = 'node-left';
+                if (posIndex === 3) posClass = 'node-right';
 
-            node.className = `level-node ${status} ${posClass}`;
+                node.className = `level-node ${status} ${posClass}`;
+                
+                if (lvl.id < userLevel) {
+                    node.innerHTML = '<i class="fas fa-check text-green-500"></i>';
+                } else if (lvl.id === userLevel) {
+                    node.innerHTML = '<i class="fas fa-play text-orange-500"></i>';
+                } else {
+                    node.innerHTML = '<i class="fas fa-lock text-gray-400"></i>';
+                }
+
+                const label = document.createElement('div');
+                label.className = "node-label";
+                label.innerText = `Lv.${lvl.id} ${lvl.title}`;
+                node.appendChild(label);
+
+                // --- CLICK EVENT: MỞ KHOÁ ---
+                node.onclick = () => {
+                    if (lvl.id <= userLevel) {
+                        window.location.href = `../nhatkyhoctap/${lvl.id}.html`;
+                    } else if (lvl.id === userLevel + 1) {
+                        // Gọi Modal xác nhận thay vì Alert
+                        tryUnlockLevel(lvl.id);
+                    } else {
+                        // Animation rung lắc nếu click bài xa quá (optional)
+                        node.style.animation = "shake 0.5s";
+                        setTimeout(() => node.style.animation = "", 500);
+                    }
+                };
+
+                container.appendChild(node);
+            });
+            setTimeout(drawCurvedPath, 500);
+        }
+
+        // --- HÀM XỬ LÝ MỞ KHOÁ VỚI POPUP ---
+        window.tryUnlockLevel = (targetLevel) => {
+            // 1. Check tiền
+            if (currentUserKeys < 2) {
+                document.getElementById('modal-current-keys').innerText = currentUserKeys;
+                document.getElementById('modal-no-keys').classList.add('active');
+                return;
+            }
+
+            // 2. Hiện Modal xác nhận
+            const confirmModal = document.getElementById('modal-confirm-unlock');
+            const confirmBtn = document.getElementById('btn-confirm-action');
             
-            if (lvl.id < userLevel) {
-                node.innerHTML = '<i class="fas fa-medal completed-medal"></i>';
-            } else if (lvl.id === userLevel) {
-                node.innerHTML = '<i class="fas fa-feather-pointed fa-shake"></i>';
-            } else {
-                node.innerHTML = '<i class="fas fa-lock text-sm opacity-30"></i>';
+            // Gán sự kiện click cho nút Mở ngay
+            confirmBtn.onclick = async () => {
+                confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                await executeUnlock(targetLevel);
+            };
+            
+            confirmModal.classList.add('active');
+        };
+
+        async function executeUnlock(targetLevel) {
+            try {
+                const userRef = doc(db, "users", auth.currentUser.uid);
+                await updateDoc(userRef, { keys: increment(-2) });
+                
+                const progressRef = doc(db, "users_progress", auth.currentUser.uid);
+                const snap = await getDoc(progressRef);
+                if (snap.exists()) {
+                    await updateDoc(progressRef, { currentLevel: targetLevel });
+                } else {
+                    await setDoc(progressRef, { currentLevel: targetLevel });
+                }
+
+                // Update UI
+                currentUserKeys -= 2;
+                currentUserLevel = targetLevel;
+                document.getElementById('keys-val').innerText = currentUserKeys;
+                document.getElementById('level-val').innerText = currentUserLevel;
+                
+                // Đóng modal cũ, mở modal success
+                closeAllModals();
+                document.getElementById('btn-confirm-action').innerHTML = "Mở ngay"; // Reset nút
+                document.getElementById('modal-success').classList.add('active');
+                
+                renderJourney(currentUserLevel);
+
+            } catch (e) {
+                console.error(e);
+                alert("Lỗi kết nối!");
+                closeAllModals();
             }
+        }
 
-            const label = document.createElement('div');
-            label.className = "node-label";
-            label.innerText = lvl.title;
-            node.appendChild(label);
+        function drawCurvedPath() {
+            const nodes = document.querySelectorAll('.level-node');
+            const svg = document.getElementById('path-svg');
+            const wrapper = document.querySelector('.path-wrapper');
+            if (!svg || nodes.length < 2) return;
 
-            if (lvl.id <= userLevel) {
-                node.onclick = () => { window.location.href = `../nhatkyhoctap/${lvl.id}.html`; };
-            }
-            container.appendChild(node);
-            setTimeout(() => node.classList.add('node-appear'), index * 150);
-        });
-        
-        // Đợi 1 chút để DOM render xong rồi vẽ đường cong
-        setTimeout(drawCurvedPath, 800);
-    }
+            svg.setAttribute('height', wrapper.scrollHeight);
+            svg.setAttribute('width', wrapper.clientWidth);
+            svg.innerHTML = "";
 
-    function drawCurvedPath() {
-        const nodes = document.querySelectorAll('.level-node');
-        const svg = document.getElementById('path-svg');
-        const wrapper = document.querySelector('.path-wrapper');
-        if (!svg || nodes.length < 2) return;
+            let pathData = "";
+            nodes.forEach((node, i) => {
+                if (i === nodes.length - 1) return; 
+                const rect1 = node.getBoundingClientRect();
+                const rect2 = nodes[i+1].getBoundingClientRect();
+                const wrapperRect = wrapper.getBoundingClientRect();
 
-        // Tăng chiều cao SVG để bao trọn do gap tăng lên
-        svg.setAttribute('height', wrapper.scrollHeight);
-        svg.setAttribute('width', wrapper.clientWidth);
-        svg.innerHTML = "";
+                const x1 = rect1.left + rect1.width / 2 - wrapperRect.left;
+                const y1 = node.offsetTop + node.offsetHeight / 2;
+                const x2 = rect2.left + rect2.width / 2 - wrapperRect.left;
+                const y2 = nodes[i+1].offsetTop + nodes[i+1].offsetHeight / 2;
 
-        let pathData = "";
-        
-        nodes.forEach((node, i) => {
-            if (i === nodes.length - 1) return; 
+                if (i === 0) pathData += `M ${x1} ${y1}`;
+                const cp1x = x1; const cp1y = y1 + (y2 - y1) / 2;
+                const cp2x = x2; const cp2y = y1 + (y2 - y1) / 2;
+                pathData += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`;
+            });
 
-            const rect1 = node.getBoundingClientRect();
-            const rect2 = nodes[i+1].getBoundingClientRect();
-            const wrapperRect = wrapper.getBoundingClientRect();
+            const pathLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            pathLine.setAttribute("d", pathData);
+            pathLine.classList.add('path-line');
+            svg.appendChild(pathLine);
 
-            // Tính tâm của nút (đã tính offset gap tự động nhờ vị trí DOM)
-            const x1 = rect1.left + rect1.width / 2 - wrapperRect.left;
-            const y1 = node.offsetTop + node.offsetHeight / 2;
+            const pathDraw = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            pathDraw.setAttribute("d", pathData);
+            pathDraw.setAttribute("fill", "none");
+            pathDraw.classList.add('path-draw-anim');
+            svg.appendChild(pathDraw);
+        }
 
-            const x2 = rect2.left + rect2.width / 2 - wrapperRect.left;
-            const y2 = nodes[i+1].offsetTop + nodes[i+1].offsetHeight / 2;
-
-            if (i === 0) pathData += `M ${x1} ${y1}`;
-
-            // Vẽ đường cong Bezier mềm mại hơn với khoảng cách dài hơn
-            const cp1x = x1; 
-            const cp1y = y1 + (y2 - y1) / 2;
-            const cp2x = x2;
-            const cp2y = y1 + (y2 - y1) / 2;
-
-            pathData += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`;
-        });
-
-        // Đường nền màu xám
-        const pathLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        pathLine.setAttribute("d", pathData);
-        pathLine.classList.add('path-line');
-        svg.appendChild(pathLine);
-
-        // Đường màu cam chạy đè lên
-        const pathDraw = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        pathDraw.setAttribute("d", pathData);
-        pathDraw.setAttribute("fill", "none");
-        pathDraw.classList.add('path-draw-anim');
-        svg.appendChild(pathDraw);
-    }
-
-    // Nạp Menu
-    import { initMenu } from "./menu.js";
-    initMenu(app);
-
-
-    window.addEventListener('resize', drawCurvedPath);
-</script>
-
+        import { initMenu } from "./menu.js";
+        initMenu(app);
+        window.addEventListener('resize', drawCurvedPath);
+    </script>
 </body>
 </html>

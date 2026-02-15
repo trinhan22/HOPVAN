@@ -14,12 +14,6 @@ const styles = `
     }
     #hopvan-chat-launcher:hover { transform: scale(1.1); box-shadow: 0 15px 40px rgba(255, 94, 98, 0.6); }
     #hopvan-chat-launcher i { font-size: 28px; color: white; transition: 0.3s; }
-    
-    #hopvan-chat-launcher::before {
-        content: ''; position: absolute; inset: -5px; border-radius: 50%;
-        border: 2px solid rgba(255, 143, 80, 0.5);
-        opacity: 0; animation: pulseWave 2s infinite; z-index: -1;
-    }
     @keyframes pulseWave { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
 
     /* --- CHAT WINDOW --- */
