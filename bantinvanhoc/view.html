@@ -16,9 +16,9 @@
     <style>
         :root {
             --primary: #FF8F50;
-            --text-heading: #232323;
-            --text-body: #333;
-            --bg-body: #FDFBF7;
+            --text-heading: #363636;
+            --text-body: #444444;
+            --bg-body: #fff6ee;
         }
 
         body { background-color: var(--bg-body); font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-body); overflow-x: hidden; }
@@ -179,7 +179,36 @@
         /* Footer */
         .mag-footer { background: #1a1a1a; color: #fff; padding: 80px 20px; text-align: center; }
         .f-slogan { font-weight: 700; letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; color: #666; margin-top: 20px; }
-    </style>
+
+        /* --- CSS CHO TRẠNG THÁI ĐÃ LƯU --- */
+        /* Trạng thái đã lưu cho nút trên Hero */
+        .btn-fav-hero.is-liked {
+            background: var(--primary) !important;
+            color: white !important;
+        }
+        .btn-fav-hero.is-liked i {
+            color: white !important;
+        }
+
+        /* Trạng thái đã lưu cho nút ở Sidebar */
+        .btn-act.btn-fav.is-liked {
+            background: #ef4444 !important; /* Đổi hẳn sang màu đỏ */
+            color: white !important;
+        }
+
+        /* Màu đỏ rực cho nút Hero khi đã lưu */
+        .btn-fav-hero.is-liked {
+            background: #ff4757 !important;
+            color: white !important;
+        }
+        .btn-fav-hero.is-liked i { color: white !important; }
+
+        /* Màu đỏ cho nút Sidebar khi đã lưu */
+        .btn-act.btn-fav.is-liked {
+            background: #ff4757 !important;
+            color: white !important;
+        }
+</style>
 </head>
 <body>
 
@@ -210,8 +239,9 @@
                 <span class="h-cate" id="h-cate">...</span>
                 <h1 class="h-title" id="h-title">...</h1>
                 <div class="h-sapo-36" id="h-sapo">...</div>
-                <div class="btn-fav-hero" onclick="saveFav()">
-                    <i class="far fa-heart text-red-500" id="h-icon"></i> <span>Lưu vào yêu thích</span>
+                <div class="btn-fav-hero" id="hero-btn-fav" onclick="saveFav()">
+                    <i class="far fa-heart text-red-500" id="h-icon-hero"></i> 
+                    <span id="hero-fav-text">Lưu vào yêu thích</span>
                 </div>
             </div>
         </div>
@@ -371,75 +401,73 @@
 
         // --- FAVORITE LOGIC (ĐÃ CẬP NHẬT: LƯU VÀO COLLECTION RIÊNG) ---
         
-        function updateBtnUI() {
-            const heroIcon = document.getElementById('h-icon'); // Icon trên Hero
-            const heroText = document.querySelector('.btn-fav-hero span');
-            const sideBtn = document.getElementById('side-btn-fav');
-            const sideIcon = document.getElementById('side-icon-heart'); // Icon ở Sidebar
-            const sideText = sideBtn.querySelector('span');
+// 1. Cập nhật giao diện (Sync cả 2 nút)
+function updateBtnUI() {
+    const hIcon = document.getElementById('h-icon-hero');
+    const hText = document.getElementById('hero-fav-text');
+    const hBtn = document.getElementById('hero-btn-fav');
 
-            if (isLiked) {
-                // Trạng thái ĐÃ LƯU
-                if(heroIcon) heroIcon.className = "fas fa-heart text-red-500";
-                if(heroText) heroText.innerText = "Đã lưu";
+    const sIcon = document.getElementById('h-icon-side');
+    const sText = document.getElementById('side-fav-text');
+    const sBtn = document.getElementById('side-btn-fav');
 
-                if(sideBtn) sideBtn.classList.add('is-liked');
-                if(sideIcon) sideIcon.className = "fas fa-heart text-white"; // Sidebar icon màu trắng
-                if(sideText) sideText.innerText = "Đã lưu";
-            } else {
-                // Trạng thái CHƯA LƯU
-                if(heroIcon) heroIcon.className = "far fa-heart text-red-500";
-                if(heroText) heroText.innerText = "Lưu vào yêu thích";
+    if (isLiked) {
+        if(hIcon) hIcon.className = "fas fa-heart text-white"; // Tim đặc
+        if(hText) hText.innerText = "Đã lưu";
+        if(hBtn) hBtn.classList.add('is-liked');
 
-                if(sideBtn) sideBtn.classList.remove('is-liked');
-                if(sideIcon) sideIcon.className = "far fa-heart";
-                if(sideText) sideText.innerText = "Lưu bài";
-            }
+        if(sIcon) sIcon.className = "fas fa-heart text-white";
+        if(sText) sText.innerText = "Đã lưu";
+        if(sBtn) sBtn.classList.add('is-liked');
+    } else {
+        if(hIcon) hIcon.className = "far fa-heart text-red-500"; // Tim rỗng
+        if(hText) hText.innerText = "Lưu vào yêu thích";
+        if(hBtn) hBtn.classList.remove('is-liked');
+
+        if(sIcon) sIcon.className = "far fa-heart";
+        if(sText) sText.innerText = "Lưu bài";
+        if(sBtn) sBtn.classList.remove('is-liked');
+    }
+}
+
+// 2. Kiểm tra trạng thái từ collection 'favorites'
+async function checkFavoriteStatus() {
+    if (!currentUser || !id) return;
+    try {
+        const favSnap = await getDoc(doc(db, "favorites", currentUser.uid));
+        if (favSnap.exists() && favSnap.data().list?.includes(id)) {
+            isLiked = true;
+            updateBtnUI();
         }
+    } catch(e) { console.error("CheckFavErr:", e); }
+}
 
-        async function checkFavoriteStatus() {
-            if (!currentUser) return;
-            try {
-                // Đọc từ collection 'favorites', document ID là UID của user
-                const favSnap = await getDoc(doc(db, "favorites", currentUser.uid));
-                if (favSnap.exists()) {
-                    const list = favSnap.data().list || []; // Mảng chứa các ID bài viết
-                    if (list.includes(id)) {
-                        isLiked = true;
-                        updateBtnUI();
-                    }
-                }
-            } catch(e) { console.log("Check fav status err:", e); }
+// 3. Hàm Lưu/Bỏ lưu (SaveFav)
+window.saveFav = async () => {
+    if(!currentUser) { showToast("Vui lòng đăng nhập!"); return; }
+    
+    const favRef = doc(db, "favorites", currentUser.uid);
+    try {
+        if(isLiked) {
+            // Xóa khỏi danh sách
+            await setDoc(favRef, { list: arrayRemove(id) }, { merge: true });
+            isLiked = false;
+            showToast("Đã bỏ lưu bài!");
+        } else {
+            // Thêm vào danh sách (tự tạo doc nếu chưa có nhờ merge: true)
+            await setDoc(favRef, { list: arrayUnion(id) }, { merge: true });
+            isLiked = true;
+            showToast("Đã lưu vào bộ sưu tập!");
         }
+        updateBtnUI();
+    } catch(e) { 
+        console.error("SaveError:", e);
+        showToast("Lỗi: " + (e.message || "Thao tác thất bại")); 
+    }
+};
 
-        window.saveFav = async () => {
-            if(!currentUser) return showToast("Vui lòng đăng nhập!");
-            
-            // Tham chiếu đến document trong collection 'favorites'
-            const favRef = doc(db, "favorites", currentUser.uid);
-
-            try {
-                if(isLiked) {
-                    // Bỏ thích: Xóa ID khỏi mảng 'list'
-                    // merge: true đảm bảo nếu doc chưa có thì tạo mới, có rồi thì update
-                    await setDoc(favRef, { list: arrayRemove(id) }, { merge: true });
-                    isLiked = false;
-                    showToast("Đã bỏ lưu bài!");
-                } else {
-                    // Thích: Thêm ID vào mảng 'list'
-                    await setDoc(favRef, { list: arrayUnion(id) }, { merge: true });
-                    isLiked = true;
-                    showToast("Đã lưu vào bộ sưu tập!");
-                }
-                updateBtnUI();
-            } catch(e) { 
-                console.error("Save Error:", e);
-                // Hiển thị lỗi cụ thể hơn (message hoặc code)
-                showToast("Lỗi: " + (e.message || "Không xác định")); 
-            }
-        };
-
-        window.toggleFav = window.saveFav; 
+// Đồng bộ tên hàm cho sidebar
+window.toggleFav = window.saveFav;
 
         window.copyLink = () => { navigator.clipboard.writeText(window.location.href); showToast("Đã sao chép link!"); };
         window.showToast = (msg) => {
