@@ -488,9 +488,9 @@
                     const data = doc.data();
                     allArticles.push({
                         id: doc.id,
+                        slug: data.slug || null, // <--- THÊM DÒNG NÀY (Lấy slug)
                         title: data.title || "Chưa có tiêu đề",
                         category: data.type || "diahat", 
-                        // Sửa lỗi hiển thị tóm tắt (lấy intro nếu summary trống)
                         summary: data.summary || data.intro?.replace(/<[^>]*>?/gm, '').slice(0, 150) + "..." || "",
                         img: data.img || "../panel.webp", 
                         date: data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('vi-VN') : 'Mới cập nhật'
@@ -527,8 +527,8 @@
             // Featured Card (Bài nổi bật to đùng)
             if (featured) {
                 const cat = getCatInfo(featured.category);
-                html += `
-                <div class="featured-card card" onclick="goToDetail('${featured.id}')">
+               html += `
+                <div class="featured-card card" onclick="goToDetail('${featured.slug || featured.id}', '${featured.slug ? 'slug' : 'id'}')">
                     <div class="c-img-box f-img-wrap">
                         <img src="${featured.img}" class="c-img f-img" loading="lazy">
                         <div class="c-badge" style="background:var(--primary); color:white; border:none;">MỚI NHẤT</div>
@@ -550,7 +550,7 @@
             list.forEach(item => {
                 const cat = getCatInfo(item.category);
                 html += `
-                <div class="card" onclick="goToDetail('${item.id}')">
+                <div class="card" onclick="goToDetail('${item.slug || item.id}', '${item.slug ? 'slug' : 'id'}')">
                     <div class="c-img-box">
                         <img src="${item.img}" class="c-img" loading="lazy">
                         <div class="c-badge">${cat.name}</div>
@@ -594,9 +594,12 @@
             container.scrollBy({ left: 300 * direction, behavior: 'smooth' });
         };
 
-        window.goToDetail = (id) => {
-            // Chuyển hướng sang trang xem chi tiết
-            window.location.href = `../bantinvanhoc/view.html?id=${id}`;
+        window.goToDetail = (val, type) => {
+            if (type === 'slug') {
+                window.location.href = `../bantinvanhoc/view.html?slug=${val}`;
+            } else {
+                window.location.href = `../bantinvanhoc/view.html?id=${val}`;
+            }
         };
 
         window.toggleSidebar = () => {
