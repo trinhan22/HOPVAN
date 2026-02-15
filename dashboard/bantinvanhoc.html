@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>HopVan - Bản Tin Văn Học</title>
     <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
+    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
     <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+    <meta property="og:url" content="https://hopvan.netlify.app" />
+    <meta property="og:type" content="article" />
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -17,236 +20,182 @@
             --primary: #FF8F50;
             --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
             --text-heading: #2D3436;
-            --text-body: #4a4a4a;
+            --bg-body: #FFF5EC;
             --sidebar-width: 280px;
         }
 
-        /* Reset & Base */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background-color: #fff8f3; min-height: 100vh; overflow-x: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
+        /* --- BASE --- */
+        body { background-color: var(--bg-body); font-family: 'Plus Jakarta Sans', sans-serif; color: #444; overflow-x: hidden; }
 
-        /* --- BACKGROUND --- */
+        /* --- LAYOUT FIX --- */
+        #menu-placeholder { position: fixed; top: 0; left: 0; height: 100vh; z-index: 900; }
+        
+        .main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            min-height: 100vh;
+            padding: 40px 60px;
+            background: rgba(255, 255, 255, 0.4); 
+            backdrop-filter: blur(20px);
+        }
+
+        /* --- TEXT STYLE --- */
+        .text-gradient { 
+            background: var(--primary-gradient); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            font-weight: 800;
+        }
+        
+        .page-header { text-align: center; margin-bottom: 30px; padding-top: 20px; }
+        .page-title { font-size: 3rem; font-weight: 800; color: var(--text-heading); letter-spacing: -1px; margin-bottom: 5px; }
+        .page-subtitle { font-size: 1rem; color: #888; font-weight: 600; }
+        
+        /* Search Box */
+        .search-box-wrap { position: relative; max-width: 500px; margin: 25px auto 0; }
+        .search-inp { 
+            width: 100%; padding: 14px 25px 14px 55px; 
+            border-radius: 20px; border: 2px solid white; 
+            background: white; box-shadow: 0 10px 30px rgba(255,143,80,0.1); 
+            font-weight: 600; outline: none; transition: 0.3s; 
+        }
+        .search-inp:focus { border-color: var(--primary); box-shadow: 0 15px 40px rgba(255,143,80,0.2); }
+        .search-icon { position: absolute; left: 22px; top: 50%; transform: translateY(-50%); color: #FF8F50; font-size: 1.1rem; }
+
+        /* --- MENU LOC (SCROLL) --- */
+        .nav-wrapper { 
+            display: flex; justify-content: center; margin-bottom: 40px; 
+            position: relative; padding: 0 40px;
+        }
+        .nav-container {
+            display: flex; gap: 10px; overflow-x: auto; padding: 5px; 
+            scrollbar-width: none; -webkit-overflow-scrolling: touch;
+            max-width: 1000px;
+        }
+        .nav-container::-webkit-scrollbar { display: none; }
+        
+        .nav-btn {
+            white-space: nowrap; padding: 10px 24px; border-radius: 50px; 
+            font-weight: 700; font-size: 0.9rem; color: #666; 
+            background: white; border: 1px solid rgba(0,0,0,0.05); 
+            cursor: pointer; transition: 0.3s; flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+        .nav-btn:hover { color: var(--primary); transform: translateY(-2px); }
+        .nav-btn.active { 
+            background: var(--primary-gradient); color: white; 
+            border-color: transparent; box-shadow: 0 8px 20px rgba(255, 94, 98, 0.4); 
+            transform: translateY(-2px);
+        }
+
+        .nav-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 40px; height: 40px; border-radius: 50%; background: white;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); color: var(--primary);
+            cursor: pointer; z-index: 10; transition: 0.2s;
+        }
+        .nav-arrow:hover { transform: translateY(-50%) scale(1.1); background: var(--primary); color: white; }
+        .nav-prev { left: 0; }
+        .nav-next { right: 0; }
+
+        /* --- CARD GIAO DIỆN MỚI --- */
+        .news-grid { 
+            display: grid; 
+            grid-template-columns: repeat(1, 1fr); 
+            gap: 30px; 
+        }
+        @media (min-width: 768px) { .news-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1100px) { .news-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        .card { 
+            background: white; border-radius: 24px; overflow: hidden; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03); 
+            border: 1px solid rgba(255,255,255,0.8);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            cursor: pointer; display: flex; flex-direction: column;
+            position: relative; height: 100%;
+        }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 20px 50px rgba(255, 143, 80, 0.2); border-color: var(--primary); }
+        
+        .c-img-box { height: 200px; overflow: hidden; position: relative; }
+        .c-img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
+        .card:hover .c-img { transform: scale(1.1); }
+        
+        .c-badge { 
+            position: absolute; top: 15px; left: 15px; 
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(5px);
+            padding: 6px 14px; border-radius: 12px; 
+            font-size: 0.7rem; font-weight: 800; text-transform: uppercase; 
+            color: var(--text-heading); box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .c-body { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
+        .c-title { 
+            font-size: 1.2rem; font-weight: 800; line-height: 1.4; 
+            color: var(--text-heading); margin-bottom: 12px; 
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+            transition: 0.3s;
+        }
+        .card:hover .c-title { color: #FF8F50; }
+        
+        .c-desc { 
+            font-size: 0.9rem; color: #666; line-height: 1.6; margin-bottom: 20px; flex-grow: 1;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+            font-family: 'Merriweather', serif; 
+        }
+
+        .c-footer {
+            border-top: 1px solid #f0f0f0; padding-top: 15px; margin-top: auto;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.8rem; color: #aaa; font-weight: 600;
+        }
+        .read-link { color: var(--primary); display: flex; align-items: center; gap: 5px; transition: 0.3s; }
+        .card:hover .read-link { gap: 10px; }
+
+        /* FEATURED CARD */
+        .featured-card {
+            grid-column: 1 / -1; /* Chiếm full chiều ngang */
+            display: grid; grid-template-columns: 1.5fr 1fr; gap: 0;
+            background: white; border-radius: 30px; overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.05); margin-bottom: 20px;
+            cursor: pointer; height: 380px; transition: 0.4s;
+            border: 2px solid white;
+        }
+        .featured-card:hover { transform: translateY(-5px); box-shadow: 0 25px 60px rgba(255, 143, 80, 0.2); }
+        .featured-card .c-img-box { height: 100%; }
+        .featured-card .c-body { padding: 40px; justify-content: center; }
+        .featured-card .c-title { font-size: 2.2rem; }
+        
+        /* LOADING */
+        .loading-state { text-align: center; padding: 100px 0; color: #ccc; font-weight: 600; }
+
+        /* --- MOBILE --- */
+        .mobile-header { display: none; }
+        @media (max-width: 1023px) {
+            .mobile-header { display: flex; position: fixed; top: 0; left: 0; right: 0; height: 70px; background: rgba(255,255,255,0.95); z-index: 1000; align-items: center; padding: 0 20px; }
+            #menu-placeholder { width: 0; }
+            aside { position: fixed; left: -280px; top: 0; bottom: 0; width: 280px; transition: 0.3s; z-index: 1001; }
+            aside.open { left: 0; }
+            #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 999; }
+            #sidebar-overlay.active { display: block; }
+            
+            .main-content { margin-left: 0; width: 100%; padding: 100px 20px 40px; }
+            .nav-wrapper { padding: 0; } .nav-arrow { display: none; }
+            .nav-container { padding: 0 10px; }
+            
+            .featured-card { grid-template-columns: 1fr; height: auto; }
+            .featured-card .c-img-box { height: 200px; }
+            .featured-card .c-body { padding: 25px; }
+            .featured-card .c-title { font-size: 1.5rem; }
+        }
+        
+        /* Background Blobs */
         .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
-        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; animation: floatBlob 10s infinite alternate; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatBlob 10s infinite alternate; }
         .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
         .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
         .blob-3 { width: 300px; height: 300px; background: #FFD1D1; top: 40%; left: 40%; animation-delay: -2s; }
-        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
-
-        /* Font riêng cho nội dung đọc */
-        .reading-font { font-family: 'Merriweather', serif; }
-
-
-        /* --- HEADER MOBILE --- */
-        .mobile-header {
-            display: none; position: fixed; top: 0; left: 0; right: 0;
-            height: 60px; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); z-index: 1000;
-            align-items: center; padding: 0 20px; border-bottom: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-        }
-        
-        /* --- SIDEBAR OVERLAY --- */
-        #sidebar-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
-            z-index: 9998;
-        }
-
-        /* --- LAYOUT CHÍNH --- */
-        @media (min-width: 1024px) {
-            #menu-placeholder { display: block; position: fixed; top: 0; left: 0; height: 100vh; width: var(--sidebar-width); z-index: 900; }
-            .main-content { margin-left: var(--sidebar-width); padding: 50px 60px; }
-            .mobile-header { display: none; }
-        }
-
-        @media (max-width: 1023px) {
-            .mobile-header { display: flex; }
-            #sidebar-overlay.active { display: block; }
-            #menu-placeholder { display: block; width: 0; height: 0; overflow: visible; }
-            
-            aside {
-                position: fixed !important; left: 0 !important; top: 0 !important; bottom: 0 !important;
-                transform: translateX(-100%); z-index: 9999 !important; width: 280px !important; 
-                background: white !important; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                display: flex !important; flex-direction: column !important;
-                box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important;
-            }
-            aside.open { transform: translateX(0) !important; }
-            .main-content { margin-left: 0 !important; width: 100% !important; padding: 80px 20px 40px !important; }
-        }
-
-        /* --- CONTENT STYLING --- */
-        .page-header { text-align: center; margin-bottom: 40px; }
-        .page-title { font-size: 2.2rem; font-weight: 900; color: var(--text-heading); margin-bottom: 5px; letter-spacing: -1px; }
-        .page-subtitle { color: #666; font-size: 1rem; font-weight: 500; }
-        .text-highlight { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        /* Search Bar */
-        .search-container { position: relative; max-width: 600px; margin: 0 auto 30px; z-index: 10; }
-        .search-box {
-            width: 100%; padding: 16px 25px 16px 55px; border-radius: 25px;
-            border: 2px solid white; background: white;
-            font-size: 1rem; font-weight: 600; color: #444;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.3s; outline: none;
-        }
-        .search-box:focus { border-color: #FF8F50; box-shadow: 0 15px 40px rgba(255, 143, 80, 0.2); transform: translateY(-2px); }
-        .search-icon { position: absolute; left: 22px; top: 50%; transform: translateY(-50%); color: #bbb; font-size: 1.2rem; transition: 0.3s; }
-        .search-box:focus + .search-icon { color: #FF8F50; }
-
-        /* Tabs Filter - Tăng khoảng cách margin-bottom để giãn dòng */
-        .tabs-container { 
-            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; 
-            margin-bottom: 40px; /* GIÃN CÁCH VỚI PHẦN DƯỚI */
-            justify-content: flex-start; -webkit-overflow-scrolling: touch; scrollbar-width: none;
-        }
-        .tabs-container::-webkit-scrollbar { display: none; }
-        @media (min-width: 768px) { .tabs-container { justify-content: center; } }
-        
-        .tab-btn {
-            padding: 10px 24px; border-radius: 50px; background: rgba(255,255,255,0.6);
-            border: 1px solid white; color: #666; font-weight: 700; font-size: 0.9rem;
-            cursor: pointer; transition: 0.3s; white-space: nowrap; flex-shrink: 0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-        }
-        .tab-btn:hover { background: white; transform: translateY(-2px); color: var(--primary); }
-        .tab-btn.active {
-            background: var(--primary-gradient); color: white; border-color: transparent;
-            box-shadow: 0 8px 20px rgba(255, 94, 98, 0.4); transform: translateY(-2px);
-        }
-
-        /* --- CARD DESIGN (REMASTERED) --- */
-        .news-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 25px; }
-        @media (min-width: 640px) { .news-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 1024px) { .news-grid { grid-template-columns: repeat(3, 1fr); } }
-
-        .card {
-            background: white; border-radius: 24px; overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.8); position: relative;
-            transition: all 0.4s ease; opacity: 0; animation: fadeUp 0.6s forwards; cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03); display: flex; flex-direction: column;
-        }
-        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
-        
-        .card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(255, 143, 80, 0.15); border-color: rgba(255, 143, 80, 0.3); }
-        
-        .card-img-box { height: 190px; overflow: hidden; position: relative; }
-        .card-img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
-        .card:hover .card-img { transform: scale(1.08); }
-        
-        /* Badge chủ đề (Cục chỉ Topic) - LÀM ĐẸP */
-        .card-badge {
-            position: absolute; top: 15px; left: 15px;
-            background: rgba(255, 255, 255, 0.8); /* Nền trong suốt hơn */
-            backdrop-filter: blur(12px); /* Hiệu ứng kính mờ mạnh hơn */
-            -webkit-backdrop-filter: blur(12px);
-            padding: 6px 16px; 
-            border-radius: 50px; /* Bo tròn kiểu viên thuốc */
-            font-size: 0.7rem; font-weight: 800; 
-            color: var(--primary); 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.6); /* Viền mỏng tinh tế */
-            transition: 0.3s;
-        }
-        /* Hover vào card thì badge sáng lên */
-        .card:hover .card-badge {
-            background: white;
-            color: #FF5E62;
-            transform: scale(1.05);
-        }
-
-        .card-content { padding: 24px; flex-grow: 1; display: flex; flex-direction: column; }
-        
-        /* Meta Topic bên dưới ảnh (nếu có) hoặc hashtag */
-        .card-meta { 
-            font-size: 0.75rem; font-weight: 700; color: #999; 
-            margin-bottom: 12px; /* Giãn cách với tiêu đề */
-            text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;
-        }
-        
-        .card-title { 
-            font-size: 1.25rem; font-weight: 800; color: var(--text-heading); 
-            line-height: 1.4; margin-bottom: 10px; transition: color 0.3s;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-        }
-        .card:hover .card-title { color: var(--primary); }
-        
-        /* Mô tả dùng font có chân, màu nhạt, thoáng */
-        .card-desc { 
-            font-family: 'Merriweather', serif; font-size: 0.9rem; color: #666; 
-            line-height: 1.6; margin-bottom: 20px; flex-grow: 1;
-            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-        }
-
-        .read-more {
-            font-size: 0.85rem; font-weight: 700; color: var(--primary);
-            display: flex; align-items: center; gap: 5px; opacity: 0.8; transition: 0.3s;
-        }
-        .card:hover .read-more { opacity: 1; gap: 8px; }
-
-        /* --- MODAL POPUP (MAGAZINE STYLE) --- */
-        .modal-wrap {
-            position: fixed; inset: 0; z-index: 10000;
-            background: rgba(255, 245, 236, 0.92); backdrop-filter: blur(15px);
-            display: none; align-items: center; justify-content: center; padding: 15px;
-        }
-        .modal-box {
-            background: white; width: 100%; max-width: 850px; max-height: 90vh;
-            border-radius: 30px; box-shadow: 0 30px 80px rgba(255, 143, 80, 0.25);
-            display: flex; flex-direction: column; overflow: hidden;
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid white;
-        }
-        @keyframes popIn { from { transform: scale(0.95) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
-
-        .modal-header { height: 280px; position: relative; flex-shrink: 0; }
-        .modal-img { width: 100%; height: 100%; object-fit: cover; }
-        .close-modal {
-            position: absolute; top: 20px; right: 20px; width: 45px; height: 45px;
-            background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; color: #FF8F50; cursor: pointer; transition: 0.3s;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 10;
-        }
-        .close-modal:hover { transform: rotate(90deg) scale(1.1); background: var(--primary); color: white; }
-
-        .modal-body { padding: 40px 50px; overflow-y: auto; -webkit-overflow-scrolling: touch; background: #fffdfa; }
-        
-        .dt-tag { 
-            background: #FFF0E5; color: var(--primary); padding: 8px 16px; 
-            border-radius: 50px; font-weight: 800; font-size: 0.8rem; 
-            display: inline-block; margin-bottom: 20px; letter-spacing: 0.5px;
-        }
-        .dt-title { 
-            font-size: 2.2rem; font-weight: 900; color: var(--text-heading); 
-            margin-bottom: 30px; line-height: 1.25; letter-spacing: -0.5px;
-        }
-        
-        /* Nội dung bài viết được format đẹp */
-        .dt-content { 
-            font-family: 'Merriweather', serif; font-size: 1.15rem; line-height: 1.9; 
-            color: #2d3436; 
-        }
-        .dt-content p { margin-bottom: 20px; text-align: justify; }
-        .dt-content strong { color: #000; font-weight: 900; }
-        
-        /* Highlight đẹp */
-        .highlight { background: linear-gradient(120deg, #ffeebb 0%, #ffeebb 100%); background-repeat: no-repeat; background-size: 100% 40%; background-position: 0 88%; padding: 0 2px; }
-
-        @media (max-width: 768px) {
-            .page-title { font-size: 1.8rem; }
-            .modal-header { height: 200px; }
-            .modal-body { padding: 25px 20px; }
-            .dt-title { font-size: 1.6rem; }
-            .dt-content { font-size: 1.05rem; line-height: 1.7; }
-        }
-
-/* --- GLOBAL SCROLLBAR STYLE --- */
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
-::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
-::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
-::-webkit-scrollbar-button { display: none; }
     </style>
 </head>
 <body>
@@ -258,241 +207,226 @@
     </div>
 
     <div class="mobile-header lg:hidden">
-        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl mr-4 focus:outline-none w-10 h-10 flex items-center justify-center rounded-full active:bg-orange-50 transition">
-            <i class="fas fa-bars"></i>
-        </button>
+        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl mr-4"><i class="fas fa-bars"></i></button>
         <div class="flex items-center gap-2">
             <img src="../LOGO.WEBP" alt="Logo" class="w-8 h-8">
             <span class="font-black text-orange-500 text-lg">HOPVAN</span>
         </div>
     </div>
-
     <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <div id="menu-placeholder"></div>
 
     <main class="main-content">
         <div class="page-header">
-            <h1 class="page-title">Bản Tin <span class="text-highlight">Văn Học</span></h1>
-            <p class="page-subtitle">Kho tàng tư liệu "đắt giá" cho bài văn điểm 9+</p>
-        </div>
-
-        <div class="search-container">
-            <input type="text" id="search-input" class="search-box" placeholder="Tìm kiếm cảm hứng...">
-            <i class="fas fa-search search-icon"></i>
-        </div>
-
-        <div class="tabs-container">
-            <div class="tab-btn active" onclick="filterData('all', this)"><i class="fas fa-layer-group"></i> Tất cả</div>
-            <div class="tab-btn" onclick="filterData('danchung', this)"><i class="fas fa-fire"></i> Dẫn chứng NLXH</div>
-            <div class="tab-btn" onclick="filterData('lyluan', this)"><i class="fas fa-book-open"></i> Lý luận văn học</div>
-            <div class="tab-btn" onclick="filterData('vanhay', this)"><i class="fas fa-pen-nib"></i> Văn hay chữ tốt</div>
-        </div>
-
-        <div class="news-grid" id="news-grid">
-            <div class="text-center w-full col-span-full py-20 font-bold text-gray-400 flex flex-col items-center">
-                <i class="fas fa-spinner fa-spin text-3xl mb-4 text-orange-300"></i>
-                Đang tải thư viện tri thức...
+            <h1 class="page-title">Bản Tin <span class="text-gradient">Văn Học</span></h1>
+            <p class="page-subtitle">Dữ liệu Dẫn chứng, Nhận định & Văn mẫu chọn lọc</p>
+            
+            <div class="search-box-wrap">
+                <input type="text" id="search-input" class="search-inp" placeholder="Tìm kiếm bài viết, tác giả...">
+                <i class="fas fa-search search-icon"></i>
             </div>
         </div>
+
+        <div class="nav-wrapper">
+            <button class="nav-arrow nav-prev" onclick="scrollNav(-1)"><i class="fas fa-chevron-left"></i></button>
+            <div class="nav-container" id="nav-scroll-container">
+                <button class="nav-btn active" onclick="filterData('all', this)">Tất cả</button>
+                <button class="nav-btn" onclick="filterData('dauchan', this)">Dấu chân thời đại</button>
+                <button class="nav-btn" onclick="filterData('chandung', this)">Chân dung bút lực</button>
+                <button class="nav-btn" onclick="filterData('diahat', this)">Địa hạt chữ nghĩa</button>
+                <button class="nav-btn" onclick="filterData('maicau', this)">Mài câu sáng chữ</button>
+                <button class="nav-btn" onclick="filterData('vetsang', this)">Vệt sáng ngôn từ</button>
+                <button class="nav-btn" onclick="filterData('liluan', this)">Lí luận văn học</button>
+                <button class="nav-btn" onclick="filterData('cuango', this)">Cửa ngõ văn chương</button>
+                <button class="nav-btn" onclick="filterData('khoinguon', this)">Khơi nguồn diễn đạt</button>
+            </div>
+            <button class="nav-arrow nav-next" onclick="scrollNav(1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+
+        <div id="content-area">
+            <div class="loading-state">
+                <i class="fas fa-spinner fa-spin text-3xl mb-3 text-orange-300"></i>
+                <br>Đang tải dữ liệu...
+            </div>
+        </div>
+
     </main>
 
-    <div id="detail-modal" class="modal-wrap">
-        <div class="modal-box">
-            <div class="modal-header">
-                <img id="m-img" class="modal-img" src="" alt="">
-                <div class="close-modal" onclick="closeModal()"><i class="fas fa-times"></i></div>
-            </div>
-            <div class="modal-body">
-                <span id="m-topic" class="dt-tag">CHỦ ĐỀ</span>
-                <h2 id="m-title" class="dt-title">Tiêu đề</h2>
-                <div id="m-body" class="dt-content"></div>
-            </div>
-        </div>
-    </div>
+    <script type="module" src="gam.js"></script>    
+    <script src="../chatbot.js"></script>
 
-<script type="module" src="gam.js"></script>    
-<script src="../chatbot.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // Import Menu (Đã thêm lại)
+        import { initMenu } from "./menu.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-    let allNews = [];
-    let currentFilter = 'all';
+        // Khởi tạo Menu bên trái
+        initMenu(app);
 
-    // --- SIDEBAR TOGGLE LOGIC ---
-    window.toggleSidebar = () => {
-        const sidebar = document.querySelector('aside') || document.getElementById('main-sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        
-        if (sidebar && overlay) {
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : 'auto';
-        } else {
-            console.log("Đang tải menu...");
-        }
-    };
+        let allArticles = [];
+        let currentFilter = 'all';
 
-    // --- HELPER: Random Image Generator ---
-    function getRandomImage(type) {
-        const images = {
-            'danchung': [
-                "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=800",
-                "https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?w=800",
-                "https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?w=800"
-            ],
-            'lyluan': [
-                "https://images.unsplash.com/photo-1478641300939-0ec5188d3163?w=800",
-                "https://images.unsplash.com/photo-1516414447565-b14be0adf13e?w=800",
-                "https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=800"
-            ],
-            'vanhay': [
-                "https://images.unsplash.com/photo-1519682337058-a5ca05e24b06?w=800",
-                "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800",
-                "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800"
-            ]
+        // 8 Danh mục mới (để hiển thị badge)
+        const CAT_CONFIG = {
+            'dauchan':  { name: 'Dấu chân thời đại' },
+            'chandung': { name: 'Chân dung bút lực' },
+            'diahat':   { name: 'Địa hạt chữ nghĩa' },
+            'maicau':   { name: 'Mài câu sáng chữ' },
+            'vetsang':  { name: 'Vệt sáng ngôn từ' },
+            'liluan':   { name: 'Lí luận văn học' },
+            'cuango':   { name: 'Cửa ngõ văn chương' },
+            'khoinguon': { name: 'Khơi nguồn diễn đạt' }
         };
-        const list = images[type] || images['danchung'];
-        return list[Math.floor(Math.random() * list.length)];
-    }
 
-    // --- HELPER: Topic Name ---
-    function getCatName(cat) {
-        if(cat === 'danchung') return 'Dẫn chứng';
-        if(cat === 'lyluan') return 'Lý luận';
-        if(cat === 'vanhay') return 'Văn hay';
-        return 'Kiến thức';
-    }
+        const getCatInfo = (code) => CAT_CONFIG[code] || { name: 'Bài viết' };
 
-    // --- LOAD DATA FROM FIREBASE ---
-    async function loadData() {
-        try {
-            const q = query(collection(db, "literary_news"), orderBy("createdAt", "desc"));
-            const snapshot = await getDocs(q);
-            allNews = [];
-
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                allNews.push({
-                    id: doc.id,
-                    title: data.title || "Không có tiêu đề",
-                    category: data.type || "danchung", // Mặc định nếu thiếu
-                    topic: getCatName(data.type),
-                    summary: data.summary || "",
-                    content: data.content || "",
-                    img: data.img || getRandomImage(data.type) // Ưu tiên ảnh nhập, nếu không thì random
+        // --- FETCH DATA ---
+        async function loadData() {
+            try {
+                const q = query(collection(db, "literary_news"), orderBy("createdAt", "desc"));
+                const snapshot = await getDocs(q);
+                
+                allArticles = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    allArticles.push({
+                        id: doc.id,
+                        title: data.title || "Chưa có tiêu đề",
+                        category: data.type || "diahat", 
+                        // Sửa lỗi hiển thị tóm tắt (lấy intro nếu summary trống)
+                        summary: data.summary || data.intro?.replace(/<[^>]*>?/gm, '').slice(0, 150) + "..." || "",
+                        img: data.img || "../panel.webp", 
+                        date: data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('vi-VN') : 'Mới cập nhật'
+                    });
                 });
-            });
 
-            if(allNews.length === 0) {
-                document.getElementById('news-grid').innerHTML = '<div class="text-center py-20 text-gray-400 font-bold col-span-full">Chưa có bài viết nào. Hãy quay lại sau nhé!</div>';
-            } else {
-                renderGrid(allNews);
+                renderLayout(allArticles);
+            } catch (e) {
+                console.error(e);
+                document.getElementById('content-area').innerHTML = `<div class="loading-state text-red-400">Không thể kết nối máy chủ.</div>`;
             }
-        } catch (e) {
-            console.error(e);
-            document.getElementById('news-grid').innerHTML = '<p class="text-center font-bold text-red-400 col-span-full">Lỗi tải dữ liệu. Vui lòng tải lại trang.</p>';
-        }
-    }
-
-    function getSummary(html, limit = 100) {
-        const div = document.createElement("div"); div.innerHTML = html;
-        let text = (div.textContent || "").trim();
-        return text.length > limit ? text.substring(0, limit) + "..." : text;
-    }
-
-    function renderGrid(data, keyword = "") {
-        const grid = document.getElementById('news-grid');
-        if(data.length === 0) {
-            grid.innerHTML = '<div class="text-center py-20 text-gray-400 font-bold col-span-full">Không tìm thấy kết quả phù hợp.</div>';
-            return;
         }
 
-        grid.innerHTML = data.map((item, index) => {
-            let title = item.title;
-            if(keyword) {
-                const regex = new RegExp(`(${keyword})`, 'gi');
-                title = item.title.replace(regex, '<span class="highlight">$1</span>');
+        // --- RENDER CARD GIAO DIỆN MỚI ---
+        function renderLayout(articles) {
+            const container = document.getElementById('content-area');
+            container.innerHTML = '';
+
+            if (articles.length === 0) {
+                container.innerHTML = '<div class="loading-state">Chưa có bài viết nào.</div>';
+                return;
             }
-            
-            return `
-            <div class="card" style="animation-delay: ${index * 0.05}s" onclick="openDetail('${item.id}')">
-                <div class="card-img-box">
-                    <img src="${item.img}" class="card-img" loading="lazy" onerror="this.src='../panel.webp'">
-                    <div class="card-badge">${item.topic}</div>
-                </div>
-                <div class="card-content">
-                    <div class="card-meta">
-                        <i class="fas fa-feather-alt text-orange-400"></i> ${getCatName(item.category)}
+
+            let featured = null;
+            let list = [...articles];
+
+            // Nếu đang xem "Tất cả", tách bài mới nhất làm Featured
+            if (currentFilter === 'all' && list.length > 0) {
+                featured = list.shift(); 
+            }
+
+            let html = '';
+
+            // Featured Card (Bài nổi bật to đùng)
+            if (featured) {
+                const cat = getCatInfo(featured.category);
+                html += `
+                <div class="featured-card card" onclick="goToDetail('${featured.id}')">
+                    <div class="c-img-box f-img-wrap">
+                        <img src="${featured.img}" class="c-img f-img" loading="lazy">
+                        <div class="c-badge" style="background:var(--primary); color:white; border:none;">MỚI NHẤT</div>
                     </div>
-                    <h3 class="card-title">${title}</h3>
-                    <p class="card-desc">${getSummary(item.summary || item.content)}</p>
-                    <div class="read-more">Đọc tiếp <i class="fas fa-arrow-right"></i></div>
-                </div>
-            </div>`;
-        }).join('');
-    }
+                    <div class="c-body f-content">
+                        <div class="c-badge" style="position:static; width:fit-content; margin-bottom:10px; background:rgba(255,143,80,0.1); color:#FF8F50;">${cat.name}</div>
+                        <h2 class="c-title f-title" style="font-size:2rem;">${featured.title}</h2>
+                        <p class="c-desc f-desc">${featured.summary}</p>
+                        <div class="c-footer">
+                            <span>${featured.date}</span>
+                            <span class="read-link">Đọc ngay <i class="fas fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+                </div>`;
+            }
 
-    // SEARCH & FILTER
-    document.getElementById('search-input').addEventListener('input', (e) => {
-        const rawKey = e.target.value;
-        const key = rawKey.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        const filtered = allNews.filter(i => {
-            const matchCat = currentFilter === 'all' || i.category === currentFilter;
-            const matchKey = i.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(key);
-            return matchCat && matchKey;
+            // Grid Cards (Các bài còn lại)
+            html += '<div class="news-grid">';
+            list.forEach(item => {
+                const cat = getCatInfo(item.category);
+                html += `
+                <div class="card" onclick="goToDetail('${item.id}')">
+                    <div class="c-img-box">
+                        <img src="${item.img}" class="c-img" loading="lazy">
+                        <div class="c-badge">${cat.name}</div>
+                    </div>
+                    <div class="c-body">
+                        <h3 class="c-title">${item.title}</h3>
+                        <p class="c-desc">${item.summary}</p>
+                        <div class="c-footer">
+                            <span>${item.date}</span>
+                            <span class="read-link">Xem <i class="fas fa-chevron-right"></i></span>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+
+            container.innerHTML = html;
+        }
+
+        // --- FILTER LOGIC ---
+        window.filterData = (cat, el) => {
+            currentFilter = cat;
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            if(el) {
+                el.classList.add('active');
+                el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+            const filtered = cat === 'all' ? allArticles : allArticles.filter(i => i.category === cat);
+            renderLayout(filtered);
+        };
+
+        // --- SEARCH ---
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const key = e.target.value.toLowerCase();
+            const filtered = allArticles.filter(i => i.title.toLowerCase().includes(key));
+            renderLayout(filtered);
         });
-        renderGrid(filtered, rawKey);
-    });
 
-    window.filterData = (cat, el) => {
-        currentFilter = cat;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        if(el) el.classList.add('active');
-        document.getElementById('search-input').value = "";
-        renderGrid(cat === 'all' ? allNews : allNews.filter(i => i.category === cat));
-    };
+        window.scrollNav = (direction) => {
+            const container = document.getElementById('nav-scroll-container');
+            container.scrollBy({ left: 300 * direction, behavior: 'smooth' });
+        };
 
-    // MODAL
-    window.openDetail = (id) => {
-        const item = allNews.find(i => i.id == id);
-        if(!item) return;
-        document.getElementById('m-img').src = item.img;
-        document.getElementById('m-topic').innerText = item.topic;
-        document.getElementById('m-title').innerText = item.title;
-        document.getElementById('m-body').innerHTML = item.content;
+        window.goToDetail = (id) => {
+            // Chuyển hướng sang trang xem chi tiết
+            window.location.href = `../bantinvanhoc/view.html?id=${id}`;
+        };
+
+        window.toggleSidebar = () => {
+            const sidebar = document.querySelector('aside');
+            const overlay = document.getElementById('sidebar-overlay');
+            if(sidebar) {
+                sidebar.classList.toggle('open');
+                if(overlay) overlay.classList.toggle('active');
+            }
+        };
+
+        onAuthStateChanged(auth, (u) => { 
+            if(!u) window.location.href="../log.html"; 
+            else loadData(); 
+        });
         
-        const modal = document.getElementById('detail-modal');
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    };
+        window.addEventListener('trigger-firebase-signout', async () => { await signOut(auth); window.location.href = "../index.html"; });
 
-    window.closeModal = () => {
-        document.getElementById('detail-modal').style.display = 'none';
-        document.body.style.overflow = 'auto';
-    };
-
-    window.onclick = (e) => {
-        if(e.target == document.getElementById('detail-modal')) window.closeModal();
-    }
-
-    // INIT
-    onAuthStateChanged(auth, (u) => { if(!u) window.location.href="../log.html"; });
-    loadData();
-
-    // LOAD MENU
-    import { initMenu } from "./menu.js";
-    initMenu(app);
-
-    window.addEventListener('trigger-firebase-signout', async () => { await signOut(auth); window.location.href = "../index.html"; });
-</script>
+    </script>
 </body>
 </html>

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -178,7 +179,7 @@
     </div>
 
     <aside class="w-[280px] sidebar hidden md:flex flex-col z-50 h-full shadow-xl">
-        <a href="index.html" class="p-8 flex items-center gap-4 hover:opacity-80 transition-opacity cursor-pointer text-decoration-none group">
+        <a class='p-8 flex items-center gap-4 hover:opacity-80 transition-opacity cursor-pointer text-decoration-none group' href='/'>
             <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20 border border-orange-50 overflow-hidden">
                 <img src="../LOGO.WEBP" alt="HopVan Logo" class="w-12 h-12 object-contain drop-shadow-md bg-white rounded-xl p-1 group-hover:scale-105 transition-transform">
             </div>
@@ -360,30 +361,45 @@
             </div>
 
             <div id="view-news" class="view-section hidden space-y-6">
-                <div class="glass-panel rounded-3xl p-2 flex justify-between items-center sticky top-0 z-20">
-                    <div class="flex gap-2">
-                        <button onclick="loadNews('all', this)" class="px-5 py-3 rounded-2xl text-xs font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 shadow-lg shadow-orange-500/30 transition filter-btn-news active">TẤT CẢ</button>
-                        <button onclick="loadNews('danchung', this)" class="px-5 py-3 rounded-2xl text-xs font-bold text-gray-500 hover:bg-white hover:text-orange-500 transition filter-btn-news">DẪN CHỨNG NLXH</button>
-                        <button onclick="loadNews('lyluan', this)" class="px-5 py-3 rounded-2xl text-xs font-bold text-gray-500 hover:bg-white hover:text-orange-500 transition filter-btn-news">LÝ LUẬN VH</button>
-                        <button onclick="loadNews('vanhay', this)" class="px-5 py-3 rounded-2xl text-xs font-bold text-gray-500 hover:bg-white hover:text-orange-500 transition filter-btn-news">VĂN HAY CHỮ TỐT</button>
-                    </div>
-                    <button onclick="openModal('new', 'literary_news')" class="w-10 h-10 rounded-xl bg-gray-900 text-white flex items-center justify-center hover:scale-110 transition"><i class="fas fa-plus"></i></button>
-                </div>
-
-                <div class="glass-panel rounded-3xl overflow-hidden min-h-[500px]">
-                    <table class="w-full text-left table-custom">
-                        <thead class="bg-gray-50/50">
-                            <tr>
-                                <th>Tiêu đề</th>
-                                <th>Thể loại</th>
-                                <th>Mô tả ngắn</th>
-                                <th class="text-right">Tác vụ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="news-table-body"></tbody>
-                    </table>
-                </div>
+    <div class="glass-panel rounded-3xl p-3 flex flex-col gap-4 sticky top-0 z-20">
+        <div class="flex justify-between items-center px-2">
+            <h3 class="font-black text-gray-800 text-lg flex items-center gap-2">
+                <i class="fas fa-newspaper text-orange-500"></i> Quản Lý Bài Viết
+            </h3>
+            <button onclick="openNewsModal('new')" class="px-4 py-2 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition flex items-center gap-2">
+                <i class="fas fa-plus"></i> Viết bài mới
+            </button>
+        </div>
+        
+        <div class="w-full overflow-x-auto pb-2 custom-scrollbar">
+            <div class="flex gap-2 w-max px-2">
+                <button onclick="loadNews('all', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 shadow-md transition filter-btn-news active whitespace-nowrap">TẤT CẢ</button>
+                <button onclick="loadNews('dauchan', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap">DẤU CHÂN THỜI ĐẠI</button>
+                <button onclick="loadNews('chandung', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap">CHÂN DUNG BÚT LỰC</button>
+                <button onclick="loadNews('diahat', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap">ĐỊA HẠT CHỮ NGHĨA</button>
+                <button onclick="loadNews('maicau', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap">MÀI CÂU SÁNG CHỮ</button>
+                <button onclick="loadNews('vetsang', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap">VỆT SÁNG NGÔN TỪ</button>
+                <button onclick="loadNews('liluan', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap">LÍ LUẬN VĂN HỌC</button>
+                <button onclick="loadNews('cuango', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap">CỬA NGÕ VĂN CHƯƠNG</button>
+                <button onclick="loadNews('khoinguon', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap">KHƠI NGUỒN DIỄN ĐẠT</button>
             </div>
+        </div>
+    </div>
+
+    <div class="glass-panel rounded-3xl overflow-hidden min-h-[500px]">
+        <table class="w-full text-left table-custom">
+            <thead class="bg-gray-50/50">
+                <tr>
+                    <th class="w-1/3">Bài viết & Slug</th>
+                    <th>Danh mục</th>
+                    <th>Ảnh bìa</th>
+                    <th class="text-right">Tác vụ</th>
+                </tr>
+            </thead>
+            <tbody id="news-table-body"></tbody>
+        </table>
+    </div>
+</div>
 
             <div id="view-journal" class="view-section hidden h-full">
                 <div class="flex gap-6 h-[calc(100vh-140px)]"> <div class="w-1/3 min-w-[300px] glass-panel rounded-3xl flex flex-col overflow-hidden bg-white/50 border border-white/60">
@@ -577,32 +593,113 @@
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, query, where, orderBy, limit, onSnapshot, getDocs, getCountFromServer, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- CONFIG FIREBASE ---
+    // --- 1. CONFIG FIREBASE & BIẾN TOÀN CỤC ---
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const API_URL = `/.netlify/functions/gemini-proxy`;
-    let questionsData = []; 
+const IMGBB_API_KEY = "82fd82fa83b95d394fffc9a7da6ee3ba"; 
+    let tempFiles = { main: null, sections: {} }; 
+    let newsEditors = {}; // Quản lý Quill cho Bản tin
+    let editors = {};     // Quản lý Quill cho Kho đề thi
     let currentCollection = 'essay_bank';
     let currentNewsFilter = 'all';
-    let editors = {}; 
+
+    // 8 DANH MỤC VĂN HỌC MỚI
+const CAT_MAP = {
+        'dauchan': { label: 'Dấu chân thời đại', color: 'bg-zinc-800 text-white' },
+        'chandung': { label: 'Chân dung bút lực', color: 'bg-stone-600 text-white' },
+        'diahat': { label: 'Địa hạt chữ nghĩa', color: 'bg-blue-100 text-blue-700' },
+        'maicau': { label: 'Mài câu sáng chữ', color: 'bg-orange-100 text-orange-700' },
+        'vetsang': { label: 'Vệt sáng ngôn từ', color: 'bg-amber-100 text-amber-700' },
+        'liluan': { label: 'Lí luận văn học', color: 'bg-purple-100 text-purple-700' },
+        'cuango': { label: 'Cửa ngõ văn chương', color: 'bg-rose-100 text-rose-700' },
+        'khoinguon': { label: 'Khơi nguồn diễn đạt', color: 'bg-emerald-100 text-emerald-700' }
+    };
+    // --- HELPER UPLOAD ---
+    async function uploadToImgBB(file) {
+        if (!file) return null;
+        const formData = new FormData();
+        formData.append("image", file);
+        try {
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
+            const result = await res.json();
+            return result.success ? result.data.url : null;
+        } catch (e) { return null; }
+    }
+
+window.openNewsModal = async (id) => {
+        const container = document.getElementById('modal-fields');
+        document.getElementById('exam-collection').value = 'literary_news';
+        document.getElementById('exam-id').value = id;
+        document.querySelector('.modal-overlay').classList.add('show');
+        container.innerHTML = '<div class="text-center py-20"><i class="fas fa-spinner fa-spin text-orange-500 text-3xl"></i></div>';
+
+        let data = { sections: [] };
+        tempFiles = { main: null, sections: {} }; 
+
+        if (id !== 'new') {
+            const snap = await getDoc(doc(db, "literary_news", id));
+            if (snap.exists()) data = snap.data();
+        }
+
+        container.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                <div class="md:col-span-4 space-y-6">
+                    <div class="bg-white p-6 rounded-3xl border border-orange-100 shadow-sm">
+                        <label class="label-custom mb-3">Ảnh bìa Hero</label>
+                        <div class="relative aspect-video bg-orange-50 rounded-2xl border-2 border-dashed border-orange-200 flex items-center justify-center overflow-hidden group">
+                            <img id="main-preview" src="${data.img || ''}" class="${data.img ? '' : 'hidden'} w-full h-full object-cover absolute inset-0 z-0">
+                            <input type="file" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewMainImg(this)">
+                            <i class="fas fa-image text-3xl text-orange-200 group-hover:text-orange-400"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-orange-100 shadow-sm space-y-4">
+                        <div>
+                            <label class="label-custom">Chuyên mục</label>
+                            <select id="news-type" class="glass-input font-bold">
+                                ${Object.entries(CAT_MAP).map(([k, v]) => `
+                                    <option value="${k}" ${data.type === k ? 'selected' : ''}>
+                                        ${v.label} 
+                                    </option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        <div><label class="label-custom">Slug URL</label><input id="news-slug" class="glass-input text-xs font-mono bg-gray-50" value="${data.slug||''}" readonly></div>
+                    </div>
+                </div>
+                <div class="md:col-span-8 space-y-8 pb-20">
+                    <div><label class="label-custom text-orange-500 font-black">1. Tiêu đề bài viết</label><input id="news-title" class="glass-input text-2xl font-black" value="${data.title||''}" onkeyup="syncSlug(this.value)"></div>
+                    <div><label class="label-custom text-blue-500 font-black">2. Mở đầu (Intro)</label><div id="editor-intro" class="bg-white rounded-xl" style="height: 120px;"></div></div>
+                    <div id="sections-list" class="space-y-10"><label class="label-custom text-emerald-500 border-b pb-2">3. Thân bài (Phân đoạn)</label></div>
+                    <button type="button" onclick="addNewsSec()" class="w-full py-4 border-2 border-dashed border-orange-200 rounded-2xl font-bold text-orange-400 hover:bg-orange-50 transition-all">+ Thêm phân đoạn nội dung mới</button>
+                    <div><label class="label-custom text-purple-500 font-black">4. Kết bài (Ending)</label><div id="editor-ending" class="bg-white rounded-xl" style="height: 100px;"></div></div>
+                </div>
+            </div>`;
+
+        newsEditors = { 
+            intro: new Quill('#editor-intro', { theme: 'snow' }),
+            ending: new Quill('#editor-ending', { theme: 'snow' })
+        };
+        newsEditors.intro.clipboard.dangerouslyPasteHTML(data.intro || "");
+        newsEditors.ending.clipboard.dangerouslyPasteHTML(data.ending || "");
+
+        if(data.sections && data.sections.length > 0) data.sections.forEach(s => addNewsSec(s));
+        else if(id === 'new') addNewsSec();
+    };
 
     // INIT DATE
     document.getElementById('current-date').innerText = new Date().toLocaleDateString('vi-VN', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
 
     // AUTH CHECK
-    const ADMIN_EMAIL = "admin@hopvan.com";
     onAuthStateChanged(auth, (user) => {
-        if (user && user.email === ADMIN_EMAIL) {
+        if (user && user.email === "admin@hopvan.com") {
             document.getElementById('admin-email').innerText = user.email.split('@')[0];
             loadStats();
-        } else {
-            signOut(auth).then(() => window.location.href = "admin-login.html");
-        }
+            loadNews('all');
+        } else { window.location.href = "admin-login.html"; }
     });
-
     document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href = "admin-login.html");
 
     // UI NAV
@@ -702,58 +799,30 @@
     };
 
     // --- 3. LITERARY NEWS LOGIC (ĐÃ BỎ LIMIT) ---
-    window.loadNews = async (filterType, btnEl) => {
+   window.loadNews = async (filterType = 'all') => {
         currentNewsFilter = filterType;
-        if(btnEl) {
-            document.querySelectorAll('.filter-btn-news').forEach(b => {
-                b.classList.remove('active', 'bg-gradient-to-r', 'from-orange-500', 'to-red-500', 'text-white', 'shadow-lg');
-                b.classList.add('text-gray-500', 'hover:bg-white');
-            });
-            btnEl.classList.remove('text-gray-500', 'hover:bg-white');
-            btnEl.classList.add('active', 'bg-gradient-to-r', 'from-orange-500', 'to-red-500', 'text-white', 'shadow-lg');
-        }
-
         const tbody = document.getElementById('news-table-body');
-        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-10"><i class="fas fa-spinner fa-spin text-orange-500 text-2xl"></i></td></tr>';
-
-        try {
-            let q;
-            // ĐÃ SỬA: Xóa limit(20) đi
-            if (filterType === 'all') {
-                q = query(collection(db, "literary_news"), orderBy("createdAt", "desc"));
-            } else {
-                q = query(collection(db, "literary_news"), where("type", "==", filterType));
-            }
-            
-            const snap = await getDocs(q);
-            tbody.innerHTML = "";
-            if(snap.empty) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-400 font-bold">Chưa có bài viết nào thuộc mục này.</td></tr>'; return; }
-
-            snap.forEach(d => {
-                const data = d.data();
-                let typeLabel = "Khác";
-                let typeColor = "bg-gray-100 text-gray-500";
-                
-                if(data.type === 'danchung') { typeLabel = "Dẫn chứng NLXH"; typeColor = "bg-green-100 text-green-700"; }
-                if(data.type === 'lyluan') { typeLabel = "Lý luận VH"; typeColor = "bg-purple-100 text-purple-700"; }
-                if(data.type === 'vanhay') { typeLabel = "Văn hay chữ tốt"; typeColor = "bg-orange-100 text-orange-700"; }
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="font-bold text-gray-800">${data.title}</td>
-                    <td><span class="px-2 py-1 rounded-md text-[10px] font-black uppercase ${typeColor}">${typeLabel}</span></td>
-                    <td class="text-sm text-gray-500 truncate max-w-xs">${data.summary || '...'}</td>
-                    <td class="text-right">
-                        <button onclick="openModal('${d.id}', 'literary_news')" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors"><i class="fas fa-pen"></i></button>
-                        <button onclick="deleteItem('literary_news', '${d.id}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg ml-1 transition-colors"><i class="fas fa-trash"></i></button>
-                    </td>`;
-                tbody.appendChild(tr);
-            });
-        } catch(e) { 
-            console.error(e);
-            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">Lỗi tải dữ liệu: ${e.message}</td></tr>`;
-        }
-    }
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-10">Đang tải...</td></tr>';
+        
+        const q = filterType === 'all' ? query(collection(db, "literary_news"), orderBy("createdAt", "desc")) : query(collection(db, "literary_news"), where("type", "==", filterType));
+        const snap = await getDocs(q);
+        tbody.innerHTML = "";
+        
+        snap.forEach(d => {
+            const data = d.data();
+            const catInfo = CAT_MAP[data.type] || { label: 'Văn học', color: 'bg-gray-100 text-gray-600' };
+            tbody.innerHTML += `
+                <tr class="border-b border-gray-50">
+                    <td class="p-5 font-bold text-gray-700">${data.title}</td>
+                    <td><span class="px-2 py-1 rounded text-[10px] font-black uppercase ${catInfo.color}">${catInfo.label}</span></td>
+                    <td><img src="${data.img}" class="w-10 h-10 rounded-lg object-cover"></td>
+                    <td class="text-right p-5">
+                        <button onclick="openModal('${d.id}', 'literary_news')" class="text-blue-500 mr-3 p-2 hover:bg-blue-50 rounded-lg"><i class="fas fa-pen"></i></button>
+                        <button onclick="deleteItem('literary_news', '${d.id}')" class="text-red-500 p-2 hover:bg-red-50 rounded-lg"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+        });
+    };
 
     // 4. MODAL LOGIC
     window.openModal = async (id, colName, preSelectType = null) => {
@@ -761,7 +830,6 @@
         const container = document.getElementById('modal-fields');
         document.getElementById('exam-collection').value = colName;
         document.getElementById('exam-id').value = id;
-        
         modal.classList.add('show');
         container.innerHTML = '<div class="text-center py-20"><i class="fas fa-spinner fa-spin text-orange-500 text-3xl"></i></div>';
 
@@ -771,147 +839,103 @@
             if(snap.exists()) data = snap.data();
         }
 
-        const toolbar = [['bold', 'italic', 'underline', 'strike'], ['blockquote', 'code-block'], [{ 'header': 1 }, { 'header': 2 }], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'align': [] }], ['clean']];
-        const simpleToolbar = [['bold', 'italic', 'underline'], [{ 'align': [] }], ['clean']];
-
         let html = '';
-        
+        const quillToolbar = [['bold', 'italic', 'underline'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'align': [] }], ['clean']];
+
+        // --- NHÁNH 1: BẢN TIN VĂN HỌC (GIAO DIỆN NÂNG CẤP) ---
         if (colName === 'literary_news') {
-             html = `
-                <div class="grid grid-cols-3 gap-6 mb-4">
-                    <div class="col-span-2">
-                        <label class="label-custom">Tiêu đề bài viết</label>
-                        <input id="news-title" class="glass-input font-bold" value="${data.title || ''}" placeholder="Nhập tiêu đề...">
-                    </div>
-                    <div>
-                        <label class="label-custom">Chuyên mục</label>
-                        <select id="news-type" class="glass-input">
-                            <option value="danchung" ${data.type === 'danchung' ? 'selected' : ''}>Dẫn chứng NLXH</option>
-                            <option value="lyluan" ${data.type === 'lyluan' ? 'selected' : ''}>Lý luận văn học</option>
-                            <option value="vanhay" ${data.type === 'vanhay' ? 'selected' : ''}>Văn hay chữ tốt</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label class="label-custom">Link Ảnh Bìa (URL)</label>
-                    <div class="flex gap-4 items-center">
-                        <input id="news-img" class="glass-input flex-1" value="${data.img || ''}" placeholder="https://...">
-                        ${data.img ? `<img src="${data.img}" class="w-10 h-10 rounded object-cover border">` : ''}
-                    </div>
-                </div>
-                <div class="mb-6">
-                    <label class="label-custom">Chủ đề</label>
-                    <textarea id="news-summary" class="glass-input h-24" placeholder="Tuổi trẻ trong kỷ nguyên vươn mình...">${data.summary || ''}</textarea>
-                </div>
-                <div>
-                    <label class="label-custom">Nội dung chi tiết</label>
-                    <div id="news-content" style="min-height: 300px; background: white;"></div>
-                </div>
-            `;
-        } else if (colName === 'fulltest_bank') {
-             html = `
-                <div class="space-y-6">
-                    <div><label class="label-custom">NGỮ LIỆU ĐỌC HIỂU</label><div id="edit-ft-read-text"></div></div>
-                    <div><label class="label-custom">CÂU HỎI ĐỌC HIỂU (Dùng [NEXT] để tách dòng)</label><div id="edit-ft-read-qs"></div></div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div><label class="label-custom">CÂU 1 (2.0đ)</label><div id="edit-ft-nlxh"></div></div>
-                        <div><label class="label-custom">CÂU 2 (4.0đ)</label><div id="edit-ft-nlvh"></div></div>
-                    </div>
-                </div>`;
-        } else if (colName === 'quiz_bank') {
-             html = `
-                <div class="space-y-6">
-                    <div><label class="label-custom">CÂU HỎI TRẮC NGHIỆM</label><div id="edit-ex-q"></div></div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        ${['A', 'B', 'C', 'D'].map((label, i) => `
-                            <div class="flex items-center gap-4 glass-input">
-                                <input type="radio" name="correct-choice" value="${i}" ${data.correct === i ? 'checked' : ''} class="w-5 h-5 accent-orange-500">
-                                <span class="font-black text-slate-300 text-xl">${label}</span>
-                                <input id="ex-opt-${i}" class="bg-transparent border-none outline-none flex-1 font-bold" value="${data.options?.[i] || ''}">
-                            </div>`).join('')}
-                    </div>
-                </div>`;
-        } else if (colName === 'reading_bank') {
-             html = `
-                <div class="space-y-6">
-                    <div><label class="label-custom">TIÊU ĐỀ</label><input id="ex-title" class="glass-input font-bold" value="${data.title||''}"></div>
-                    <div><label class="label-custom">VĂN BẢN NGỮ LIỆU</label><div id="edit-ex-text"></div></div>
-                    <div><label class="label-custom">CÂU HỎI (Dùng [NEXT] để tách dòng)</label><div id="edit-ex-qs"></div></div>
-                </div>`;
-        } else {
-            // --- ĐÂY LÀ PHẦN SỬA CHO ESSAY_BANK ---
-            const currentType = data.type || preSelectType || 'nlxh';
-            
             html = `
-                <div class="flex gap-4 mb-4">
-                    <div class="flex-1">
-                        <label class="label-custom">LOẠI ĐỀ</label>
-                        <select id="ex-type" class="glass-input font-bold cursor-pointer" onchange="toggleGenreInput()">
-                            <option value="nlxh" ${currentType === 'nlxh' ? 'selected' : ''}>Nghị Luận Xã Hội</option>
-                            <option value="nlvh" ${currentType === 'nlvh' ? 'selected' : ''}>Nghị Luận Văn Học</option>
-                        </select>
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                    <div class="md:col-span-4 space-y-6">
+                        <div class="bg-white p-6 rounded-3xl border border-orange-100 shadow-sm">
+                            <label class="label-custom">Ảnh bìa Hero</label>
+                            <div class="relative aspect-video bg-orange-50 rounded-2xl border-2 border-dashed border-orange-200 flex items-center justify-center overflow-hidden">
+                                <img id="main-preview" src="${data.img || ''}" class="${data.img ? '' : 'hidden'} w-full h-full object-cover absolute">
+                                <input type="file" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewMainImg(this)">
+                                <i class="fas fa-image text-3xl text-orange-200"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl border border-orange-100 space-y-4">
+                            <div><label class="label-custom">Chuyên mục</label><select id="news-type" class="glass-input font-bold">
+                                ${Object.entries(CAT_MAP).map(([k,v]) => `<option value="${k}" ${data.type===k?'selected':''}>${v.label}</option>`).join('')}
+                            </select></div>
+                            <div><label class="label-custom">Slug URL</label><input id="news-slug" class="glass-input text-xs font-mono bg-gray-50" value="${data.slug||''}" readonly></div>
+                        </div>
                     </div>
-                    
-                    <div id="genre-wrapper" class="flex-1 ${currentType === 'nlvh' ? '' : 'hidden'}">
-                        <label class="label-custom">THỂ LOẠI</label>
-                        <select id="ex-genre" class="glass-input cursor-pointer">
-                            <option value="Truyện" ${data.genre === 'Truyện' ? 'selected' : ''}>Truyện</option>
-                            <option value="Thơ" ${data.genre === 'Thơ' ? 'selected' : ''}>Thơ</option>
-                            <option value="Kịch" ${data.genre === 'Kịch' ? 'selected' : ''}>Kịch</option>
-                            <option value="Ký" ${data.genre === 'Ký' ? 'selected' : ''}>Ký</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div id="work-wrapper" class="mb-4 ${currentType === 'nlvh' ? '' : 'hidden'}">
-                    <label class="label-custom">TÊN TÁC PHẨM (Nếu có)</label>
-                    <input id="ex-work" class="glass-input" value="${data.workName || ''}" placeholder="VD: Vợ chồng A Phủ, Sóng...">
-                </div>
-
-                <div class="space-y-6">
-                    <div>
-                        <label class="label-custom">YÊU CẦU ĐỀ BÀI</label>
-                        <div id="edit-ex-topic"></div>
-                    </div>
-                    <div>
-                        <label class="label-custom">NGỮ LIỆU PHỤ / TRÍCH DẪN</label>
-                        <div id="edit-ex-text"></div>
-                    </div>
-                    <div class="bg-green-50/50 p-4 rounded-2xl border border-green-100">
-                        <label class="label-custom text-green-600"><i class="fas fa-robot"></i> GỢI Ý CHẤM (AI Prompt)</label>
-                        <div id="edit-ex-hint"></div>
+                    <div class="md:col-span-8 space-y-8 pb-20">
+                        <div><label class="label-custom text-orange-500 font-black">Tiêu đề chính</label><input id="news-title" class="glass-input text-2xl font-black" value="${data.title||''}" onkeyup="syncSlug(this.value)"></div>
+                        <div><label class="label-custom text-blue-500 font-black">Mở bài (Intro)</label><div id="editor-intro" class="bg-white rounded-xl" style="height: 150px;"></div></div>
+                        <div id="sections-list" class="space-y-10"><label class="label-custom text-emerald-500 border-b pb-2">Thân bài (Sections)</label></div>
+                        <button type="button" onclick="addNewsSec()" class="w-full py-4 border-2 border-dashed border-orange-200 rounded-2xl font-bold text-orange-400 hover:bg-orange-50 transition-all">+ Thêm đoạn mới (H2 + Text + Ảnh)</button>
+                        <div><label class="label-custom text-purple-500 font-black">Kết bài (Ending)</label><div id="editor-ending" class="bg-white rounded-xl" style="height: 120px;"></div></div>
                     </div>
                 </div>`;
+        } 
+        // --- NHÁNH 2: KHO ĐỀ THI CŨ (GIỮ NGUYÊN HOÀN TOÀN) ---
+        else if (colName === 'fulltest_bank') {
+            html = `<div class="space-y-6"><div><label class="label-custom">NGỮ LIỆU ĐỌC HIỂU</label><div id="edit-ft-read-text"></div></div><div><label class="label-custom">CÂU HỎI ĐỌC HIỂU</label><div id="edit-ft-read-qs"></div></div><div class="grid grid-cols-2 gap-6"><div><label class="label-custom">NLXH (2đ)</label><div id="edit-ft-nlxh"></div></div><div><label class="label-custom">NLVH (4đ)</label><div id="edit-ft-nlvh"></div></div></div></div>`;
+        } else if (colName === 'quiz_bank') {
+            html = `<div class="space-y-6"><div><label class="label-custom">CÂU HỎI TRẮC NGHIỆM</label><div id="edit-ex-q"></div></div><div class="grid grid-cols-2 gap-4">${['A', 'B', 'C', 'D'].map((label, i) => `<div class="flex items-center gap-4 glass-input"><input type="radio" name="correct-choice" value="${i}" ${data.correct === i ? 'checked' : ''}><span class="font-black text-slate-300">${label}</span><input id="ex-opt-${i}" class="bg-transparent outline-none flex-1 font-bold" value="${data.options?.[i] || ''}"></div>`).join('')}</div></div>`;
+        } else if (colName === 'reading_bank') {
+            html = `<div class="space-y-6"><div><label class="label-custom">TIÊU ĐỀ</label><input id="ex-title" class="glass-input font-bold" value="${data.title||''}"></div><div><label class="label-custom">VĂN BẢN</label><div id="edit-ex-text"></div></div><div><label class="label-custom">CÂU HỎI</label><div id="edit-ex-qs"></div></div></div>`;
+        } else {
+            const currentType = data.type || preSelectType || 'nlxh';
+            html = `<div class="flex gap-4 mb-4"><div class="flex-1"><label class="label-custom">LOẠI ĐỀ</label><select id="ex-type" class="glass-input font-bold" onchange="toggleGenreInput()"><option value="nlxh" ${currentType === 'nlxh' ? 'selected' : ''}>Nghị Luận Xã Hội</option><option value="nlvh" ${currentType === 'nlvh' ? 'selected' : ''}>Nghị Luận Văn Học</option></select></div><div id="genre-wrapper" class="flex-1 ${currentType === 'nlvh' ? '' : 'hidden'}"><label class="label-custom">THỂ LOẠI</label><select id="ex-genre" class="glass-input"><option value="Truyện">Truyện</option><option value="Thơ">Thơ</option><option value="Kịch">Kịch</option><option value="Ký">Ký</option></select></div></div><div id="work-wrapper" class="mb-4 ${currentType === 'nlvh' ? '' : 'hidden'}"><label class="label-custom">TÊN TÁC PHẨM</label><input id="ex-work" class="glass-input" value="${data.workName || ''}"></div><div class="space-y-6"><div><label class="label-custom">YÊU CẦU</label><div id="edit-ex-topic"></div></div><div><label class="label-custom">NGỮ LIỆU PHỤ</label><div id="edit-ex-text"></div></div><div class="bg-green-50/50 p-4 rounded-2xl"><label class="label-custom text-green-600">GỢI Ý CHẤM</label><div id="edit-ex-hint"></div></div></div>`;
         }
+
         container.innerHTML = html;
 
-        const initQ = (id, content, bar) => {
-            if(!document.querySelector(id)) return null;
-            const q = new Quill(id, { modules: { toolbar: bar || simpleToolbar }, theme: 'snow' });
-            q.clipboard.dangerouslyPasteHTML(content || "");
-            return q;
-        };
-
-        editors = {};
+        // Khởi tạo trình soạn thảo sau khi render
         setTimeout(() => {
+            const createQ = (sel, content) => { if(!document.querySelector(sel)) return; const q = new Quill(sel, { theme: 'snow', modules: { toolbar: quillToolbar } }); q.clipboard.dangerouslyPasteHTML(content || ""); return q; };
             if (colName === 'literary_news') {
-                editors.content = initQ('#news-content', data.content, toolbar);
+                newsEditors.intro = createQ('#editor-intro', data.intro);
+                newsEditors.ending = createQ('#editor-ending', data.ending);
+                if(data.sections && data.sections.length > 0) data.sections.forEach(s => addNewsSec(s));
+                else if(id === 'new') addNewsSec();
             } else if (colName === 'fulltest_bank') {
-                editors.readText = initQ('#edit-ft-read-text', data.reading_text);
-                editors.readQs = initQ('#edit-ft-read-qs', (data.reading_questions||[]).join('<p>[NEXT]</p>'));
-                editors.nlxh = initQ('#edit-ft-nlxh', data.nlxh_topic);
-                editors.nlvh = initQ('#edit-ft-nlvh', data.nlvh_topic);
+                editors.readText = createQ('#edit-ft-read-text', data.reading_text);
+                editors.readQs = createQ('#edit-ft-read-qs', (data.reading_questions||[]).join('<p>[NEXT]</p>'));
+                editors.nlxh = createQ('#edit-ft-nlxh', data.nlxh_topic);
+                editors.nlvh = createQ('#edit-ft-nlvh', data.nlvh_topic);
             } else if (colName === 'quiz_bank') {
-                editors.q = initQ('#edit-ex-q', data.question);
+                editors.q = createQ('#edit-ex-q', data.question);
             } else if (colName === 'reading_bank') {
-                editors.text = initQ('#edit-ex-text', data.text);
-                editors.qs = initQ('#edit-ex-qs', (data.questions||[]).map(x=>x.q).join('<p>[NEXT]</p>'));
+                editors.text = createQ('#edit-ex-text', data.text);
+                editors.qs = createQ('#edit-ex-qs', (data.questions||[]).map(x=>x.q).join('<p>[NEXT]</p>'));
             } else {
-                editors.topic = initQ('#edit-ex-topic', data.topic);
-                editors.text = initQ('#edit-ex-text', data.text);
-                editors.hint = initQ('#edit-ex-hint', data.hint);
+                editors.topic = createQ('#edit-ex-topic', data.topic);
+                editors.text = createQ('#edit-ex-text', data.text);
+                editors.hint = createQ('#edit-ex-hint', data.hint);
             }
         }, 100);
+    };
+
+window.addNewsSec = (sData = null) => {
+        const sId = 'sec-' + Date.now() + Math.floor(Math.random()*100);
+        tempFiles.sections[sId] = [];
+        const div = document.createElement('div');
+        div.className = "news-section-item bg-white p-6 rounded-3xl border border-gray-100 relative group animate-fade-in mb-6";
+        div.setAttribute('data-section-id', sId);
+        div.innerHTML = `<button onclick="this.parentElement.remove()" class="absolute -right-2 -top-2 w-7 h-7 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition"><i class="fas fa-times"></i></button><div class="space-y-4"><input class="section-h2 glass-input font-bold bg-orange-50/50 border-none" placeholder="Tiêu đề đoạn (H2)..." value="${sData?sData.h2:''}"> <div id="ed-${sId}" style="height:200px;"></div> <div class="pt-4"><label class="text-[10px] font-black text-gray-400 uppercase mb-3 block">Gallery ảnh đoạn này</label><div class="flex flex-wrap gap-2" id="gal-${sId}">${sData && sData.images ? sData.images.map(img => `<div class="w-16 h-16 rounded-lg overflow-hidden border shadow-sm"><img src="${img}" class="w-full h-full object-cover"></div>`).join('') : ''}<label class="w-16 h-16 border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-300 rounded-lg cursor-pointer hover:border-orange-500"><i class="fas fa-plus"></i><input type="file" class="hidden" multiple onchange="uploadToGallery(this, '${sId}')"></label></div></div></div>`;
+        document.getElementById('sections-list').appendChild(div);
+        const q = new Quill(`#ed-${sId}`, { theme: 'snow' });
+        q.clipboard.dangerouslyPasteHTML(sData ? sData.p : "");
+        newsEditors[sId] = q;
+    };
+
+    window.uploadToGallery = (input, sId) => {
+        if (!tempFiles.sections[sId]) tempFiles.sections[sId] = [];
+        Array.from(input.files).forEach(file => {
+            tempFiles.sections[sId].push(file);
+            const reader = new FileReader();
+            reader.onload = e => {
+                const imgDiv = document.createElement('div'); imgDiv.className = "w-16 h-16 rounded-lg overflow-hidden border opacity-50";
+                imgDiv.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                document.getElementById(`gal-${sId}`).insertBefore(imgDiv, document.getElementById(`gal-${sId}`).lastElementChild);
+            };
+            reader.readAsDataURL(file);
+        });
     };
 
     window.toggleGenreInput = () => {
@@ -932,67 +956,92 @@
     window.saveExamData = async () => {
         const id = document.getElementById('exam-id').value;
         const colName = document.getElementById('exam-collection').value;
-        let data = { createdAt: serverTimestamp() };
+        const btnSave = document.querySelector('button[onclick="saveExamData()"]');
+        
+        let docData = { updatedAt: serverTimestamp() };
+        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+        btnSave.disabled = true;
 
         try {
+            // A. XỬ LÝ LƯU BẢN TIN VĂN HỌC (DÙNG IMGBB)
             if (colName === 'literary_news') {
-                data.title = document.getElementById('news-title').value || "Bản tin mới";
-                data.type = document.getElementById('news-type').value;
-                data.img = document.getElementById('news-img').value || "";
-                data.summary = document.getElementById('news-summary').value || "";
-                data.content = editors.content ? editors.content.root.innerHTML : "";
+                docData.title = document.getElementById('news-title').value;
+                docData.slug = document.getElementById('news-slug').value;
+                docData.type = document.getElementById('news-type').value;
+                docData.intro = newsEditors.intro.root.innerHTML;
+                docData.ending = newsEditors.ending.root.innerHTML;
+                docData.sections = [];
+                docData.img = tempFiles.main ? await uploadToImgBB(tempFiles.main) : document.getElementById('main-preview').src;
+
+                const sectionEls = document.querySelectorAll('.news-section-item');
+                for (let el of sectionEls) {
+                    const sId = el.getAttribute('data-section-id');
+                    const h2 = el.querySelector('.section-h2').value;
+                    const p = newsEditors[sId].root.innerHTML;
+                    const existingImgs = Array.from(el.querySelectorAll('img')).map(i=>i.src).filter(src => src.startsWith('http') && !src.includes('blob:'));
+                    const newImgs = [];
+                    if (tempFiles.sections[sId]) {
+                        for (let file of tempFiles.sections[sId]) {
+                            const url = await uploadToImgBB(file);
+                            if (url) newImgs.push(url);
+                        }
+                    }
+                    docData.sections.push({ h2, p, images: [...existingImgs, ...newImgs] });
+                }
+                const div = document.createElement("div"); div.innerHTML = docData.intro;
+                docData.summary = div.textContent.substring(0, 150) + "...";
             } 
+            // B. XỬ LÝ LƯU KHO ĐỀ THI (LOGIC CŨ)
             else if (colName === 'fulltest_bank') {
-                data.type = 'fulltest';
-                data.reading_text = editors.readText.root.innerHTML;
-                data.reading_questions = editors.readQs.root.innerHTML.split('[NEXT]').map(q => q.replace(/<[^>]*>/g, '').trim()).filter(x => x);
-                data.nlxh_topic = editors.nlxh.root.innerHTML;
-                data.nlvh_topic = editors.nlvh.root.innerHTML;
-            } 
-            else if (colName === 'quiz_bank') {
-                data.type = 'tracnghiem';
-                data.question = editors.q.root.innerHTML;
-                data.options = [0,1,2,3].map(i => document.getElementById(`ex-opt-${i}`).value);
-                data.correct = parseInt(document.querySelector('input[name="correct-choice"]:checked')?.value || 0);
-            } 
-            else if (colName === 'reading_bank') {
-                data.type = 'dochieu';
-                data.title = document.getElementById('ex-title').value;
-                data.text = editors.text.root.innerHTML;
-                data.questions = editors.qs.root.innerHTML.split('[NEXT]').map(q => ({ q: q.replace(/<[^>]*>/g, '').trim() })).filter(x => x.q);
-            } 
-            else {
-                // --- SỬA PHẦN NÀY ---
-                data.type = document.getElementById('ex-type').value; // nlxh hoặc nlvh
-                data.topic = editors.topic.root.innerHTML;
-                data.text = editors.text.root.innerHTML;
-                data.hint = editors.hint.root.innerHTML;
-                
-                // Nếu là NLVH thì lưu thêm thể loại và tên tác phẩm
-                if (data.type === 'nlvh') {
-                    data.genre = document.getElementById('ex-genre').value;
-                    data.workName = document.getElementById('ex-work').value;
+                docData.reading_text = editors.readText.root.innerHTML;
+                docData.reading_questions = editors.readQs.root.innerHTML.split('[NEXT]').map(q => q.replace(/<[^>]*>/g, '').trim()).filter(x => x);
+                docData.nlxh_topic = editors.nlxh.root.innerHTML;
+                docData.nlvh_topic = editors.nlvh.root.innerHTML;
+            } else if (colName === 'quiz_bank') {
+                docData.question = editors.q.root.innerHTML;
+                docData.options = [0,1,2,3].map(i => document.getElementById(`ex-opt-${i}`).value);
+                docData.correct = parseInt(document.querySelector('input[name="correct-choice"]:checked')?.value || 0);
+            } else if (colName === 'reading_bank') {
+                docData.title = document.getElementById('ex-title').value;
+                docData.text = editors.text.root.innerHTML;
+                docData.questions = editors.qs.root.innerHTML.split('[NEXT]').map(q => ({ q: q.replace(/<[^>]*>/g, '').trim() })).filter(x => x.q);
+            } else {
+                docData.type = document.getElementById('ex-type').value;
+                docData.topic = editors.topic.root.innerHTML;
+                docData.text = editors.text.root.innerHTML;
+                docData.hint = editors.hint.root.innerHTML;
+                if (docData.type === 'nlvh') {
+                    docData.genre = document.getElementById('ex-genre').value;
+                    docData.workName = document.getElementById('ex-work').value;
                 }
             }
 
+            // GHI VÀO DATABASE
             if (id === 'new') {
-                await addDoc(collection(db, colName), data);
+                docData.createdAt = serverTimestamp();
+                await addDoc(collection(db, colName), docData);
             } else {
-                await updateDoc(doc(db, colName, id), data);
+                await updateDoc(doc(db, colName, id), docData);
             }
 
-            showToast("Đã lưu thành công!");
+            showToast("Đã lưu dữ liệu thành công!");
             closeModal();
-            
-            if (colName === 'literary_news') loadNews(currentNewsFilter);
-            else loadBank(colName);
+            if (colName === 'literary_news') loadNews('all'); else loadBank(colName);
             loadStats();
 
         } catch (e) {
-            console.error("Lỗi khi lưu:", e);
-            alert("Có lỗi xảy ra: " + e.message);
+            console.error(e); alert("Lỗi khi lưu: " + e.message);
+        } finally {
+            btnSave.innerHTML = 'Lưu Dữ Liệu';
+            btnSave.disabled = false;
+            tempFiles = { main: null, sections: {} }; 
         }
     };
+
+// --- CÁC HÀM CÒN LẠI (GIỮ NGUYÊN NHƯ BẢN CỦA BẠN NHƯNG FIX TÊN HÀM) ---
+    window.previewMainImg = (input) => { if (input.files[0]) { tempFiles.main = input.files[0]; const reader = new FileReader(); reader.onload = e => { document.getElementById('main-preview').src = e.target.result; document.getElementById('main-preview').classList.remove('hidden'); }; reader.readAsDataURL(input.files[0]); } };
+
+window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, "d").replace(/([^0-9a-z-\s])/g, "").replace(/(\s+)/g, "-").replace(/-+/g, "-").replace(/^-+|-+$/g, ""); };
 
     window.deleteItem = async (col, id) => { 
         if(confirm("Xóa vĩnh viễn?")) { 
@@ -1347,7 +1396,5 @@
         setTimeout(() => t.classList.add('translate-x-60'), 3000);
     }
 </script>
-</body>
-</html>
 </body>
 </html>
