@@ -247,6 +247,53 @@ const styles = `
     .btn-q-claim:hover { transform: scale(1.05); filter: brightness(1.1); }
     .btn-q-claim:disabled { background: #e2e8f0; color: #94a3b8; box-shadow: none; cursor: default; }
 
+    /* Nút info nhỏ ở góc phải */
+    .gt-btn-small {
+        width: 36px; flex: none !important; padding: 0 !important;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.8rem !important; border-radius: 10px !important;
+    }
+
+    /* Nội dung hướng dẫn Keys */
+    .info-content { padding: 5px 5px; }
+    .info-item { 
+        display: flex; gap: 12px; margin-bottom: 15px; 
+        background: #f8fafc; padding: 10px; border-radius: 15px;
+    }
+    .info-icon { 
+        width: 50px; height: 40px; background: white; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--hv-orange); box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .info-txt h5 { margin: 0; font-size: 0.75rem; font-weight: 800; color: var(--text-primary); }
+    .info-txt p { margin: 2px 0 0; font-size: 0.65rem; color: var(--text-secondary); line-height: 1.3; }
+
+    /* Fix lỗi icon bị bóp méo ở tất cả mọi nơi */
+    .icon-box, .info-icon, .q-icon-neo {
+        display: flex !important;
+        align-items: center !important;      /* Căn giữa dọc */
+        justify-content: center !important;   /* Căn giữa ngang */
+        padding: 0 !important;               /* Xóa padding thừa để không bị đẩy icon */
+        line-height: 0 !important;           /* Xóa line-height để không bị dính khoảng cách chữ */
+        overflow: hidden !important;
+    }
+
+    /* Kích thước chuẩn cho từng loại để không bị hẹp */
+    .icon-box { width: 28px; height: 28px; min-width: 28px; }
+    .info-icon { width: 32px; height: 32px; min-width: 32px; }
+    .q-icon-neo { width: 34px; height: 34px; min-width: 34px; }
+
+    /* Đảm bảo icon bên trong (SVG hoặc FontAwesome) luôn nằm giữa */
+    .icon-box i, .info-icon i, .q-icon-neo i,
+    .icon-box svg, .info-icon svg, .q-icon-neo svg {
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;           /* Chuyển về block để Flexbox xử lý chuẩn hơn */
+        line-height: 1 !important;           /* Reset độ cao dòng của icon */
+        text-align: center !important;
+        flex-shrink: 0 !important;           /* Chống bị bóp hẹp */
+    }
+
     `;
 
 // --- 3. LOGIC ---
@@ -570,6 +617,7 @@ class Gamification {
                 <div class="gam-tabs">
                     <button class="gt-btn active" onclick="window.hvSwitch('daily', this)">Điểm danh</button>
                     <button class="gt-btn" onclick="window.hvSwitch('quests', this)">Nhiệm vụ</button>
+                    <button class="gt-btn gt-btn-small" onclick="window.hvSwitch('info', this)"><i class="fas fa-info"></i></button>
                 </div>
                 <div class="gam-body custom-scrollbar">
                     <div id="view-daily" class="g-view active">
@@ -580,6 +628,32 @@ class Gamification {
                         </div>
                     </div>
                     <div id="view-quests" class="g-view"><div id="quest-list" style="text-align:center; padding:20px; color:#ccc;">Đang nạp nhiệm vụ...</div></div>
+                    
+                    <div id="view-info" class="g-view">
+                        <div class="info-content">
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fas fa-key"></i></div>
+                                <div class="info-txt">
+                                    <h5>Keys dùng để làm gì?</h5>
+                                    <p>Sử dụng để mở khóa các level trong Nhật Ký Học Tập tại HopVan.</p>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fas fa-star"></i></div>
+                                <div class="info-txt">
+                                    <h5>Cách kiếm thêm Keys?</h5>
+                                    <p>Điểm danh mỗi ngày (+4), hoàn thành nhiệm vụ ngày (+1 đến +25) và duy trì chuỗi Streak.</p>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fab fa-discord"></i></div>
+                                <div class="info-txt">
+                                    <h5>Đổi Keys lấy quà Discord</h5>
+                                    <p>Tích lũy Keys để nâng cấp danh hiệu và nhận đặc quyền trong cộng đồng Discord của HopVan.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="hv-gam-trigger" onclick="document.getElementById('hv-gam-panel').classList.toggle('open')"><i class="fas fa-trophy"></i><div class="hv-badge">!</div></div>`;
