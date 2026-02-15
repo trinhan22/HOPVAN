@@ -168,6 +168,42 @@
         ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
         ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
         ::-webkit-scrollbar-button { display: none; }
+
+/* --- ĐỊNH DẠNG NỘI DUNG --- */
+.ql-editor .ql-art-quote {
+    text-align: center !important;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.25rem;
+    color: #475569;
+    padding: 30px 10% !important;
+    position: relative;
+}
+.ql-editor .ql-art-quote::before {
+    content: '“';
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    font-size: 4rem; color: var(--primary); opacity: 0.2;
+}
+
+.ql-editor blockquote {
+    border-left: 4px solid var(--primary) !important;
+    background: rgba(255, 143, 80, 0.05) !important;
+    padding: 15px 20px !important;
+    border-radius: 4px 16px 16px 4px;
+    font-style: normal;
+}
+
+.ql-editor .ql-highlight {
+    background-color: #fef3c7 !important; /* Màu vàng highlight */
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* --- GÁN ICON CHO TOOLBAR (Quan trọng để ko bị trắng nút) --- */
+.ql-art-quote::before { content: "\f10e"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: #444; }
+.ql-highlight::before { content: "\f591"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: #444; }
     </style>
 </head>
 <body class="h-screen flex">
@@ -598,13 +634,40 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const Parchment = Quill.import('parchment');
 
-const IMGBB_API_KEY = "82fd82fa83b95d394fffc9a7da6ee3ba"; 
+    const IMGBB_API_KEY = "82fd82fa83b95d394fffc9a7da6ee3ba"; 
     let tempFiles = { main: null, sections: {} }; 
     let newsEditors = {}; // Quản lý Quill cho Bản tin
     let editors = {};     // Quản lý Quill cho Kho đề thi
     let currentCollection = 'essay_bank';
     let currentNewsFilter = 'all';
+
+    // --- ĐĂNG KÝ CÁC ĐỊNH DẠNG TÙY CHỈNH CHO QUILL ---
+    const Inline = Quill.import('blots/inline');
+    class HighlightBlot extends Inline {}
+    HighlightBlot.blotName = 'highlight';
+    HighlightBlot.tagName = 'span';
+    HighlightBlot.className = 'ql-highlight';
+    Quill.register(HighlightBlot);
+
+    const Block = Quill.import('blots/block');
+    class ArtQuoteBlot extends Block {}
+    ArtQuoteBlot.blotName = 'art-quote';
+    ArtQuoteBlot.tagName = 'p'; // Dùng thẻ p nhưng gán class nghệ thuật
+    ArtQuoteBlot.className = 'ql-art-quote';
+    Quill.register(ArtQuoteBlot);
+
+    // --- ĐƯA QUILL TOOLBAR RA NGOÀI (GLOBAL) ĐỂ HÀM NÀO CŨNG DÙNG ĐƯỢC ---
+    const quillToolbar = [
+        ['bold', 'italic', 'underline'],
+        [{ 'header': [2, 3, false] }],
+        ['blockquote', 'art-quote'], // Nút Quote Box và Art Quote
+        ['highlight'],                // Nút Bút dạ highlight
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'align': [] }],
+        ['clean']
+    ];
 
     // 8 DANH MỤC VĂN HỌC MỚI
 const CAT_MAP = {
@@ -629,7 +692,7 @@ const CAT_MAP = {
         } catch (e) { return null; }
     }
 
-window.openNewsModal = async (id) => {
+    window.openNewsModal = async (id) => {
         const container = document.getElementById('modal-fields');
         document.getElementById('exam-collection').value = 'literary_news';
         document.getElementById('exam-id').value = id;
@@ -687,6 +750,13 @@ window.openNewsModal = async (id) => {
 
         if(data.sections && data.sections.length > 0) data.sections.forEach(s => addNewsSec(s));
         else if(id === 'new') addNewsSec();
+
+        // Gán nhãn cho các nút tùy chỉnh để dễ nhận biết
+        const toolbarArtQuote = document.querySelector('.ql-art-quote');
+        if (toolbarArtQuote) toolbarArtQuote.innerHTML = '<i class="fas fa-quote-right" title="Trích dẫn nghệ thuật"></i>';
+
+        const toolbarHighlight = document.querySelector('.ql-highlight');
+        if (toolbarHighlight) toolbarHighlight.innerHTML = '<i class="fas fa-marker" title="Highlight chữ"></i>';
     };
 
     // INIT DATE
@@ -840,8 +910,7 @@ window.openNewsModal = async (id) => {
         }
 
         let html = '';
-        const quillToolbar = [['bold', 'italic', 'underline'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], [{ 'align': [] }], ['clean']];
-
+        
         // --- NHÁNH 1: BẢN TIN VĂN HỌC (GIAO DIỆN NÂNG CẤP) ---
         if (colName === 'literary_news') {
             html = `
@@ -912,17 +981,49 @@ window.openNewsModal = async (id) => {
     };
 
 window.addNewsSec = (sData = null) => {
-        const sId = 'sec-' + Date.now() + Math.floor(Math.random()*100);
-        tempFiles.sections[sId] = [];
-        const div = document.createElement('div');
-        div.className = "news-section-item bg-white p-6 rounded-3xl border border-gray-100 relative group animate-fade-in mb-6";
-        div.setAttribute('data-section-id', sId);
-        div.innerHTML = `<button onclick="this.parentElement.remove()" class="absolute -right-2 -top-2 w-7 h-7 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition"><i class="fas fa-times"></i></button><div class="space-y-4"><input class="section-h2 glass-input font-bold bg-orange-50/50 border-none" placeholder="Tiêu đề đoạn (H2)..." value="${sData?sData.h2:''}"> <div id="ed-${sId}" style="height:200px;"></div> <div class="pt-4"><label class="text-[10px] font-black text-gray-400 uppercase mb-3 block">Gallery ảnh đoạn này</label><div class="flex flex-wrap gap-2" id="gal-${sId}">${sData && sData.images ? sData.images.map(img => `<div class="w-16 h-16 rounded-lg overflow-hidden border shadow-sm"><img src="${img}" class="w-full h-full object-cover"></div>`).join('') : ''}<label class="w-16 h-16 border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-300 rounded-lg cursor-pointer hover:border-orange-500"><i class="fas fa-plus"></i><input type="file" class="hidden" multiple onchange="uploadToGallery(this, '${sId}')"></label></div></div></div>`;
-        document.getElementById('sections-list').appendChild(div);
-        const q = new Quill(`#ed-${sId}`, { theme: 'snow' });
-        q.clipboard.dangerouslyPasteHTML(sData ? sData.p : "");
-        newsEditors[sId] = q;
-    };
+    const sId = 'sec-' + Date.now() + Math.floor(Math.random()*100);
+    tempFiles.sections[sId] = [];
+    const div = document.createElement('div');
+    div.className = "news-section-item bg-white p-6 rounded-3xl border border-gray-100 relative group animate-fade-in mb-6";
+    div.setAttribute('data-section-id', sId);
+    
+    // HTML Cấu trúc: Tiêu đề H2 -> Trình soạn thảo (Ghi nội dung) -> Gallery
+    div.innerHTML = `
+        <button onclick="this.parentElement.remove()" class="absolute -right-2 -top-2 w-7 h-7 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition z-20"><i class="fas fa-times"></i></button>
+        <div class="space-y-4">
+            <input class="section-h2 glass-input font-bold bg-orange-50/50 border-none" placeholder="Tiêu đề đoạn (H2)..." value="${sData ? sData.h2 : ''}"> 
+            
+            <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                <div id="ed-${sId}" style="height:250px;"></div> 
+            </div>
+
+            <div class="pt-4">
+                <label class="text-[10px] font-black text-gray-400 uppercase mb-3 block">Gallery ảnh đoạn này</label>
+                <div class="flex flex-wrap gap-2" id="gal-${sId}">
+                    ${sData && sData.images ? sData.images.map(img => `<div class="w-16 h-16 rounded-lg overflow-hidden border shadow-sm"><img src="${img}" class="w-full h-full object-cover"></div>`).join('') : ''}
+                    <label class="w-16 h-16 border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-300 rounded-lg cursor-pointer hover:border-orange-500">
+                        <i class="fas fa-plus"></i>
+                        <input type="file" class="hidden" multiple onchange="uploadToGallery(this, '${sId}')">
+                    </label>
+                </div>
+            </div>
+        </div>`;
+
+    document.getElementById('sections-list').appendChild(div);
+
+    // KHỞI TẠO QUILL CHO THÂN BÀI
+    const q = new Quill(`#ed-${sId}`, { 
+        theme: 'snow', 
+        modules: { toolbar: quillToolbar } 
+    });
+    
+    // Đổ dữ liệu cũ vào nếu có
+    if (sData && sData.p) {
+        q.clipboard.dangerouslyPasteHTML(sData.p);
+    }
+    
+    newsEditors[sId] = q;
+};
 
     window.uploadToGallery = (input, sId) => {
         if (!tempFiles.sections[sId]) tempFiles.sections[sId] = [];
