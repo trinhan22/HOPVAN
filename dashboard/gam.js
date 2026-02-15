@@ -224,6 +224,29 @@ const styles = `
     .hv-spin { animation: spin 1s linear infinite; display: inline-block; color: var(--hv-orange); }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
+    /* Popup thông báo nhận thưởng kiểu iOS */
+    .reward-toast {
+        position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px);
+        padding: 10px 20px; border-radius: 20px; border: 1px solid #f1f5f9;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        display: flex; align-items: center; gap: 12px; z-index: 10001;
+        transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    .reward-toast.show { top: 25px; }
+    .rt-icon { width: 32px; height: 32px; background: var(--hv-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem; }
+    .rt-msg { font-size: 0.8rem; font-weight: 800; color: var(--text-primary); }
+
+    /* Nút Claim nhỏ gọn */
+    .btn-q-claim {
+        background: var(--hv-gradient); color: white; border: none;
+        padding: 5px 12px; border-radius: 12px; font-size: 0.65rem;
+        font-weight: 800; cursor: pointer; transition: 0.2s;
+        box-shadow: 0 4px 10px rgba(255, 94, 98, 0.2);
+    }
+    .btn-q-claim:hover { transform: scale(1.05); filter: brightness(1.1); }
+    .btn-q-claim:disabled { background: #e2e8f0; color: #94a3b8; box-shadow: none; cursor: default; }
+
     `;
 
 // --- 3. LOGIC ---
@@ -330,7 +353,6 @@ class Gamification {
     }
 
     // HIỆN SPIN KHI LOAD NHIỆM VỤ
-// 1. Sửa lỗi load nhiệm vụ (Chống treo loading)
     async checkQuests() {
         const listContainer = document.getElementById('quest-list');
         if (!listContainer) return;
@@ -390,32 +412,82 @@ class Gamification {
         } else { resetQuests(); }
     }
 
+    async rewardUser(amount, questId) {
+        const today = new Date().toLocaleDateString('en-CA');
+        const storageKey = `claimed_q_${this.user.uid}_${today}`;
+        let claimedIds = JSON.parse(localStorage.getItem(storageKey) || "[]");
+
+        if (claimedIds.includes(questId)) return; // Chống bấm 2 lần
+
+        try {
+            // 1. Cộng vào Database
+            await updateDoc(doc(db, 'users', this.user.uid), { keys: increment(amount) });
+            
+            // 2. Cập nhật giao diện Keys
+            this.userData.keys += amount;
+            this.updateUIBasic();
+
+            // 3. Đánh dấu đã nhận
+            claimedIds.push(questId);
+            localStorage.setItem(storageKey, JSON.stringify(claimedIds));
+
+            // 4. Hiệu ứng & Thông báo
+            this.showToast(`Chúc mừng! Bạn nhận được +${amount} Keys`);
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#FF8F50', '#FF5E62', '#ffffff'] });
+            
+            // 5. Vẽ lại list nhiệm vụ để mất nút Nhận
+            this.updateUIQuests();
+        } catch (e) {
+            console.error(e);
+            alert("Lỗi khi nhận quà, thử lại sau nhé!");
+        }
+    }
+
+    showToast(msg) {
+        let toast = document.querySelector('.reward-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'reward-toast';
+            toast.innerHTML = `<div class="rt-icon"><i class="fas fa-check"></i></div><div class="rt-msg"></div>`;
+            document.body.appendChild(toast);
+        }
+        toast.querySelector('.rt-msg').innerText = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
     // VẼ LẠI GIAO DIỆN NHIỆM VỤ GỌN GÀNG
     updateUIQuests() {
         const list = document.getElementById('quest-list');
-        const allDone = this.dailyQuests.every(q => (this.progress[q.id] || 0) >= q.target);
+        const today = new Date().toLocaleDateString('en-CA');
+        const storageKey = `claimed_q_${this.user.uid}_${today}`;
+        const claimedIds = JSON.parse(localStorage.getItem(storageKey) || "[]");
+
+        const allDone = this.dailyQuests.every(q => claimedIds.includes(q.id));
         
         if (allDone && this.dailyQuests.length > 0) {
-            list.innerHTML = `
-                <div style="text-align:center; padding:20px;">
-                    <i class="fas fa-medal" style="font-size:2rem; color:#f59e0b"></i>
-                    <p style="margin-top:5px; font-weight:800; font-size:0.75rem;">HOÀN THÀNH!</p>
-                </div>`;
+            list.innerHTML = `<div style="text-align:center; padding:20px;"><i class="fas fa-medal" style="font-size:2rem; color:#f59e0b"></i><p style="margin-top:5px; font-weight:800; font-size:0.75rem;">XONG HẾT RỒI!</p></div>`;
         } else {
             list.innerHTML = this.dailyQuests.map(q => {
                 const cur = this.progress[q.id] || 0; 
-                const done = cur >= q.target;
+                const isCompleted = cur >= q.target;
+                const isClaimed = claimedIds.includes(q.id);
+
+                let actionHtml = `<span class="tag-reward">+${q.reward}</span>`; // Mặc định hiện tag thưởng
+                if (isClaimed) {
+                    actionHtml = `<i class="fas fa-check-circle" style="color:#10b981; font-size:1.1rem;"></i>`;
+                } else if (isCompleted) {
+                    actionHtml = `<button class="btn-q-claim" onclick="window.hvGam.rewardUser(${q.reward}, '${q.id}')">NHẬN</button>`;
+                }
+
                 return `
-                <div class="q-card ${done ? 'done' : ''}">
+                <div class="q-card ${isClaimed ? 'done' : ''}">
                     <div class="q-icon-neo"><i class="fas ${q.icon}"></i></div>
                     <div style="flex:1">
                         <div class="q-title">${q.title}</div>
-                        <div class="q-desc">${q.desc} (${cur}/${q.target})</div>
+                        <div class="q-desc">${isClaimed ? 'Đã nhận thưởng' : `${q.desc} (${cur}/${q.target})`}</div>
                     </div>
-                    <div>
-                        ${done ? '<i class="fas fa-check-circle" style="color:#10b981; font-size:1.1rem;"></i>' 
-                               : `<span class="tag-reward">+${q.reward}</span>`}
-                    </div>
+                    <div>${actionHtml}</div>
                 </div>`;
             }).join('');
         }
@@ -446,21 +518,39 @@ class Gamification {
 
         try {
             const today = new Date().toLocaleDateString('en-CA');
-            // Kiểm tra Fresh Data một lần nữa trước khi nộp
             const snap = await getDoc(doc(db, 'users', this.user.uid));
+            
             if (snap.exists() && snap.data().lastClaimDate === today) {
-                 this.userData.lastClaimDate = today;
-                 this.updateUIBasic();
-                 return;
+                this.userData.lastClaimDate = today;
+                this.updateUIBasic();
+                return;
             }
 
+            // 1. Cập nhật Database (Cộng 4 Keys và ghi ngày điểm danh)
             await updateDoc(doc(db, 'users', this.user.uid), {
-                keys: increment(4), lastClaimDate: today
+                keys: increment(4),
+                lastClaimDate: today
             });
-            this.userData.keys += 4; this.userData.lastClaimDate = today;
+
+            // 2. Cập nhật dữ liệu tại chỗ
+            this.userData.keys += 4;
+            this.userData.lastClaimDate = today;
             this.updateUIBasic();
-            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#FF8F50', '#FF5E62', '#ffffff'] });
-        } catch(e) { console.error(e); btn.innerText = "Lỗi!"; btn.disabled = false; }
+
+            // 3. HIỆN TOAST & PHÁO GIẤY ĂN MỪNG
+            this.showToast("Điểm danh thành công! Bạn nhận được +4 Keys");
+            confetti({ 
+                particleCount: 150, 
+                spread: 70, 
+                origin: { y: 0.6 }, 
+                colors: ['#FF8F50', '#FF5E62', '#ffffff'] 
+            });
+
+        } catch(e) { 
+            console.error(e); 
+            btn.innerText = "Lỗi kết nối!"; 
+            btn.disabled = false; 
+        }
     }
 
     render() {
@@ -504,4 +594,4 @@ class Gamification {
     }
 }
 
-new Gamification();
+window.hvGam = new Gamification();

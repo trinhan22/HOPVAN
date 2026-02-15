@@ -270,9 +270,9 @@
                 </a>
                 
                 <div class="sidebar-heading">Luyện tập</div>
-                <a href="#nhatky" class="sidebar-link">
-                    <div class="icon-box"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M9 11a3 3 0 1 0 6 0 3 3 0 0 0-6 0"></path><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 0 1-2.827 0l-4.244-4.243a8 8 0 1 1 11.314 0z"></path></svg></div>
-                    Nhật ký học tập
+                <a href="#diary-gamification" class="sidebar-link">
+                    <div class="icon-box"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"></path></svg></div>
+                    Nhật ký & Gamification
                 </a>
                 <a href="#luyende" class="sidebar-link">
                     <div class="icon-box"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></div>
@@ -350,16 +350,103 @@
                     </div>
                 </section>
 
-                <section id="nhatky" class="reveal section-card relative overflow-hidden">
-                    <span class="h2-number">02</span>
-                    <h2>Nhật ký học tập</h2>
-                    <p>Hệ thống Gamification giúp việc học không còn nhàm chán. Theo dõi Streak (số ngày học liên tục) và cấp độ (Level) của bản thân.</p>
-                    <div class="mockup-window">
-                        <div class="mockup-header"><div class="mockup-dot bg-red-500"></div><div class="mockup-dot bg-yellow-500"></div><div class="mockup-dot bg-green-500"></div></div>
-                        <div class="mockup-content"><img src="IMG/nhatky.png" alt="Giao diện Nhật ký học tập" class="w-full"></div>
-                    </div>
-                </section>
+<section id="diary-gamification" class="reveal section-card relative overflow-hidden group/section">
+    <span class="h2-number">02</span>
+    
+    <h2 class="bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-pink-600 font-black tracking-tight">
+        Hành trình & Phần thưởng
+    </h2>
+    <p class="text-gray-600 text-lg mb-10 leading-relaxed max-w-3xl">
+        Hệ thống tích hợp giúp biến mỗi phút giây học tập thành một trải nghiệm giải trí. <strong>Nhật ký học tập</strong> không chỉ lưu trữ bài làm, mà còn là trái tim điều khiển cơ chế nhận thưởng <strong>Keys</strong>.
+    </p>
 
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
+        <div class="p-6 bg-white/40 backdrop-blur-sm rounded-[24px] border border-white/60 hover:bg-white/80 transition-all duration-500 hover:shadow-xl hover:shadow-orange-500/10 group">
+            <div class="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-50 rounded-2xl flex items-center justify-center text-orange-500 mb-4 group-hover:scale-110 transition-transform shadow-inner">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.115.385-2.256 1-3.5a2.5 2.5 0 0 1 2.5 3.5z"></path></svg>
+            </div>
+            <h4 class="font-black text-orange-600 text-[11px] uppercase tracking-[0.15em] mb-2">Duy trì Streak</h4>
+            <p class="text-[12px] text-gray-500 leading-relaxed">Chuỗi ngày học liên tục được ghi nhận để nhân đôi phần thưởng và giữ "lửa" tinh thần.</p>
+        </div>
+
+        <div class="p-6 bg-white/40 backdrop-blur-sm rounded-[24px] border border-white/60 hover:bg-white/80 transition-all duration-500 hover:shadow-xl hover:shadow-blue-500/10 group">
+            <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-50 rounded-2xl flex items-center justify-center text-blue-500 mb-4 group-hover:scale-110 transition-transform shadow-inner">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+            </div>
+            <h4 class="font-black text-blue-600 text-[11px] uppercase tracking-[0.15em] mb-2">Nhiệm vụ Ngày</h4>
+            <p class="text-[12px] text-gray-500 leading-relaxed">Hệ thống chọn ngẫu nhiên 4 thử thách mỗi ngày từ kho thử thách chuyên sâu để bạn chinh phục.</p>
+        </div>
+
+        <div class="p-6 bg-white/40 backdrop-blur-sm rounded-[24px] border border-white/60 hover:bg-white/80 transition-all duration-500 hover:shadow-xl hover:shadow-pink-500/10 group">
+            <div class="w-12 h-12 bg-gradient-to-br from-pink-100 to-pink-50 rounded-2xl flex items-center justify-center text-pink-500 mb-4 group-hover:scale-110 transition-transform shadow-inner">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+            </div>
+            <h4 class="font-black text-pink-600 text-[11px] uppercase tracking-[0.15em] mb-2">Cơ chế Claim</h4>
+            <p class="text-[12px] text-gray-500 leading-relaxed">Nhận thưởng chủ động để cảm nhận thành quả sau khi hoàn thành nhiệm vụ ngày.</p>
+        </div>
+    </div>
+
+    <div class="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-[32px] p-1 shadow-2xl mb-10 overflow-hidden">
+        <div class="absolute top-0 left-1/4 w-1/2 h-full bg-orange-500/10 blur-[100px] pointer-events-none"></div>
+        
+        <div class="bg-white rounded-[30px] p-8 relative overflow-hidden">
+             <div class="flex items-center justify-between mb-6">
+                 <div>
+                     <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Giao diện trong Nhiệm vụ</p>
+                     <h5 class="text-gray-800 font-bold">Nhiệm vụ sẵn sàng</h5>
+                 </div>
+                 <div class="px-3 py-1 bg-orange-50 rounded-full text-[10px] font-bold text-orange-500 border border-orange-100 flex items-center gap-1">
+                     <span class="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse"></span> Trạng thái: 1/4 Đã xong
+                 </div>
+             </div>
+
+             <div class="flex flex-col sm:flex-row items-center gap-4 p-5 bg-gradient-to-r from-orange-50/50 to-white rounded-[24px] border border-orange-100/50 group/card transition-all hover:shadow-lg">
+                 <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-orange-500 shadow-sm border border-orange-100 transition-transform group-hover/card:rotate-3">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>
+                 </div>
+                 <div class="flex-1 text-center sm:text-left">
+                     <p class="text-base font-black text-gray-800 mb-0.5 tracking-tight">Vua Trắc Nghiệm I</p>
+                     <p class="text-[11px] text-gray-500 font-medium leading-none">Hoàn thành 1 đề trắc nghiệm bất kỳ (1/1)</p>
+                 </div>
+                 <div class="relative">
+                     <div class="absolute -inset-1 bg-gradient-to-r from-orange-500 to-pink-600 rounded-xl blur opacity-25 group-hover/card:opacity-50 transition duration-1000"></div>
+                     <button class="relative bg-gradient-to-r from-orange-500 to-pink-600 text-white text-[11px] font-black px-6 py-2.5 rounded-xl shadow-lg flex items-center gap-2 hover:scale-105 active:scale-95 transition-all">
+                         NHẬN THƯỞNG 
+                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                     </button>
+                 </div>
+             </div>
+        </div>
+    </div>
+
+    <div class="bg-gradient-to-br from-indigo-900 to-purple-900 rounded-[32px] p-8 relative overflow-hidden shadow-2xl shadow-indigo-500/20">
+        <div class="absolute -right-20 -bottom-20 w-64 h-64 bg-indigo-500/30 blur-[80px] rounded-full"></div>
+        <div class="absolute -left-10 -top-10 w-40 h-40 bg-purple-500/20 blur-[60px] rounded-full"></div>
+        
+        <h4 class="text-white font-black text-xl mb-6 relative z-10 flex items-center gap-3">
+            <span class="w-10 h-10 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.778-7.778zM12 2l.77 7.77 7.77.77L12 12l-.77-7.77L2 3.5 12 2z"></path></svg>
+            </span>
+            Bạn có thể làm gì với Keys?
+        </h4>
+        
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+            <li class="flex items-center gap-3 text-indigo-100/90 text-sm bg-white/5 p-3 rounded-2xl border border-white/10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Mở khóa các level trong Nhật ký học tập
+            </li>
+            <li class="flex items-center gap-3 text-indigo-100/90 text-sm bg-white/5 p-3 rounded-2xl border border-white/10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Tăng hạng & đổi danh hiệu Discord
+            </li>
+            <li class="flex items-center gap-3 text-indigo-100/90 text-sm bg-white/5 p-3 rounded-2xl border border-white/10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Tham gia các sự kiện quà tặng đặc biệt
+            </li>
+        </ul>
+    </div>
+</section>
+                
                 <section id="luyende" class="reveal section-card relative overflow-hidden">
                     <span class="h2-number">03</span>
                     <h2>Phòng luyện đề AI</h2>
