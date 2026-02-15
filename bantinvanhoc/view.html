@@ -208,6 +208,43 @@
             background: #ff4757 !important;
             color: white !important;
         }
+
+/* --- GHOST SCROLLBAR (ẨN NỀN HOÀN TOÀN) --- */
+        
+        /* 1. Độ rộng của vùng cuộn (rất mảnh) */
+        ::-webkit-scrollbar {
+            width: 4px; /* Chỉ để 4px cho tinh tế */
+            height: 4px;
+        }
+
+        /* 2. Ẩn hoàn toàn nền (Track) - Không có bất kỳ màu sắc hay đường kẻ nào */
+        ::-webkit-scrollbar-track {
+            background: transparent !important;
+        }
+
+        /* 3. Cục kéo (Thumb) - Mặc định là trong suốt (ẩn) */
+        ::-webkit-scrollbar-thumb {
+            background-color: transparent;
+            border-radius: 20px;
+            transition: background-color 0.4s ease;
+        }
+
+        /* 4. CHỈ HIỆN khi người dùng rê chuột vào trang web */
+        /* Giúp người dùng biết mình đang ở đâu khi bắt đầu đọc */
+        body:hover::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.15); /* Màu xám cực nhạt */
+        }
+
+        /* 5. Hiện màu Cam thương hiệu khi rê trực tiếp vào thanh cuộn */
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--primary) !important;
+        }
+
+        /* Dành cho Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+        }
 </style>
 </head>
 <body>
