@@ -172,8 +172,8 @@
             <div class="hv-modal-icon icon-unlock"><i class="fas fa-lock-open"></i></div>
             <h3 class="hv-modal-title">Mở khoá bài học?</h3>
             <p class="hv-modal-desc">
-                Bạn cần <strong class="text-orange-500">2 Keys</strong> để mở khoá level này.<br>
-                Bạn có muốn dùng ngay không?
+                Bạn cần <strong class="text-orange-500">5 Keys</strong> để mua vé vào bài học này.<br>
+                Mua một lần, vào mãi mãi!
             </p>
             <div class="hv-modal-actions">
                 <button class="hv-btn hv-btn-gray" onclick="closeAllModals()">Để sau</button>
@@ -187,7 +187,7 @@
             <div class="hv-modal-icon icon-lock"><i class="fas fa-key"></i></div>
             <h3 class="hv-modal-title">Thiếu Keys rồi!</h3>
             <p class="hv-modal-desc">
-                Bạn cần 2 Keys nhưng hiện tại chỉ có <span id="modal-current-keys" class="font-bold text-red-500">0</span> Keys.<br>
+                Bạn cần 5 Keys nhưng hiện tại chỉ có <span id="modal-current-keys" class="font-bold text-red-500">0</span> Keys.<br>
                 Hãy làm nhiệm vụ hoặc điểm danh nhé!
             </p>
             <div class="hv-modal-actions">
@@ -249,219 +249,217 @@
     <script type="module" src="gam.js"></script>
     <script src="../chatbot.js"></script>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        // Danh sách 20 level
-        const courseMap = [
-            { id: 1, title: 'Trắc Nghiệm' }, { id: 2, title: 'Đọc Hiểu' }, { id: 3, title: 'NLXH' }, { id: 4, title: 'NLVH' },
-            { id: 5, title: 'Trắc Nghiệm' }, { id: 6, title: 'Đọc Hiểu' }, { id: 7, title: 'NLXH' }, { id: 8, title: 'NLVH' },
-            { id: 9, title: 'Trắc Nghiệm' }, { id: 10, title: 'Đọc Hiểu' }, { id: 11, title: 'NLXH' }, { id: 12, title: 'NLVH' },
-            { id: 13, title: 'Trắc Nghiệm' }, { id: 14, title: 'Đọc Hiểu' }, { id: 15, title: 'NLXH' }, { id: 16, title: 'NLVH' },
-            { id: 17, title: 'Trắc Nghiệm' }, { id: 18, title: 'Đọc Hiểu' }, { id: 19, title: 'NLXH' }, { id: 20, title: 'NLVH' }
-        ];
+    const courseMap = Array.from({ length: 20 }, (_, i) => ({ id: i + 1, title: ['Trắc Nghiệm', 'Đọc Hiểu', 'NLXH', 'NLVH'][i % 4] }));
 
-        let currentUserKeys = 0;
-        let currentUserLevel = 1;
+    let currentUserKeys = 0;
+    let currentUserLevel = 1;
+    let paidLevel = 0; // Level cao nhất đã được trả tiền
 
-        window.toggleSidebar = () => {
-            const sidebar = document.querySelector('aside');
-            const overlay = document.getElementById('sidebar-overlay');
-            if (sidebar && overlay) {
-                sidebar.classList.toggle('open');
-                overlay.classList.toggle('active');
-            }
-        };
-
-        // --- HELPER POPUP ---
-        window.closeAllModals = () => {
-            document.querySelectorAll('.hv-modal-overlay').forEach(el => el.classList.remove('active'));
-        };
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const name = user.displayName || user.email.split('@')[0];
-                document.getElementById('user-display-name').innerText = name;
-                document.getElementById('avatar-initial').innerText = name[0].toUpperCase();
-
-                // Lấy Keys
-                const userRef = doc(db, "users", user.uid);
-                const userSnap = await getDoc(userRef);
-                if (userSnap.exists()) {
-                    const data = userSnap.data();
-                    currentUserKeys = data.keys || 0;
-                    document.getElementById('streak-val').innerText = data.streak || 0;
-                    document.getElementById('keys-val').innerText = currentUserKeys;
-                } else {
-                    await setDoc(userRef, { keys: 0, streak: 0, email: user.email });
-                }
-
-                // Lấy Level
-                const progressRef = doc(db, "users_progress", user.uid);
-                const progressSnap = await getDoc(progressRef);
-                currentUserLevel = progressSnap.exists() ? progressSnap.data().currentLevel : 1;
-                
-                document.getElementById('level-val').innerText = currentUserLevel;
-                renderJourney(currentUserLevel);
-
-            } else { window.location.href = "../log.html"; }
-        });
-
-        function renderJourney(userLevel) {
-            const container = document.getElementById('path-render');
-            container.innerHTML = "";
-
-            courseMap.forEach((lvl, index) => {
-                const node = document.createElement('div');
-                let status = 'level-locked';
-                
-                if (lvl.id < userLevel) status = 'level-passed';
-                else if (lvl.id === userLevel) status = 'level-current';
-
-                let posClass = '';
-                const posIndex = index % 4;
-                if (posIndex === 1) posClass = 'node-left';
-                if (posIndex === 3) posClass = 'node-right';
-
-                node.className = `level-node ${status} ${posClass}`;
-                
-                if (lvl.id < userLevel) {
-                    node.innerHTML = '<i class="fas fa-check text-green-500"></i>';
-                } else if (lvl.id === userLevel) {
-                    node.innerHTML = '<i class="fas fa-play text-orange-500"></i>';
-                } else {
-                    node.innerHTML = '<i class="fas fa-lock text-gray-400"></i>';
-                }
-
-                const label = document.createElement('div');
-                label.className = "node-label";
-                label.innerText = `Lv.${lvl.id} ${lvl.title}`;
-                node.appendChild(label);
-
-                // --- CLICK EVENT: MỞ KHOÁ ---
-                node.onclick = () => {
-                    if (lvl.id <= userLevel) {
-                        window.location.href = `../nhatkyhoctap/${lvl.id}.html`;
-                    } else if (lvl.id === userLevel + 1) {
-                        // Gọi Modal xác nhận thay vì Alert
-                        tryUnlockLevel(lvl.id);
-                    } else {
-                        // Animation rung lắc nếu click bài xa quá (optional)
-                        node.style.animation = "shake 0.5s";
-                        setTimeout(() => node.style.animation = "", 500);
-                    }
-                };
-
-                container.appendChild(node);
-            });
-            setTimeout(drawCurvedPath, 500);
+    window.toggleSidebar = () => {
+        const sidebar = document.querySelector('aside');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (sidebar && overlay) {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
         }
+    };
 
-        // --- HÀM XỬ LÝ MỞ KHOÁ VỚI POPUP ---
-        window.tryUnlockLevel = (targetLevel) => {
-            // 1. Check tiền
-            if (currentUserKeys < 2) {
-                document.getElementById('modal-current-keys').innerText = currentUserKeys;
-                document.getElementById('modal-no-keys').classList.add('active');
-                return;
-            }
+    window.closeAllModals = () => {
+        document.querySelectorAll('.hv-modal-overlay').forEach(el => el.classList.remove('active'));
+    };
 
-            // 2. Hiện Modal xác nhận
-            const confirmModal = document.getElementById('modal-confirm-unlock');
-            const confirmBtn = document.getElementById('btn-confirm-action');
-            
-            // Gán sự kiện click cho nút Mở ngay
-            confirmBtn.onclick = async () => {
-                confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                await executeUnlock(targetLevel);
-            };
-            
-            confirmModal.classList.add('active');
-        };
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const name = user.displayName || user.email.split('@')[0];
+            document.getElementById('user-display-name').innerText = name;
+            document.getElementById('avatar-initial').innerText = name[0].toUpperCase();
 
-        async function executeUnlock(targetLevel) {
-            try {
-                const userRef = doc(db, "users", auth.currentUser.uid);
-                await updateDoc(userRef, { keys: increment(-2) });
-                
-                const progressRef = doc(db, "users_progress", auth.currentUser.uid);
-                const snap = await getDoc(progressRef);
-                if (snap.exists()) {
-                    await updateDoc(progressRef, { currentLevel: targetLevel });
-                } else {
-                    await setDoc(progressRef, { currentLevel: targetLevel });
-                }
-
-                // Update UI
-                currentUserKeys -= 2;
-                currentUserLevel = targetLevel;
+            // 1. Tải dữ liệu User (Keys, Streak)
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+                const data = userSnap.data();
+                currentUserKeys = data.keys || 0;
+                document.getElementById('streak-val').innerText = data.streak || 0;
                 document.getElementById('keys-val').innerText = currentUserKeys;
-                document.getElementById('level-val').innerText = currentUserLevel;
-                
-                // Đóng modal cũ, mở modal success
-                closeAllModals();
-                document.getElementById('btn-confirm-action').innerHTML = "Mở ngay"; // Reset nút
-                document.getElementById('modal-success').classList.add('active');
-                
-                renderJourney(currentUserLevel);
-
-            } catch (e) {
-                console.error(e);
-                alert("Lỗi kết nối!");
-                closeAllModals();
             }
+
+            // 2. Tải dữ liệu Progress (Level hiện tại & Level đã mua vé)
+            const progressRef = doc(db, "users_progress", user.uid);
+            const progressSnap = await getDoc(progressRef);
+            if (progressSnap.exists()) {
+                const pData = progressSnap.data();
+                currentUserLevel = pData.currentLevel || 1;
+                paidLevel = pData.paidLevel || 0; // Lấy lịch sử đã mua vé
+            } else {
+                await setDoc(progressRef, { currentLevel: 1, paidLevel: 0 });
+            }
+            
+            document.getElementById('level-val').innerText = currentUserLevel;
+            renderJourney(currentUserLevel);
+
+        } else { window.location.href = "../log.html"; }
+    });
+
+    function renderJourney(userLevel) {
+        const container = document.getElementById('path-render');
+        container.innerHTML = "";
+
+        courseMap.forEach((lvl, index) => {
+            const node = document.createElement('div');
+            let status = 'level-locked';
+            
+            // Xử lý hiển thị
+            if (lvl.id < userLevel) status = 'level-passed';
+            else if (lvl.id === userLevel) status = 'level-current';
+
+            let posClass = '';
+            const posIndex = index % 4;
+            if (posIndex === 1) posClass = 'node-left';
+            if (posIndex === 3) posClass = 'node-right';
+
+            node.className = `level-node ${status} ${posClass}`;
+            
+            // Icon hiển thị
+            if (lvl.id < userLevel) {
+                node.innerHTML = '<i class="fas fa-check text-green-500"></i>';
+            } else if (lvl.id === userLevel) {
+                // Nếu là bài hiện tại nhưng chưa mua vé thì hiện icon Keys
+                node.innerHTML = (lvl.id <= paidLevel) ? '<i class="fas fa-play text-orange-500"></i>' : '<i class="fas fa-key text-orange-400"></i>';
+            } else {
+                node.innerHTML = '<i class="fas fa-lock text-gray-400"></i>';
+            }
+
+            const label = document.createElement('div');
+            label.className = "node-label";
+            label.innerText = `Lv.${lvl.id} ${lvl.title}`;
+            node.appendChild(label);
+
+            node.onclick = () => {
+                if (lvl.id < userLevel) {
+                    // Đã xong rồi, vào xem lại thoải mái
+                    window.location.href = `../nhatkyhoctap/${lvl.id}.html`;
+                } 
+                else if (lvl.id === userLevel) {
+                    // Level hiện tại: Kiểm tra xem đã mua vé chưa
+                    if (lvl.id <= paidLevel) {
+                        // Đã mua vé rồi -> Vào học luôn
+                        window.location.href = `../nhatkyhoctap/${lvl.id}.html`;
+                    } else {
+                        // Chưa mua vé -> Hiện popup thu phí
+                        tryUnlockLevel(lvl.id);
+                    }
+                } 
+                else {
+                    // Level tương lai -> Rung lắc báo khóa
+                    node.classList.add('shake');
+                    setTimeout(() => node.classList.remove('shake'), 500);
+                }
+            };
+
+            container.appendChild(node);
+        });
+        setTimeout(drawCurvedPath, 500);
+    }
+
+    // --- HÀM XỬ LÝ THANH TOÁN (MUA VÉ) ---
+    window.tryUnlockLevel = (targetLevel) => {
+        const cost = 5; // Đã sửa từ 10 xuống 5 Keys
+        if (currentUserKeys < cost) {
+            document.getElementById('modal-current-keys').innerText = currentUserKeys;
+            document.getElementById('modal-no-keys').classList.add('active');
+            return;
         }
 
-        function drawCurvedPath() {
-            const nodes = document.querySelectorAll('.level-node');
-            const svg = document.getElementById('path-svg');
-            const wrapper = document.querySelector('.path-wrapper');
-            if (!svg || nodes.length < 2) return;
+        const confirmModal = document.getElementById('modal-confirm-unlock');
+        const confirmBtn = document.getElementById('btn-confirm-action');
+        
+        confirmBtn.onclick = async () => {
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            await executeUnlock(targetLevel, cost);
+        };
+        
+        confirmModal.classList.add('active');
+    };
 
-            svg.setAttribute('height', wrapper.scrollHeight);
-            svg.setAttribute('width', wrapper.clientWidth);
-            svg.innerHTML = "";
+    async function executeUnlock(targetLevel, cost) {
+        try {
+            const uid = auth.currentUser.uid;
+            
+            // 1. Trừ 10 Keys trong Database
+            await updateDoc(doc(db, "users", uid), { keys: increment(-cost) });
+            
+            // 2. Lưu lịch sử "Đã mua vé" vào users_progress
+            await updateDoc(doc(db, "users_progress", uid), { paidLevel: targetLevel });
 
-            let pathData = "";
-            nodes.forEach((node, i) => {
-                if (i === nodes.length - 1) return; 
-                const rect1 = node.getBoundingClientRect();
-                const rect2 = nodes[i+1].getBoundingClientRect();
-                const wrapperRect = wrapper.getBoundingClientRect();
+            // 3. Cập nhật biến local để UI thay đổi ngay
+            currentUserKeys -= cost;
+            paidLevel = targetLevel;
+            
+            document.getElementById('keys-val').innerText = currentUserKeys;
+            
+            closeAllModals();
+            document.getElementById('btn-confirm-action').innerHTML = "Mở ngay";
+            document.getElementById('modal-success').classList.add('active');
+            
+            // Vẽ lại bản đồ để hiện nút Play thay vì nút Key
+            renderJourney(currentUserLevel);
 
-                const x1 = rect1.left + rect1.width / 2 - wrapperRect.left;
-                const y1 = node.offsetTop + node.offsetHeight / 2;
-                const x2 = rect2.left + rect2.width / 2 - wrapperRect.left;
-                const y2 = nodes[i+1].offsetTop + nodes[i+1].offsetHeight / 2;
-
-                if (i === 0) pathData += `M ${x1} ${y1}`;
-                const cp1x = x1; const cp1y = y1 + (y2 - y1) / 2;
-                const cp2x = x2; const cp2y = y1 + (y2 - y1) / 2;
-                pathData += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`;
-            });
-
-            const pathLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            pathLine.setAttribute("d", pathData);
-            pathLine.classList.add('path-line');
-            svg.appendChild(pathLine);
-
-            const pathDraw = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            pathDraw.setAttribute("d", pathData);
-            pathDraw.setAttribute("fill", "none");
-            pathDraw.classList.add('path-draw-anim');
-            svg.appendChild(pathDraw);
+        } catch (e) {
+            console.error(e);
+            alert("Lỗi kết nối!");
+            closeAllModals();
         }
+    }
 
-        import { initMenu } from "./menu.js";
-        initMenu(app);
-        window.addEventListener('resize', drawCurvedPath);
-    </script>
+    // Phần drawCurvedPath và Resize giữ nguyên...
+    function drawCurvedPath() {
+        const nodes = document.querySelectorAll('.level-node');
+        const svg = document.getElementById('path-svg');
+        const wrapper = document.querySelector('.path-wrapper');
+        if (!svg || nodes.length < 2) return;
+        svg.setAttribute('height', wrapper.scrollHeight);
+        svg.setAttribute('width', wrapper.clientWidth);
+        svg.innerHTML = "";
+        let pathData = "";
+        nodes.forEach((node, i) => {
+            if (i === nodes.length - 1) return; 
+            const rect1 = node.getBoundingClientRect();
+            const rect2 = nodes[i+1].getBoundingClientRect();
+            const wrapperRect = wrapper.getBoundingClientRect();
+            const x1 = rect1.left + rect1.width / 2 - wrapperRect.left;
+            const y1 = node.offsetTop + node.offsetHeight / 2;
+            const x2 = rect2.left + rect2.width / 2 - wrapperRect.left;
+            const y2 = nodes[i+1].offsetTop + nodes[i+1].offsetHeight / 2;
+            if (i === 0) pathData += `M ${x1} ${y1}`;
+            const cp1x = x1; const cp1y = y1 + (y2 - y1) / 2;
+            const cp2x = x2; const cp2y = y1 + (y2 - y1) / 2;
+            pathData += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x2} ${y2}`;
+        });
+        const pathLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        pathLine.setAttribute("d", pathData);
+        pathLine.classList.add('path-line');
+        svg.appendChild(pathLine);
+        const pathDraw = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        pathDraw.setAttribute("d", pathData);
+        pathDraw.setAttribute("fill", "none");
+        pathDraw.classList.add('path-draw-anim');
+        svg.appendChild(pathDraw);
+    }
+
+    import { initMenu } from "./menu.js";
+    initMenu(app);
+    window.addEventListener('resize', drawCurvedPath);
+</script>
 </body>
 </html>
