@@ -643,6 +643,17 @@
     let currentCollection = 'essay_bank';
     let currentNewsFilter = 'all';
 
+    // --- KHAI BÁO TOOLBAR ĐẦY ĐỦ (GLOBAL) ---
+    const FULL_TOOLBAR = [
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'header': [2, 3, false] }],
+        ['blockquote', 'art-quote'], // Nút Quote Box & Art Quote
+        ['highlight'],                // Nút Highlight
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'align': [] }],
+        ['clean']
+    ];
+
     // --- ĐĂNG KÝ CÁC ĐỊNH DẠNG TÙY CHỈNH CHO QUILL ---
     const Inline = Quill.import('blots/inline');
     class HighlightBlot extends Inline {}
@@ -657,17 +668,6 @@
     ArtQuoteBlot.tagName = 'p'; // Dùng thẻ p nhưng gán class nghệ thuật
     ArtQuoteBlot.className = 'ql-art-quote';
     Quill.register(ArtQuoteBlot);
-
-    // --- ĐƯA QUILL TOOLBAR RA NGOÀI (GLOBAL) ĐỂ HÀM NÀO CŨNG DÙNG ĐƯỢC ---
-    const quillToolbar = [
-        ['bold', 'italic', 'underline'],
-        [{ 'header': [2, 3, false] }],
-        ['blockquote', 'art-quote'], // Nút Quote Box và Art Quote
-        ['highlight'],                // Nút Bút dạ highlight
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        [{ 'align': [] }],
-        ['clean']
-    ];
 
     // 8 DANH MỤC VĂN HỌC MỚI
 const CAT_MAP = {
@@ -741,9 +741,20 @@ const CAT_MAP = {
                 </div>
             </div>`;
 
+        const createQ = (sel, content) => { 
+            if (!document.querySelector(sel)) return null;
+            const q = new Quill(sel, { 
+                theme: 'snow', 
+                modules: { toolbar: FULL_TOOLBAR } // Quan trọng: Dùng bộ công cụ đầy đủ
+            }); 
+            q.clipboard.dangerouslyPasteHTML(content || ""); 
+            return q; 
+        };
+
+        // Khởi tạo cho Mở bài & Kết bài
         newsEditors = { 
-            intro: new Quill('#editor-intro', { theme: 'snow' }),
-            ending: new Quill('#editor-ending', { theme: 'snow' })
+            intro: createQ('#editor-intro', data.intro),
+            ending: createQ('#editor-ending', data.ending)
         };
         newsEditors.intro.clipboard.dangerouslyPasteHTML(data.intro || "");
         newsEditors.ending.clipboard.dangerouslyPasteHTML(data.ending || "");
@@ -956,7 +967,15 @@ const CAT_MAP = {
 
         // Khởi tạo trình soạn thảo sau khi render
         setTimeout(() => {
-            const createQ = (sel, content) => { if(!document.querySelector(sel)) return; const q = new Quill(sel, { theme: 'snow', modules: { toolbar: quillToolbar } }); q.clipboard.dangerouslyPasteHTML(content || ""); return q; };
+            const createQ = (sel, content) => { 
+                if (!document.querySelector(sel)) return null;
+                const q = new Quill(sel, { 
+                    theme: 'snow', 
+                    modules: { toolbar: FULL_TOOLBAR } // Quan trọng: Dùng bộ công cụ đầy đủ
+                }); 
+                q.clipboard.dangerouslyPasteHTML(content || ""); 
+                return q; 
+            };
             if (colName === 'literary_news') {
                 newsEditors.intro = createQ('#editor-intro', data.intro);
                 newsEditors.ending = createQ('#editor-ending', data.ending);
@@ -1014,10 +1033,9 @@ window.addNewsSec = (sData = null) => {
     // KHỞI TẠO QUILL CHO THÂN BÀI
     const q = new Quill(`#ed-${sId}`, { 
         theme: 'snow', 
-        modules: { toolbar: quillToolbar } 
+        modules: { toolbar: FULL_TOOLBAR } // Quan trọng: Dùng bộ công cụ đầy đủ
     });
     
-    // Đổ dữ liệu cũ vào nếu có
     if (sData && sData.p) {
         q.clipboard.dangerouslyPasteHTML(sData.p);
     }
