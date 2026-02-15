@@ -232,6 +232,60 @@
 ::-webkit-scrollbar-button {
     display: none;
 }
+
+/* --- HEADER ACTIONS (SEARCH + FAV BUTTON) --- */
+.header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px; /* Khoảng cách giữa search và nút tim */
+    max-width: 600px;
+    margin: 28px auto 0;
+    padding: 18px 10px;
+}
+
+/* Chỉnh lại thanh search để nó tự co giãn */
+.search-box-wrap {
+    flex-grow: 1;
+    margin: 0 !important; /* Gỡ bỏ margin cũ */
+}
+
+/* Nút Yêu thích vuông bo góc */
+.btn-love-mode {
+    width: 54px; height: 54px;
+    border-radius: 20px;
+    background: white;
+    border: 2px solid white;
+    box-shadow: 0 10px 30px rgba(255, 143, 80, 0.1);
+    color: #ff4757;
+    font-size: 1.4rem;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    flex-shrink: 0;
+}
+
+.btn-love-mode:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(255, 71, 87, 0.2);
+    background: #fff0f0;
+}
+
+/* Trạng thái ĐANG XEM yêu thích */
+.btn-love-mode.active {
+    background: linear-gradient(135deg, #ff4757, #ff6b81);
+    color: white;
+    box-shadow: 0 10px 25px rgba(255, 71, 87, 0.4);
+    animation: pulseRed 2s infinite; /* Hiệu ứng tim đập */
+}
+
+@keyframes pulseRed {
+    0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+}
+
+
     </style>
 </head>
 <body>
@@ -258,10 +312,15 @@
             <h1 class="page-title">Bản Tin <span class="text-gradient">Văn Học</span></h1>
             <p class="page-subtitle">Dữ liệu Dẫn chứng, Nhận định & Văn mẫu chọn lọc</p>
             
+        <div class="header-actions">
             <div class="search-box-wrap">
                 <input type="text" id="search-input" class="search-inp" placeholder="Tìm kiếm bài viết, tác giả...">
                 <i class="fas fa-search search-icon"></i>
             </div>
+
+            <button onclick="toggleFavorites()" id="btn-love-mode" class="btn-love-mode" title="Xem bộ sưu tập">
+                <i class="fas fa-heart"></i>
+            </button>
         </div>
 
         <div class="nav-wrapper">
@@ -304,6 +363,99 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+// ------------------------------------------------------------------
+    //  LOGIC DANH SÁCH YÊU THÍCH (Dán vào trong script type="module")
+    // ------------------------------------------------------------------
+    
+    // 1. Import thêm hàm đọc document (nếu trên đầu file chưa có)
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    let isFavMode = false; // Biến theo dõi trạng thái (Đang xem / Không xem)
+
+    window.toggleFavorites = async () => {
+        const btn = document.getElementById('btn-love-mode');
+        const container = document.getElementById('content-area');
+        const navBtns = document.querySelectorAll('.nav-btn'); // Các nút danh mục
+
+        // TRƯỜNG HỢP 1: ĐANG BẬT -> TẮT (Quay về xem tất cả)
+        if (isFavMode) {
+            isFavMode = false;
+            btn.classList.remove('active');
+            btn.innerHTML = '<i class="fas fa-heart"></i>'; // Trả lại icon tim
+            
+            // Kích hoạt lại nút "Tất cả" và tải lại danh sách gốc
+            const btnAll = document.querySelector('.nav-btn:first-child');
+            if(btnAll) btnAll.click(); 
+            return;
+        }
+
+        // TRƯỜNG HỢP 2: ĐANG TẮT -> BẬT (Xem danh sách yêu thích)
+        isFavMode = true;
+        
+        // Cập nhật giao diện nút
+        btn.classList.add('active');
+        btn.innerHTML = '<i class="fas fa-times"></i>'; // Đổi thành dấu X để đóng
+        
+        // Tắt active của các nút danh mục kia cho đỡ rối
+        navBtns.forEach(b => b.classList.remove('active')); 
+
+        // Hiển thị loading đẹp
+        container.innerHTML = `
+            <div class="loading-state" style="padding: 60px 0;">
+                <i class="fas fa-spinner fa-spin text-3xl mb-3 text-orange-300"></i>
+                <br>Đang tìm trong bộ sưu tập của bạn...
+            </div>`;
+
+        try {
+            const user = auth.currentUser;
+            if (!user) {
+                alert("Vui lòng đăng nhập để xem bộ sưu tập!");
+                btn.click(); // Tự động tắt chế độ này
+                return;
+            }
+
+            // Gọi lên Firebase lấy danh sách ID đã lưu
+            const favSnap = await getDoc(doc(db, "favorites", user.uid));
+            
+            // Nếu chưa lưu bài nào
+            if (!favSnap.exists() || !favSnap.data().list || favSnap.data().list.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10">
+                        <i class="far fa-folder-open text-6xl text-gray-200 mb-4"></i>
+                        <h3 class="text-xl font-bold text-gray-400">Chưa có bài viết nào</h3>
+                        <p class="text-sm text-gray-400 mt-2">Hãy thả tim <i class="fas fa-heart text-red-400"></i> các bài viết hay để lưu vào đây nhé!</p>
+                        <button onclick="toggleFavorites()" class="mt-6 px-6 py-2 bg-orange-100 text-orange-500 rounded-full font-bold hover:bg-orange-200 transition">Quay lại Đọc báo</button>
+                    </div>`;
+                return;
+            }
+
+            const favIds = favSnap.data().list; // Mảng chứa các ID [id1, id2...]
+
+            // Lọc ra các bài viết trùng khớp từ danh sách allArticles đã tải sẵn
+            // (Cách này nhanh hơn là query lại database)
+            const favArticles = allArticles.filter(item => favIds.includes(item.id));
+
+            if (favArticles.length === 0) {
+                container.innerHTML = '<div class="loading-state">Các bài viết bạn lưu có thể đã bị xóa khỏi hệ thống.</div>';
+            } else {
+                // Hiển thị danh sách kèm tiêu đề
+                renderLayout(favArticles);
+                
+                // Chèn thêm header nhỏ báo số lượng
+                container.insertAdjacentHTML('afterbegin', `
+                    <div class="col-span-full mb-6 pb-4 border-b border-gray-100 flex items-center gap-3 animate-fade-in">
+                        <div class="w-8 h-8 rounded-full bg-red-100 text-red-500 flex items-center justify-center font-bold"><i class="fas fa-heart"></i></div>
+                        <span class="font-bold text-gray-600">Bạn đã lưu ${favArticles.length} bài viết</span>
+                    </div>
+                `);
+            }
+
+        } catch (e) {
+            console.error(e);
+            container.innerHTML = '<div class="loading-state text-red-400">Lỗi tải dữ liệu yêu thích.</div>';
+        }
+    };
 
         // Khởi tạo Menu bên trái
         initMenu(app);
