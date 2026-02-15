@@ -513,7 +513,7 @@ class Gamification {
         const allDone = this.dailyQuests.every(q => claimedIds.includes(q.id));
         
         if (allDone && this.dailyQuests.length > 0) {
-            list.innerHTML = `<div style="text-align:center; padding:20px;"><i class="fas fa-medal" style="font-size:2rem; color:#f59e0b"></i><p style="margin-top:5px; font-weight:800; font-size:0.75rem;">ĐÃ HOÀN THÀNH NHIỆM VỤ NGÀY<br> HÃY QUAY LẠI VÀO NGÀY MAI NHÉ</p></div>`;
+            list.innerHTML = `<div style="text-align:center; padding:20px;"><i class="fas fa-medal" style="font-size:2rem; color:#f59e0b"></i><p style="margin-top:5px; font-weight:800; font-size:0.75rem;">Bạn đã hoàn thành mọi thử thách hôm nay.<br>Hãy quay lại vào ngày mai nhé!</p></div>`;
         } else {
             list.innerHTML = this.dailyQuests.map(q => {
                 const cur = this.progress[q.id] || 0; 
