@@ -138,7 +138,6 @@ const styles = `
     .gt-btn.active { color: var(--hv-orange); background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 
     /* CONTENT */
-    .gam-body { padding: 5px 25px 25px; min-height: 230px; }
     .g-view { display: none; animation: slideUp 0.3s ease; }
     .g-view.active { display: block; }
 
@@ -172,12 +171,6 @@ const styles = `
     .btn-claim:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; }
 
     /* QUEST VIEW */
-    .q-card {
-        background: white; border: 1px solid #f1f5f9;
-        border-radius: 18px; padding: 14px; margin-bottom: 12px;
-        display: flex; align-items: center; gap: 14px;
-        transition: 0.2s;
-    }
     .q-card:hover { border-color: #fdba74; transform: scale(1.02); box-shadow: 0 5px 15px rgba(255, 143, 80, 0.1); }
     .q-card.done { opacity: 0.6; background: #f8fafc; filter: grayscale(1); }
     
@@ -189,10 +182,6 @@ const styles = `
     .q-content p { margin: 0; font-size: 0.75rem; color: var(--text-secondary); }
     
     .q-status { margin-left: auto; text-align: right; }
-    .tag-reward { 
-        background: #fee2e2; color: var(--hv-red); 
-        font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 20px; 
-    }
     .icon-check { color: #10b981; font-size: 1.4rem; }
 
     .all-done-msg { text-align: center; padding: 30px 0; animation: slideUp 0.5s; }
@@ -205,7 +194,37 @@ const styles = `
     @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
     .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
     @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
-`;
+
+
+    /* Tinh gọn Body: Chỉ hiện 2 nhiệm vụ, còn lại cuộn */
+    .gam-body { 
+        padding: 0 15px 15px; 
+        max-height: 350px; /* Chiều cao cố định cho 2 card */
+        overflow-y: auto; 
+    }
+    .gam-body::-webkit-scrollbar { width: 4px; }
+    .gam-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+    /* Quest Card: Chữ siêu nhỏ, Icon gọn */
+    .q-card { 
+        background: white; border: 1px solid #f8fafc; border-radius: 16px; padding: 10px; 
+        margin-bottom: 8px; display: flex; align-items: center; gap: 10px; transition: 0.2s;
+    }
+    .q-card.done { opacity: 0.6; filter: grayscale(1); border-style: dashed; }
+    
+    .q-icon-neo { 
+        width: 34px; height: 34px; background: #fdf2f8; border-radius: 10px; 
+        display: flex; align-items: center; justify-content: center; 
+        font-size: 1rem; color: var(--hv-orange); flex-shrink: 0; 
+    }
+    .q-title { font-size: 0.78rem; font-weight: 800; color: var(--text-primary); margin: 0; line-height: 1.2; }
+    .q-desc { font-size: 0.68rem; color: var(--text-secondary); line-height: 1.3; margin-top: 2px; }
+    .tag-reward { background: #fee2e2; color: var(--hv-red); font-weight: 900; font-size: 0.62rem; padding: 2px 6px; border-radius: 10px; }
+
+    .hv-spin { animation: spin 1s linear infinite; display: inline-block; color: var(--hv-orange); }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    `;
 
 // --- 3. LOGIC ---
 class Gamification {
@@ -272,22 +291,22 @@ class Gamification {
     }
 
     init() {
-        const s = document.createElement("style"); s.innerHTML = styles; document.head.appendChild(s);
+        const s = document.createElement("style"); s.innerHTML = styles;
+        document.head.appendChild(s);
         this.render();
         
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 this.user = user;
-                // --- FIX 0: Hiện Keys và Streak ngay lập tức ---
-                await this.syncUserData();
-                this.updateUIBasic();
+                // 1. Tải Keys và Streak ngay lập tức để không hiện số 0
+                await this.syncUserData(); 
+                this.updateUIBasic();      
 
-                // Chạy ngầm việc check nhiệm vụ (không làm treo màn hình)
-                this.selectQuests();
+                // 2. Chọn nhiệm vụ và hiện cái Spin quay tròn để nạp đề
+                this.selectQuests();       
                 await this.checkQuests();
-                this.updateUIQuests();
-                
-                // Tự động mở popup nếu hôm nay chưa nhận thưởng ngày
+
+                // 3. Tự động mở popup nếu hôm nay chưa nhận quà
                 const today = new Date().toLocaleDateString('en-CA');
                 if (this.userData.lastClaimDate !== today) {
                     setTimeout(() => {
@@ -296,9 +315,11 @@ class Gamification {
                             document.getElementById('hv-gam-trigger').classList.add('shake');
                             panel.classList.add('open');
                         }
-                    }, 1500);
+                    }, 1200);
                 }
-            } else { document.getElementById('hv-gam-root').style.display = 'none'; }
+            } else { 
+                document.getElementById('hv-gam-root').style.display = 'none'; 
+            }
         });
     }
 
@@ -308,16 +329,99 @@ class Gamification {
         if (snap.exists()) this.userData = { ...this.userData, ...snap.data() };
     }
 
-    // --- LOGIC TÁCH BIỆT: TẢI DATA NHIỆM VỤ ---
+    // HIỆN SPIN KHI LOAD NHIỆM VỤ
+// 1. Sửa lỗi load nhiệm vụ (Chống treo loading)
     async checkQuests() {
-        const start = new Date(); start.setHours(0,0,0,0);
-        const q = query(collection(db, 'activities'), where('uid', '==', this.user.uid), where('timestamp', '>=', Timestamp.fromDate(start)));
-        const snap = await getDocs(q);
-        const acts = snap.docs.map(d => d.data());
-        this.dailyQuests.forEach(q => { this.progress[q.id] = acts.filter(q.filter).length; });
+        const listContainer = document.getElementById('quest-list');
+        if (!listContainer) return;
+
+        // Hiện Spin quay tròn khi đang nạp
+        listContainer.innerHTML = `
+            <div style="text-align:center; padding:35px;">
+                <i class="fas fa-circle-notch fa-spin hv-spin" style="font-size:1.6rem"></i>
+                <p style="margin-top:10px; font-size:0.65rem; color:#94a3b8; font-weight:600">Đang nạp nhiệm vụ...</p>
+            </div>`;
+
+        try {
+            const startOfDay = new Date(); 
+            startOfDay.setHours(0, 0, 0, 0);
+
+            // Chỉ lấy theo UID (Tránh lỗi Index của Firebase)
+            const q = query(collection(db, 'activities'), where('uid', '==', this.user.uid));
+            const snap = await getDocs(q);
+            
+            // Lọc dữ liệu ngày hôm nay bằng Javascript (An toàn 100%)
+            const acts = snap.docs.map(d => d.data()).filter(a => {
+                if (!a.timestamp) return false;
+                const d = a.timestamp.toDate ? a.timestamp.toDate() : new Date(a.timestamp);
+                return d >= startOfDay;
+            });
+
+            this.dailyQuests.forEach(quest => {
+                this.progress[quest.id] = acts.filter(quest.filter).length;
+            });
+
+            this.updateUIQuests();
+        } catch (e) {
+            console.error(e);
+            listContainer.innerHTML = `<div style="text-align:center; padding:15px; color:red; font-size:0.65rem;">Lỗi nạp đề. Thử F5 nhé!</div>`;
+        }
     }
 
-    // Cập nhật số liệu Keys/Streak (Chạy ngay)
+    // 2. Sửa lỗi ID cũ kẹt trong bộ nhớ gây không hiện đề
+    selectQuests() {
+        const today = new Date().toLocaleDateString('en-CA');
+        const key = `hv_q_${this.user.uid}_${today}`;
+        let saved = localStorage.getItem(key);
+
+        const resetQuests = () => {
+            const shuffled = [...this.questPool].sort(() => 0.5 - Math.random());
+            this.dailyQuests = shuffled.slice(0, 4);
+            localStorage.setItem(key, JSON.stringify(this.dailyQuests.map(q => q.id)));
+        };
+
+        if (saved) {
+            try {
+                const ids = JSON.parse(saved);
+                // Kiểm tra xem các ID lưu trong máy có nằm trong bộ 36 đề mới không
+                this.dailyQuests = this.questPool.filter(q => ids.includes(q.id));
+                if (this.dailyQuests.length < 4) resetQuests();
+            } catch (e) { resetQuests(); }
+        } else { resetQuests(); }
+    }
+
+    // VẼ LẠI GIAO DIỆN NHIỆM VỤ GỌN GÀNG
+    updateUIQuests() {
+        const list = document.getElementById('quest-list');
+        const allDone = this.dailyQuests.every(q => (this.progress[q.id] || 0) >= q.target);
+        
+        if (allDone && this.dailyQuests.length > 0) {
+            list.innerHTML = `
+                <div style="text-align:center; padding:20px;">
+                    <i class="fas fa-medal" style="font-size:2rem; color:#f59e0b"></i>
+                    <p style="margin-top:5px; font-weight:800; font-size:0.75rem;">HOÀN THÀNH!</p>
+                </div>`;
+        } else {
+            list.innerHTML = this.dailyQuests.map(q => {
+                const cur = this.progress[q.id] || 0; 
+                const done = cur >= q.target;
+                return `
+                <div class="q-card ${done ? 'done' : ''}">
+                    <div class="q-icon-neo"><i class="fas ${q.icon}"></i></div>
+                    <div style="flex:1">
+                        <div class="q-title">${q.title}</div>
+                        <div class="q-desc">${q.desc} (${cur}/${q.target})</div>
+                    </div>
+                    <div>
+                        ${done ? '<i class="fas fa-check-circle" style="color:#10b981; font-size:1.1rem;"></i>' 
+                               : `<span class="tag-reward">+${q.reward}</span>`}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+    }
+
+    // FIX LỖI LOAD 0: Hiện thông số cơ bản ngay lập tức
     updateUIBasic() {
         document.getElementById('ui-streak').textContent = this.userData.streak || 0;
         document.getElementById('ui-keys').textContent = this.userData.keys || 0;
@@ -325,52 +429,13 @@ class Gamification {
         const today = new Date().toLocaleDateString('en-CA');
         const btn = document.getElementById('btn-claim');
         const badge = document.querySelector('.hv-badge');
-        const icon = document.querySelector('#hv-gam-trigger i');
 
-        // --- FIX F5: Chặn nhận thưởng lặp lại dựa vào lastClaimDate ---
         if (this.userData.lastClaimDate === today) {
-            btn.innerHTML = '<span><i class="fas fa-check"></i> ĐÃ NHẬN HÔM NAY</span>';
-            btn.disabled = true;
-            badge.style.display = 'none';
-            icon.className = 'fas fa-trophy';
+            btn.innerHTML = '<span><i class="fas fa-check"></i> ĐÃ NHẬN</span>';
+            btn.disabled = true; badge.style.display = 'none';
         } else {
-            btn.innerHTML = '<i class="fas fa-gift"></i><span>NHẬN +4 KEYS</span>';
-            btn.disabled = false;
-            badge.style.display = 'block';
-            icon.className = 'fas fa-gift';
-        }
-    }
-
-    // Cập nhật danh sách nhiệm vụ (Chạy sau)
-    updateUIQuests() {
-        const list = document.getElementById('quest-list');
-        const allDone = this.dailyQuests.every(q => (this.progress[q.id] || 0) >= q.target);
-        
-        if (allDone && this.dailyQuests.length > 0) {
-            list.innerHTML = `<div class="all-done-msg"><i class="fas fa-medal"></i><h3 style="margin:0; color:#1e293b;">Xuất sắc!</h3><p style="color:#64748b; font-size:0.9rem;">Bạn đã hoàn thành tất cả nhiệm vụ.</p></div>`;
-        } else {
-            list.innerHTML = this.dailyQuests.map(q => {
-                const cur = this.progress[q.id] || 0; const done = cur >= q.target;
-                return `<div class="q-card ${done ? 'done' : ''}">
-                    <div class="q-icon"><i class="fas ${q.icon}"></i></div>
-                    <div class="q-content"><h4>${q.title}</h4><p>${q.desc} (${cur}/${q.target})</p></div>
-                    <div class="q-status">${done ? '<i class="fas fa-check-circle icon-check"></i>' : `<span class="tag-reward">+${q.reward} Key</span>`}</div>
-                </div>`;
-            }).join('');
-        }
-    }
-
-    selectQuests() {
-        const today = new Date().toLocaleDateString('en-CA');
-        const key = `hv_q_${this.user.uid}_${today}`;
-        const saved = localStorage.getItem(key);
-        if (saved) {
-            const ids = JSON.parse(saved);
-            this.dailyQuests = this.questPool.filter(q => ids.includes(q.id));
-        } else {
-            const shuffled = [...this.questPool].sort(() => 0.5 - Math.random());
-            this.dailyQuests = shuffled.slice(0, 4);
-            localStorage.setItem(key, JSON.stringify(this.dailyQuests.map(q => q.id)));
+            btn.innerHTML = '<span>NHẬN +4 KEYS</span>';
+            btn.disabled = false; badge.style.display = 'block';
         }
     }
 
