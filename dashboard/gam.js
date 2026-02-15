@@ -212,93 +212,152 @@ class Gamification {
     constructor() {
         this.user = null;
         this.userData = { keys: 0, streak: 0, lastClaimDate: '' };
-        
-        // KHO NHIỆM VỤ (QUEST POOL) - EXTENDED 36 QUESTS
+        this.progress = {};
+        this.dailyQuests = [];
+
+        // KHO 36 NHIỆM VỤ CHI TIẾT (Đã tối ưu cho 9 phòng luyện)
         this.questPool = [
-            // --- NHÓM 1: KHỞI ĐỘNG (DỄ - 5 Quest) ---
-            { id: 'warmup_1', icon: 'fa-mug-hot', title: 'Khởi động nhẹ', desc: 'Hoàn thành 1 bài tập bất kỳ', target: 1, reward: 1, filter: a => true },
-            { id: 'warmup_2', icon: 'fa-bolt', title: 'Tăng tốc', desc: 'Hoàn thành 2 bài tập bất kỳ', target: 2, reward: 2, filter: a => true },
-            { id: 'warmup_morning', icon: 'fa-sun', title: 'Chào ngày mới', desc: 'Làm 1 bài Đọc Hiểu', target: 1, reward: 2, filter: a => a.type === 'reading' },
-            { id: 'warmup_quiz', icon: 'fa-check', title: 'Thử tài nhanh', desc: 'Làm 1 đề Trắc Nghiệm', target: 1, reward: 2, filter: a => a.type === 'quiz' },
-            { id: 'warmup_write', icon: 'fa-pencil-alt', title: 'Cảm hứng viết', desc: 'Viết 1 đoạn NLXH ngắn', target: 1, reward: 3, filter: a => a.type === 'nlxh' },
+            // 1. Khởi động (5)
+            { id: 'w1', icon: 'fa-mug-hot', title: 'Khởi đầu nhẹ', desc: 'Làm 1 bài tập bất kỳ', target: 1, reward: 1, filter: a => true },
+            { id: 'w2', icon: 'fa-bolt', title: 'Tăng tốc nhanh', desc: 'Làm 2 bài tập bất kỳ', target: 2, reward: 2, filter: a => true },
+            { id: 'w3', icon: 'fa-sun', title: 'Chào ngày mới', desc: 'Làm 1 bài Đọc Hiểu', target: 1, reward: 2, filter: a => a.type === 'reading' },
+            { id: 'w4', icon: 'fa-check', title: 'Thử tài nhanh', desc: 'Làm 1 đề Trắc Nghiệm', target: 1, reward: 2, filter: a => a.type === 'quiz' },
+            { id: 'w5', icon: 'fa-pencil-alt', title: 'Cảm hứng viết', desc: 'Viết 1 đoạn NLXH', target: 1, reward: 3, filter: a => a.type === 'nlxh' },
 
-            // --- NHÓM 2: TRẮC NGHIỆM & ĐỌC HIỂU (6 Quest) ---
-            { id: 'quiz_master_1', icon: 'fa-check-double', title: 'Vua Trắc Nghiệm I', desc: 'Làm 1 đề Trắc Nghiệm', target: 1, reward: 3, filter: a => a.type === 'quiz' },
-            { id: 'quiz_master_2', icon: 'fa-brain', title: 'Vua Trắc Nghiệm II', desc: 'Làm 2 đề Trắc Nghiệm', target: 2, reward: 5, filter: a => a.type === 'quiz' },
-            { id: 'quiz_speed', icon: 'fa-stopwatch', title: 'Tốc độ ánh sáng', desc: 'Làm 3 đề Trắc Nghiệm', target: 3, reward: 8, filter: a => a.type === 'quiz' },
-            { id: 'read_basic', icon: 'fa-glasses', title: 'Đôi mắt tinh anh', desc: 'Làm 1 bài Đọc Hiểu', target: 1, reward: 2, filter: a => a.type === 'reading' },
-            { id: 'read_pro', icon: 'fa-book-open', title: 'Thấu hiểu văn bản', desc: 'Làm 2 bài Đọc Hiểu', target: 2, reward: 5, filter: a => a.type === 'reading' },
-            { id: 'read_expert', icon: 'fa-graduation-cap', title: 'Chuyên gia Đọc Hiểu', desc: 'Làm 3 bài Đọc Hiểu', target: 3, reward: 7, filter: a => a.type === 'reading' },
+            // 2. Trắc nghiệm & Đọc hiểu (6)
+            { id: 'qz1', icon: 'fa-check-double', title: 'Vua Trắc Nghiệm I', desc: 'Làm 1 đề Trắc Nghiệm', target: 1, reward: 3, filter: a => a.type === 'quiz' },
+            { id: 'qz2', icon: 'fa-brain', title: 'Siêu trí tuệ', desc: 'Làm 2 đề Trắc Nghiệm', target: 2, reward: 5, filter: a => a.type === 'quiz' },
+            { id: 'qz3', icon: 'fa-stopwatch', title: 'Tốc độ ánh sáng', desc: 'Làm 3 đề Trắc Nghiệm', target: 3, reward: 8, filter: a => a.type === 'quiz' },
+            { id: 'rd1', icon: 'fa-glasses', title: 'Đôi mắt tinh anh', desc: 'Làm 1 bài Đọc Hiểu', target: 1, reward: 2, filter: a => a.type === 'reading' },
+            { id: 'rd2', icon: 'fa-book-open', title: 'Thấu hiểu văn bản', desc: 'Làm 2 bài Đọc Hiểu', target: 2, reward: 5, filter: a => a.type === 'reading' },
+            { id: 'rd3', icon: 'fa-search', title: 'Tầm soát chữ', desc: 'Làm 3 bài Đọc Hiểu', target: 3, reward: 8, filter: a => a.type === 'reading' },
 
-            // --- NHÓM 3: NGHỊ LUẬN XÃ HỘI (5 Quest) ---
-            { id: 'nlxh_1', icon: 'fa-users', title: 'Góc nhìn xã hội', desc: 'Viết 1 bài NLXH', target: 1, reward: 3, filter: a => a.type === 'nlxh' },
-            { id: 'nlxh_2', icon: 'fa-comments', title: 'Tiếng nói trẻ', desc: 'Viết 2 bài NLXH', target: 2, reward: 7, filter: a => a.type === 'nlxh' },
-            { id: 'nlxh_deep', icon: 'fa-fingerprint', title: 'Tư duy phản biện', desc: 'Viết 1 bài NLXH sâu sắc', target: 1, reward: 4, filter: a => a.type === 'nlxh' },
-            { id: 'nlxh_life', icon: 'fa-tree', title: 'Bài học cuộc sống', desc: 'Làm 1 đề NLXH về lẽ sống', target: 1, reward: 3, filter: a => a.type === 'nlxh' }, // Tạm tính chung là nlxh
-            { id: 'nlxh_hard', icon: 'fa-gavel', title: 'Tranh biện sắc sảo', desc: 'Viết 3 bài NLXH', target: 3, reward: 10, filter: a => a.type === 'nlxh' },
+            // 3. Nghị luận xã hội (5)
+            { id: 'sh1', icon: 'fa-users', title: 'Góc nhìn xã hội', desc: 'Viết 1 bài NLXH', target: 1, reward: 3, filter: a => a.type === 'nlxh' },
+            { id: 'sh2', icon: 'fa-comments', title: 'Tiếng nói trẻ', desc: 'Viết 2 bài NLXH', target: 2, reward: 7, filter: a => a.type === 'nlxh' },
+            { id: 'sh3', icon: 'fa-fingerprint', title: 'Bản sắc riêng', desc: 'Viết 1 bài NLXH sâu sắc', target: 1, reward: 4, filter: a => a.type === 'nlxh' },
+            { id: 'sh4', icon: 'fa-gavel', title: 'Nhà hùng biện', desc: 'Viết 3 bài NLXH', target: 3, reward: 12, filter: a => a.type === 'nlxh' },
+            { id: 'sh5', icon: 'fa-earth-asia', title: 'Trách nhiệm công dân', desc: 'Làm 1 đề NLXH đặc biệt', target: 1, reward: 4, filter: a => a.type === 'nlxh' },
 
-            // --- NHÓM 4: NGHỊ LUẬN VĂN HỌC - CHI TIẾT (12 Quest) ---
-            // Thơ
-            { id: 'nlvh_tho_1', icon: 'fa-feather-alt', title: 'Hồn thơ', desc: 'Làm 1 đề về Thơ', target: 1, reward: 4, filter: a => a.type === 'nlvh' && a.genre === 'Thơ' },
-            { id: 'nlvh_tho_2', icon: 'fa-music', title: 'Giai điệu cảm xúc', desc: 'Làm 2 đề về Thơ', target: 2, reward: 9, filter: a => a.type === 'nlvh' && a.genre === 'Thơ' },
-            // Truyện
-            { id: 'nlvh_truyen_1', icon: 'fa-book', title: 'Thế giới Truyện', desc: 'Làm 1 đề về Truyện', target: 1, reward: 4, filter: a => a.type === 'nlvh' && a.genre === 'Truyện' },
-            { id: 'nlvh_truyen_2', icon: 'fa-user-friends', title: 'Nhân vật điển hình', desc: 'Làm 2 đề về Truyện', target: 2, reward: 9, filter: a => a.type === 'nlvh' && a.genre === 'Truyện' },
-            // Kịch
-            { id: 'nlvh_kich_1', icon: 'fa-masks-theater', title: 'Sân khấu Kịch', desc: 'Làm 1 đề về Kịch', target: 1, reward: 4, filter: a => a.type === 'nlvh' && a.genre === 'Kịch' },
-            { id: 'nlvh_kich_conflict', icon: 'fa-bolt', title: 'Xung đột kịch tính', desc: 'Làm 1 đề Kịch (Hồn Trương Ba...)', target: 1, reward: 5, filter: a => a.type === 'nlvh' && a.genre === 'Kịch' },
-            // Ký
-            { id: 'nlvh_ky_1', icon: 'fa-pen-fancy', title: 'Cái tôi Ký', desc: 'Làm 1 đề về Ký', target: 1, reward: 4, filter: a => a.type === 'nlvh' && a.genre === 'Ký' },
-            { id: 'nlvh_ky_river', icon: 'fa-water', title: 'Dòng sông văn chương', desc: 'Làm 1 đề Ký (Sông Đà/Hương)', target: 1, reward: 5, filter: a => a.type === 'nlvh' && a.genre === 'Ký' },
-            // Tổng hợp NLVH
-            { id: 'nlvh_mix_1', icon: 'fa-pen-nib', title: 'Nhà phê bình', desc: 'Viết 1 bài NLVH bất kỳ', target: 1, reward: 3, filter: a => a.type === 'nlvh' },
-            { id: 'nlvh_mix_2', icon: 'fa-scroll', title: 'Cây bút vàng', desc: 'Viết 2 bài NLVH bất kỳ', target: 2, reward: 8, filter: a => a.type === 'nlvh' },
-            { id: 'nlvh_mix_3', icon: 'fa-star', title: 'Văn chương bác học', desc: 'Viết 3 bài NLVH bất kỳ', target: 3, reward: 12, filter: a => a.type === 'nlvh' },
-
-            // --- NHÓM 5: THỬ THÁCH NÂNG CAO & COMBO (8 Quest) ---
-            { id: 'fulltest_hero', icon: 'fa-layer-group', title: 'Chiến binh Sĩ tử', desc: 'Làm 1 đề Tổng hợp (Fulltest)', target: 1, reward: 10, filter: a => a.type === 'fulltest' },
-            { id: 'fulltest_legend', icon: 'fa-dragon', title: 'Huyền thoại', desc: 'Làm 2 đề Tổng hợp', target: 2, reward: 25, filter: a => a.type === 'fulltest' },
-            { id: 'random_luck_1', icon: 'fa-dice-d20', title: 'Nhân phẩm', desc: 'Làm 1 đề Ngẫu nhiên', target: 1, reward: 3, filter: a => a.type === 'essay' },
-            { id: 'random_luck_2', icon: 'fa-dice', title: 'Thử vận may', desc: 'Làm 2 đề Ngẫu nhiên', target: 2, reward: 7, filter: a => a.type === 'essay' },
+            // 4. Nghị luận văn học theo thể loại (12)
+            { id: 'th1', icon: 'fa-feather-alt', title: 'Hồn thơ I', desc: 'Làm 1 đề về Thơ', target: 1, reward: 4, filter: a => a.type === 'nlvh' && a.genre === 'Thơ' },
+            { id: 'th2', icon: 'fa-music', title: 'Giai điệu cảm xúc', desc: 'Làm 2 đề về Thơ', target: 2, reward: 9, filter: a => a.type === 'nlvh' && a.genre === 'Thơ' },
+            { id: 'th3', icon: 'fa-wind', title: 'Phiêu lãng chữ', desc: 'Làm 3 đề về Thơ', target: 3, reward: 15, filter: a => a.type === 'nlvh' && a.genre === 'Thơ' },
             
-            // Combo (Tương đối: Đếm tổng số bài làm phù hợp)
-            { id: 'combo_read_write', icon: 'fa-balance-scale', title: 'Văn võ song toàn', desc: '1 Đọc hiểu + 1 NLXH (Tổng 2)', target: 2, reward: 6, filter: a => a.type === 'reading' || a.type === 'nlxh' },
-            { id: 'hard_grind_5', icon: 'fa-fire-alt', title: 'Cày cuốc', desc: 'Hoàn thành 5 hoạt động bất kỳ', target: 5, reward: 10, filter: a => true },
-            { id: 'hard_grind_10', icon: 'fa-gem', title: 'Học bá toàn năng', desc: 'Hoàn thành 10 hoạt động', target: 10, reward: 20, filter: a => true },
-            { id: 'weekend_warrior', icon: 'fa-calendar-check', title: 'Chiến binh cuối tuần', desc: 'Làm 3 đề NLVH hoặc NLXH', target: 3, reward: 15, filter: a => a.type === 'nlvh' || a.type === 'nlxh' }
+            { id: 'tr1', icon: 'fa-book', title: 'Thế giới truyện I', desc: 'Làm 1 đề về Truyện', target: 1, reward: 4, filter: a => a.type === 'nlvh' && a.genre === 'Truyện' },
+            { id: 'tr2', icon: 'fa-user-tag', title: 'Nhân vật điển hình', desc: 'Làm 2 đề về Truyện', target: 2, reward: 9, filter: a => a.type === 'nlvh' && a.genre === 'Truyện' },
+            { id: 'tr3', icon: 'fa-bookmark', title: 'Mạch kể truyện', desc: 'Làm 3 đề về Truyện', target: 3, reward: 15, filter: a => a.type === 'nlvh' && a.genre === 'Truyện' },
+
+            { id: 'kc1', icon: 'fa-masks-theater', title: 'Sân khấu kịch I', desc: 'Làm 1 đề về Kịch', target: 1, reward: 4, filter: a => a.type === 'nlvh' && a.genre === 'Kịch' },
+            { id: 'kc2', icon: 'fa-bolt', title: 'Xung đột kịch tính', desc: 'Làm 2 đề về Kịch', target: 2, reward: 10, filter: a => a.type === 'nlvh' && a.genre === 'Kịch' },
+
+            { id: 'ki1', icon: 'fa-pen-fancy', title: 'Cái tôi Ký I', desc: 'Làm 1 đề về Ký', target: 1, reward: 4, filter: a => a.type === 'nlvh' && a.genre === 'Ký' },
+            { id: 'ki2', icon: 'fa-map-marked-alt', title: 'Dấu chân lãng tử', desc: 'Làm 2 đề về Ký', target: 2, reward: 9, filter: a => a.type === 'nlvh' && a.genre === 'Ký' },
+            
+            { id: 'mix1', icon: 'fa-pen-nib', title: 'Nhà phê bình', desc: 'Viết 1 bài NLVH bất kỳ', target: 1, reward: 3, filter: a => a.type === 'nlvh' },
+            { id: 'mix2', icon: 'fa-scroll', title: 'Cây bút vàng', desc: 'Viết 2 bài NLVH bất kỳ', target: 2, reward: 8, filter: a => a.type === 'nlvh' },
+
+            // 5. Thử thách nâng cao (8)
+            { id: 'ft1', icon: 'fa-layer-group', title: 'Chiến binh sĩ tử', desc: 'Làm 1 đề Tổng hợp', target: 1, reward: 10, filter: a => a.type === 'fulltest' },
+            { id: 'ft2', icon: 'fa-dragon', title: 'Huyền thoại HopVan', desc: 'Làm 2 đề Tổng hợp', target: 2, reward: 25, filter: a => a.type === 'fulltest' },
+            { id: 'rn1', icon: 'fa-dice', title: 'Nhân phẩm cao', desc: 'Làm 1 đề Ngẫu nhiên', target: 1, reward: 3, filter: a => a.type === 'essay' },
+            { id: 'rn2', icon: 'fa-random', title: 'Vạn sự tùy duyên', desc: 'Làm 2 đề Ngẫu nhiên', target: 2, reward: 8, filter: a => a.type === 'essay' },
+            { id: 'cb1', icon: 'fa-balance-scale', title: 'Văn võ song toàn', desc: '1 Đọc hiểu + 1 NLXH', target: 2, reward: 6, filter: a => a.type === 'reading' || a.type === 'nlxh' },
+            { id: 'gr1', icon: 'fa-fire-alt', title: 'Cày cuốc chăm chỉ', desc: 'Hoàn thành 5 bài tập', target: 5, reward: 10, filter: a => true },
+            { id: 'gr2', icon: 'fa-gem', title: 'Học bá toàn năng', desc: 'Hoàn thành 10 bài tập', target: 10, reward: 22, filter: a => true },
+            { id: 'wr1', icon: 'fa-pencil-ruler', title: 'Đỉnh cao ngòi bút', desc: 'Viết 2 bài văn dài', target: 2, reward: 10, filter: a => a.type === 'nlxh' || a.type === 'nlvh' }
         ];
 
-        this.dailyQuests = [];
-        this.progress = {};
         this.init();
     }
 
     init() {
-        const s = document.createElement("style");
-        s.innerHTML = styles;
-        document.head.appendChild(s);
+        const s = document.createElement("style"); s.innerHTML = styles; document.head.appendChild(s);
         this.render();
         
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 this.user = user;
-                await this.syncData();
+                // --- FIX 0: Hiện Keys và Streak ngay lập tức ---
+                await this.syncUserData();
+                this.updateUIBasic();
+
+                // Chạy ngầm việc check nhiệm vụ (không làm treo màn hình)
                 this.selectQuests();
                 await this.checkQuests();
-                this.updateUI();
+                this.updateUIQuests();
                 
-                // Auto Open
+                // Tự động mở popup nếu hôm nay chưa nhận thưởng ngày
                 const today = new Date().toLocaleDateString('en-CA');
                 if (this.userData.lastClaimDate !== today) {
                     setTimeout(() => {
-                        document.getElementById('hv-gam-trigger').classList.add('shake');
-                        setTimeout(() => document.getElementById('hv-gam-panel').classList.add('open'), 1000);
+                        const panel = document.getElementById('hv-gam-panel');
+                        if (panel) {
+                            document.getElementById('hv-gam-trigger').classList.add('shake');
+                            panel.classList.add('open');
+                        }
                     }, 1500);
                 }
-            } else {
-                document.getElementById('hv-gam-root').style.display = 'none';
-            }
+            } else { document.getElementById('hv-gam-root').style.display = 'none'; }
         });
+    }
+
+    // --- LOGIC TÁCH BIỆT: TẢI DATA USER ---
+    async syncUserData() {
+        const snap = await getDoc(doc(db, 'users', this.user.uid));
+        if (snap.exists()) this.userData = { ...this.userData, ...snap.data() };
+    }
+
+    // --- LOGIC TÁCH BIỆT: TẢI DATA NHIỆM VỤ ---
+    async checkQuests() {
+        const start = new Date(); start.setHours(0,0,0,0);
+        const q = query(collection(db, 'activities'), where('uid', '==', this.user.uid), where('timestamp', '>=', Timestamp.fromDate(start)));
+        const snap = await getDocs(q);
+        const acts = snap.docs.map(d => d.data());
+        this.dailyQuests.forEach(q => { this.progress[q.id] = acts.filter(q.filter).length; });
+    }
+
+    // Cập nhật số liệu Keys/Streak (Chạy ngay)
+    updateUIBasic() {
+        document.getElementById('ui-streak').textContent = this.userData.streak || 0;
+        document.getElementById('ui-keys').textContent = this.userData.keys || 0;
+        
+        const today = new Date().toLocaleDateString('en-CA');
+        const btn = document.getElementById('btn-claim');
+        const badge = document.querySelector('.hv-badge');
+        const icon = document.querySelector('#hv-gam-trigger i');
+
+        // --- FIX F5: Chặn nhận thưởng lặp lại dựa vào lastClaimDate ---
+        if (this.userData.lastClaimDate === today) {
+            btn.innerHTML = '<span><i class="fas fa-check"></i> ĐÃ NHẬN HÔM NAY</span>';
+            btn.disabled = true;
+            badge.style.display = 'none';
+            icon.className = 'fas fa-trophy';
+        } else {
+            btn.innerHTML = '<i class="fas fa-gift"></i><span>NHẬN +4 KEYS</span>';
+            btn.disabled = false;
+            badge.style.display = 'block';
+            icon.className = 'fas fa-gift';
+        }
+    }
+
+    // Cập nhật danh sách nhiệm vụ (Chạy sau)
+    updateUIQuests() {
+        const list = document.getElementById('quest-list');
+        const allDone = this.dailyQuests.every(q => (this.progress[q.id] || 0) >= q.target);
+        
+        if (allDone && this.dailyQuests.length > 0) {
+            list.innerHTML = `<div class="all-done-msg"><i class="fas fa-medal"></i><h3 style="margin:0; color:#1e293b;">Xuất sắc!</h3><p style="color:#64748b; font-size:0.9rem;">Bạn đã hoàn thành tất cả nhiệm vụ.</p></div>`;
+        } else {
+            list.innerHTML = this.dailyQuests.map(q => {
+                const cur = this.progress[q.id] || 0; const done = cur >= q.target;
+                return `<div class="q-card ${done ? 'done' : ''}">
+                    <div class="q-icon"><i class="fas ${q.icon}"></i></div>
+                    <div class="q-content"><h4>${q.title}</h4><p>${q.desc} (${cur}/${q.target})</p></div>
+                    <div class="q-status">${done ? '<i class="fas fa-check-circle icon-check"></i>' : `<span class="tag-reward">+${q.reward} Key</span>`}</div>
+                </div>`;
+            }).join('');
+        }
     }
 
     selectQuests() {
@@ -315,164 +374,68 @@ class Gamification {
         }
     }
 
+    async claim() {
+        const btn = document.getElementById('btn-claim');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ĐANG XỬ LÝ...';
+        btn.disabled = true;
+
+        try {
+            const today = new Date().toLocaleDateString('en-CA');
+            // Kiểm tra Fresh Data một lần nữa trước khi nộp
+            const snap = await getDoc(doc(db, 'users', this.user.uid));
+            if (snap.exists() && snap.data().lastClaimDate === today) {
+                 this.userData.lastClaimDate = today;
+                 this.updateUIBasic();
+                 return;
+            }
+
+            await updateDoc(doc(db, 'users', this.user.uid), {
+                keys: increment(4), lastClaimDate: today
+            });
+            this.userData.keys += 4; this.userData.lastClaimDate = today;
+            this.updateUIBasic();
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#FF8F50', '#FF5E62', '#ffffff'] });
+        } catch(e) { console.error(e); btn.innerText = "Lỗi!"; btn.disabled = false; }
+    }
+
     render() {
-        const div = document.createElement('div');
-        div.id = 'hv-gam-root';
+        const div = document.createElement('div'); div.id = 'hv-gam-root';
         div.innerHTML = `
             <div id="hv-gam-panel">
                 <div class="gam-header">
                     <div class="gh-top">
                         <div class="gh-title"><i class="fas fa-crown"></i> HopVan Rewards</div>
-                        <div class="gh-close" onclick="document.getElementById('hv-gam-panel').classList.remove('open')">
-                            <i class="fas fa-times"></i>
-                        </div>
+                        <div class="gh-close" onclick="document.getElementById('hv-gam-panel').classList.remove('open')"><i class="fas fa-times"></i></div>
                     </div>
                 </div>
-
                 <div class="gam-stats">
-                    <div class="gs-col">
-                        <span class="gs-val" id="ui-streak">0</span>
-                        <span class="gs-lbl">Ngày Streak</span>
-                    </div>
-                    <div class="gs-col">
-                        <span class="gs-val" id="ui-keys" style="color:var(--hv-orange)">0</span>
-                        <span class="gs-lbl">Keys</span>
-                    </div>
+                    <div class="gs-col"><span class="gs-val" id="ui-streak"><i class="fas fa-spinner fa-spin"></i></span><span class="gs-lbl">Ngày Streak</span></div>
+                    <div class="gs-col"><span class="gs-val" id="ui-keys" style="color:var(--hv-orange)"><i class="fas fa-spinner fa-spin"></i></span><span class="gs-lbl">Keys</span></div>
                 </div>
-
                 <div class="gam-tabs">
                     <button class="gt-btn active" onclick="window.hvSwitch('daily', this)">Điểm danh</button>
                     <button class="gt-btn" onclick="window.hvSwitch('quests', this)">Nhiệm vụ</button>
                 </div>
-
-                <div class="gam-body">
+                <div class="gam-body custom-scrollbar">
                     <div id="view-daily" class="g-view active">
                         <div class="daily-box">
-                            <div class="fire-ring">
-                                <i class="fas fa-fire big-fire"></i>
-                            </div>
-                            <p class="daily-note">
-                                Duy trì ngọn lửa học tập mỗi ngày.<br>
-                                <strong>Nhận ngay +4 Keys miễn phí!</strong>
-                            </p>
-                            <button id="btn-claim" class="btn-claim">
-                                <i class="fas fa-gift"></i>
-                                <span>Nhận Thưởng Ngay</span>
-                            </button>
+                            <div class="fire-ring"><i class="fas fa-fire big-fire"></i></div>
+                            <p class="daily-note">Duy trì ngọn lửa học tập mỗi ngày.<br><strong>Nhận ngay +4 Keys miễn phí!</strong></p>
+                            <button id="btn-claim" class="btn-claim" disabled>Đang kiểm tra...</button>
                         </div>
                     </div>
-
-                    <div id="view-quests" class="g-view">
-                        <div id="quest-list">
-                            <div style="text-align:center; padding:30px; color:#ccc;">
-                                <i class="fas fa-spinner fa-spin"></i>
-                            </div>
-                        </div>
-                    </div>
+                    <div id="view-quests" class="g-view"><div id="quest-list" style="text-align:center; padding:20px; color:#ccc;">Đang nạp nhiệm vụ...</div></div>
                 </div>
             </div>
-
-            <div id="hv-gam-trigger" onclick="document.getElementById('hv-gam-panel').classList.toggle('open')">
-                <i class="fas fa-trophy"></i>
-                <div class="hv-badge">!</div>
-            </div>
-        `;
+            <div id="hv-gam-trigger" onclick="document.getElementById('hv-gam-panel').classList.toggle('open')"><i class="fas fa-trophy"></i><div class="hv-badge">!</div></div>`;
         document.body.appendChild(div);
 
         window.hvSwitch = (tab, el) => {
-            document.querySelectorAll('.gt-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
+            document.querySelectorAll('.gt-btn').forEach(b => b.classList.remove('active')); el.classList.add('active');
             document.querySelectorAll('.g-view').forEach(v => v.classList.remove('active'));
             document.getElementById(`view-${tab}`).classList.add('active');
         };
-
         document.getElementById('btn-claim').addEventListener('click', () => this.claim());
-    }
-
-    async syncData() {
-        const snap = await getDoc(doc(db, 'users', this.user.uid));
-        if (snap.exists()) this.userData = { ...this.userData, ...snap.data() };
-    }
-
-    async checkQuests() {
-        const start = new Date(); start.setHours(0,0,0,0);
-        const q = query(collection(db, 'activities'), where('uid', '==', this.user.uid), where('timestamp', '>=', Timestamp.fromDate(start)));
-        const snap = await getDocs(q);
-        const acts = snap.docs.map(d => d.data());
-        this.dailyQuests.forEach(q => { this.progress[q.id] = acts.filter(q.filter).length; });
-    }
-
-    updateUI() {
-        document.getElementById('ui-streak').textContent = this.userData.streak || 0;
-        document.getElementById('ui-keys').textContent = this.userData.keys || 0;
-
-        const today = new Date().toLocaleDateString('en-CA');
-        const btn = document.getElementById('btn-claim');
-        const badge = document.querySelector('.hv-badge');
-        const icon = document.querySelector('#hv-gam-trigger i');
-
-        if (this.userData.lastClaimDate === today) {
-            btn.innerHTML = '<span><i class="fas fa-check"></i> Đã nhận hôm nay</span>';
-            btn.disabled = true;
-            badge.style.display = 'none';
-            icon.className = 'fas fa-trophy';
-        } else {
-            btn.innerHTML = '<i class="fas fa-gift"></i><span>Nhận ngay +4 Keys</span>';
-            btn.disabled = false;
-            badge.style.display = 'block';
-            icon.className = 'fas fa-gift';
-        }
-
-        const list = document.getElementById('quest-list');
-        const allDone = this.dailyQuests.every(q => (this.progress[q.id] || 0) >= q.target);
-
-        if (allDone && this.dailyQuests.length > 0) {
-            list.innerHTML = `
-                <div class="all-done-msg">
-                    <i class="fas fa-medal"></i>
-                    <h3 style="margin:0; color:#1e293b;">Xuất sắc!</h3>
-                    <p style="color:#64748b; font-size:0.9rem;">Bạn đã hoàn thành tất cả nhiệm vụ.</p>
-                </div>
-            `;
-        } else {
-            list.innerHTML = this.dailyQuests.map(q => {
-                const cur = this.progress[q.id] || 0;
-                const isDone = cur >= q.target;
-                return `
-                    <div class="q-card ${isDone ? 'done' : ''}">
-                        <div class="q-icon"><i class="fas ${q.icon}"></i></div>
-                        <div class="q-content">
-                            <h4>${q.title}</h4>
-                            <p>${q.desc}</p>
-                        </div>
-                        <div class="q-status">
-                            ${isDone 
-                                ? '<i class="fas fa-check-circle icon-check"></i>' 
-                                : `<span class="tag-reward">+${q.reward} Key</span>`
-                            }
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-    }
-
-    async claim() {
-        const btn = document.getElementById('btn-claim');
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ...';
-        btn.disabled = true;
-
-        try {
-            const today = new Date().toLocaleDateString('en-CA');
-            await updateDoc(doc(db, 'users', this.user.uid), {
-                keys: increment(4), lastClaimDate: today
-            });
-            this.userData.keys += 4; this.userData.lastClaimDate = today;
-            this.updateUI();
-            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#FF8F50', '#FF5E62', '#ffffff'] });
-        } catch(e) { 
-            console.error(e); btn.innerText = "Lỗi!"; btn.disabled = false; 
-        }
     }
 }
 
