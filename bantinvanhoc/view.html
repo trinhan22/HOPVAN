@@ -149,7 +149,6 @@
             font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 600; 
             margin: 50px 0 20px; line-height: 1.3; color: #111; clear: both;
         }
-        .article-body p { margin-bottom: 25px; }
         
         /* Magazine Image Float */
         .mag-img-wrap { width: 100%; margin: 30px 0; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
@@ -245,6 +244,57 @@
             scrollbar-width: thin;
             scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
         }
+
+/* --- ĐỊNH DẠNG NỘI DUNG NÂNG CAO (Art Quote & Highlight) --- */
+
+/* 1. Trích dẫn nghệ thuật (Art Quote) */
+.article-body .ql-art-quote {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: #555;
+    padding: 40px 10%;
+    margin: 40px 0;
+    position: relative;
+    line-height: 1.8;
+}
+/* Dấu ngoặc kép trang trí */
+.article-body .ql-art-quote::before {
+    content: '“';
+    position: absolute;
+    top: -10px; left: 50%; transform: translateX(-50%);
+    font-size: 6rem; color: var(--primary); opacity: 0.15;
+    font-family: serif;
+}
+
+/* 2. Hộp trích dẫn (Quote Box) */
+.article-body blockquote {
+    border-left: 5px solid var(--primary);
+    background: rgba(255, 143, 80, 0.08); /* Nền cam rất nhạt */
+    padding: 20px 30px;
+    border-radius: 4px 16px 16px 4px;
+    font-style: normal; /* Chữ đứng bình thường */
+    color: #333;
+    margin: 30px 0;
+    font-size: 1.05rem;
+}
+
+/* 3. Highlight (Bút dạ quang) */
+.article-body .ql-highlight {
+    background-color: #fef3c7; /* Vàng nhạt */
+    color: #92400e; /* Chữ nâu cam */
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* Mặc định cho văn bản thường (Normal Text) */
+.article-body p {
+    margin-bottom: 25px;
+    line-height: 2;
+    text-align: justify;
+}
 </style>
 </head>
 <body>
@@ -361,61 +411,83 @@
         }
 
         // --- LOAD DATA ---
-        async function loadContent() {
-            if (!id) { setTimeout(() => { document.getElementById('intro-overlay').style.display = 'none'; }, 2000); return; }
-            try {
-                const snap = await getDoc(doc(db, "literary_news", id));
-                if (snap.exists()) {
-                    const data = snap.data();
-                    const catName = CAT_MAP[data.type] || "Tạp chí Văn học";
+        // --- LOAD DATA ---
+async function loadContent() {
+    if (!id) { setTimeout(() => { document.getElementById('intro-overlay').style.display = 'none'; }, 2000); return; }
+    try {
+        const snap = await getDoc(doc(db, "literary_news", id));
+        if (snap.exists()) {
+            const data = snap.data();
+            const catName = CAT_MAP[data.type] || "Tạp chí Văn học";
 
-                    // Update UI
-                    document.title = data.title;
-                    document.getElementById('loading-title').innerText = data.title;
-                    document.getElementById('loading-cate').innerText = catName;
-                    
-                    const div = document.createElement('div'); div.innerHTML = data.intro || data.content;
-                    const text = div.textContent || div.innerText || "";
-                    const sapoShort = text.split(/\s+/).slice(0, 36).join(" ") + "...";
-                    document.getElementById('loading-sapo').innerText = sapoShort;
+            // Update UI Header (Title, Cate, Date...) - GIỮ NGUYÊN PHẦN NÀY CỦA BẠN
+            document.title = data.title;
+            document.getElementById('loading-title').innerText = data.title;
+            document.getElementById('loading-cate').innerText = catName;
+            
+            // Xử lý Sapo ngắn cho Loading Screen & Hero
+            const tempDiv = document.createElement('div'); tempDiv.innerHTML = data.intro || data.content;
+            const sapoShort = (tempDiv.textContent || "").split(/\s+/).slice(0, 36).join(" ") + "...";
+            document.getElementById('loading-sapo').innerText = sapoShort;
 
-                    document.getElementById('hero-img').src = data.img || '../panel.webp';
-                    document.getElementById('h-title').innerText = data.title;
-                    document.getElementById('h-cate').innerText = catName;
-                    document.getElementById('h-sapo').innerText = sapoShort;
-                    document.getElementById('s-cate').innerText = catName;
-                    document.getElementById('s-date').innerText = new Date(data.createdAt.seconds * 1000).toLocaleDateString('vi-VN');
+            // Update Hero Image & Info - GIỮ NGUYÊN
+            document.getElementById('hero-img').src = data.img || '../panel.webp';
+            document.getElementById('h-title').innerText = data.title;
+            document.getElementById('h-cate').innerText = catName;
+            document.getElementById('h-sapo').innerText = sapoShort;
+            document.getElementById('s-cate').innerText = catName;
+            document.getElementById('s-date').innerText = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('vi-VN') : 'Mới cập nhật';
 
-                    const bodyEl = document.getElementById('article-body');
-                    let htmlContent = `<div class="font-bold text-xl italic text-gray-600 mb-10 border-l-4 border-orange-500 pl-6 leading-relaxed">${data.intro}</div>`;
+            // --- PHẦN QUAN TRỌNG: RENDER NỘI DUNG BÀI VIẾT ---
+            const bodyEl = document.getElementById('article-body');
+            let htmlContent = "";
 
-                    if (data.sections && data.sections.length > 0) {
-                        data.sections.forEach((sec) => {
-                            let imgsHtml = '';
-                            if(sec.images && sec.images.length > 0) imgsHtml = `<div class="mag-img-wrap"><img src="${sec.images[0]}" loading="lazy"></div>`;
-                            htmlContent += `<div class="wc-section-block" style="overflow:hidden; margin-bottom: 40px;"><h2>${sec.h2}</h2>${imgsHtml}<div class="sec-paragraph">${sec.p}</div></div>`;
-                        });
-                    } else { htmlContent += `<div>${data.content || ""}</div>`; }
-                    bodyEl.innerHTML = htmlContent;
-
-                    if(data.ending) {
-                        document.getElementById('article-ending').style.display = 'block';
-                        document.getElementById('article-ending').innerHTML = `"${data.ending}"`;
-                    }
-
-                    // Tăng view (catch lỗi để không chặn luồng chính)
-                    updateDoc(doc(db, "literary_news", id), { views: increment(1) }).catch(err => console.log("View error:", err));
-                    
-                    // Check status và mở màn
-                    checkFavoriteStatus();
-                    setTimeout(triggerReveal, 800);
-                }
-            } catch(e) { 
-                console.error(e); 
-                // Safety net: mở rèm nếu lỗi
-                setTimeout(() => { document.getElementById('intro-overlay').style.display = 'none'; }, 2000);
+            // 1. Mở bài (Intro)
+            if (data.intro) {
+                // Intro mặc định là chữ thường, trừ khi Admin format
+                htmlContent += `<div class="mb-10">${data.intro}</div>`; 
             }
+
+            // 2. Thân bài (Sections)
+            if (data.sections && data.sections.length > 0) {
+                data.sections.forEach((sec) => {
+                    let imgsHtml = '';
+                    // Xử lý Gallery ảnh (nếu có)
+                    if(sec.images && sec.images.length > 0) {
+                        // Lấy ảnh đầu tiên làm ảnh minh họa chính
+                        imgsHtml = `<div class="mag-img-wrap"><img src="${sec.images[0]}" loading="lazy"></div>`;
+                    }
+                    
+                    htmlContent += `
+                        <div class="wc-section-block" style="overflow:hidden; margin-bottom: 40px;">
+                            ${sec.h2 ? `<h2>${sec.h2}</h2>` : ''} 
+                            ${imgsHtml}
+                            <div class="sec-paragraph">${sec.p}</div> 
+                        </div>`;
+                });
+            } else { 
+                // Fallback cho bài viết cũ không có section
+                htmlContent += `<div>${data.content || ""}</div>`; 
+            }
+
+            // 3. Kết bài (Ending)
+            if(data.ending) {
+                // Ending cũng render HTML gốc để giữ định dạng
+                htmlContent += `<div class="mt-10 pt-10 border-t border-gray-200">${data.ending}</div>`;
+            }
+
+            bodyEl.innerHTML = htmlContent;
+
+            // --- CÁC HÀM PHỤ TRỢ KHÁC (GIỮ NGUYÊN) ---
+            updateDoc(doc(db, "literary_news", id), { views: increment(1) }).catch(err => console.log("View error:", err));
+            checkFavoriteStatus();
+            setTimeout(triggerReveal, 800);
         }
+    } catch(e) { 
+        console.error(e); 
+        setTimeout(() => { document.getElementById('intro-overlay').style.display = 'none'; }, 2000);
+    }
+}
 
         function initGSAP() {
             gsap.registerPlugin(ScrollTrigger);
