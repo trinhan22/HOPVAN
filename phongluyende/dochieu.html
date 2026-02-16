@@ -105,6 +105,61 @@
 ::-webkit-scrollbar-button {
     display: none;
 }
+
+/* --- FULLSCREEN POPUP NEON SYNC --- */
+        .fs-modal-box {
+            background: white; 
+            padding: 45px 35px; 
+            border-radius: 32px; /* Bo góc cực đại như Stat Card */
+            width: 90%; 
+            max-width: 420px; 
+            text-align: center;
+            position: relative;
+            /* Hiệu ứng viền Neon mờ */
+            border: 2px solid rgba(255, 143, 80, 0.2);
+            /* Đổ bóng Glow đặc trưng */
+            box-shadow: 0 20px 60px rgba(255, 107, 107, 0.15), 0 0 30px rgba(255, 143, 80, 0.1);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Icon mở rộng với Gradient cam đào */
+        .fs-icon-wrap {
+            width: 80px; height: 80px;
+            margin: 0 auto 25px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem;
+            background: linear-gradient(135deg, #FF8F50 0%, #FF6B6B 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 8px 15px rgba(255, 107, 107, 0.3));
+        }
+
+        /* Nút bấm đồng bộ với phong cách Dashboard */
+        .btn-neon-fs {
+            width: 100%;
+            padding: 16px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #FF8F50 0%, #FF6B6B 100%);
+            color: white;
+            font-weight: 800;
+            font-size: 1.1rem;
+            text-transform: none; /* Giữ chữ thường như ảnh mẫu */
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+            transition: 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-neon-fs:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.5);
+            filter: brightness(1.1);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -135,6 +190,21 @@
             <h3 class="font-bold text-xl mb-2">Bài Quá Ngắn</h3>
             <p class="text-gray-600">Bài làm cần ít nhất <strong>50 từ</strong> để AI chấm chính xác. Hãy viết thêm chút nữa nhé!</p>
             <div class="modal-actions"><button onclick="document.getElementById('short-essay-popup').style.display='none'" class="modal-btn bg-orange-100 !text-white-600 hover:bg-orange-200">Viết tiếp</button></div>
+        </div>
+    </div>
+    
+<div id="fullscreen-popup" class="custom-modal" style="display: none; z-index: 40000; background: rgba(255, 245, 236, 0.7); backdrop-filter: blur(8px);">
+        <div class="fs-modal-box">
+            <div class="fs-icon-wrap">
+                <i class="fas fa-expand-arrows-alt"></i>
+            </div>
+            
+            <h3 class="text-2xl font-black text-gray-800 mb-2">Chế độ Làm bài thi</h3>
+            <p class="text-gray-500 leading-relaxed mb-8 px-4">Để đảm bảo sự tập trung cao nhất, hệ thống sẽ chuyển sang <b>Toàn màn hình</b>.</p>
+            
+            <div class="modal-actions">
+                <button onclick="enableFullscreen()" class="btn-neon-fs">Tiếp tục</button>
+            </div>
         </div>
     </div>
 
@@ -546,6 +616,39 @@
     onAuthStateChanged(auth, u => { if(u) { startTimer(); loadQuestions(); } else window.location.href="../log.html"; });
     document.getElementById('file-upload').addEventListener('change', (e) => { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); if(f.name.endsWith('.docx')) { r.onload = (ev) => mammoth.extractRawText({arrayBuffer: ev.target.result}).then(res => document.getElementById('student-essay').value = res.value); r.readAsArrayBuffer(f); } else showPopup("Lỗi", "Chỉ nhận file .docx", "error"); });
     document.getElementById('student-essay').oninput = function() { document.getElementById('word-count').innerText = `${this.value.trim().split(/\s+/).filter(x => x).length} TỪ`; };
+
+// --- FULLSCREEN LOGIC ---
+    // Hàm kích hoạt toàn màn hình
+    window.enableFullscreen = () => {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) { /* Safari */
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) { /* IE11 */
+            elem.msRequestFullscreen();
+        }
+        // Ẩn popup sau khi bật
+        document.getElementById('fullscreen-popup').style.display = 'none';
+    };
+
+    // Tự động hiện popup khi tải trang
+    window.addEventListener('load', () => {
+        // Chỉ hiện nếu chưa ở chế độ fullscreen
+        if (!document.fullscreenElement) {
+            setTimeout(() => {
+                document.getElementById('fullscreen-popup').style.display = 'flex';
+            }, 500); // Delay nhẹ 0.5s để mượt hơn
+        }
+    });
+
+    // Lắng nghe sự kiện thoát fullscreen (tùy chọn: hiện lại popup nếu thoát ra)
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+            // Nếu người dùng thoát fullscreen, có thể hiện lại thông báo hoặc cảnh báo (tuỳ ý)
+            // console.log("Đã thoát chế độ toàn màn hình");
+        }
+    });
 </script>
 </body>
 </html>
