@@ -365,37 +365,41 @@
         .ql-toolbar.ql-snow { border-radius: 16px 16px 0 0 !important; border: 1px solid #E2E8F0 !important; background: white; }
         .ql-editor { font-size: 1rem; line-height: 1.6; }
 
-        /* --- CUSTOM SCROLLBAR (NHỎ & MẢNH) --- */
-        
-        /* 1. Kích thước thanh cuộn */
-        ::-webkit-scrollbar { 
-            width: 6px;  /* Chiều rộng cho thanh dọc */
-            height: 6px; /* Chiều cao cho thanh ngang (cái bạn cần sửa) */
-        }
+/* --- GLOBAL SCROLLBAR STYLE --- */
 
-        /* 2. Rãnh trượt (Track) - Trong suốt hoặc màu rất nhạt */
-        ::-webkit-scrollbar-track { 
-            background: transparent; 
-            border-radius: 10px; 
-        }
+/* 1. Thiết lập độ rộng/cao của thanh trượt */
+::-webkit-scrollbar {
+    width: 10px;  /* Độ rộng cho thanh dọc */
+    height: 10px; /* Độ cao cho thanh ngang */
+}
 
-        /* 3. Tay nắm (Thumb) - Màu cam nhạt, bo tròn */
-        ::-webkit-scrollbar-thumb { 
-            background-color: rgba(255, 143, 80, 0.3); /* Cam nhạt */
-            border-radius: 10px; 
-            border: 2px solid transparent; /* Tạo khoảng hở giúp nó trông mảnh hơn */
-            background-clip: content-box;  /* Kỹ thuật để làm thanh cuộn nhỏ lại */
-            transition: background-color 0.3s ease; 
-        }
+/* 2. Thiết lập rãnh trượt (Track) - Nền chìm */
+::-webkit-scrollbar-track {
+    background: rgba(255, 143, 80, 0.05); /* Màu cam cực nhạt, gần như trong suốt */
+    border-radius: 10px;
+}
 
-        /* 4. Hiệu ứng khi di chuột vào (Hover) */
-        ::-webkit-scrollbar-thumb:hover { 
-            background-color: #FF8F50; /* Đổi sang cam đậm */
-            border: 0; /* Bỏ viền để nó to ra chút khi hover */
-        }
+/* 3. Thiết lập tay nắm (Thumb) - Phần di chuyển */
+::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 143, 80, 0.3); /* Mặc định là cam nhạt */
+    border-radius: 10px; /* Bo tròn mềm mại */
+    
+    /* Mẹo: Tạo viền trong suốt để thanh trượt trông nhỏ hơn và "lơ lửng" */
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: background-color 0.3s ease;
+}
 
-        /* 5. Ẩn nút mũi tên */
-        ::-webkit-scrollbar-button { display: none; }
+/* 4. Hiệu ứng khi di chuột vào (Hover) */
+::-webkit-scrollbar-thumb:hover {
+    background-color: #FF8F50; /* Đổi sang màu cam chính thương hiệu */
+    border: 1px solid transparent; /* Làm thanh trượt to ra một chút khi hover */
+}
+
+/* 5. (Tùy chọn) Ẩn nút mũi tên 2 đầu (nếu trình duyệt hiển thị) */
+::-webkit-scrollbar-button {
+    display: none;
+}
 
 /* --- ĐỊNH DẠNG NỘI DUNG --- */
 .ql-editor .ql-art-quote {
@@ -432,6 +436,15 @@
 /* --- GÁN ICON CHO TOOLBAR (Quan trọng để ko bị trắng nút) --- */
 .ql-art-quote::before { content: "\f10e"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: #444; }
 .ql-highlight::before { content: "\f591"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: #444; }
+
+/* --- ẨN SCROLLBAR NHƯNG VẪN SCROLL ĐƯỢC --- */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
     </style>
 </head>
 <body class="h-screen flex">
@@ -642,18 +655,25 @@
             </button>
         </div>
         
-        <div class="w-full overflow-x-auto pb-2 custom-scrollbar">
-            <div class="flex gap-2 w-max px-2">
-                <button onclick="loadNews('all', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 shadow-md transition filter-btn-news active whitespace-nowrap">TẤT CẢ</button>
-                <button onclick="loadNews('dauchan', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap">DẤU CHÂN THỜI ĐẠI</button>
-                <button onclick="loadNews('chandung', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap">CHÂN DUNG BÚT LỰC</button>
-                <button onclick="loadNews('diahat', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap">ĐỊA HẠT CHỮ NGHĨA</button>
-                <button onclick="loadNews('maicau', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap">MÀI CÂU SÁNG CHỮ</button>
-                <button onclick="loadNews('vetsang', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap">VỆT SÁNG NGÔN TỪ</button>
-                <button onclick="loadNews('liluan', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap">LÍ LUẬN VĂN HỌC</button>
-                <button onclick="loadNews('cuango', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap">CỬA NGÕ VĂN CHƯƠNG</button>
-                <button onclick="loadNews('khoinguon', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap">KHƠI NGUỒN DIỄN ĐẠT</button>
+<div class="relative px-2 mx-2"> <button onclick="scrollCategories(-1)" class="absolute -left-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white/90 backdrop-blur rounded-full shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-orange-500 hover:scale-110 transition group">
+                <i class="fas fa-chevron-left text-xs"></i>
+            </button>
+
+            <div id="news-cat-scroll" class="w-full overflow-x-auto flex gap-2 py-2 no-scrollbar scroll-smooth px-1">
+                <button onclick="loadNews('all', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 shadow-md transition filter-btn-news active whitespace-nowrap flex-shrink-0">TẤT CẢ</button>
+                <button onclick="loadNews('dauchan', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap flex-shrink-0">DẤU CHÂN THỜI ĐẠI</button>
+                <button onclick="loadNews('chandung', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap flex-shrink-0">CHÂN DUNG BÚT LỰC</button>
+                <button onclick="loadNews('diahat', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap flex-shrink-0">ĐỊA HẠT CHỮ NGHĨA</button>
+                <button onclick="loadNews('maicau', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap flex-shrink-0">MÀI CÂU SÁNG CHỮ</button>
+                <button onclick="loadNews('vetsang', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap flex-shrink-0">VỆT SÁNG NGÔN TỪ</button>
+                <button onclick="loadNews('liluan', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap flex-shrink-0">LÍ LUẬN VĂN HỌC</button>
+                <button onclick="loadNews('cuango', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap flex-shrink-0">CỬA NGÕ VĂN CHƯƠNG</button>
+                <button onclick="loadNews('khoinguon', this)" class="px-4 py-2 rounded-xl text-[10px] font-bold text-gray-500 bg-white border border-gray-100 hover:text-orange-500 transition filter-btn-news whitespace-nowrap flex-shrink-0">KHƠI NGUỒN DIỄN ĐẠT</button>
             </div>
+
+            <button onclick="scrollCategories(1)" class="absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white/90 backdrop-blur rounded-full shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-orange-500 hover:scale-110 transition">
+                <i class="fas fa-chevron-right text-xs"></i>
+            </button>
         </div>
     </div>
 
@@ -948,6 +968,19 @@ const CAT_MAP = {
             return result.success ? result.data.url : null;
         } catch (e) { return null; }
     }
+
+// --- HÀM SCROLL DANH MỤC ---
+    window.scrollCategories = (direction) => {
+        const container = document.getElementById('news-cat-scroll');
+        const scrollAmount = 200; // Khoảng cách mỗi lần cuộn (px)
+        
+        if (container) {
+            container.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth' // Hiệu ứng trượt mượt mà
+            });
+        }
+    };
 
     window.openNewsModal = async (id) => {
         const container = document.getElementById('modal-fields');
