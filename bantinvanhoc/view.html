@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HopVan Magazine</title>
+    <title>Loading...</title>
     <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
     <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
     <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
@@ -48,32 +48,59 @@
         .intro-title { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: 600; line-height: 1.2; margin-bottom: 30px; }
         .intro-sapo { font-family: 'Merriweather', serif; font-size: 0.9rem; line-height: 1.6; opacity: 0.8; max-width: 600px; margin: 0 auto; font-style: italic; }
 
-        /* --- 2. HERO SECTION --- */
+        /* --- 2. HERO SECTION (MOBILE FIX FINAL) --- */
+        
+        /* Reset cơ bản để tránh lỗi cuộn */
+        html, body {
+            height: 100%;
+            margin: 0; padding: 0;
+        }
+
+        /* Khung bao ngoài cùng */
+        #hero-section {
+            display: block;
+            width: 100%;
+            height: 100vh;      /* Fallback cho trình duyệt cũ */
+            height: 100dvh;     /* Fix lỗi thanh địa chỉ trên Mobile */
+            min-height: 100dvh; /* Đảm bảo không bao giờ bị co lại */
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Khung hiển thị nội dung */
         #hero-viewport { 
-            position: relative; 
+            position: absolute; /* Neo chặt vào khung cha */
+            inset: 0;
             width: 100%; 
-            height: 100vh; 
+            height: 100%; 
             overflow: hidden; 
-            margin: 0; 
-            padding: 0; 
+            margin: 0; padding: 0; 
         }
         
+        /* Lớp nền */
         .hero-bg { 
             position: absolute; 
             inset: 0; 
+            width: 100%; height: 100%; 
             z-index: 1; 
-            width: 100%; 
-            height: 100%; 
         }
         
+        /* ẢNH HERO - QUAN TRỌNG NHẤT */
         .hero-img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            /* Giữ độ sáng 0.6 để text màu trắng bên trên dễ đọc */
+            position: absolute; /* Neo 4 góc */
+            top: 0; left: 0;
+            width: 100% !important; 
+            height: 100% !important; /* Bắt buộc cao 100% khung chứa */
+            
+            /* Lấp đầy khung hình mà không bị méo */
+            object-fit: cover !important; 
+            object-position: center center !important; 
+            
             filter: brightness(0.6); 
-            /* Zoom nhẹ 1.1 để khi cuộn có hiệu ứng Parallax mượt hơn */
-            transform: scale(1.1); 
+            transform: scale(1.1); /* Zoom nhẹ */
+            will-change: transform;
+            display: block;
+            z-index: 1;
         }
         
         .hero-overlay { 
@@ -81,8 +108,43 @@
             inset: 0; 
             z-index: 2; 
             background: rgba(0,0,0,0.3); 
-            width: 100%; 
-            height: 100%; 
+            width: 100%; height: 100%; 
+        }
+
+        /* --- UI ELEMENTS TRÊN HERO --- */
+        /* Stage 1: Chữ to góc trái */
+        .stage-1-ui {
+            position: absolute; top: 40px; left: 40px; z-index: 5;
+            color: rgba(255,255,255,0.8); font-family: 'Playfair Display', serif;
+            font-size: 6vw; font-weight: 600; line-height: 0.9; text-transform: uppercase;
+            pointer-events: none;
+        }
+
+        /* Stage 2: Nội dung trung tâm */
+        .stage-2-ui {
+            position: absolute; inset: 0; z-index: 10;
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; /* Căn giữa hoàn toàn */
+            color: white; text-align: center; padding: 0 20px;
+            opacity: 0; visibility: hidden;
+            width: 100%; height: 100%; /* Đảm bảo khung nội dung cũng full */
+        }
+
+        .h-cate { 
+            font-weight: 600; letter-spacing: 3px; color: var(--primary); 
+            text-transform: uppercase; font-size: 0.75rem; margin-bottom: 20px; 
+            background: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 50px;
+        }
+        .h-title { 
+            font-family: 'Playfair Display', serif; 
+            font-size: clamp(2rem, 5vw, 3.5rem); /* Responsive font size */
+            font-weight: 600; line-height: 1.2; margin-bottom: 25px; 
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+        }
+        .h-sapo-36 { 
+            font-family: 'Merriweather', serif; font-size: 1.1rem; line-height: 1.8; 
+            color: rgba(255,255,255,0.9); max-width: 700px; margin-bottom: 40px; 
+            font-style: italic; font-weight: 300;
         }
 
         /* Stage 1: Chữ to góc trái */
