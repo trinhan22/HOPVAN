@@ -622,28 +622,38 @@
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
+            // 1. Hiển thị tên và Avatar ngay lập tức (không chờ)
             const name = user.displayName || user.email.split('@')[0];
             document.getElementById('welcome-name').textContent = `Xin chào, ${name}`;
             document.getElementById('avatar-initial').textContent = name.charAt(0).toUpperCase();
             
-            // Tải dữ liệu Streak, Keys và kiểm tra Profile đồng thời
-            await updateUserStreak(user); 
+            // 2. Chạy các hàm setup (không dùng await để tránh chặn code phía dưới)
+            updateUserStreak(user); 
             setupRealtimeStats(user);
             setupLeaderboard(user);
 
-            // --- KIỂM TRA VÀ HIỆN POPUP NGAY LẬP TỨC ---
-            const userSnap = await getDoc(doc(db, "users", user.uid));
-            if (userSnap.exists()) {
-                const userData = userSnap.data();
-                // Nếu thiếu trường hoặc lớp và chưa bấm "Để sau" trong phiên này
-                if (!userData.school || !userData.grade) {
-                    if (!sessionStorage.getItem('skipped_profile_update')) {
+            // 3. KIỂM TRA VÀ HIỆN POPUP
+            try {
+                const userSnap = await getDoc(doc(db, "users", user.uid));
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    
+                    // Kiểm tra điều kiện: Thiếu thông tin & Chưa bấm bỏ qua
+                    const isMissingInfo = !userData.school || !userData.grade;
+                    const hasNotSkipped = !sessionStorage.getItem('skipped_profile_update');
+
+                    if (isMissingInfo && hasNotSkipped) {
                         const modal = document.getElementById('profileUpdateModal');
-                        modal.style.display = 'flex'; // Ép hiển thị flex trước
-                        // Thêm một chút delay cực nhỏ (10ms) để trình duyệt kịp render transition
-                        setTimeout(() => modal.classList.add('show'), 10);
+                        // Reset style để đảm bảo nó hiện ra
+                        modal.style.display = 'flex'; 
+                        // Dùng requestAnimationFrame để trình duyệt render kịp hiệu ứng mượt
+                        requestAnimationFrame(() => {
+                            modal.classList.add('show');
+                        });
                     }
                 }
+            } catch (err) {
+                console.error("Lỗi check profile:", err);
             }
         } else { 
             window.location.href = "../log.html"; 
