@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HopVan - Quản Lý Tài Khoản</title>
+    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
+    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+    <meta property="og:url" content="https://hopvan.netlify.app" />
+    <meta property="og:type" content="article" />
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --blur: 25px;
+            --sidebar-width: 260px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        body { background-color: #FFF5EC; height: 100vh; overflow: hidden; display: flex; }
+
+        /* --- BACKGROUND --- */
+        .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatBlob 10s infinite alternate; }
+        .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
+        .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
+        .blob-3 { width: 300px; height: 300px; background: #FFD1D1; top: 40%; left: 40%; animation-delay: -2s; }
+        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
+
+        /* --- LAYOUT --- */
+        aside { width: var(--sidebar-width); background: white; border-right: 1px solid #eee; display: flex; flex-direction: column; z-index: 50; }
+        .main-content { 
+            flex: 1; margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width));
+            background: var(--glass-bg); backdrop-filter: blur(var(--blur)); 
+            padding: 30px 40px; overflow-y: auto; position: relative; 
+        }
+
+        /* --- COMPONENTS --- */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid white;
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+            height: 100%;
+        }
+
+        .glass-input {
+            width: 100%; padding: 12px 16px;
+            background: #f9fafb; border: 1px solid #e5e7eb;
+            border-radius: 12px; font-size: 0.95rem; color: #374151; outline: none;
+        }
+        .glass-input:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255, 143, 80, 0.15); }
+        .glass-input:disabled { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; }
+
+        .btn-primary {
+            background: var(--primary-gradient); color: white;
+            padding: 12px 24px; border-radius: 12px; font-weight: 700;
+            border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 15px rgba(255, 94, 98, 0.3);
+        }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 94, 98, 0.4); }
+        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        .sidebar-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--text-light); border-radius: 12px; margin-bottom: 4px; font-weight: 600; text-decoration: none; }
+        .sidebar-link:hover { background: #fff5ec; color: var(--primary); }
+        .sidebar-link.active { background: var(--primary-gradient); color: white; box-shadow: 0 4px 15px rgba(255, 143, 80, 0.3); }
+
+        .avatar-circle {
+            width: 90px; height: 90px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 2.5rem; font-weight: 800;
+            box-shadow: 0 10px 30px rgba(255, 143, 80, 0.3);
+            margin: 0 auto 15px; border: 4px solid white;
+        }
+
+        /* --- TOAST NOTIFICATION (NEW STYLE) --- */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; }
+        .toast {
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            padding: 16px 20px; border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            display: flex; align-items: center; gap: 15px;
+            transform: translateX(120%); opacity: 0; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid rgba(255,255,255,0.8); min-width: 320px;
+            position: relative; overflow: hidden;
+        }
+        .toast.show { transform: translateX(0); opacity: 1; }
+        
+        .toast-icon { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+        .toast.success .toast-icon { background: #dcfce7; color: #16a34a; }
+        .toast.error .toast-icon { background: #fee2e2; color: #dc2626; }
+        
+        .toast-content { flex: 1; }
+        .toast-title { font-weight: 800; font-size: 0.9rem; color: #1f2937; }
+        .toast-msg { font-size: 0.8rem; color: #6b7280; font-weight: 500; }
+
+        /* --- CUSTOM MODAL POPUP --- */
+        .custom-modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px);
+            z-index: 10000; display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .custom-modal-overlay.open { display: flex; opacity: 1; }
+        
+        .custom-modal-box {
+            background: white; padding: 35px; border-radius: 28px;
+            width: 90%; max-width: 400px; text-align: center;
+            box-shadow: 0 30px 60px -10px rgba(0,0,0,0.25);
+            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+        .custom-modal-overlay.open .custom-modal-box { transform: scale(1); }
+
+        .modal-icon {
+            width: 70px; height: 70px; border-radius: 50%; margin: 0 auto 20px;
+            display: flex; align-items: center; justify-content: center; font-size: 2rem;
+        }
+        .modal-icon.danger { background: #fee2e2; color: #dc2626; }
+        .modal-icon.info { background: #e0f2fe; color: #0284c7; }
+
+        .modal-btn-group { display: flex; gap: 12px; margin-top: 25px; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 14px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; }
+        .btn-cancel { background: #f3f4f6; color: #4b5563; }
+        .btn-cancel:hover { background: #e5e7eb; }
+        .btn-confirm-danger { background: #dc2626; color: white; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3); }
+        .btn-confirm-danger:hover { background: #b91c1c; }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            aside { display: none; } 
+            .main-content { margin-left: 0; width: 100%; padding: 80px 20px 30px; } /* padding-top cho mobile header */
+            .grid-layout { grid-template-columns: 1fr !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div id="menu-placeholder"></div>
+
+    <main class="main-content">
+        <div id="toast-container"></div>
+
+        <div id="custom-modal" class="custom-modal-overlay">
+            <div class="custom-modal-box">
+                <div id="modal-icon-container" class="modal-icon danger">
+                    <i id="modal-icon-class" class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 id="modal-title" class="text-xl font-black text-gray-800 mb-2">Thông báo</h3>
+                <p id="modal-message" class="text-sm text-gray-500 leading-relaxed">Nội dung thông báo...</p>
+                <div class="modal-btn-group">
+                    <button class="modal-btn btn-cancel" onclick="closeModal()">Hủy</button>
+                    <button id="modal-confirm-btn" class="modal-btn btn-confirm-danger">Xác nhận</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-2xl font-black text-gray-800">Quản lý tài khoản</h1>
+                <p class="text-gray-500 text-sm mt-1">Quản lý thông tin cá nhân và bảo mật.</p>
+            </div>
+            <a href="dashboard.html" class="md:hidden w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-gray-500">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 grid-layout" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px;">
+            
+            <div class="glass-panel">
+                <div class="text-center mb-8">
+                    <div class="avatar-circle" id="user-avatar-display">U</div>
+                    <h2 class="font-bold text-lg text-gray-800" id="display-name-header">Đang tải...</h2>
+                    <p class="text-xs text-gray-400 font-bold uppercase tracking-wider" id="user-role-display">Học viên</p>
+                </div>
+
+                <form id="profile-form" class="space-y-5">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="col-span-2">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Họ và tên</label>
+                            <input id="profile-name" type="text" class="glass-input" required placeholder="Nhập tên của bạn">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Email</label>
+                            <input id="profile-email" type="email" class="glass-input" disabled value="loading...">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Trường học</label>
+                            <input id="profile-school" type="text" class="glass-input" placeholder="VD: THPT FPT Cần Thơ">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Khối lớp</label>
+                            <select id="profile-grade" class="glass-input cursor-pointer">
+                                <option value="10">Lớp 10</option>
+                                <option value="11">Lớp 11</option>
+                                <option value="12">Lớp 12</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="pt-4 text-right">
+                        <button type="submit" class="btn-primary w-full md:w-auto">
+                            <i class="fas fa-save"></i> Lưu thay đổi
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="glass-panel h-auto">
+                <h3 class="font-black text-gray-800 text-lg mb-6 flex items-center gap-2">
+                    <i class="fas fa-shield-alt text-orange-500"></i> Đổi mật khẩu
+                </h3>
+                <form id="password-form" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Mật khẩu mới</label>
+                        <input id="new-password" type="password" class="glass-input" required placeholder="••••••••">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Xác nhận mật khẩu</label>
+                        <input id="confirm-password" type="password" class="glass-input" required placeholder="••••••••">
+                    </div>
+                    <div class="pt-4">
+                        <button type="submit" class="btn-primary w-full bg-gray-800 hover:shadow-gray-300">
+                            <i class="fas fa-key"></i> Cập nhật mật khẩu
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-8 pt-6 border-t border-gray-100">
+                    <h4 class="text-sm font-bold text-red-500 mb-2">Vùng nguy hiểm</h4>
+                    <p class="text-xs text-gray-400 mb-4">Xóa tài khoản sẽ làm mất toàn bộ dữ liệu bài làm và tiến độ.</p>
+                    <button onclick="confirmDeleteAccount()" class="w-full py-2 border border-red-200 text-red-500 rounded-xl text-xs font-bold hover:bg-red-50 transition">
+                        Yêu cầu xóa tài khoản
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // Import Menu
+        import { initMenu } from "./menu.js";
+
+        // CONFIG
+        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // KHỞI TẠO MENU
+        initMenu(app, 'account');
+
+        let currentUser = null;
+
+        // --- 1. TOAST NOTIFICATION (ĐẸP HƠN) ---
+        window.showToast = (title, msg, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const div = document.createElement('div');
+            div.className = `toast ${type}`;
+            
+            const iconClass = type === 'success' ? 'fa-check' : 'fa-times';
+            
+            div.innerHTML = `
+                <div class="toast-icon">
+                    <i class="fas ${iconClass}"></i>
+                </div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-msg">${msg}</div>
+                </div>
+            `;
+            container.appendChild(div);
+            
+            // Animation In
+            setTimeout(() => div.classList.add('show'), 10);
+            
+            // Animation Out
+            setTimeout(() => {
+                div.classList.remove('show');
+                setTimeout(() => div.remove(), 400);
+            }, 3500);
+        }
+
+        // --- 2. MODAL LOGIC (POPUP XỊN) ---
+        window.openModal = (title, msg, type = 'danger', onConfirm) => {
+            const modal = document.getElementById('custom-modal');
+            const iconContainer = document.getElementById('modal-icon-container');
+            const icon = document.getElementById('modal-icon-class');
+            
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = msg;
+            
+            // Style theo type
+            iconContainer.className = `modal-icon ${type}`;
+            icon.className = type === 'danger' ? 'fas fa-trash-alt' : 'fas fa-info-circle';
+            
+            // Setup nút confirm
+            const btnConfirm = document.getElementById('modal-confirm-btn');
+            btnConfirm.onclick = () => {
+                onConfirm();
+                window.closeModal();
+            };
+
+            modal.classList.add('open');
+        }
+
+        window.closeModal = () => {
+            document.getElementById('custom-modal').classList.remove('open');
+        }
+
+        // Action: Xóa tài khoản
+        window.confirmDeleteAccount = () => {
+            window.openModal(
+                "Xóa tài khoản?",
+                "Hành động này không thể hoàn tác. Mọi dữ liệu học tập của bạn sẽ bị xóa vĩnh viễn.",
+                "danger",
+                () => {
+                    // Logic xóa thật ở đây (Hiện tại chỉ thông báo)
+                    window.showToast("Thông báo", "Yêu cầu đã được gửi đến Admin.", "success");
+                }
+            );
+        };
+
+        // --- LOAD DATA ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                
+                // 1. Logic check Admin để đổi danh xưng ngay lập tức
+                const roleEl = document.getElementById('user-role-display');
+                if (user.email === 'admin@hopvan.com') {
+                    roleEl.textContent = "QUẢN TRỊ VIÊN";
+                    roleEl.className = "text-xs text-orange-600 font-black uppercase tracking-wider bg-orange-100 px-3 py-1 rounded-full inline-block mt-1"; // Style riêng cho Admin
+                } else {
+                    roleEl.textContent = "HỌC VIÊN";
+                    roleEl.className = "text-xs text-gray-400 font-bold uppercase tracking-wider"; // Style mặc định
+                }
+
+                // 2. Lấy dữ liệu chi tiết từ Firestore
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    
+                    document.getElementById('display-name-header').textContent = data.name || user.email.split('@')[0];
+                    document.getElementById('user-avatar-display').textContent = (data.name || user.email).charAt(0).toUpperCase();
+                    
+                    document.getElementById('profile-name').value = data.name || '';
+                    document.getElementById('profile-email').value = user.email || '';
+                    document.getElementById('profile-school').value = data.school || '';
+                    document.getElementById('profile-grade').value = data.grade || '12';
+                }
+            } else {
+                window.location.href = '../log.html';
+            }
+        });
+
+        // --- UPDATE PROFILE ---
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Đang lưu...';
+            btn.disabled = true;
+
+            const name = document.getElementById('profile-name').value.trim();
+            const school = document.getElementById('profile-school').value.trim();
+            const grade = document.getElementById('profile-grade').value;
+
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    name: name,
+                    school: school,
+                    grade: parseInt(grade),
+                    selectedGrade: parseInt(grade)
+                });
+                
+                document.getElementById('display-name-header').textContent = name;
+                document.getElementById('user-avatar-display').textContent = name.charAt(0).toUpperCase();
+                
+                window.showToast('Thành công', 'Thông tin đã được cập nhật!', 'success');
+            } catch (error) {
+                window.showToast('Lỗi', error.message, 'error');
+            } finally {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            }
+        });
+
+        // --- CHANGE PASSWORD ---
+        document.getElementById('password-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const p1 = document.getElementById('new-password').value;
+            const p2 = document.getElementById('confirm-password').value;
+
+            if (p1.length < 6) return window.showToast('Thất bại', 'Mật khẩu phải từ 6 ký tự!', 'error');
+            if (p1 !== p2) return window.showToast('Thất bại', 'Mật khẩu xác nhận không khớp!', 'error');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Đang đổi...';
+
+            try {
+                await updatePassword(currentUser, p1);
+                window.showToast('Thành công', 'Đổi mật khẩu thành công!', 'success');
+                e.target.reset();
+            } catch (error) {
+                if (error.code === 'auth/requires-recent-login') {
+                    window.showToast('Cảnh báo', 'Vui lòng đăng xuất và đăng nhập lại để đổi mật khẩu.', 'error');
+                } else {
+                    window.showToast('Lỗi', error.message, 'error');
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-key"></i> Cập nhật mật khẩu';
+            }
+        });
+    </script>
+</body>
+</html>

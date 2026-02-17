@@ -445,6 +445,45 @@
             -ms-overflow-style: none;  /* IE and Edge */
             scrollbar-width: none;  /* Firefox */
         }
+
+/* --- CSS CHO CÁC POPUP ADMIN --- */
+        
+        /* 1. Nền mờ chung */
+        .modal-overlay, .custom-modal-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(5px);
+            display: none; /* QUAN TRỌNG: Mặc định phải ẩn */
+            align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        /* Class để kích hoạt hiện popup */
+        .modal-overlay.show, .custom-modal-overlay.open { 
+            display: flex !important; 
+            opacity: 1; 
+        }
+
+        /* 2. Hộp nội dung Popup */
+        .modal-box, .custom-modal-box {
+            background: white; border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-height: 90vh; overflow-y: auto; position: relative;
+        }
+        /* Hiệu ứng phóng to khi hiện */
+        .modal-overlay.show .modal-box, .custom-modal-overlay.open .custom-modal-box { 
+            transform: scale(1); 
+        }
+
+        /* 3. Icon & Nút bấm trong Popup Xóa */
+        .custom-modal-box { width: 90%; max-width: 400px; padding: 30px; text-align: center; }
+        .modal-icon { width: 70px; height: 70px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+        .modal-icon.danger { background: #fee2e2; color: #dc2626; }
+        
+        .modal-btn-group { display: flex; gap: 12px; margin-top: 25px; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-cancel { background: #f3f4f6; color: #4b5563; }
+        .btn-confirm-danger { background: #dc2626; color: white; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3); }
+        .btn-confirm-danger:hover { background: #b91c1c; }
     </style>
 </head>
 <body class="h-screen flex">
@@ -486,7 +525,7 @@
 
             <div class="px-6 mt-8 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Dữ Liệu</div>
             <div class="nav-item" onclick="switchView('history', this)">
-                <i class="fas fa-chart-line w-6"></i> Kết Quả Thi
+                <i class="fas fa-users w-6"></i> Quản Lý Tài Khoản
             </div>
             <div class="nav-item" onclick="switchView('feedbacks', this)">
                 <i class="fas fa-comment-dots w-6"></i> Góp Ý & Phản Hồi
@@ -814,14 +853,42 @@
 
             <div id="view-history" class="view-section hidden">
                 <div class="glass-panel rounded-3xl p-8">
-                    <div class="flex justify-between items-center mb-8">
-                        <h3 class="font-black text-2xl text-gray-800">Lịch Sử Làm Bài</h3>
-                        <button onclick="loadSubmissions()" class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 hover:rotate-180 transition"><i class="fas fa-sync"></i></button>
+                    
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <div>
+                            <h3 class="font-black text-2xl text-gray-800">Danh Sách Tài Khoản</h3>
+                            <p class="text-xs text-gray-400 font-bold mt-1 uppercase">Quản lý thông tin & tiến độ học tập</p>
+                        </div>
+                        
+                        <div class="flex items-center gap-3 w-full md:w-auto">
+                            <div class="relative group w-full md:w-auto">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors"></i>
+                                <input type="text" id="user-search" onkeyup="filterUsers()" 
+                                       placeholder="Tìm theo tên, email, trường..." 
+                                       class="glass-input pl-11 pr-4 py-2.5 text-sm font-bold w-full md:w-64 focus:w-full md:focus:w-80 transition-all duration-300 border-transparent focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
+                                       style="padding-left: 2.75rem;"> </div>
+
+                            <button onclick="loadUsers()" class="w-11 h-11 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-orange-50 hover:text-orange-500 hover:rotate-180 transition shadow-sm flex-shrink-0" title="Làm mới danh sách">
+                                <i class="fas fa-sync"></i>
+                            </button>
+                        </div>
                     </div>
-                    <table class="w-full text-left table-custom">
-                        <thead class="bg-gray-50"><tr><th>User</th><th>Bài Làm</th><th>Điểm</th><th>Thời gian</th></tr></thead>
-                        <tbody id="history-list"></tbody>
-                    </table>
+                    
+                    <div class="overflow-x-auto no-scrollbar pb-4">
+                        <table class="w-full text-left table-custom">
+                            <thead class="bg-gray-50/50">
+                                <tr>
+                                    <th class="pl-4 whitespace-nowrap">Email / Tài khoản</th>
+                                    <th class="whitespace-nowrap">Họ tên hiển thị</th>
+                                    <th class="whitespace-nowrap">Trường / Lớp</th>
+                                    <th class="whitespace-nowrap">Tài sản (Keys)</th>
+                                    <th class="text-right pr-4 whitespace-nowrap">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-list-body">
+                                </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -867,6 +934,73 @@
                     <button onclick="closeModal()" class="px-6 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition text-sm">Hủy bỏ</button>
                     <button onclick="saveExamData()" class="px-8 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:shadow-lg hover:shadow-orange-500/30 hover:-translate-y-1 transition text-sm">Lưu Dữ Liệu</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="user-detail-modal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 500px; height: auto;">
+            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <h3 class="font-black text-xl text-gray-800">Hồ Sơ Học Viên</h3>
+                <button onclick="document.getElementById('user-detail-modal').classList.remove('show')" class="w-8 h-8 rounded-full bg-white text-gray-400 hover:text-red-500 shadow-sm flex items-center justify-center transition"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="p-8 space-y-6">
+                <div class="text-center">
+                    <div id="ud-avatar" class="w-20 h-20 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center text-3xl font-black text-white mx-auto shadow-lg shadow-orange-500/30 mb-3">U</div>
+                    <h2 id="ud-email" class="font-bold text-gray-800 text-lg">email@example.com</h2>
+                    <span id="ud-role" class="text-[10px] font-black uppercase bg-gray-100 text-gray-500 px-3 py-1 rounded-full mt-2 inline-block">Học viên</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Họ và tên</span>
+                        <p id="ud-name" class="font-bold text-gray-700">Chưa cập nhật</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Đăng nhập cuối</span>
+                        <p id="ud-login" class="font-bold text-gray-700 font-mono text-sm">--/--/----</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Trường học</span>
+                        <p id="ud-school" class="font-bold text-gray-700">Chưa cập nhật</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Khối lớp</span>
+                        <p id="ud-grade" class="font-bold text-gray-700">--</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-4 border-t border-gray-100">
+                    <div class="flex-1 p-3 bg-orange-50 rounded-xl text-center border border-orange-100">
+                        <i class="fas fa-key text-orange-500 mb-1"></i>
+                        <div class="text-xs text-gray-500 font-bold">KEYS</div>
+                        <div id="ud-keys" class="font-black text-orange-600 text-lg">0</div>
+                    </div>
+                    <div class="flex-1 p-3 bg-red-50 rounded-xl text-center border border-red-100">
+                        <i class="fas fa-fire text-red-500 mb-1"></i>
+                        <div class="text-xs text-gray-500 font-bold">STREAK</div>
+                        <div id="ud-streak" class="font-black text-red-600 text-lg">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<div id="delete-user-modal" class="custom-modal-overlay" style="display: none;">
+        <div class="custom-modal-box">
+            <div class="modal-icon danger">
+                <i class="fas fa-user-slash"></i>
+            </div>
+            <h3 class="text-xl font-black text-gray-800 mb-2">Xóa tài khoản?</h3>
+            <p class="text-sm text-gray-500 leading-relaxed mb-6">
+                Bạn có chắc chắn muốn xóa thành viên <b id="del-user-target" class="text-gray-900">...</b> khỏi hệ thống không?
+                <br><span class="text-red-500 font-bold text-xs">Hành động này sẽ xóa dữ liệu hồ sơ vĩnh viễn.</span>
+            </p>
+            <div class="modal-btn-group">
+                <button class="modal-btn btn-cancel" onclick="closeDeleteModal()">Hủy bỏ</button>
+                <button onclick="executeDeleteUser()" id="btn-confirm-del-user" class="modal-btn btn-confirm-danger">Xác nhận xóa</button>
             </div>
         </div>
     </div>
@@ -1073,7 +1207,7 @@ const CAT_MAP = {
         }
         if(viewId === 'bank') loadBank(currentCollection);
         if(viewId === 'journal') loadLevelsList();
-        if(viewId === 'history') loadSubmissions();
+        if(viewId === 'history') loadUsers();
         if(viewId === 'news') loadNews(currentNewsFilter);
         if(viewId === 'feedbacks') loadFeedbacks();
     };
@@ -1945,37 +2079,181 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
         }
     };
 
-    window.loadSubmissions = async () => {
-        const tbody = document.getElementById('history-list');
-        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center"><i class="fas fa-spinner fa-spin"></i></td></tr>';
+// --- 7. QUẢN LÝ THÀNH VIÊN (USER MANAGER) ---
+    window.loadUsers = async () => {
+        const tbody = document.getElementById('user-list-body');
+        tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center"><i class="fas fa-circle-notch fa-spin text-orange-500 text-2xl"></i><p class="text-xs text-gray-400 mt-2 font-bold">Đang tải danh sách tài khoản...</p></td></tr>';
+
         try {
-            const snap = await getDocs(query(collection(db, "activities"), orderBy("timestamp", "desc"), limit(15)));
+            // Lấy tất cả users (Sắp xếp theo lần đăng nhập cuối nếu có field đó, hoặc lấy mặc định)
+            const q = query(collection(db, "users")); // Bạn có thể thêm orderBy("lastLoginDate", "desc") nếu muốn
+            const snap = await getDocs(q);
+            
             tbody.innerHTML = "";
             
             if(snap.empty) {
-                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400">Chưa có hoạt động nào</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-bold">Chưa có thành viên nào.</td></tr>';
                 return;
             }
 
-            snap.forEach(d => {
-                const data = d.data();
-                let timeStr = "N/A";
-                if (data.timestamp && data.timestamp.seconds) {
-                    timeStr = new Date(data.timestamp.seconds * 1000).toLocaleDateString('vi-VN');
-                }
+            snap.forEach(doc => {
+                const u = doc.data();
+                const uid = doc.id;
+                
+                // Xử lý dữ liệu hiển thị (Fallback nếu chưa có)
+                const email = u.email || "No Email";
+                const initial = email.charAt(0).toUpperCase();
+                const name = u.name || '<span class="text-gray-300 italic text-xs">Chưa cập nhật tên</span>';
+                const school = u.school || '<span class="text-gray-300 italic text-xs">Chưa có trường</span>';
+                const grade = u.grade ? `<span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-[10px] font-bold">Khối ${u.grade}</span>` : '<span class="text-gray-300 text-xs">--</span>';
+                const keys = u.keys || 0;
+                
+                // Style đặc biệt cho Admin
+                const isAdmin = email === 'admin@hopvan.com';
+                const rowClass = isAdmin ? "bg-orange-50/30 border-l-4 border-orange-500" : "hover:bg-gray-50";
+                const roleBadge = isAdmin ? '<i class="fas fa-crown text-yellow-500 ml-2" title="Quản trị viên"></i>' : '';
 
                 const tr = document.createElement('tr');
+                tr.className = `transition border-b border-gray-50 ${rowClass}`;
                 tr.innerHTML = `
-                    <td class="font-bold text-gray-700">${data.userName || 'User'}</td>
-                    <td class="text-sm">${data.examTitle || 'Bài tập'}</td>
-                    <td class="font-black text-orange-500">${data.score != null ? data.score : '-'}</td>
-                    <td class="text-xs text-gray-400 font-mono">${timeStr}</td>
+                    <td class="pl-4 py-4 whitespace-nowrap"> <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center font-black text-gray-500 shadow-inner">
+                                ${initial}
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="font-bold text-gray-700 text-sm flex items-center">${email.split('@')[0]} ${roleBadge}</span>
+                                <span class="text-[10px] text-gray-400 font-mono">${uid.slice(0,6)}...</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-sm font-medium text-gray-600 whitespace-nowrap">${name}</td> <td class="text-sm whitespace-nowrap"> <div class="flex flex-col">
+                            <span class="font-bold text-gray-700 text-xs">${school}</span>
+                            <span class="mt-1">${grade}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="flex items-center gap-1 font-black text-orange-500">
+                            ${keys} <i class="fas fa-key text-[10px] text-orange-300"></i>
+                        </div>
+                    </td>
+                    <td class="text-right pr-4 whitespace-nowrap">
+                        <button onclick='openUserDetail(${JSON.stringify(u)})' class="bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 px-3 py-2 rounded-xl shadow-sm transition text-xs font-bold mr-2">
+                            <i class="fas fa-eye mr-1"></i> Xem
+                        </button>
+                        
+                        ${!isAdmin ? `
+                        <button onclick="confirmDeleteUser('${uid}', '${email}')" class="bg-white border border-red-200 text-red-500 hover:bg-red-50 hover:border-red-400 px-3 py-2 rounded-xl shadow-sm transition text-xs font-bold" title="Xóa thành viên này">
+                            <i class="fas fa-user-times"></i>
+                        </button>` : ''}
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
-        } catch(e) { 
-            console.error("Lỗi tải lịch sử:", e);
-            tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-400">Lỗi tải dữ liệu: ${e.message}</td></tr>`; 
+
+        } catch (e) {
+            console.error(e);
+            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-400 font-bold">Lỗi tải dữ liệu: ${e.message}</td></tr>`;
+        }
+    };
+
+    // Hàm mở Modal Chi Tiết
+    window.openUserDetail = (u) => {
+        document.getElementById('ud-email').innerText = u.email || "Không có email";
+        document.getElementById('ud-avatar').innerText = (u.email || "U").charAt(0).toUpperCase();
+        
+        // Cập nhật thông tin (nếu không có thì hiện placeholder)
+        document.getElementById('ud-name').innerHTML = u.name || '<span class="text-gray-400 italic">Chưa cập nhật</span>';
+        document.getElementById('ud-school').innerHTML = u.school || '<span class="text-gray-400 italic">Chưa cập nhật</span>';
+        document.getElementById('ud-grade').innerText = u.grade ? `Khối ${u.grade}` : "Chưa chọn";
+        
+        document.getElementById('ud-login').innerText = u.lastLoginDate || "Chưa đăng nhập";
+        document.getElementById('ud-keys').innerText = u.keys || 0;
+        document.getElementById('ud-streak').innerText = u.streak || 0;
+
+        // Check Role
+        const roleEl = document.getElementById('ud-role');
+        if(u.email === 'admin@hopvan.com') {
+            roleEl.innerText = "QUẢN TRỊ VIÊN";
+            roleEl.className = "text-[10px] font-black uppercase bg-orange-100 text-orange-600 px-3 py-1 rounded-full mt-2 inline-block";
+        } else {
+            roleEl.innerText = "HỌC VIÊN";
+            roleEl.className = "text-[10px] font-black uppercase bg-gray-100 text-gray-500 px-3 py-1 rounded-full mt-2 inline-block";
+        }
+
+        document.getElementById('user-detail-modal').classList.add('show');
+    };
+
+// --- TÌM KIẾM USER (CLIENT-SIDE SEARCH) ---
+    window.filterUsers = () => {
+        const input = document.getElementById('user-search');
+        const filter = input.value.toUpperCase(); // Chuyển chữ hoa để tìm không phân biệt hoa thường
+        const tbody = document.getElementById('user-list-body');
+        const tr = tbody.getElementsByTagName('tr');
+
+        // Duyệt qua từng dòng trong bảng
+        for (let i = 0; i < tr.length; i++) {
+            // Lấy nội dung các cột quan trọng: Email(0), Tên(1), Trường(2)
+            const tdEmail = tr[i].getElementsByTagName("td")[0];
+            const tdName = tr[i].getElementsByTagName("td")[1];
+            const tdSchool = tr[i].getElementsByTagName("td")[2];
+            
+            if (tdEmail || tdName || tdSchool) {
+                // Gom nội dung lại thành 1 chuỗi để tìm
+                const txtValue = (tdEmail.textContent || tdEmail.innerText) + 
+                                 (tdName.textContent || tdName.innerText) + 
+                                 (tdSchool.textContent || tdSchool.innerText);
+                
+                // Kiểm tra xem từ khóa có nằm trong chuỗi đó không
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = ""; // Có thì hiện
+                } else {
+                    tr[i].style.display = "none"; // Không thì ẩn
+                }
+            }       
+        }
+    };
+
+// --- LOGIC XÓA USER ---
+    let userToDeleteId = null;
+
+    // 1. Hàm mở Popup hỏi
+    window.confirmDeleteUser = (uid, email) => {
+        userToDeleteId = uid;
+        document.getElementById('del-user-target').innerText = email;
+        document.getElementById('delete-user-modal').classList.add('open');
+    };
+
+    // 2. Hàm đóng Popup
+    window.closeDeleteModal = () => {
+        document.getElementById('delete-user-modal').classList.remove('open');
+        userToDeleteId = null;
+    };
+
+    // 3. Hàm thực thi Xóa trên Firebase
+    window.executeDeleteUser = async () => {
+        if (!userToDeleteId) return;
+
+        const btn = document.getElementById('btn-confirm-del-user');
+        const originalText = btn.innerText;
+        btn.innerText = "Đang xử lý...";
+        btn.disabled = true;
+
+        try {
+            // Xóa document trong collection 'users'
+            await deleteDoc(doc(db, "users", userToDeleteId));
+            
+            // (Tùy chọn) Xóa thêm dữ liệu liên quan nếu cần, ví dụ:
+            // await deleteDoc(doc(db, "progress", userToDeleteId)); 
+
+            showToast("Thành công", "Đã xóa thành viên khỏi danh sách.", "success");
+            closeDeleteModal();
+            loadUsers(); // Tải lại bảng
+        } catch (e) {
+            console.error(e);
+            showToast("Lỗi", "Không thể xóa: " + e.message, "error");
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
         }
     };
 
