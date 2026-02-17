@@ -430,6 +430,24 @@ class Gamification {
                 this.progress[quest.id] = acts.filter(quest.filter).length;
             });
 
+            // --- KIỂM TRA NHIỆM VỤ CỐ ĐỊNH: CẬP NHẬT HỒ SƠ ---
+            const isProfileDone = this.userData.school && this.userData.grade; // Kiểm tra có trường và lớp chưa
+            const profileQuestId = 'fixed_profile';
+            
+            // Nếu đã xong hồ sơ, đánh dấu 1/1, nếu chưa thì 0/1
+            this.progress[profileQuestId] = isProfileDone ? 1 : 0;
+
+            // Thêm nhiệm vụ này vào đầu danh sách dailyQuests hiển thị
+            const profileQuest = {
+                id: profileQuestId,
+                icon: 'fa-user-edit',
+                title: 'Hồ sơ chỉnh chu',
+                desc: 'Cập nhật Trường & Khối lớp',
+                target: 1,
+                reward: 10, // 10 Keys như bạn muốn
+                isFixed: true // Đánh dấu đây là nhiệm vụ cố định
+            };
+
             this.updateUIQuests();
         } catch (e) {
             console.error(e);
@@ -503,33 +521,80 @@ class Gamification {
         setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
+    async rewardFixedUser(amount, questId) {
+        const permanentClaimedKey = `claimed_fixed_${this.user.uid}`;
+        if (localStorage.getItem(permanentClaimedKey) === 'true') return;
+
+        try {
+            await updateDoc(doc(db, 'users', this.user.uid), { keys: increment(amount) });
+            this.userData.keys += amount;
+            this.updateUIBasic();
+
+            // Lưu vĩnh viễn là đã nhận thưởng này
+            localStorage.setItem(permanentClaimedKey, 'true');
+
+            this.showToast(`Tuyệt vời! Thưởng hồ sơ +${amount} Keys`);
+            confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+            
+            this.updateUIQuests();
+        } catch (e) {
+            console.error(e);
+            alert("Lỗi khi nhận thưởng hồ sơ!");
+        }
+    }
+
     // VẼ LẠI GIAO DIỆN NHIỆM VỤ GỌN GÀNG
     updateUIQuests() {
         const list = document.getElementById('quest-list');
         const today = new Date().toLocaleDateString('en-CA');
         const storageKey = `claimed_q_${this.user.uid}_${today}`;
         const claimedIds = JSON.parse(localStorage.getItem(storageKey) || "[]");
-
-        const allDone = this.dailyQuests.every(q => claimedIds.includes(q.id));
         
-        if (allDone && this.dailyQuests.length > 0) {
+        // Kiểm tra xem nhiệm vụ hồ sơ ĐÃ TỪNG được nhận thưởng chưa (lưu vĩnh viễn)
+        const permanentClaimedKey = `claimed_fixed_${this.user.uid}`;
+        const hasClaimedProfile = localStorage.getItem(permanentClaimedKey) === 'true';
+
+        let questsToRender = [...this.dailyQuests];
+
+        // Nếu chưa nhận thưởng hồ sơ, chèn nó lên đầu danh sách
+        if (!hasClaimedProfile) {
+            const profileQuest = {
+                id: 'fixed_profile',
+                icon: 'fa-user-edit',
+                title: 'Hồ sơ chỉnh chu',
+                desc: 'Cập nhật Trường & Khối lớp',
+                target: 1,
+                reward: 10,
+                isFixed: true
+            };
+            questsToRender.unshift(profileQuest);
+        }
+
+        const allDone = questsToRender.every(q => claimedIds.includes(q.id) || (q.isFixed && hasClaimedProfile));
+        
+        if (allDone && questsToRender.length > 0) {
             list.innerHTML = `<div style="text-align:center; padding:20px;"><i class="fas fa-medal" style="font-size:2rem; color:#f59e0b"></i><p style="margin-top:5px; font-weight:800; font-size:0.75rem;">Bạn đã hoàn thành mọi thử thách hôm nay<br>Hãy quay lại vào ngày mai nhé!</p></div>`;
         } else {
-            list.innerHTML = this.dailyQuests.map(q => {
+            list.innerHTML = questsToRender.map(q => {
                 const cur = this.progress[q.id] || 0; 
                 const isCompleted = cur >= q.target;
-                const isClaimed = claimedIds.includes(q.id);
+                const isClaimed = q.isFixed ? hasClaimedProfile : claimedIds.includes(q.id);
 
-                let actionHtml = `<span class="tag-reward">+${q.reward}</span>`; // Mặc định hiện tag thưởng
+                let actionHtml = `<span class="tag-reward">+${q.reward}</span>`;
                 if (isClaimed) {
                     actionHtml = `<i class="fas fa-check-circle" style="color:#10b981; font-size:1.1rem;"></i>`;
                 } else if (isCompleted) {
-                    actionHtml = `<button class="btn-q-claim" onclick="window.hvGam.rewardUser(${q.reward}, '${q.id}')">NHẬN</button>`;
+                    // Nếu là nhiệm vụ hồ sơ, gọi hàm nhận thưởng riêng hoặc dùng chung nhưng lưu key khác
+                    const claimFn = q.isFixed ? `window.hvGam.rewardFixedUser(${q.reward}, '${q.id}')` : `window.hvGam.rewardUser(${q.reward}, '${q.id}')`;
+                    actionHtml = `<button class="btn-q-claim" onclick="${claimFn}">NHẬN</button>`;
+                } else if (q.isFixed) {
+                    // Nếu chưa xong hồ sơ, hiện nút dẫn sang trang tài khoản
+                    actionHtml = `<button class="btn-q-claim" style="background:var(--text-secondary)" onclick="window.location.href='account.html'">SỬA</button>`;
                 }
 
                 return `
                 <div class="q-card ${isClaimed ? 'done' : ''}">
-                    <div class="q-icon-neo"><i class="fas ${q.icon}"></i></div>
+                    <div class="q-icon-neo" style="${q.isFixed ? 'background:#eff6ff; color:#3b82f6' : ''}"><i class="fas ${q.icon}"></i></div>
                     <div style="flex:1">
                         <div class="q-title">${q.title}</div>
                         <div class="q-desc">${isClaimed ? 'Đã nhận thưởng' : `${q.desc} (${cur}/${q.target})`}</div>
