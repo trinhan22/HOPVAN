@@ -995,7 +995,7 @@
             </div>
             <h3 class="text-xl font-black text-gray-800 mb-2">Xóa tài khoản?</h3>
             <p class="text-sm text-gray-500 leading-relaxed mb-6">
-                Bạn có chắc chắn muốn xóa thành viên <b id="del-user-target" class="text-gray-900">...</b> khỏi hệ thống không?
+                Bạn có chắc chắn muốn xóa tài khoản <b id="del-user-target" class="text-gray-900">...</b> khỏi hệ thống không?
                 <br><span class="text-red-500 font-bold text-xs">Hành động này sẽ xóa dữ liệu hồ sơ vĩnh viễn.</span>
             </p>
             <div class="modal-btn-group">
@@ -2092,7 +2092,7 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
             tbody.innerHTML = "";
             
             if(snap.empty) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-bold">Chưa có thành viên nào.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-bold">Chưa có tài khoản nào.</td></tr>';
                 return;
             }
 
@@ -2142,7 +2142,7 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
                         </button>
                         
                         ${!isAdmin ? `
-                        <button onclick="confirmDeleteUser('${uid}', '${email}')" class="bg-white border border-red-200 text-red-500 hover:bg-red-50 hover:border-red-400 px-3 py-2 rounded-xl shadow-sm transition text-xs font-bold" title="Xóa thành viên này">
+                        <button onclick="confirmDeleteUser('${uid}', '${email}')" class="bg-white border border-red-200 text-red-500 hover:bg-red-50 hover:border-red-400 px-3 py-2 rounded-xl shadow-sm transition text-xs font-bold" title="Xóa tài khoản này">
                             <i class="fas fa-user-times"></i>
                         </button>` : ''}
                     </td>
@@ -2245,7 +2245,7 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
             // (Tùy chọn) Xóa thêm dữ liệu liên quan nếu cần, ví dụ:
             // await deleteDoc(doc(db, "progress", userToDeleteId)); 
 
-            showToast("Thành công", "Đã xóa thành viên khỏi danh sách.", "success");
+            showToast("Thành công", "Đã xóa tài khoản khỏi danh sách.", "success");
             closeDeleteModal();
             loadUsers(); // Tải lại bảng
         } catch (e) {
