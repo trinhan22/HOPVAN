@@ -874,35 +874,37 @@
     }
 
     function processChartData(activities) {
-        // Lấy 10 bài gần nhất có điểm số
+        // Lấy 10 bài gần nhất có điểm số để vẽ biểu đồ
         const scoredActs = activities.filter(a => a.score !== undefined && a.score !== null);
-        const last10 = scoredActs.slice(0, 10).reverse(); // Đảo ngược để vẽ từ cũ -> mới
+        const last10 = scoredActs.slice(0, 10).reverse();
         
         const labels = last10.map(a => { 
             const d = a.timestamp ? a.timestamp.toDate() : new Date(); 
             return `${d.getDate()}/${d.getMonth()+1}`; 
         });
-        
         const data = last10.map(a => parseFloat(a.score));
 
-        // Tính điểm trung bình (Tách NLXH/NLVH là Tự luận, Reading là Trắc nghiệm - Tương đối)
+        // --- LOGIC TÍNH ĐIỂM TRUNG BÌNH ---
         let quizSum = 0, quizCount = 0; 
         let essaySum = 0, essayCount = 0;
 
-        scoredActs.forEach(a => {
-            const s = parseFloat(a.score);
-            if (a.type === 'reading') {
-                quizSum += s; quizCount++;
-            } else {
-                essaySum += s; essayCount++;
+        activities.forEach(a => {
+            const s = parseFloat(a.score || 0);
+            // Phân loại Trắc nghiệm (Quiz/Reading) và Tự luận (NLXH/NLVH/Fulltest)
+            if (a.type === 'quiz' || a.type === 'reading') {
+                quizSum += s;
+                quizCount++;
+            } else if (a.type === 'nlxh' || a.type === 'nlvh' || a.type === 'fulltest') {
+                essaySum += s;
+                essayCount++;
             }
         });
 
         return { 
             labels, 
             data, 
-            avgReading: quizCount ? (quizSum/quizCount).toFixed(2) : 0, 
-            avgEssay: essayCount ? (essaySum/essayCount).toFixed(2) : 0, 
+            avgQuiz: quizCount ? (quizSum / quizCount).toFixed(1) : "0.0", 
+            avgEssay: essayCount ? (essaySum / essayCount).toFixed(1) : "0.0", 
             total: activities.length 
         };
     }
@@ -975,48 +977,57 @@
     };
 
     window.openStatsModal = () => {
-        const chartData = processChartData(allActivities);
+        const stats = processChartData(allActivities);
         
-        // Cập nhật lại các ID trong HTML Modal cho khớp với logic mới
-        document.getElementById('avg-quiz-score').textContent = chartData.avgReading; // Tái sử dụng ô trắc nghiệm cho Đọc hiểu
-        document.querySelector('#avg-quiz-score + .ms-label').textContent = "TB Đọc Hiểu"; // Sửa nhãn
-        
-        document.getElementById('avg-essay-score').textContent = chartData.avgEssay;
-        document.getElementById('total-tests-count').textContent = chartData.total;
+        // Hiển thị điểm TB Trắc nghiệm vào ô đầu tiên
+        const quizValEl = document.getElementById('avg-quiz-score');
+        if(quizValEl) {
+            quizValEl.textContent = stats.avgQuiz;
+            quizValEl.nextElementSibling.textContent = "TB Trắc nghiệm"; // Đảm bảo nhãn đúng
+        }
+
+        // Hiển thị điểm TB Tự luận vào ô thứ hai
+        const essayValEl = document.getElementById('avg-essay-score');
+        if(essayValEl) {
+            essayValEl.textContent = stats.avgEssay;
+            essayValEl.nextElementSibling.textContent = "TB Tự luận"; // Đảm bảo nhãn đúng
+        }
+
+        // Tổng số bài
+        const totalEl = document.getElementById('total-tests-count');
+        if(totalEl) totalEl.textContent = stats.total;
         
         document.getElementById('statsFullModal').style.display = "flex";
         
-        const ctx = document.getElementById('largeChart').getContext('2d');
-        if (largeChartInstance) largeChartInstance.destroy();
-        
-        largeChartInstance = new Chart(ctx, { 
-            type: 'line', 
-            data: { 
-                labels: chartData.labels, 
-                datasets: [{ 
-                    label: 'Tiến độ điểm số', 
-                    data: chartData.data, 
-                    borderColor: '#FF5E62', 
-                    backgroundColor: 'rgba(255, 94, 98, 0.1)', 
-                    borderWidth: 3, 
-                    tension: 0.3, 
-                    fill: true, 
-                    pointBackgroundColor: '#fff', 
-                    pointBorderColor: '#FF5E62', 
-                    pointRadius: 6,
-                    pointHoverRadius: 8
-                }] 
-            }, 
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: { display: false } }, 
-                scales: { 
-                    y: { beginAtZero: true, max: 10, grid: { color: '#f0f0f0' } }, 
-                    x: { grid: { display: false } } 
+        // Vẽ biểu đồ lớn
+        setTimeout(() => {
+            const ctx = document.getElementById('largeChart').getContext('2d');
+            if (largeChartInstance) largeChartInstance.destroy();
+            largeChartInstance = new Chart(ctx, { 
+                type: 'line', 
+                data: { 
+                    labels: stats.labels, 
+                    datasets: [{ 
+                        label: 'Tiến độ điểm số', 
+                        data: stats.data, 
+                        borderColor: '#FF5E62', 
+                        backgroundColor: 'rgba(255, 94, 98, 0.1)', 
+                        borderWidth: 3, 
+                        tension: 0.3, 
+                        fill: true, 
+                        pointBackgroundColor: '#fff', 
+                        pointBorderColor: '#FF5E62', 
+                        pointRadius: 6
+                    }] 
+                }, 
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, max: 10 } }
                 } 
-            } 
-        });
+            });
+        }, 300);
     };
 
     window.closeActivityModal = () => document.getElementById('activityFullModal').style.display = "none";
