@@ -157,81 +157,166 @@
             flex: 1; background: #fafafa; padding: 15px; border-radius: 15px; text-align: center; border: 1px solid #eee;
         }
 
-        /* --- MOBILE REFINEMENT --- */
-@media (max-width: 768px) { 
-            /* Fix Header Mobile */
-            .mobile-header { display: flex; z-index: 1000; }
-
-            /* Fix Sidebar - Ép nó về bên trái và nằm trên cùng */
-            aside {
-                position: fixed !important; 
-                left: 0 !important; 
-                top: 0 !important;
-                bottom: 0 !important;
-                transform: translateX(-100%); /* Giấu sang trái */
-                z-index: 9999 !important; 
-                width: 280px !important; 
-                background: white !important;
-                transition: transform 0.3s ease-in-out !important;
+        /* --- MOBILE OPTIMIZATION (APP-LIKE FEEL) --- */
+        @media (max-width: 768px) { 
+            /* 1. Reset Layout cơ bản */
+            body { 
+                height: 100%; /* Cho phép cuộn trang tự nhiên */
+                overflow: auto; 
             }
-            aside.open { 
-                transform: translateX(0) !important; /* Hiện ra */
-                box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important;
+            
+            .mobile-header { 
+                display: flex; 
+                z-index: 1000;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.05);
             }
 
-            /* Fix Nội dung chính không bị lệch */
             .main-content { 
                 margin-left: 0 !important; 
                 width: 100% !important; 
-                padding: 80px 15px 20px !important; 
+                padding: 80px 20px 40px !important; /* Tăng padding bottom để lướt sướng hơn */
+                height: auto !important;
+                overflow: visible !important;
             } 
 
-            /* Lớp phủ mờ */
+            /* 2. Sidebar Overlay & Animation */
+            aside {
+                position: fixed !important; 
+                left: 0 !important; top: 0 !important; bottom: 0 !important;
+                transform: translateX(-100%); 
+                z-index: 9999 !important; 
+                width: 280px !important; 
+                background: white !important;
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            }
+            aside.open { 
+                transform: translateX(0) !important; 
+                box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important;
+            }
             #sidebar-overlay {
-                z-index: 9998 !important; /* Dưới sidebar nhưng trên content */
-                background: rgba(0,0,0,0.4) !important;
+                z-index: 9998 !important; 
+                background: rgba(0,0,0,0.5) !important; /* Đậm hơn chút để tập trung vào menu */
+                backdrop-filter: blur(4px);
             }
             #sidebar-overlay.active { display: block !important; }
 
-            .stats-grid { grid-template-columns: 1fr 1fr !important; }
-            .welcome-text h2 { font-size: 1.8rem; }
+            /* 3. Header User: Gọn gàng hơn */
+            .user-header { 
+                margin-bottom: 25px; 
+            }
+            .welcome-text h2 { font-size: 1.5rem; }
+            .user-avatar { width: 45px; height: 45px; font-size: 1.1rem; }
+
+            /* 4. STATS GRID -> CAROUSEL TRƯỢT NGANG (Highlight) */
+            .stats-grid { 
+                display: flex !important; /* Chuyển thành Flex */
+                overflow-x: auto; /* Cho phép cuộn ngang */
+                scroll-snap-type: x mandatory; /* Bắt dính thẻ */
+                gap: 15px;
+                padding-bottom: 20px; /* Chừa chỗ cho bóng đổ */
+                margin: 0 -20px 20px -20px; /* Tràn viền màn hình */
+                padding-left: 20px; /* Padding bù lại */
+                padding-right: 20px;
+                scrollbar-width: none; /* Ẩn thanh cuộn trên Firefox */
+            }
+            .stats-grid::-webkit-scrollbar { display: none; /* Ẩn thanh cuộn trên Chrome */ }
+            
+            .stat-card {
+                min-width: 150px; /* Kích thước cố định cho mỗi thẻ */
+                width: 150px;
+                scroll-snap-align: start; /* Bắt dính vào đầu */
+                flex-shrink: 0; /* Không cho co lại */
+            }
+
+            /* 5. Split Grid & Layout Chung -> Xếp chồng dọc */
+            .split-grid { 
+                display: flex !important;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            /* 6. Banner tối ưu cho Mobile */
+            .banner-cta {
+                padding: 25px 20px !important;
+                align-items: center !important;
+                text-align: center !important;
+                min-height: auto !important;
+            }
+            .banner-cta h2 { font-size: 1.5rem !important; }
+            /* Giấu icon to đi hoặc làm nhỏ lại để đỡ che chữ */
+            .banner-decor { 
+                opacity: 0.1 !important; 
+                font-size: 6rem !important; 
+                bottom: -10px !important;
+            }
+
+            /* 7. Chart Box & BXH */
+            .chart-box {
+                min-height: auto !important;
+                height: auto !important;
+            }
+            #mini-leaderboard {
+                max-height: 250px; /* Giới hạn chiều cao BXH trên mobile */
+            }
+
+            /* 8. Tips Grid -> Xếp chồng */
+            .tips-grid { 
+                grid-template-columns: 1fr !important; 
+                gap: 15px;
+            }
+
+            /* 9. Modal Fullscreen cho Mobile */
+            .modal {
+                align-items: flex-end; /* Modal trồi từ dưới lên */
+            }
+            .modal-content {
+                width: 100% !important;
+                max-width: 100% !important;
+                border-radius: 20px 20px 0 0 !important; /* Bo tròn góc trên */
+                max-height: 90vh !important;
+                animation: slideUpModal 0.3s ease-out;
+            }
+            @keyframes slideUpModal {
+                from { transform: translateY(100%); }
+                to { transform: translateY(0); }
+            }
         }
 
-/* --- GLOBAL SCROLLBAR STYLE --- */
+        /* --- GLOBAL SCROLLBAR STYLE --- */
 
-/* 1. Thiết lập độ rộng/cao của thanh trượt */
-::-webkit-scrollbar {
-    width: 10px;  /* Độ rộng cho thanh dọc */
-    height: 10px; /* Độ cao cho thanh ngang */
-}
+        /* 1. Thiết lập độ rộng/cao của thanh trượt */
+        ::-webkit-scrollbar {
+            width: 10px;  /* Độ rộng cho thanh dọc */
+            height: 10px; /* Độ cao cho thanh ngang */
+        }
 
-/* 2. Thiết lập rãnh trượt (Track) - Nền chìm */
-::-webkit-scrollbar-track {
-    background: rgba(255, 143, 80, 0.05); /* Màu cam cực nhạt, gần như trong suốt */
-    border-radius: 10px;
-}
+        /* 2. Thiết lập rãnh trượt (Track) - Nền chìm */
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 143, 80, 0.05); /* Màu cam cực nhạt, gần như trong suốt */
+            border-radius: 10px;
+        }
 
-/* 3. Thiết lập tay nắm (Thumb) - Phần di chuyển */
-::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 143, 80, 0.3); /* Mặc định là cam nhạt */
-    border-radius: 10px; /* Bo tròn mềm mại */
-    
-    /* Mẹo: Tạo viền trong suốt để thanh trượt trông nhỏ hơn và "lơ lửng" */
-    border: 2px solid transparent;
-    background-clip: content-box;
-    transition: background-color 0.3s ease;
-}
+        /* 3. Thiết lập tay nắm (Thumb) - Phần di chuyển */
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 143, 80, 0.3); /* Mặc định là cam nhạt */
+            border-radius: 10px; /* Bo tròn mềm mại */
+            
+            /* Mẹo: Tạo viền trong suốt để thanh trượt trông nhỏ hơn và "lơ lửng" */
+            border: 2px solid transparent;
+            background-clip: content-box;
+            transition: background-color 0.3s ease;
+        }
 
-/* 4. Hiệu ứng khi di chuột vào (Hover) */
-::-webkit-scrollbar-thumb:hover {
-    background-color: #FF8F50; /* Đổi sang màu cam chính thương hiệu */
-    border: 1px solid transparent; /* Làm thanh trượt to ra một chút khi hover */
-}
+        /* 4. Hiệu ứng khi di chuột vào (Hover) */
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #FF8F50; /* Đổi sang màu cam chính thương hiệu */
+            border: 1px solid transparent; /* Làm thanh trượt to ra một chút khi hover */
+        }
 
-/* 5. (Tùy chọn) Ẩn nút mũi tên 2 đầu (nếu trình duyệt hiển thị) */
-::-webkit-scrollbar-button {
-    display: none;
-}
+        /* 5. (Tùy chọn) Ẩn nút mũi tên 2 đầu (nếu trình duyệt hiển thị) */
+        ::-webkit-scrollbar-button {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -285,13 +370,45 @@
                 </div>
             </div>
             
-            <div class="banner-cta">
-                <div style="position: relative; z-index: 2;">
-                    <h2 style="font-size: 1.8rem; margin-bottom: 10px; color: white; font-weight: 800;">Sẵn sàng bứt phá điểm số?</h2>
-                    <p style="opacity: 0.9; margin-bottom: 20px;">Làm ngay một bài test để AI đánh giá năng lực của bạn.</p>
-                    <a href="phongluyende.html" style="background: white; color: #FF5E62; padding: 12px 30px; border: none; border-radius: 50px; font-weight: 800; cursor: pointer; text-decoration: none; display: inline-block;">Vào phòng luyện</a>
+            <div class="split-grid" style="align-items: stretch;"> 
+                
+                <div class="banner-cta" style="margin-bottom: 0; padding: 30px 50px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; text-align: left; height: 100%;">
+                    
+                    <div style="position: relative; z-index: 2; width: 100%;">
+                        <div style="background: rgba(255,255,255,0.25); backdrop-filter: blur(5px); display: inline-flex; align-items: center; padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                            <i class="fas fa-magic mr-2 text-yellow-300"></i> AI Powered
+                        </div>
+
+                        <h2 style="font-size: 2rem; line-height: 1.2; margin-bottom: 12px; color: white; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.1);">Sẵn sàng bứt phá?</h2>
+                        
+                        <p style="opacity: 0.95; margin-bottom: 28px; font-size: 1rem; font-weight: 500; max-width: 85%; line-height: 1.6;">
+                            Hệ thống AI sẽ phân tích điểm mạnh, điểm yếu và đề xuất <br>lộ trình ôn thi riêng biệt cho bạn.
+                        </p>
+
+                        <a href="phongluyende.html" class="hover:scale-105 hover:shadow-xl hover:bg-white/90 active:scale-95 transition-all duration-300 ease-out" 
+                           style="background: white; color: #FF5E62; padding: 14px 32px; border: none; border-radius: 16px; font-weight: 800; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
+                            Vào phòng luyện <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <i class="fas fa-rocket banner-decor" style="font-size: 9rem; right: -20px; bottom: -40px; opacity: 0.15; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));"></i>
                 </div>
-                <i class="fas fa-rocket banner-decor"></i>
+
+                <div class="chart-box" style="padding: 20px; overflow: hidden; height: 100%; min-height: 320px;">
+                    <div class="chart-header" style="margin-bottom: 15px;">
+                        <h3 class="chart-title"><i class="fas fa-trophy text-yellow-500 mr-2"></i> BXH Keys</h3>
+                        <button onclick="openLeaderboardModal()" class="text-xs font-bold text-orange-500 hover:underline">Xem tất cả</button>
+                    </div>
+                    
+                    <div id="mini-leaderboard" class="flex-grow flex flex-col gap-3 overflow-y-auto custom-scrollbar pr-1">
+                        <div class="text-center text-gray-400 text-xs py-4">Đang tải...</div>
+                    </div>
+
+                    <div id="my-rank-footer" class="mt-auto pt-3 border-t border-dashed border-gray-200 flex justify-between items-center text-xs font-bold text-gray-600">
+                        <span>Hạng của bạn:</span>
+                        <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-lg">--</span>
+                    </div>
+                </div>
             </div>
 
             <div class="split-grid">
@@ -365,6 +482,29 @@
         </div>
     </div>
 
+    <div id="leaderboardModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <button onclick="document.getElementById('leaderboardModal').style.display='none'" class="close-btn"><i class="fas fa-times"></i></button>
+            <div style="text-align: center; margin-bottom: 25px;">
+                <h2 style="font-size: 1.8rem; font-weight: 900; color: var(--text-main);">Bảng Phong Thần</h2>
+                <p style="color: var(--text-light); font-size: 0.9rem;">Đua Top Keys - Nhận quà khủng</p>
+            </div>
+            
+            <div class="modal-table-container custom-scrollbar" style="max-height: 400px;">
+                <table style="width: 100%; border-collapse: separate; border-spacing: 0 8px;">
+                    <thead class="sticky top-0 bg-white z-10">
+                        <tr style="text-align: left; color: #999; font-size: 0.7rem; text-transform: uppercase;">
+                            <th class="pb-2 pl-2">Hạng</th>
+                            <th class="pb-2">Thành viên</th>
+                            <th class="pb-2 text-right pr-2">Keys</th>
+                        </tr>
+                    </thead>
+                    <tbody id="full-leaderboard-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <div id="statsFullModal" class="modal">
         <div class="modal-content">
             <button onclick="closeStatsModal()" class="close-btn"><i class="fas fa-times"></i></button>
@@ -385,13 +525,13 @@
         </div>
     </div>
 
-<script type="module" src="gam.js"></script>
+    <script type="module" src="gam.js"></script>
     <script src="../chatbot.js"></script>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, orderBy, onSnapshot, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
@@ -418,6 +558,7 @@
             document.getElementById('avatar-initial').textContent = name.charAt(0).toUpperCase();
             updateUserStreak(user);
             setupRealtimeStats(user);
+            setupLeaderboard(user);
         } else { window.location.href = "../log.html"; }
     });
 
@@ -494,6 +635,122 @@
             drawMiniChart(allActivities);
         });
     }
+
+    // --- LEADERBOARD LOGIC (FIXED) ---
+    function setupLeaderboard(currentUser) {
+        // Query đơn giản hóa để tránh lỗi Index
+        const usersRef = collection(db, "users");
+        
+        // Lắng nghe thay đổi
+        onSnapshot(usersRef, (snapshot) => {
+            let users = [];
+            snapshot.forEach(doc => {
+                const d = doc.data();
+                // Chỉ lấy user có email và tạo field keys giả lập nếu chưa có
+                if (d.email) {
+                    users.push({ 
+                        id: doc.id, 
+                        ...d, 
+                        keys: d.keys || 0 // Quan trọng: Nếu không có keys thì tính là 0
+                    });
+                }
+            });
+
+            // Sắp xếp thủ công ở Client để tránh lỗi Index Firestore
+            users.sort((a, b) => b.keys - a.keys);
+
+            // Lưu và render
+            window.fullLeaderboardData = users;
+            window.currentUserId = currentUser.uid;
+            renderMiniLeaderboard(users, currentUser.uid);
+        });
+    }
+
+    function renderMiniLeaderboard(users, myUid) {
+        const container = document.getElementById('mini-leaderboard');
+        const myRankEl = document.getElementById('my-rank-footer');
+        
+        // Render Top 3-4 ở widget nhỏ
+        const topUsers = users.slice(0, 4); 
+        
+        container.innerHTML = topUsers.map((u, index) => {
+            let rankBadge = `<span class="w-6 h-6 flex items-center justify-center rounded-full font-bold text-xs bg-gray-100 text-gray-500">${index + 1}</span>`;
+            
+            // Icon huy chương cho Top 3
+            if (index === 0) rankBadge = `<i class="fas fa-crown text-yellow-400 text-lg"></i>`;
+            if (index === 1) rankBadge = `<i class="fas fa-medal text-gray-400 text-lg"></i>`;
+            if (index === 2) rankBadge = `<i class="fas fa-medal text-orange-700 text-lg"></i>`;
+
+            const isMe = u.id === myUid ? "bg-orange-50 border-orange-100" : "bg-gray-50 border-transparent";
+            const name = u.email ? u.email.split('@')[0] : "Ẩn danh";
+
+            return `
+            <div class="flex items-center justify-between p-2 rounded-xl border ${isMe}">
+                <div class="flex items-center gap-3">
+                    <div class="w-6 text-center">${rankBadge}</div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-gray-700 text-sm truncate max-w-[100px]">${name}</span>
+                    </div>
+                </div>
+                <div class="font-black text-orange-500 text-sm flex items-center gap-1">
+                    ${u.keys || 0} <i class="fas fa-key text-[10px] text-gray-300"></i>
+                </div>
+            </div>`;
+        }).join('');
+
+        // Tìm hạng của mình
+        const myIndex = users.findIndex(u => u.id === myUid);
+        const myRank = myIndex !== -1 ? myIndex + 1 : "--";
+        const myKeys = myIndex !== -1 ? (users[myIndex].keys || 0) : 0;
+        
+        myRankEl.innerHTML = `
+            <span class="text-gray-500">Hạng của bạn:</span>
+            <div class="flex items-center gap-2">
+                <span class="font-black text-gray-800">#${myRank}</span>
+                <span class="bg-orange-100 text-orange-600 px-2 py-0.5 rounded text-[10px] font-bold">${myKeys} keys</span>
+            </div>
+        `;
+    }
+
+    // Gán hàm mở popup ra window để nút HTML gọi được
+    window.openLeaderboardModal = () => {
+        const users = window.fullLeaderboardData || [];
+        const myUid = window.currentUserId;
+        const tbody = document.getElementById('full-leaderboard-body');
+        
+        tbody.innerHTML = users.map((u, index) => {
+            const rank = index + 1;
+            let rankClass = "text-gray-500 font-bold";
+            let rowClass = "hover:bg-gray-50 transition";
+            
+            // Style đặc biệt cho Top 3 và Bản thân
+            if (rank === 1) rankClass = "text-yellow-500 font-black text-lg";
+            if (rank === 2) rankClass = "text-gray-400 font-black text-lg";
+            if (rank === 3) rankClass = "text-orange-700 font-black text-lg";
+            
+            if (u.id === myUid) rowClass = "bg-orange-50 border border-orange-100";
+
+            const name = u.email ? u.email.split('@')[0] : "User";
+
+            return `
+            <tr class="${rowClass} rounded-lg">
+                <td class="pl-2 py-3 rounded-l-lg ${rankClass}">#${rank}</td>
+                <td class="py-3 font-bold text-gray-700 text-sm">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold">
+                            ${name.charAt(0).toUpperCase()}
+                        </div>
+                        ${name} ${u.id === myUid ? '<span class="text-[9px] bg-orange-200 text-orange-800 px-1 rounded">Bạn</span>' : ''}
+                    </div>
+                </td>
+                <td class="pr-2 py-3 text-right font-black text-orange-500 rounded-r-lg">
+                    ${u.keys || 0}
+                </td>
+            </tr>`;
+        }).join('');
+
+        document.getElementById('leaderboardModal').style.display = 'flex';
+    };
 
     // --- XỬ LÝ DỮ LIỆU MỚI (QUAN TRỌNG) ---
     function updateActivityList(dataList) {
