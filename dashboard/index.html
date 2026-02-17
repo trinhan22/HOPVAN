@@ -335,23 +335,22 @@
         }
         .profile-modal.show .pm-content { transform: scale(1); }
 
+        /* Tìm và thay thế các class này trong thẻ <style> */
         .pm-icon {
-            width: 80px; height: 80px; margin: 0 auto 20px;
-            background: #fffafa; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 2.5rem; color: #FF8F50;
-            box-shadow: 0 10px 20px rgba(255, 94, 98, 0.25);
-            position: relative;
+            background: #fff5f5 !important; /* Nền hồng cam nhạt */
+            color: #FF8F50 !important; /* Màu cam chính */
+            box-shadow: 0 10px 25px rgba(255, 143, 80, 0.2) !important;
         }
         .pm-icon::after {
-            content: "\f00c"; font-family: "Font Awesome 6 Free"; font-weight: 900;
-            position: absolute; bottom: 0; right: 0;
-            width: 28px; height: 28px; background: #FF8F50; color: white;
-            border-radius: 50%; font-size: 0.9rem; border: 3px solid white;
-            display: flex; align-items: center; justify-content: center;
+            background: #FF8F50 !important; /* Dấu tích màu cam */
         }
-
-        .pm-title { font-size: 1.6rem; font-weight: 900; color: #2D3436; margin-bottom: 10px; letter-spacing: -0.5px; }
+        .pm-title {
+            color: #2D3436 !important;
+        }
+        .btn-pm-update {
+            background: linear-gradient(135deg, #FF8F50, #FF5E62) !important;
+            box-shadow: 0 8px 20px rgba(255, 94, 98, 0.3) !important;
+        }
         .pm-desc { font-size: 0.95rem; color: #636E72; line-height: 1.6; margin-bottom: 30px; padding: 0 10px; }
 
         .pm-actions { display: grid; grid-template-columns: 1fr 1.5fr; gap: 12px; }
@@ -611,449 +610,222 @@
     let miniChartInstance = null;
     let largeChartInstance = null;
 
-    // --- TỪ ĐIỂN LOẠI ĐỀ ---
     const EXAM_TYPES = {
-        'nlxh': { name: 'Nghị Luận Xã Hội', icon: 'fas fa-users', color: '#10b981' }, // Green
-        'nlvh': { name: 'Nghị Luận Văn Học', icon: 'fas fa-book-open', color: '#8b5cf6' }, // Purple
-        'reading': { name: 'Đọc Hiểu', icon: 'fas fa-glasses', color: '#3b82f6' }, // Blue
-        'fulltest': { name: 'Đề Tổng Hợp', icon: 'fas fa-layer-group', color: '#f59e0b' }, // Orange
-        'random': { name: 'Luyện Ngẫu Nhiên', icon: 'fas fa-dice', color: '#ef4444' } // Red
+        'nlxh': { name: 'Nghị Luận Xã Hội', icon: 'fas fa-users', color: '#10b981' },
+        'nlvh': { name: 'Nghị Luận Văn Học', icon: 'fas fa-book-open', color: '#8b5cf6' },
+        'reading': { name: 'Đọc Hiểu', icon: 'fas fa-glasses', color: '#3b82f6' },
+        'fulltest': { name: 'Đề Tổng Hợp', icon: 'fas fa-layer-group', color: '#f59e0b' },
+        'random': { name: 'Luyện Ngẫu Nhiên', icon: 'fas fa-dice', color: '#ef4444' }
     };
 
-    onAuthStateChanged(auth, async (user) => {
+    // --- 1. AUTH & USER SNAPSHOT (REALTIME) ---
+    onAuthStateChanged(auth, (user) => {
         if (user) {
-            // 1. Hiển thị tên và Avatar ngay lập tức (không chờ)
             const name = user.displayName || user.email.split('@')[0];
             document.getElementById('welcome-name').textContent = `Xin chào, ${name}`;
             document.getElementById('avatar-initial').textContent = name.charAt(0).toUpperCase();
             
-            // 2. Chạy các hàm setup (không dùng await để tránh chặn code phía dưới)
-            updateUserStreak(user); 
+            // Khởi chạy các dữ liệu khác
+            updateUserStreak(user);
             setupRealtimeStats(user);
             setupLeaderboard(user);
 
-            // 3. KIỂM TRA VÀ HIỆN POPUP
-            try {
-                const userSnap = await getDoc(doc(db, "users", user.uid));
-                if (userSnap.exists()) {
-                    const userData = userSnap.data();
-                    
-                    // Kiểm tra điều kiện: Thiếu thông tin & Chưa bấm bỏ qua
-                    const isMissingInfo = !userData.school || !userData.grade;
-                    const hasNotSkipped = !sessionStorage.getItem('skipped_profile_update');
+            // Lắng nghe dữ liệu User để hiện Popup & Cập nhật Keys
+            onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                if (docSnap.exists()) {
+                    const userData = docSnap.data();
+                    document.getElementById('keys-value').textContent = userData.keys || 0;
 
-                    if (isMissingInfo && hasNotSkipped) {
+                    // Hiện Popup nếu thiếu thông tin
+                    const isMissing = !userData.school || !userData.grade;
+                    const notSkipped = !sessionStorage.getItem('skipped_profile_update');
+                    if (isMissing && notSkipped) {
                         const modal = document.getElementById('profileUpdateModal');
-                        // Reset style để đảm bảo nó hiện ra
-                        modal.style.display = 'flex'; 
-                        // Dùng requestAnimationFrame để trình duyệt render kịp hiệu ứng mượt
-                        requestAnimationFrame(() => {
-                            modal.classList.add('show');
-                        });
+                        modal.style.display = 'flex';
+                        requestAnimationFrame(() => modal.classList.add('show'));
                     }
                 }
-            } catch (err) {
-                console.error("Lỗi check profile:", err);
-            }
+            });
         } else { 
             window.location.href = "../log.html"; 
         }
     });
 
+    // --- 2. HÀM ĐÓNG POPUP CẬP NHẬT ---
     window.closeProfileModal = () => {
         const modal = document.getElementById('profileUpdateModal');
         modal.classList.remove('show');
-        setTimeout(() => modal.style.display = 'none', 300);
-        
-        // Lưu lại trạng thái đã bỏ qua để không hiện lại mỗi khi F5 (chỉ hiện lại khi tắt tab mở lại)
+        setTimeout(() => { modal.style.display = 'none'; }, 300);
         sessionStorage.setItem('skipped_profile_update', 'true');
     };
 
-    // --- SIDEBAR TOGGLE ---
-    window.toggleSidebar = () => {
-        const sidebar = document.querySelector('aside') || document.getElementById('main-sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        if (sidebar && overlay) {
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : 'auto';
-        }
-    };
-
+    // --- 3. STREAK LOGIC ---
     async function updateUserStreak(user) {
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
-        const todayStr = new Date().toLocaleDateString('en-CA');
+        const today = new Date().toLocaleDateString('en-CA');
         const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
         const yesterdayStr = yesterday.toLocaleDateString('en-CA');
         
-        let currentStreak = 1;
         if (userSnap.exists()) {
             const userData = userSnap.data();
-            
-            if (!userData.school || !userData.grade) {
-                // Kiểm tra xem user đã bấm "Để sau" trong phiên này chưa (dùng sessionStorage)
-                const hasSkipped = sessionStorage.getItem('skipped_profile_update');
-                
-                if (!hasSkipped) {
-                    setTimeout(() => {
-                        const modal = document.getElementById('profileUpdateModal');
-                        modal.classList.add('show');
-                    }, 1500); // Hiện sau 1.5s để user kịp nhìn thấy dashboard
-                }
+            let streak = userData.streak || 1;
+            if (userData.lastLoginDate !== today) {
+                streak = (userData.lastLoginDate === yesterdayStr) ? streak + 1 : 1;
+                await updateDoc(userRef, { lastLoginDate: today, streak: streak });
             }
-
-            // --- ĐOẠN CODE MỚI THÊM VÀO ĐÂY ---
-            // Lấy số Keys từ database, nếu không có thì bằng 0
-            const currentKeys = userData.keys || 0;
-            document.getElementById('keys-value').textContent = currentKeys;
-            // ----------------------------------
-
-            currentStreak = userData.streak || 1;
-            if (userData.lastLoginDate !== todayStr) {
-                currentStreak = (userData.lastLoginDate === yesterdayStr) ? currentStreak + 1 : 1;
-                await updateDoc(userRef, { lastLoginDate: todayStr, streak: currentStreak });
-            }
-            document.getElementById('streak-value').textContent = currentStreak;
+            document.getElementById('streak-value').textContent = streak;
         } else {
-            // Tạo user mới
-            await setDoc(userRef, { lastLoginDate: todayStr, streak: 1, email: user.email, keys: 0 });
+            await setDoc(userRef, { lastLoginDate: today, streak: 1, email: user.email, keys: 0 });
             document.getElementById('streak-value').textContent = 1;
-            document.getElementById('keys-value').textContent = 0; // Set keys = 0 cho user mới
         }
     }
 
+    // --- 4. THỐNG KÊ HOẠT ĐỘNG & BIỂU ĐỒ ---
     function setupRealtimeStats(user) {
-        // Lắng nghe thay đổi từ Firebase
         const q = query(collection(db, "activities"), where("uid", "==", user.uid), orderBy("timestamp", "desc"));
-        
         onSnapshot(q, (snapshot) => {
             allActivities = snapshot.docs.map(doc => doc.data());
-            
-            // 1. Cập nhật số tổng
             document.getElementById('total-exams').textContent = allActivities.length;
             
-            // 2. Tính Level
-            let levelName = "Đồng";
-            const levelNum = Math.floor(allActivities.length / 5) + 1;
-            if (levelNum > 5) levelName = "Bạc";
-            if (levelNum > 15) levelName = "Vàng";
-            if (levelNum > 30) levelName = "Bạch Kim";
-            if (levelNum > 50) levelName = "Kim Cương";
+            let lv = Math.floor(allActivities.length / 5) + 1;
+            let lvName = lv > 50 ? "Kim Cương" : lv > 30 ? "Bạch Kim" : lv > 15 ? "Vàng" : lv > 5 ? "Bạc" : "Đồng";
             
-            const levelCard = document.getElementById('level-card');
-            if (levelCard) {
-                levelCard.querySelector('.value').textContent = `Level ${levelNum}`;
-                levelCard.querySelector('.unit').textContent = levelName;
+            const lvCard = document.getElementById('level-card');
+            if (lvCard) {
+                lvCard.querySelector('.value').textContent = `Level ${lv}`;
+                lvCard.querySelector('.unit').textContent = lvName;
             }
-
-            // 3. Cập nhật danh sách hoạt động
-            updateActivityList(allActivities.slice(0, 3));
-            
-            // 4. Vẽ biểu đồ
-            drawMiniChart(allActivities);
+            renderActivityList(allActivities.slice(0, 3));
+            drawCharts(allActivities);
         });
     }
 
-    // --- LEADERBOARD LOGIC (FIXED) ---
-    function setupLeaderboard(currentUser) {
-        // Query đơn giản hóa để tránh lỗi Index
-        const usersRef = collection(db, "users");
+    function renderActivityList(dataList) {
+        const listEl = document.getElementById('activity-list');
+        if (dataList.length === 0) { 
+            listEl.innerHTML = `<li class="py-4 text-center text-gray-400 font-bold">Chưa có hoạt động nào.</li>`; 
+            return; 
+        }
         
-        // Lắng nghe thay đổi
-        onSnapshot(usersRef, (snapshot) => {
+        listEl.innerHTML = dataList.map(data => {
+            const type = EXAM_TYPES[data.type] || { name: 'Bài Tập', icon: 'fas fa-pen', color: '#999' };
+            const score = typeof data.score === 'number' ? data.score.toFixed(2) : '0.00';
+            const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString('vi-VN') : '--/--';
+            
+            return `
+                <li class="activity-item" style="display: flex; align-items: center; gap: 15px; padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                    <div class="act-icon" style="background:${type.color}20; color:${type.color}; width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i class="${type.icon}" style="font-size: 1.1rem;"></i>
+                    </div>
+                    <div style="flex-grow: 1; min-width: 0;">
+                        <h4 class="font-bold text-gray-800 text-sm truncate">${type.name}</h4>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase">${date}</p>
+                    </div>
+                    <div class="font-black text-sm" style="color:${type.color}; white-space: nowrap;">
+                        ${score}đ
+                    </div>
+                </li>`;
+        }).join('');
+    }
+
+    // --- 5. BẢNG XẾP HẠNG KEYS ---
+    function setupLeaderboard(currentUser) {
+        onSnapshot(collection(db, "users"), (snapshot) => {
             let users = [];
             snapshot.forEach(doc => {
                 const d = doc.data();
-                // Chỉ lấy user có email và tạo field keys giả lập nếu chưa có
-                if (d.email) {
-                    users.push({ 
-                        id: doc.id, 
-                        ...d, 
-                        keys: d.keys || 0 // Quan trọng: Nếu không có keys thì tính là 0
-                    });
-                }
+                if (d.email) users.push({ id: doc.id, ...d, keys: d.keys || 0 });
             });
-
-            // Sắp xếp thủ công ở Client để tránh lỗi Index Firestore
             users.sort((a, b) => b.keys - a.keys);
-
-            // Lưu và render
             window.fullLeaderboardData = users;
             window.currentUserId = currentUser.uid;
-            renderMiniLeaderboard(users, currentUser.uid);
+            
+            // Render Mini BXH
+            const container = document.getElementById('mini-leaderboard');
+            const topUsers = users.slice(0, 4); 
+            container.innerHTML = topUsers.map((u, index) => {
+                let badge = index === 0 ? `<i class="fas fa-crown text-yellow-400 text-lg"></i>` : index === 1 ? `<i class="fas fa-medal text-gray-400 text-lg"></i>` : index === 2 ? `<i class="fas fa-medal text-orange-700 text-lg"></i>` : `<span class="w-6 h-6 flex items-center justify-center rounded-full font-bold text-xs bg-gray-100 text-gray-500">${index + 1}</span>`;
+                const isMe = u.id === currentUser.uid ? "bg-orange-50 border-orange-100" : "bg-gray-50 border-transparent";
+                return `<div class="flex items-center justify-between p-2 rounded-xl border ${isMe}"><div class="flex items-center gap-3"><div class="w-6 text-center">${badge}</div><span class="font-bold text-gray-700 text-sm truncate max-w-[100px]">${u.email.split('@')[0]}</span></div><div class="font-black text-orange-500 text-sm">${u.keys} <i class="fas fa-key text-[10px] text-gray-300"></i></div></div>`;
+            }).join('');
+
+            // Hạng của bạn
+            const myIdx = users.findIndex(u => u.id === currentUser.uid);
+            document.getElementById('my-rank-footer').innerHTML = `<span class="text-gray-500">Hạng của bạn:</span><div class="flex items-center gap-2"><span class="font-black text-gray-800">#${myIdx !== -1 ? myIdx + 1 : "--"}</span><span class="bg-orange-100 text-orange-600 px-2 py-0.5 rounded text-[10px] font-bold">${myIdx !== -1 ? users[myIdx].keys : 0} keys</span></div>`;
         });
     }
 
-    function renderMiniLeaderboard(users, myUid) {
-        const container = document.getElementById('mini-leaderboard');
-        const myRankEl = document.getElementById('my-rank-footer');
-        
-        // Render Top 3-4 ở widget nhỏ
-        const topUsers = users.slice(0, 4); 
-        
-        container.innerHTML = topUsers.map((u, index) => {
-            let rankBadge = `<span class="w-6 h-6 flex items-center justify-center rounded-full font-bold text-xs bg-gray-100 text-gray-500">${index + 1}</span>`;
-            
-            // Icon huy chương cho Top 3
-            if (index === 0) rankBadge = `<i class="fas fa-crown text-yellow-400 text-lg"></i>`;
-            if (index === 1) rankBadge = `<i class="fas fa-medal text-gray-400 text-lg"></i>`;
-            if (index === 2) rankBadge = `<i class="fas fa-medal text-orange-700 text-lg"></i>`;
-
-            const isMe = u.id === myUid ? "bg-orange-50 border-orange-100" : "bg-gray-50 border-transparent";
-            const name = u.email ? u.email.split('@')[0] : "Ẩn danh";
-
-            return `
-            <div class="flex items-center justify-between p-2 rounded-xl border ${isMe}">
-                <div class="flex items-center gap-3">
-                    <div class="w-6 text-center">${rankBadge}</div>
-                    <div class="flex flex-col">
-                        <span class="font-bold text-gray-700 text-sm truncate max-w-[100px]">${name}</span>
-                    </div>
-                </div>
-                <div class="font-black text-orange-500 text-sm flex items-center gap-1">
-                    ${u.keys || 0} <i class="fas fa-key text-[10px] text-gray-300"></i>
-                </div>
-            </div>`;
-        }).join('');
-
-        // Tìm hạng của mình
-        const myIndex = users.findIndex(u => u.id === myUid);
-        const myRank = myIndex !== -1 ? myIndex + 1 : "--";
-        const myKeys = myIndex !== -1 ? (users[myIndex].keys || 0) : 0;
-        
-        myRankEl.innerHTML = `
-            <span class="text-gray-500">Hạng của bạn:</span>
-            <div class="flex items-center gap-2">
-                <span class="font-black text-gray-800">#${myRank}</span>
-                <span class="bg-orange-100 text-orange-600 px-2 py-0.5 rounded text-[10px] font-bold">${myKeys} keys</span>
-            </div>
-        `;
-    }
-
-    // Gán hàm mở popup ra window để nút HTML gọi được
+    // --- 6. MODALS LOGIC ---
     window.openLeaderboardModal = () => {
         const users = window.fullLeaderboardData || [];
-        const myUid = window.currentUserId;
         const tbody = document.getElementById('full-leaderboard-body');
-        
         tbody.innerHTML = users.map((u, index) => {
-            const rank = index + 1;
-            let rankClass = "text-gray-500 font-bold";
-            let rowClass = "hover:bg-gray-50 transition";
-            
-            // Style đặc biệt cho Top 3 và Bản thân
-            if (rank === 1) rankClass = "text-yellow-500 font-black text-lg";
-            if (rank === 2) rankClass = "text-gray-400 font-black text-lg";
-            if (rank === 3) rankClass = "text-orange-700 font-black text-lg";
-            
-            if (u.id === myUid) rowClass = "bg-orange-50 border border-orange-100";
-
-            const name = u.email ? u.email.split('@')[0] : "User";
-
-            return `
-            <tr class="${rowClass} rounded-lg">
-                <td class="pl-2 py-3 rounded-l-lg ${rankClass}">#${rank}</td>
-                <td class="py-3 font-bold text-gray-700 text-sm">
-                    <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold">
-                            ${name.charAt(0).toUpperCase()}
-                        </div>
-                        ${name} ${u.id === myUid ? '<span class="text-[9px] bg-orange-200 text-orange-800 px-1 rounded">Bạn</span>' : ''}
-                    </div>
-                </td>
-                <td class="pr-2 py-3 text-right font-black text-orange-500 rounded-r-lg">
-                    ${u.keys || 0}
-                </td>
-            </tr>`;
+            const isMe = u.id === window.currentUserId;
+            return `<tr class="${isMe ? 'bg-orange-50' : ''}"><td class="p-3 font-bold text-gray-500 text-center">#${index + 1}</td><td class="p-3 font-bold">${u.email.split('@')[0]} ${isMe ? '(Bạn)' : ''}</td><td class="p-3 text-right font-black text-orange-500">${u.keys}</td></tr>`;
         }).join('');
-
         document.getElementById('leaderboardModal').style.display = 'flex';
     };
 
-    // --- XỬ LÝ DỮ LIỆU MỚI (QUAN TRỌNG) ---
-    function updateActivityList(dataList) {
-        const listEl = document.getElementById('activity-list');
-        if (dataList.length === 0) {
-            listEl.innerHTML = `<li style="text-align: center; color: #999; padding: 20px; font-weight: 700;">Chưa có hoạt động nào.</li>`;
-        } else {
-            listEl.innerHTML = dataList.map(data => {
-                // Xác định tên bài thi từ type
-                const typeInfo = EXAM_TYPES[data.type] || { name: 'Bài Tập', icon: 'fas fa-pen', color: '#999' };
-                
-                // Lấy điểm số trực tiếp (Code mới đã lưu field 'score')
-                const score = typeof data.score === 'number' ? data.score : parseFloat(data.score || 0);
-                const scoreDisplay = score > 0 ? `<span style="color:${typeInfo.color}; font-weight:800;">${score.toFixed(2)}đ</span>` : '<span style="color:#999">--</span>';
-                
-                const date = data.timestamp ? data.timestamp.toDate() : new Date();
-                
-                return `
-                <li class="activity-item">
-                    <div class="act-icon" style="background: ${typeInfo.color}20; color: ${typeInfo.color}; border-radius: 10px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                        <i class="${typeInfo.icon}"></i>
-                    </div>
-                    <div style="flex-grow: 1;">
-                        <h4 style="font-weight: 800; font-size: 0.9rem; color: #2d3436;">${typeInfo.name}</h4>
-                        <p style="font-size: 0.75rem; color:#999;">${date.toLocaleDateString('vi-VN')}</p>
-                    </div>
-                    <div style="text-align:right;">${scoreDisplay}</div>
-                </li>`;
-            }).join('');
-        }
-    }
-
-    function processChartData(activities) {
-        // Lấy 10 bài gần nhất có điểm số
-        const scoredActs = activities.filter(a => a.score !== undefined && a.score !== null);
-        const last10 = scoredActs.slice(0, 10).reverse(); // Đảo ngược để vẽ từ cũ -> mới
-        
-        const labels = last10.map(a => { 
-            const d = a.timestamp ? a.timestamp.toDate() : new Date(); 
-            return `${d.getDate()}/${d.getMonth()+1}`; 
-        });
-        
-        const data = last10.map(a => parseFloat(a.score));
-
-        // Tính điểm trung bình (Tách NLXH/NLVH là Tự luận, Reading là Trắc nghiệm - Tương đối)
-        let quizSum = 0, quizCount = 0; 
-        let essaySum = 0, essayCount = 0;
-
-        scoredActs.forEach(a => {
-            const s = parseFloat(a.score);
-            if (a.type === 'reading') {
-                quizSum += s; quizCount++;
-            } else {
-                essaySum += s; essayCount++;
-            }
-        });
-
-        return { 
-            labels, 
-            data, 
-            avgReading: quizCount ? (quizSum/quizCount).toFixed(2) : 0, 
-            avgEssay: essayCount ? (essaySum/essayCount).toFixed(2) : 0, 
-            total: activities.length 
-        };
-    }
-
-    function drawMiniChart(activities) {
-        const chartData = processChartData(activities);
-        const ctx = document.getElementById('miniChart').getContext('2d');
-        
-        if (miniChartInstance) miniChartInstance.destroy();
-        
-        miniChartInstance = new Chart(ctx, { 
-            type: 'line', 
-            data: { 
-                labels: chartData.labels, 
-                datasets: [{ 
-                    label: 'Điểm số', 
-                    data: chartData.data, 
-                    borderColor: '#FF8F50', 
-                    backgroundColor: (context) => {
-                        const ctx = context.chart.ctx;
-                        const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-                        gradient.addColorStop(0, 'rgba(255, 143, 80, 0.4)');
-                        gradient.addColorStop(1, 'rgba(255, 143, 80, 0.0)');
-                        return gradient;
-                    },
-                    tension: 0.4, 
-                    fill: true, 
-                    pointRadius: 4,
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: '#FF8F50'
-                }] 
-            }, 
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: { display: false } }, 
-                scales: { 
-                    y: { beginAtZero: true, max: 10, ticks: { display: false }, grid: { display: false } }, 
-                    x: { display: false } 
-                } 
-            } 
-        });
-    }
-
-    // --- MODAL LOGIC ---
     window.openActivityModal = () => {
-        const bodyEl = document.getElementById('full-activity-body');
         document.getElementById('modal-count-val').textContent = allActivities.length;
-        
-        bodyEl.innerHTML = allActivities.map(data => {
-            const typeInfo = EXAM_TYPES[data.type] || { name: 'Bài Tập', color: '#999' };
-            const d = data.timestamp ? data.timestamp.toDate() : new Date();
-            const score = typeof data.score === 'number' ? data.score : parseFloat(data.score || 0);
-            
-            return `
-            <tr style="background: #fafafa; border-radius: 15px;">
-                <td style="padding: 15px 10px; font-weight: 800; border-radius: 15px 0 0 15px; color: ${typeInfo.color}">
-                    ${typeInfo.name}
-                </td>
-                <td style="font-weight: 600; color: #636e72; font-size: 0.85rem;">
-                    ${d.toLocaleDateString('vi-VN')} ${d.toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})}
-                </td>
-                <td style="text-align: right; padding-right: 15px; border-radius: 0 15px 15px 0; font-weight: 900; color: var(--text-main);">
-                    ${score.toFixed(2)}
-                </td>
-            </tr>`;
+        const body = document.getElementById('full-activity-body');
+        body.innerHTML = allActivities.map(a => {
+            const type = EXAM_TYPES[a.type] || { name: 'Bài Tập', color: '#999' };
+            const date = a.timestamp ? a.timestamp.toDate().toLocaleString('vi-VN') : '--';
+            return `<tr class="border-b border-gray-50"><td class="p-4 font-bold" style="color:${type.color}">${type.name}</td><td class="p-4 text-xs text-gray-500">${date}</td><td class="p-4 text-right font-black">${a.score?.toFixed(2)}đ</td></tr>`;
         }).join('');
-        
         document.getElementById('activityFullModal').style.display = "flex";
     };
 
     window.openStatsModal = () => {
-        const chartData = processChartData(allActivities);
-        
-        // Cập nhật lại các ID trong HTML Modal cho khớp với logic mới
-        document.getElementById('avg-quiz-score').textContent = chartData.avgReading; // Tái sử dụng ô trắc nghiệm cho Đọc hiểu
-        document.querySelector('#avg-quiz-score + .ms-label').textContent = "TB Đọc Hiểu"; // Sửa nhãn
-        
-        document.getElementById('avg-essay-score').textContent = chartData.avgEssay;
-        document.getElementById('total-tests-count').textContent = chartData.total;
-        
+        const data = processChartData(allActivities);
+        document.getElementById('avg-quiz-score').textContent = data.avgReading;
+        document.getElementById('avg-essay-score').textContent = data.avgEssay;
+        document.getElementById('total-tests-count').textContent = data.total;
         document.getElementById('statsFullModal').style.display = "flex";
         
-        const ctx = document.getElementById('largeChart').getContext('2d');
-        if (largeChartInstance) largeChartInstance.destroy();
-        
-        largeChartInstance = new Chart(ctx, { 
-            type: 'line', 
-            data: { 
-                labels: chartData.labels, 
-                datasets: [{ 
-                    label: 'Tiến độ điểm số', 
-                    data: chartData.data, 
-                    borderColor: '#FF5E62', 
-                    backgroundColor: 'rgba(255, 94, 98, 0.1)', 
-                    borderWidth: 3, 
-                    tension: 0.3, 
-                    fill: true, 
-                    pointBackgroundColor: '#fff', 
-                    pointBorderColor: '#FF5E62', 
-                    pointRadius: 6,
-                    pointHoverRadius: 8
-                }] 
-            }, 
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: { display: false } }, 
-                scales: { 
-                    y: { beginAtZero: true, max: 10, grid: { color: '#f0f0f0' } }, 
-                    x: { grid: { display: false } } 
-                } 
-            } 
-        });
+        setTimeout(() => {
+            const ctx = document.getElementById('largeChart').getContext('2d');
+            if (largeChartInstance) largeChartInstance.destroy();
+            largeChartInstance = new Chart(ctx, { type: 'line', data: { labels: data.labels, datasets: [{ label: 'Điểm số', data: data.data, borderColor: '#FF5E62', backgroundColor: 'rgba(255, 94, 98, 0.1)', fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false } });
+        }, 300);
     };
 
+    // --- 7. CHART JS HELPERS ---
+    function processChartData(activities) {
+        const scoredActs = activities.filter(a => a.score !== undefined).slice(0, 10).reverse();
+        const labels = scoredActs.map(a => `${a.timestamp?.toDate().getDate()}/${a.timestamp?.toDate().getMonth() + 1}`);
+        const data = scoredActs.map(a => a.score);
+        
+        let rSum = 0, rCount = 0, eSum = 0, eCount = 0;
+        activities.forEach(a => {
+            if(a.type === 'reading') { rSum += a.score; rCount++; }
+            else { eSum += a.score; eCount++; }
+        });
+
+        return { 
+            labels, data, 
+            avgReading: rCount ? (rSum/rCount).toFixed(1) : "0.0", 
+            avgEssay: eCount ? (eSum/eCount).toFixed(1) : "0.0", 
+            total: activities.length 
+        };
+    }
+
+    function drawCharts(activities) {
+        const chartData = processChartData(activities);
+        const ctx = document.getElementById('miniChart').getContext('2d');
+        if (miniChartInstance) miniChartInstance.destroy();
+        miniChartInstance = new Chart(ctx, { type: 'line', data: { labels: chartData.labels, datasets: [{ data: chartData.data, borderColor: '#FF8F50', tension: 0.4, fill: true, backgroundColor: 'rgba(255, 143, 80, 0.1)', pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { display: false } } } });
+    }
+
+    // Modal close helpers
     window.closeActivityModal = () => document.getElementById('activityFullModal').style.display = "none";
     window.closeStatsModal = () => document.getElementById('statsFullModal').style.display = "none";
+    window.toggleSidebar = () => { const sb = document.querySelector('aside') || document.getElementById('main-sidebar'); const ov = document.getElementById('sidebar-overlay'); sb.classList.toggle('open'); ov.classList.toggle('active'); };
 
     import { initMenu } from "./menu.js";
     initMenu(app);
-
 </script>
 </body>
 </html>
