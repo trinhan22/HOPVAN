@@ -625,10 +625,29 @@
             const name = user.displayName || user.email.split('@')[0];
             document.getElementById('welcome-name').textContent = `Xin chào, ${name}`;
             document.getElementById('avatar-initial').textContent = name.charAt(0).toUpperCase();
-            updateUserStreak(user);
+            
+            // Tải dữ liệu Streak, Keys và kiểm tra Profile đồng thời
+            await updateUserStreak(user); 
             setupRealtimeStats(user);
             setupLeaderboard(user);
-        } else { window.location.href = "../log.html"; }
+
+            // --- KIỂM TRA VÀ HIỆN POPUP NGAY LẬP TỨC ---
+            const userSnap = await getDoc(doc(db, "users", user.uid));
+            if (userSnap.exists()) {
+                const userData = userSnap.data();
+                // Nếu thiếu trường hoặc lớp và chưa bấm "Để sau" trong phiên này
+                if (!userData.school || !userData.grade) {
+                    if (!sessionStorage.getItem('skipped_profile_update')) {
+                        const modal = document.getElementById('profileUpdateModal');
+                        modal.style.display = 'flex'; // Ép hiển thị flex trước
+                        // Thêm một chút delay cực nhỏ (10ms) để trình duyệt kịp render transition
+                        setTimeout(() => modal.classList.add('show'), 10);
+                    }
+                }
+            }
+        } else { 
+            window.location.href = "../log.html"; 
+        }
     });
 
     window.closeProfileModal = () => {
