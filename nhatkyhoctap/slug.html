@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HopVan - Bài Học</title>
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --text-main: #1e293b;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #FFF5EC; 
+            min-height: 100vh; 
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* --- BACKGROUND --- */
+        .bg-blob { position: fixed; filter: blur(80px); z-index: -1; opacity: 0.6; animation: float 25s infinite alternate ease-in-out; }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #ffe4d3; }
+        .blob-2 { bottom: 5%; right: -5%; width: 400px; height: 400px; background: #ffdec2; animation-delay: -5s; }
+        @keyframes float { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(40px, 40px) rotate(15deg); } }
+
+        /* --- LAYOUT --- */
+        .main-container { max-width: 850px; margin: 0 auto; padding: 20px; position: relative; min-height: 100vh; }
+
+        /* --- HEADER GLASS --- */
+        .glass-header {
+            position: sticky; top: 10px; z-index: 50;
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border-radius: 999px; padding: 10px 20px; margin-bottom: 30px;
+            display: flex; justify-content: space-between; items-items: center;
+        }
+
+        /* --- CONTENT BOXES --- */
+        .liquid-glass {
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 10px 40px -10px rgba(255, 130, 60, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px); border-radius: 24px; 
+            margin-bottom: 24px; transition: transform 0.3s;
+        }
+
+        /* --- TYPOGRAPHY FOR CONTENT --- */
+        .passage-content {
+            font-family: 'Merriweather', serif; font-size: 1.05rem; line-height: 1.8; color: #334155; text-align: justify;
+        }
+        .passage-content p { margin-bottom: 1rem; }
+        .passage-content blockquote { border-left: 4px solid var(--primary); padding: 10px 15px; background: #fff7ed; font-style: italic; margin: 15px 0; border-radius: 0 8px 8px 0; }
+
+        /* --- QUIZ STYLES --- */
+        .option-box {
+            display: flex; align-items: center; gap: 12px; padding: 16px;
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 16px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .option-box:hover { border-color: var(--primary); background: #fff7ed; transform: translateY(-2px); }
+        .option-box:has(input:checked) { background: #fff7ed; border-color: var(--primary); border-width: 2px; }
+        .option-radio { appearance: none; width: 20px; height: 20px; border: 2px solid #cbd5e1; border-radius: 50%; display: grid; place-content: center; flex-shrink: 0; }
+        .option-radio::before { content: ""; width: 10px; height: 10px; border-radius: 50%; transform: scale(0); transition: 0.2s; background: var(--primary); }
+        .option-radio:checked::before { transform: scale(1); }
+        .option-radio:checked { border-color: var(--primary); }
+
+        /* Result Colors */
+        .option-box.correct { background: #d1fae5 !important; border-color: #10b981 !important; color: #065f46; }
+        .option-box.wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #991b1b; }
+
+        /* --- WRITING STYLES --- */
+        .glass-textarea {
+            width: 100%; min-height: 400px; padding: 20px;
+            border-radius: 20px; border: 1px solid #cbd5e1;
+            background: #fff; font-size: 1rem; line-height: 1.7;
+            resize: none; outline: none; transition: 0.3s;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .glass-textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255, 143, 80, 0.15); }
+
+        /* --- AI RESULT BOX --- */
+        #result-box { display: none; animation: slideUp 0.5s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .score-ring {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: conic-gradient(var(--primary) 0%, #eee 0%);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1); margin: 0 auto;
+        }
+        .score-inner { width: 80px; height: 80px; background: white; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        #ai-correction { font-family: 'Merriweather', serif; line-height: 1.8; text-align: justify; }
+        .text-good { background: #dcfce7; color: #166534; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .text-bad { background: #fee2e2; color: #991b1b; text-decoration: line-through; padding: 2px 6px; border-radius: 4px; }
+        .text-fix { color: #2563eb; font-weight: bold; margin-left: 5px; background: #eff6ff; padding: 2px 6px; border-radius: 4px; }
+
+        /* --- LOADING & MODALS --- */
+        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .loader-robot { font-size: 4rem; animation: bounce 1s infinite alternate; }
+        @keyframes bounce { to { transform: translateY(-20px); } }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 10000; display: none; justify-content: center; align-items: center; }
+        .modal-overlay.open { display: flex; }
+        .modal-box { background: white; width: 90%; max-width: 400px; padding: 30px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.25); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* Fullscreen Popup Style */
+        .fs-modal-box { 
+            background: white; padding: 40px 30px; border-radius: 30px; width: 90%; max-width: 420px; 
+            text-align: center; border: 2px solid rgba(255, 143, 80, 0.2);
+            box-shadow: 0 0 50px rgba(255, 143, 80, 0.2);
+        }
+        .btn-neon {
+            width: 100%; padding: 14px; border-radius: 16px; 
+            background: var(--primary-gradient); color: white; font-weight: 800; 
+            box-shadow: 0 8px 20px rgba(255, 94, 98, 0.3); transition: 0.3s;
+        }
+        .btn-neon:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(255, 94, 98, 0.4); }
+
+        /* Utility */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loader-robot">🤖</div>
+        <p class="mt-4 font-bold text-gray-500 animate-pulse text-lg" id="loading-text">Đang tải dữ liệu...</p>
+    </div>
+
+    <div id="fullscreen-popup" class="modal-overlay">
+        <div class="fs-modal-box">
+            <div class="text-5xl mb-4 text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">
+                <i class="fas fa-expand-arrows-alt"></i>
+            </div>
+            <h3 class="text-2xl font-black text-gray-800 mb-2">Chế độ Tập trung</h3>
+            <p class="text-gray-500 mb-8 px-2">Hệ thống sẽ chuyển sang chế độ <b>Toàn màn hình</b> để bạn làm bài tốt nhất.</p>
+            <button onclick="enableFullscreen()" class="btn-neon">Bắt đầu ngay</button>
+        </div>
+    </div>
+
+    <div id="alert-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div id="alert-icon" class="text-4xl mb-4">⚠️</div>
+            <h3 id="alert-title" class="text-xl font-bold text-gray-800 mb-2">Thông báo</h3>
+            <p id="alert-msg" class="text-gray-500 text-sm mb-6">Nội dung...</p>
+            <div id="alert-actions" class="flex gap-3 justify-center"></div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="glass-header">
+            <a href="nhatkyhoctap.html" class="flex items-center gap-2 text-gray-600 hover:text-orange-500 font-bold transition">
+                <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow text-orange-500"><i class="fas fa-arrow-left"></i></div>
+                <span class="hidden sm:inline">Quay lại</span>
+            </a>
+            
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden sm:block">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Thời gian</p>
+                    <p class="text-base font-black text-gray-800 tabular-nums" id="timer-text">00:00</p>
+                </div>
+                <div class="relative w-10 h-10 flex items-center justify-center">
+                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                        <path class="text-gray-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" />
+                        <path id="timer-circle" class="text-orange-500 transition-all duration-1000 ease-linear" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div id="dynamic-content">
+            </div>
+
+        <div id="result-box" class="liquid-glass p-8 bg-white/95 border-2 border-white mt-10">
+            <div class="flex flex-col md:flex-row items-center mb-8 border-b border-gray-100 pb-8">
+                <div class="score-ring" id="score-ring">
+                    <div class="score-inner">
+                        <span class="text-3xl font-black text-gray-800" id="score-text">0</span>
+                        <span class="text-[10px] font-bold text-gray-400 uppercase">Điểm</span>
+                    </div>
+                </div>
+                <div class="text-center md:text-left mt-4 md:mt-0 md:ml-6 flex-1">
+                    <h3 class="text-2xl font-black text-gray-800 mb-1" id="result-title">Kết quả</h3>
+                    <p class="text-gray-500 text-sm italic" id="result-desc">Đang xử lý...</p>
+                </div>
+            </div>
+
+            <div id="feedback-detail" class="space-y-6"></div>
+
+            <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="window.location.href='nhatkyhoctap.html'" class="hidden w-full sm:w-auto bg-green-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-600 transition shadow-lg shadow-green-200" id="btn-finish">Hoàn Thành & Quay Về</button>
+                <button onclick="location.reload()" class="hidden w-full sm:w-auto bg-gray-100 text-gray-600 px-8 py-3 rounded-xl font-bold hover:bg-gray-200 transition" id="btn-retry">Làm Lại</button>
+            </div>
+        </div>
+
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, addDoc, collection, serverTimestamp, query, where, getDocs, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- CONFIG ---
+    const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    
+    // API Proxy để gọi AI (tránh lộ key)
+    const API_URL = `/.netlify/functions/gemini-proxy`;
+
+    // State
+    let userUid = null;
+    let currentData = null; // Dữ liệu bài học từ DB
+    let currentType = '';   // 'quiz', 'reading', 'nlxh', 'nlvh'
+    let timerInterval = null;
+
+    // --- 1. AUTH & ROUTER ---
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            userUid = user.uid;
+            // Hiện popup fullscreen khi đã login xong
+            setTimeout(() => document.getElementById('fullscreen-popup').classList.add('open'), 500);
+            
+            // Lấy slug từ URL (?id=xxx)
+            const urlParams = new URLSearchParams(window.location.search);
+            const slug = urlParams.get('id');
+            
+            if (slug) {
+                await loadContent(slug);
+            } else {
+                showPopup('error', 'Lỗi đường dẫn', 'Không tìm thấy bài học.', () => window.location.href = 'nhatkyhoctap.html');
+            }
+        } else {
+            window.location.href = "../log.html";
+        }
+    });
+
+    // --- 2. LOAD CONTENT FROM FIREBASE ---
+    async function loadContent(slug) {
+        showLoading(true, "Đang tải bài học...");
+        try {
+            // Giả sử bạn lưu bài học trong collection 'study_levels' hoặc 'lessons'
+            // Tìm doc có field slug == slug
+            const q = query(collection(db, "study_levels"), where("slug", "==", slug));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                showPopup('error', 'Không tìm thấy', 'Bài học này chưa được cập nhật.');
+                showLoading(false);
+                return;
+            }
+
+            // Lấy dữ liệu
+            const docData = querySnapshot.docs[0].data();
+            currentData = docData.content; 
+            currentType = docData.type; // Quan trọng: type xác định giao diện (quiz/reading/nlxh/nlvh)
+
+            renderInterface(currentType, currentData);
+            startTimer(currentData.duration || 45); // Mặc định 45p nếu ko có setting
+
+        } catch (error) {
+            console.error(error);
+            showPopup('error', 'Lỗi hệ thống', 'Không thể tải dữ liệu.');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // --- 3. RENDER INTERFACE (SWITCHER) ---
+    function renderInterface(type, data) {
+        const container = document.getElementById('dynamic-content');
+        container.innerHTML = ''; // Clear old
+
+        // Common Title
+        const headerHTML = `
+            <div class="liquid-glass p-8 mb-8 relative overflow-hidden bg-gradient-to-br from-white/90 to-white/50">
+                <div class="relative z-10">
+                    <span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-widest">${type.toUpperCase()}</span>
+                    <h1 class="text-3xl font-black text-gray-800 mt-3 mb-2">${data.title || 'Bài tập'}</h1>
+                    <p class="text-gray-500 font-medium text-sm">${data.desc || 'Hoàn thành bài tập để nhận điểm.'}</p>
+                </div>
+                <i class="fas fa-feather-alt absolute -right-6 -bottom-8 text-9xl text-orange-500/10 rotate-12"></i>
+            </div>
+        `;
+        container.innerHTML += headerHTML;
+
+        // Render Body based on Type
+        if (type === 'tracnghiem' || type === 'quiz') {
+            renderQuiz(container, data);
+        } else if (type === 'reading' || type === 'doc_hieu') {
+            renderReading(container, data);
+        } else if (type === 'nlxh' || type === 'nlvh') {
+            renderEssay(container, data);
+        } else {
+            container.innerHTML += `<p class="text-center text-red-500">Loại bài học không hỗ trợ: ${type}</p>`;
+        }
+
+        // Submit Button
+        const btnHTML = `
+            <div class="mt-10 text-center" id="submit-wrapper">
+                <button onclick="window.handleSubmit()" class="group relative inline-flex items-center justify-center px-12 py-4 font-black text-white transition-all duration-300 bg-gray-900 rounded-2xl hover:shadow-xl hover:shadow-orange-500/20 hover:-translate-y-1 active:scale-95 overflow-hidden">
+                    <span class="relative z-10 flex items-center gap-2">NỘP BÀI <i class="fas fa-paper-plane"></i></span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </button>
+            </div>
+        `;
+        container.innerHTML += btnHTML;
+    }
+
+    // --- RENDERERS ---
+    
+    // A. Trắc Nghiệm
+    function renderQuiz(container, data) {
+        const form = document.createElement('div');
+        form.className = "space-y-6";
+        data.questions.forEach((q, i) => {
+            const div = document.createElement('div');
+            div.className = "liquid-glass p-6 bg-white border border-gray-100";
+            div.innerHTML = `
+                <div class="flex items-start gap-3 mb-4">
+                    <span class="bg-orange-100 text-orange-600 px-2 py-1 rounded text-xs font-bold whitespace-nowrap">Câu ${i+1}</span>
+                    <h3 class="font-bold text-gray-800 text-lg">${q.question}</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    ${q.options.map((opt, idx) => `
+                        <label class="option-box" id="q${i}-opt${idx}">
+                            <input type="radio" name="q${i}" value="${idx}" class="option-radio">
+                            <span class="text-sm font-medium text-gray-600">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+            form.appendChild(div);
+        });
+        container.appendChild(form);
+    }
+
+    // B. Đọc Hiểu (Nhiều câu tự luận nhỏ)
+    function renderReading(container, data) {
+        // Ngữ liệu
+        if (data.text) {
+            container.innerHTML += `
+                <div class="liquid-glass p-8 bg-white border border-orange-100">
+                    <div class="flex items-center gap-2 mb-4"><i class="fas fa-quote-left text-orange-400"></i><span class="text-xs font-bold text-orange-400 uppercase">Văn bản</span></div>
+                    <div class="passage-content">${data.text}</div>
+                </div>
+            `;
+        }
+        
+        // Câu hỏi
+        const form = document.createElement('div');
+        form.className = "space-y-6";
+        data.questions.forEach((q, i) => {
+            form.innerHTML += `
+                <div class="liquid-glass p-6 bg-white">
+                    <label class="block font-bold text-gray-800 mb-2">Câu ${i+1}: ${q.q}</label>
+                    <textarea id="ans-${i}" class="glass-textarea" style="min-height: 150px;" placeholder="Trả lời..."></textarea>
+                </div>
+            `;
+        });
+        container.appendChild(form);
+    }
+
+    // C. Nghị Luận (1 bài văn lớn)
+    function renderEssay(container, data) {
+        // Đề bài & Ngữ liệu
+        let contentHTML = `<div class="liquid-glass p-8 bg-white border border-orange-100">`;
+        
+        if (data.topic) contentHTML += `<div class="mb-4"><span class="text-xs font-bold text-gray-400 uppercase">Đề bài</span><div class="font-bold text-lg text-gray-800 mt-1 text-justify">${data.topic}</div></div>`;
+        
+        if (data.text) {
+            contentHTML += `
+                <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 mb-6">
+                    <div class="passage-content text-sm">${data.text}</div>
+                </div>
+            `;
+        }
+
+        contentHTML += `
+            <div class="relative">
+                <textarea id="student-essay" class="glass-textarea" placeholder="Viết bài làm của bạn tại đây..."></textarea>
+                <div class="absolute bottom-4 right-6 text-xs font-bold text-gray-400 bg-white/90 px-3 py-1 rounded-full border border-gray-200">
+                    <span id="word-count" class="text-orange-500">0</span> từ
+                </div>
+            </div>
+        </div>`;
+        
+        container.innerHTML += contentHTML;
+
+        // Word count listener
+        setTimeout(() => {
+            const area = document.getElementById('student-essay');
+            if(area) area.oninput = function() {
+                const w = this.value.trim().split(/\s+/).filter(x=>x).length;
+                document.getElementById('word-count').innerText = w;
+            };
+        }, 500);
+    }
+
+
+    // --- 4. SUBMISSION LOGIC ---
+    window.handleSubmit = () => {
+        showPopup('warning', 'Nộp bài?', 'Bạn có chắc chắn muốn nộp bài không?', processSubmission);
+    };
+
+    async function processSubmission() {
+        showLoading(true, "AI đang chấm bài...");
+        
+        // A. Xử lý Trắc nghiệm (Chấm tại chỗ)
+        if (currentType === 'tracnghiem' || currentType === 'quiz') {
+            let correct = 0;
+            currentData.questions.forEach((q, i) => {
+                const radios = document.getElementsByName(`q${i}`);
+                let selected = -1;
+                for(let r of radios) { 
+                    if(r.checked) selected = parseInt(r.value);
+                    r.disabled = true; // Lock
+                }
+                
+                // UI Feedback
+                const rightDiv = document.getElementById(`q${i}-opt${q.correct}`);
+                if(rightDiv) rightDiv.classList.add('correct');
+
+                if (selected === q.correct) correct++;
+                else if (selected !== -1) {
+                    const wrongDiv = document.getElementById(`q${i}-opt${selected}`);
+                    if(wrongDiv) wrongDiv.classList.add('wrong');
+                }
+            });
+
+            const score = parseFloat(((correct / currentData.questions.length) * 10).toFixed(1));
+            displayResult(score, { title: "Kết quả trắc nghiệm", desc: `Bạn làm đúng ${correct}/${currentData.questions.length} câu.` });
+            saveToFirebase(score, `Trắc nghiệm: ${score}đ`);
+            showLoading(false);
+        } 
+        
+        // B. Xử lý Tự luận / Đọc hiểu (Gửi AI)
+        else {
+            let inputContent = "";
+            let systemPrompt = "";
+
+            if (currentType === 'reading' || currentType === 'doc_hieu') {
+                // Gom câu trả lời
+                inputContent = currentData.questions.map((q, i) => `Câu ${i+1} (${q.q}): ${document.getElementById(`ans-${i}`).value}`).join('\n');
+                systemPrompt = "Bạn là giáo viên Văn. Chấm điểm bài Đọc Hiểu thang 10. Trả về JSON: {score: number, title: string, desc: string, feedback_html: string (chi tiết từng câu)}";
+            } else {
+                // NLXH / NLVH
+                inputContent = document.getElementById('student-essay').value;
+                systemPrompt = "Bạn là giáo viên Văn. Chấm điểm bài Nghị Luận thang 10. Trả về JSON: {score: number, title: string, desc: string, correction_html: string (bài làm với thẻ <span class='text-bad/text-good/text-fix'> để sửa lỗi), pros: [], cons: []}";
+            }
+
+            if (inputContent.length < 20) {
+                showLoading(false);
+                return showPopup('error', 'Quá ngắn', 'Bài làm quá ngắn để chấm.');
+            }
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        systemPrompt: systemPrompt,
+                        messages: `ĐỀ BÀI: ${currentData.title}\nNỘI DUNG: ${currentData.text || ''}\nBÀI LÀM:\n${inputContent}`
+                    })
+                });
+
+                if (!response.ok) throw new Error("API Error");
+                const resData = await response.json();
+                
+                // Parse JSON từ AI (Cần xử lý kỹ chuỗi markdown)
+                let raw = resData.choices[0].message.content.replace(/```json/g, '').replace(/```/g, '').trim();
+                const jsonStart = raw.indexOf('{'); const jsonEnd = raw.lastIndexOf('}');
+                if (jsonStart !== -1 && jsonEnd !== -1) raw = raw.substring(jsonStart, jsonEnd + 1);
+                
+                const result = JSON.parse(raw);
+                let safeScore = parseFloat(result.score) || 0;
+                if(safeScore > 10) safeScore = 10;
+
+                // Hiển thị
+                displayResult(safeScore, result);
+                saveToFirebase(safeScore, `${currentType.toUpperCase()}: ${safeScore}đ`);
+
+            } catch (e) {
+                console.error(e);
+                showPopup('error', 'Lỗi chấm bài', 'Hệ thống AI đang bận. Vui lòng thử lại.');
+            } finally {
+                showLoading(false);
+            }
+        }
+    }
+
+    // --- 5. HIỂN THỊ KẾT QUẢ ---
+    function displayResult(score, data) {
+        document.getElementById('submit-wrapper').style.display = 'none';
+        document.getElementById('result-box').style.display = 'block';
+        document.getElementById('result-box').scrollIntoView({behavior:'smooth'});
+
+        // Animation điểm
+        document.getElementById('score-text').innerText = score;
+        const ring = document.querySelector('.score-ring');
+        const color = score >= 5 ? '#10b981' : '#ef4444';
+        ring.style.background = `conic-gradient(${color} ${score*10}%, #eee 0%)`;
+
+        document.getElementById('result-title').innerText = data.title || (score >= 5 ? "Đạt Yêu Cầu" : "Cần Cố Gắng");
+        document.getElementById('result-desc').innerText = data.desc || "";
+
+        // Nội dung chi tiết (xử lý khác nhau tùy loại)
+        const detailDiv = document.getElementById('feedback-detail');
+        if (data.correction_html) {
+            detailDiv.innerHTML = `<div id="ai-correction" class="bg-gray-50 p-6 rounded-xl border border-gray-200">${data.correction_html}</div>`;
+            if(data.pros) detailDiv.innerHTML += `<div class="grid grid-cols-2 gap-4 mt-4"><div class="bg-green-50 p-4 rounded text-sm text-green-800"><b>Ưu điểm:</b><ul>${data.pros.map(x=>`<li>- ${x}</li>`).join('')}</ul></div><div class="bg-red-50 p-4 rounded text-sm text-red-800"><b>Hạn chế:</b><ul>${data.cons.map(x=>`<li>- ${x}</li>`).join('')}</ul></div></div>`;
+        } else if (data.feedback_html) {
+            detailDiv.innerHTML = data.feedback_html;
+        }
+
+        // Nút bấm
+        if (score >= 5) document.getElementById('btn-finish').classList.remove('hidden');
+        else document.getElementById('btn-retry').classList.remove('hidden');
+    }
+
+    // --- 6. FIREBASE SAVE ---
+    async function saveToFirebase(score, actionText) {
+        if (!userUid) return;
+        try {
+            // 1. Lưu lịch sử làm bài vào 'activities'
+            await addDoc(collection(db, "activities"), {
+                uid: userUid,
+                userName: auth.currentUser.displayName || "User",
+                examTitle: currentData.title || "Bài tập",
+                action: actionText,
+                score: score,
+                type: currentType,
+                timestamp: serverTimestamp()
+            });
+
+            // 2. XỬ LÝ PHẦN THƯỞNG & TIẾN ĐỘ
+            // Giả sử điểm >= 5.0 là Đạt (Pass)
+            if (score >= 5.0) {
+                // A. Cộng 10 Keys vào tài khoản User
+                const userRef = doc(db, "users", userUid);
+                await updateDoc(userRef, {
+                    keys: increment(10) // Tăng 10 keys
+                });
+
+                // B. Hiển thị thông báo nhỏ (Optional)
+                console.log("Đã cộng 10 keys thưởng!");
+
+                // C. Cập nhật Level/Mở khoá bài tiếp theo (Logic cũ của bạn)
+                // Ví dụ: Nếu bài này là bài chốt của Level, mở khoá Level tiếp theo
+                if (currentData.level) { // Nếu bài học có gắn Level
+                     const nextLevel = parseInt(currentData.level) + 1;
+                     const progressRef = doc(db, "users_progress", userUid);
+                     // Logic này tuỳ thuộc vào cách bạn lưu tiến độ, ví dụ cập nhật bài đã xong
+                     // await updateDoc(progressRef, { ... });
+                }
+            }
+
+        } catch (e) { 
+            console.error("Lỗi khi lưu/cộng điểm:", e); 
+        }
+    }
+
+    // --- UTILS ---
+    function startTimer(minutes) {
+        let seconds = minutes * 60;
+        const text = document.getElementById('timer-text');
+        const circle = document.getElementById('timer-circle');
+        
+        timerInterval = setInterval(() => {
+            seconds--;
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            text.innerText = `${m}:${s<10?'0'+s:s}`;
+            
+            const pct = (seconds / (minutes*60)) * 100;
+            circle.setAttribute('stroke-dasharray', `${pct}, 100`);
+
+            if (seconds <= 0) {
+                clearInterval(timerInterval);
+                showPopup('warning', 'Hết giờ', 'Hệ thống đang tự động nộp bài...', processSubmission);
+            }
+        }, 1000);
+    }
+
+    function showLoading(show, text="Đang tải...") {
+        document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
+        document.getElementById('loading-text').innerText = text;
+    }
+
+    // Fullscreen
+    window.enableFullscreen = () => {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) elem.requestFullscreen();
+        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+        document.getElementById('fullscreen-popup').classList.remove('open');
+        setTimeout(()=> document.getElementById('fullscreen-popup').style.display = 'none', 300);
+    };
+
+    // Load Menu Sidebar
+    import { initMenu } from "./menu.js";
+    initMenu(app);
+
+</script>
+</body>
+</html>

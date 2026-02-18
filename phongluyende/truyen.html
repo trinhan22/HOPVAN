@@ -662,6 +662,29 @@
             // console.log("Đã thoát chế độ toàn màn hình");
         }
     });
+
+// --- CHỐNG COPY PASTE (ANTI CHEAT) ---
+    const essayArea = document.getElementById('student-essay');
+
+    if (essayArea) {
+        // 1. Chặn hành động Dán (Paste)
+        essayArea.addEventListener('paste', (e) => {
+            e.preventDefault(); // Ngăn chặn hành động dán
+            showPopup("Chế độ Luyện Tập", "Vui lòng tự gõ bài để rèn luyện tư duy.\nHệ thống không cho phép Copy-Paste.", "warning");
+        });
+
+        // 2. Chặn hành động Sao chép & Cắt (Copy & Cut) - Để tránh copy đề hoặc bài ra ngoài
+        essayArea.addEventListener('copy', (e) => e.preventDefault());
+        essayArea.addEventListener('cut', (e) => e.preventDefault());
+
+        // 3. Chặn Kéo thả text vào ô (Drop)
+        essayArea.addEventListener('drop', (e) => e.preventDefault());
+
+        // 4. (Tuỳ chọn) Chặn Menu chuột phải trong ô nhập liệu
+        essayArea.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+    }
 </script>
 </body>
 </html>

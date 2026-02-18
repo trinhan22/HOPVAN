@@ -433,6 +433,23 @@
     font-weight: 600;
 }
 
+/* --- STYLE CHO BẢNG (TABLE LIKE WORD) --- */
+        .ql-editor table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+            font-size: 0.95rem;
+        }
+        .ql-editor table td {
+            border: 1px solid #cbd5e1; /* Viền xám nhạt */
+            padding: 10px 15px;
+            position: relative;
+        }
+        /* Hiệu ứng khi đang chọn ô trong bảng */
+        .ql-editor table td[data-row] {
+            cursor: text;
+        }
+
 /* --- GÁN ICON CHO TOOLBAR (Quan trọng để ko bị trắng nút) --- */
 .ql-art-quote::before { content: "\f10e"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: #444; }
 .ql-highlight::before { content: "\f591"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: #444; }
@@ -1043,6 +1060,18 @@
         ['clean']
     ];
 
+// --- THÊM ĐOẠN NÀY VÀO NHÉ (TOOLBAR CÓ BẢNG) ---
+    const NEWS_TOOLBAR = [
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'header': [2, 3, false] }],
+        ['blockquote', 'art-quote'],
+        ['highlight'],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'align': [] }],
+        ['table'], // <--- QUAN TRỌNG: Nút tạo bảng ở đây
+        ['clean']
+    ];
+
     // --- ĐĂNG KÝ CÁC ĐỊNH DẠNG TÙY CHỈNH CHO QUILL ---
     const Inline = Quill.import('blots/inline');
     class HighlightBlot extends Inline {}
@@ -1059,20 +1088,36 @@
     Quill.register(ArtQuoteBlot);
 
     // --- HÀM TẠO EDITOR (DÙNG CHUNG CHO MỌI CHỖ) ---
-    const createQ = (sel, content) => {
+    // --- HÀM TẠO EDITOR (CẬP NHẬT: HỖ TRỢ TABLE) ---
+    const createQ = (sel, content, isNewsMode = false) => {
         const el = document.querySelector(sel);
-        if (!el) {
-            console.error(`Không tìm thấy selector: ${sel}`); // Log lỗi nếu không thấy thẻ div
-            return null;
-        }
-        // Xóa editor cũ nếu đã có (tránh bị double toolbar)
+        if (!el) return null;
         el.innerHTML = ''; 
         
+        // Cấu hình module
+        const modules = {
+            toolbar: isNewsMode ? NEWS_TOOLBAR : FULL_TOOLBAR,
+            table: isNewsMode // Bật module table nếu là News
+        };
+
         const q = new Quill(sel, { 
             theme: 'snow', 
-            modules: { toolbar: FULL_TOOLBAR },
+            modules: modules,
             placeholder: ''
         });
+
+        // XỬ LÝ NÚT TABLE CHO BẢN TIN
+        if (isNewsMode) {
+            const toolbar = q.getModule('toolbar');
+            toolbar.addHandler('table', function() {
+                // Mặc định chèn bảng 3 dòng 2 cột
+                this.quill.getModule('table').insertTable(3, 2);
+            });
+            
+            // Thay icon mặc định xấu xí bằng icon đẹp
+            const tableBtn = document.querySelector(`${sel} .ql-table`);
+            if(tableBtn) tableBtn.innerHTML = '<i class="fas fa-table" title="Chèn bảng (3x2)"></i>';
+        }
         
         if (content) {
             q.clipboard.dangerouslyPasteHTML(content);
@@ -1167,8 +1212,8 @@ const CAT_MAP = {
 
         // Khởi tạo cho Mở bài & Kết bài
         newsEditors = { 
-            intro: createQ('#editor-intro', data.intro),
-            ending: createQ('#editor-ending', data.ending)
+            intro: createQ('#editor-intro', data.intro, true), // Thêm true
+            ending: createQ('#editor-ending', data.ending, true) // Thêm true
         };
         newsEditors.intro.clipboard.dangerouslyPasteHTML(data.intro || "");
         newsEditors.ending.clipboard.dangerouslyPasteHTML(data.ending || "");
@@ -1417,7 +1462,7 @@ const CAT_MAP = {
         }
         
         // ============================================================
-        // CASE 2: FULL ĐỀ THI (FULLTEST) - CÓ SỬ DỤNG [NEXT]
+        // CASE 2: FULL ĐỀ THI (FULLTEST) - ĐÃ THÊM AI HINT
         // ============================================================
         else if (colName === 'fulltest_bank') {
             html = `
@@ -1441,8 +1486,12 @@ const CAT_MAP = {
                         <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden"><div id="edit-ft-nlvh" style="height: 150px;"></div></div>
                     </div>
                 </div>
+                <div class="bg-green-50/50 p-4 rounded-2xl border border-green-100">
+                    <label class="label-custom text-green-600"><i class="fas fa-robot"></i> GỢI Ý CHẤM (AI PROMPT)</label>
+                    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden mt-2"><div id="edit-ex-hint" style="height: 120px;"></div></div>
+                </div>
             </div>`;
-        } 
+        }
         
         // ============================================================
         // CASE 3: TRẮC NGHIỆM (QUIZ)
@@ -1467,7 +1516,7 @@ const CAT_MAP = {
         } 
         
         // ============================================================
-        // CASE 4: ĐỌC HIỂU (READING) - CÓ SỬ DỤNG [NEXT]
+        // CASE 4: ĐỌC HIỂU (READING) - ĐÃ THÊM AI HINT
         // ============================================================
         else if (colName === 'reading_bank') {
             html = `
@@ -1485,8 +1534,12 @@ const CAT_MAP = {
                     <div class="text-[10px] text-gray-400 mb-2"><i class="fas fa-info-circle"></i> Dùng thẻ <b>[NEXT]</b> để tách các câu hỏi.</div>
                     <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden"><div id="edit-ex-qs" style="height: 150px;"></div></div>
                 </div>
+                <div class="bg-green-50/50 p-4 rounded-2xl border border-green-100">
+                    <label class="label-custom text-green-600"><i class="fas fa-robot"></i> GỢI Ý CHẤM (AI PROMPT)</label>
+                    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden mt-2"><div id="edit-ex-hint" style="height: 120px;"></div></div>
+                </div>
             </div>`;
-        } 
+        }
         
         // ============================================================
         // CASE 5: LÀM VĂN (ESSAY - NLXH / NLVH)
@@ -1570,18 +1623,20 @@ const CAT_MAP = {
             }
             else if (colName === 'fulltest_bank') {
                 editors.readText = createQ('#edit-ft-read-text', data.reading_text);
-                // Join mảng câu hỏi thành chuỗi với [NEXT] để hiển thị
                 editors.readQs = createQ('#edit-ft-read-qs', (data.reading_questions||[]).join('<p>[NEXT]</p>'));
                 editors.nlxh = createQ('#edit-ft-nlxh', data.nlxh_topic);
                 editors.nlvh = createQ('#edit-ft-nlvh', data.nlvh_topic);
+                // THÊM DÒNG NÀY:
+                editors.hint = createQ('#edit-ex-hint', data.hint); 
             } 
             else if (colName === 'quiz_bank') {
                 editors.q = createQ('#edit-ex-q', data.question);
             } 
             else if (colName === 'reading_bank') {
                 editors.text = createQ('#edit-ex-text', data.text);
-                // Join mảng câu hỏi object {q: ...} thành chuỗi với [NEXT]
                 editors.qs = createQ('#edit-ex-qs', (data.questions||[]).map(x=>x.q).join('<p>[NEXT]</p>'));
+                // THÊM DÒNG NÀY:
+                editors.hint = createQ('#edit-ex-hint', data.hint);
             } 
             else { // essay_bank
                 editors.topic = createQ('#edit-ex-topic', data.topic);
@@ -1643,14 +1698,7 @@ const CAT_MAP = {
         document.getElementById('sections-list').appendChild(div);
 
         // Khởi tạo Editor
-        const q = new Quill(`#ed-${sId}`, { 
-            theme: 'snow', 
-            modules: { toolbar: FULL_TOOLBAR }
-        });
-        
-        if (sData && sData.p) {
-            q.clipboard.dangerouslyPasteHTML(sData.p);
-        }
+        const q = createQ(`#ed-${sId}`, (sData && sData.p ? sData.p : ""), true); // Thêm true
         
         newsEditors[sId] = q;
     };
@@ -1727,7 +1775,6 @@ const CAT_MAP = {
     };
 
     // 5. SAVE DATA
-    // 5. SAVE DATA (LOGIC MỚI CHO BẢN TIN VĂN HỌC)
     window.saveExamData = async () => {
         const id = document.getElementById('exam-id').value;
         const colName = document.getElementById('exam-collection').value;
@@ -1786,6 +1833,8 @@ const CAT_MAP = {
                docData.reading_questions = editors.readQs.root.innerHTML.split('[NEXT]').map(q => q.replace(/<[^>]*>/g, '').trim()).filter(x => x);
                docData.nlxh_topic = editors.nlxh.root.innerHTML;
                docData.nlvh_topic = editors.nlvh.root.innerHTML;
+               // THÊM LƯU HINT
+               docData.hint = editors.hint.root.innerHTML;
             } else if (colName === 'quiz_bank') {
                docData.question = editors.q.root.innerHTML;
                docData.options = [0,1,2,3].map(i => document.getElementById(`ex-opt-${i}`).value);
@@ -1794,6 +1843,8 @@ const CAT_MAP = {
                docData.title = document.getElementById('ex-title').value;
                docData.text = editors.text.root.innerHTML;
                docData.questions = editors.qs.root.innerHTML.split('[NEXT]').map(q => ({ q: q.replace(/<[^>]*>/g, '').trim() })).filter(x => x.q);
+               // THÊM LƯU HINT
+               docData.hint = editors.hint.root.innerHTML;
             } else {
                docData.type = document.getElementById('ex-type').value;
                docData.topic = editors.topic.root.innerHTML;

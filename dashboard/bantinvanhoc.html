@@ -285,7 +285,10 @@
     100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
 }
 
-
+        /* --- DASHBOARD ELEMENTS --- */
+        .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .user-avatar { width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.3rem; box-shadow: 0 10px 25px rgba(255, 143, 80, 0.3); transform: rotate(-5deg); transition: 0.3s; cursor: pointer; }
+        .user-avatar:hover { transform: rotate(0deg) scale(1.1); }
     </style>
 </head>
 <body>
@@ -308,6 +311,7 @@
     <div id="menu-placeholder"></div>
 
     <main class="main-content">
+        
         <div class="page-header">
             <h1 class="page-title">Bản Tin <span class="text-gradient">Văn Học</span></h1>
             <p class="page-subtitle">Dữ liệu Dẫn chứng, Nhận định & Văn mẫu chọn lọc</p>
