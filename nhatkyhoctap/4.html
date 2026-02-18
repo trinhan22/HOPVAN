@@ -375,7 +375,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, increment, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
@@ -535,16 +535,29 @@
                 await addDoc(collection(db, "activities"), { 
                     uid: userUid, 
                     userName: auth.currentUser.displayName || "User",
-                    examTitle: "NLVH Level 4",
-                    action: `Level 4: ${safeScore} điểm`, 
-                    type: "journal",
-                    score: safeScore, 
+                    examTitle: levelData.title, 
+                    action: `Đọc hiểu Level 2: ${safeScore}đ`, 
+                    type: "journal", 
+                    score: safeScore,
                     timestamp: serverTimestamp() 
                 });
                 
-                // Hoàn thành Level 4 -> Coi như xong khóa cơ bản (Level 5)
-                if (safeScore >= 6) {
-                    await setDoc(doc(db, "users_progress", userUid), { currentLevel: 5, lastPassed: serverTimestamp() }, { merge: true });
+                // --- LOGIC MỚI: MỞ KHÓA & THƯỞNG KEYS ---
+                if(safeScore >= 6) {
+                    const progressRef = doc(db, "users_progress", userUid);
+                    const userRef = doc(db, "users", userUid);
+                    
+                    // 1. Mở khóa Level 3 (Nếu chưa mở)
+                    const progSnap = await getDoc(progressRef);
+                    const currentLvl = progSnap.exists() ? (progSnap.data().currentLevel || 1) : 1;
+                    
+                    if (currentLvl < 3) {
+                        await setDoc(progressRef, { currentLevel: 3, lastPassed: serverTimestamp() }, { merge: true });
+                    }
+
+                    // 2. Thưởng 10 Keys
+                    await updateDoc(userRef, { keys: increment(10) });
+                    console.log("Đã thưởng 10 keys!");
                 }
             }
         } catch (e) { 

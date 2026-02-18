@@ -791,8 +791,18 @@
 
                                 <div>
                                     <label class="label-custom">Tiêu đề bài học</label>
-                                    <input id="lvl-title" class="glass-input font-bold" placeholder="VD: Vợ chồng A Phủ - Tô Hoài">
+                                    <input id="lvl-title" class="glass-input font-bold" placeholder="VD: Vợ chồng A Phủ" onkeyup="generateSlug(this.value)">
                                 </div>
+
+                                <div class="mt-4">
+                                    <label class="label-custom text-orange-500">Slug (Đường dẫn định danh)</label>
+                                    <div class="relative">
+                                        <input id="lvl-slug" class="glass-input font-mono text-sm bg-orange-50 text-orange-600 pl-10" placeholder="vo-chong-a-phu">
+                                        <i class="fas fa-link absolute left-4 top-1/2 -translate-y-1/2 text-orange-300"></i>
+                                    </div>
+                                    <p class="text-[10px] text-gray-400 mt-1">Dùng để tạo link: .../nhatkyhoctap/slug.html?id=<b>slug-cua-ban</b></p>
+                                </div>
+
                                 <div>
                                     <label class="label-custom">Mô tả ngắn (Sub-title)</label>
                                     <input id="lvl-desc" class="glass-input" placeholder="VD: Phân tích sức sống tiềm tàng...">
@@ -1967,11 +1977,13 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
                 div.className = "p-4 bg-white border border-gray-100 rounded-xl hover:bg-orange-50 cursor-pointer transition flex items-center justify-between group shadow-sm";
                 div.onclick = () => fillLevelForm(d.id, data);
                 div.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <span class="text-[10px] font-black bg-gray-100 px-2 py-1 rounded text-gray-500 group-hover:bg-orange-500 group-hover:text-white transition">LV ${data.level}</span>
-                        <span class="font-bold text-gray-700 text-sm truncate max-w-[150px]">${data.title}</span>
+                    <div class="flex items-center gap-3 w-full">
+                        <span class="text-[10px] font-black bg-gray-100 px-2 py-1 rounded text-gray-500 group-hover:bg-orange-500 group-hover:text-white transition flex-shrink-0">LV ${data.level}</span>
+                        <div class="min-w-0 flex-1">
+                            <div class="font-bold text-gray-700 text-sm truncate">${data.title}</div>
+                            <div class="text-[10px] text-gray-400 font-mono truncate">/${data.slug}</div> </div>
                     </div>
-                    <i class="fas fa-chevron-right text-gray-300 text-xs group-hover:translate-x-1 transition"></i>
+                    <i class="fas fa-chevron-right text-gray-300 text-xs group-hover:translate-x-1 transition flex-shrink-0"></i>
                 `;
                 listEl.appendChild(div);
             });
@@ -2022,6 +2034,18 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
 
     initJournalEditors();
 
+// --- HÀM TẠO SLUG TỰ ĐỘNG ---
+    window.generateSlug = (str) => {
+        const slug = str.toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/[đĐ]/g, "d")
+            .replace(/([^0-9a-z-\s])/g, "")
+            .replace(/(\s+)/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/^-+|-+$/g, "");
+        document.getElementById('lvl-slug').value = slug;
+    };
+
     window.fillLevelForm = (id, data) => {
         resetLevelForm();
         
@@ -2029,6 +2053,11 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
         document.getElementById('lvl-num').value = data.level;
         document.getElementById('lvl-type').value = data.type;
         document.getElementById('lvl-title').value = data.title;
+        
+        // --- CẬP NHẬT: Gán Slug ---
+        document.getElementById('lvl-slug').value = data.slug || ''; 
+        // --------------------------
+
         document.getElementById('lvl-desc').value = data.desc;
         document.getElementById('lvl-form-title').innerText = `Sửa Level ${data.level}`;
         document.getElementById('btn-del-lvl').classList.remove('hidden');
@@ -2045,6 +2074,8 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
             document.getElementById('lvl-read-title').value = data.content.title || '';
             document.getElementById('lvl-read-qs').value = data.content.questions ? data.content.questions.map(x => x.q).join(' [NEXT] ') : '';
             journalEditors.readText.root.innerHTML = data.content.text || '';
+            // Load Hint nếu có
+            if(data.content.hint) journalEditors.essayHint.root.innerHTML = data.content.hint;
         } 
         else {
             journalEditors.essayTopic.root.innerHTML = data.content.topic || '';
@@ -2060,6 +2091,10 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
         document.getElementById('btn-del-lvl').classList.add('hidden');
         document.getElementById('quiz-list').innerHTML = "";
         
+        // --- CẬP NHẬT: Reset Slug ---
+        document.getElementById('lvl-slug').value = "";
+        // ---------------------------
+
         journalEditors.readText.setText('');
         journalEditors.essayTopic.setText('');
         journalEditors.essayText.setText('');
@@ -2074,6 +2109,11 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
         const type = document.getElementById('lvl-type').value;
         const levelNum = parseInt(document.getElementById('lvl-num').value);
         
+        // --- CẬP NHẬT: Lấy Slug ---
+        const slug = document.getElementById('lvl-slug').value;
+        if (!slug) { alert("Vui lòng nhập tiêu đề để tạo Slug!"); return; }
+        // --------------------------
+
         let content = {};
         
         try {
@@ -2094,6 +2134,8 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
                 content.text = journalEditors.readText.root.innerHTML; 
                 const qsRaw = document.getElementById('lvl-read-qs').value;
                 content.questions = qsRaw.split('[NEXT]').map(q => ({ q: q.trim() })).filter(x => x.q !== "");
+                // Lưu Hint
+                content.hint = journalEditors.essayHint.root.innerHTML;
             } 
             else {
                 content.topic = journalEditors.essayTopic.root.innerHTML;
@@ -2102,8 +2144,13 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
             }
 
             const finalData = {
-                level: levelNum, type: type, title: document.getElementById('lvl-title').value,
-                desc: document.getElementById('lvl-desc').value, content: content, updatedAt: serverTimestamp()
+                level: levelNum, 
+                type: type, 
+                title: document.getElementById('lvl-title').value,
+                slug: slug, // <--- Đã thêm trường SLUG vào đây
+                desc: document.getElementById('lvl-desc').value, 
+                content: content, 
+                updatedAt: serverTimestamp()
             };
 
             if(id) {
