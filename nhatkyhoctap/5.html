@@ -392,13 +392,62 @@
         if(confirmCallback) document.getElementById('btn-confirm-popup').onclick = () => { overlay.remove(); confirmCallback(); };
     };
 
+    // --- TIMER LOGIC (ĐẾM NGƯỢC) ---
+    let timerInterval;
+    let timeLeft = 30 * 60; // 30 phút tính bằng giây
+    const totalTime = 30 * 60; // Dùng để tính % thanh chạy
+
+    function startTimer() {
+        const timerText = document.getElementById('timer-text');
+        const timerMini = document.getElementById('timer-mini');
+        const timerCircle = document.getElementById('timer-circle');
+
+        timerInterval = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerText.innerText = "HẾT GIỜ";
+                timerMini.innerText = "0";
+                timerCircle.style.strokeDasharray = "0, 100";
+                
+                // Tự động nộp bài khi hết giờ
+                showPopup('warning', 'Hết giờ!', 'Đã hết thời gian làm bài. Hệ thống sẽ tự động nộp bài.', () => {
+                    submitQuizProcess();
+                });
+                return;
+            }
+
+            timeLeft--;
+
+            // Cập nhật text (Phút : Giây)
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            let mStr = m < 10 ? "0" + m : m;
+            let sStr = s < 10 ? "0" + s : s;
+            
+            if (timerText) timerText.innerText = `${mStr} phút ${sStr} giây`;
+            if (timerMini) timerMini.innerText = m; // Chỉ hiện phút trên icon nhỏ
+
+            // Cập nhật vòng tròn (strokeDasharray từ 100 -> 0)
+            if (timerCircle) {
+                const percentage = (timeLeft / totalTime) * 100;
+                timerCircle.style.strokeDasharray = `${percentage}, 100`;
+                
+                // Đổi sang màu đỏ nếu còn dưới 5 phút (300 giây)
+                if (timeLeft < 300) {
+                    timerCircle.classList.remove('text-orange-500');
+                    timerCircle.classList.add('text-red-500');
+                    timerMini.classList.add('text-red-500', 'animate-pulse');
+                }
+            }
+        }, 1000);
+    }
+
     onAuthStateChanged(auth, (u) => {
         if (u) { userUid = u.uid; initQuiz(); } 
         else { showPopup('info', 'Yêu cầu đăng nhập', 'Bạn cần đăng nhập để làm bài.', () => window.location.href = "../log.html"); }
     });
 
     async function initQuiz() {
-        // ... (Phần tải câu hỏi giữ nguyên) ...
         const form = document.getElementById('quiz-form');
         try {
             const q = query(collection(db, "study_levels"), where("level", "==", 5), where("type", "==", "tracnghiem"));
@@ -412,7 +461,6 @@
                 else if (data.content && data.content.question) currentQuestions.push(data.content);
             });
             
-            // Render câu hỏi (Giữ nguyên logic render của bạn)
             form.innerHTML = ''; 
             currentQuestions.forEach((item, index) => {
                 const div = document.createElement('div');
@@ -432,6 +480,10 @@
                     </div>`;
                 form.appendChild(div);
             });
+
+            // GỌI HÀM ĐẾM NGƯỢC Ở ĐÂY SAU KHI ĐÃ TẢI XONG ĐỀ:
+            startTimer();
+
         } catch (e) { console.error(e); }
     }
 
@@ -441,6 +493,7 @@
 
     // --- QUAN TRỌNG: LOGIC CHẤM & THƯỞNG ---
     const submitQuizProcess = async () => {
+        clearInterval(timerInterval);
         if (currentQuestions.length === 0) return;
         
         let correctCount = 0;
