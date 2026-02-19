@@ -863,9 +863,8 @@
                 if (rank === 1) {
                     // Top 1: Màu vàng rực, có icon vương miện nhỏ và bóng đổ
                     rankHtml = `
-                    <div class="w-10 h-10 mx-auto bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-lg flex flex-col items-center justify-center shadow-md shadow-yellow-500/40 border border-yellow-200 text-white relative">
-                        <i class="fas fa-crown text-[8px] absolute top-1"></i>
-                        <span class="font-black text-xl mt-1">#1</span>
+                    <div class="w-9 h-9 mx-auto bg-gradient-to-br from-yellow-200 to-yellow-400 rounded-lg flex items-center justify-center shadow-sm border border-yellow-100 text-white">
+                        <span class="font-black text-lg">#1</span>
                     </div>`;
                 } else if (rank === 2) {
                     // Top 2: Màu bạc (Silver)
@@ -876,12 +875,12 @@
                 } else if (rank === 3) {
                     // Top 3: Màu đồng (Bronze)
                     rankHtml = `
-                    <div class="w-8 h-8 mx-auto bg-gradient-to-br from-orange-300 to-orange-500 rounded-lg flex items-center justify-center shadow-sm border border-orange-200 text-white">
-                        <span class="font-black text-base">#3</span>
+                    <div class="w-9 h-9 mx-auto bg-gradient-to-br from-orange-200 to-orange-400 rounded-lg flex items-center justify-center shadow-sm border border-orange-100 text-white">
+                        <span class="font-black text-lg">#3</span>
                     </div>`;
                 } else if (rank === 4) {
                     // Top 4: Xám đậm, chữ to hơn bình thường một chút
-                    rankHtml = `<span class="font-black text-lg text-slate-500">#4</span>`;
+                    rankHtml = `<span class="font-black text-lg text-slate-400">#4</span>`;
                 } else {
                     // Top 5 trở đi: Xám nhạt, size chuẩn
                     rankHtml = `<span class="font-bold text-gray-400 text-sm">#${rank}</span>`;
