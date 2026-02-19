@@ -134,7 +134,7 @@ const menuStyles = `
 const menuHTML = `
 
 <aside class="sidebar-comp" id="main-sidebar">
-    <a href="../index.html" class="sb-logo-link group">
+    <a href="../" class="sb-logo-link group">
         <div class="logo-card-box shadow-lg">
             <img src="../LOGO.WEBP" alt="HopVan Logo" class="drop-shadow-md">
         </div>
@@ -144,7 +144,7 @@ const menuHTML = `
     </a>
 
     <nav class="sb-list">
-        <a href="index.html" class="sb-link" data-page="index"><i class="fas fa-home"></i> Tổng quan</a>
+        <a href="../dashboard" class="sb-link" data-page="index"><i class="fas fa-home"></i> Tổng quan</a>
         <a href="phongluyende.html" class="sb-link" data-page="phongluyende"><i class="fas fa-pen-nib"></i> Phòng luyện đề</a>
         <a href="bantinvanhoc.html" class="sb-link" data-page="bantinvanhoc"><i class="fas fa-newspaper"></i> Bản tin Văn học</a>
         <a href="congdong.html" class="sb-link" data-page="congdong"><i class="fas fa-users"></i> Cộng đồng</a>
@@ -262,7 +262,7 @@ function startMenuLogic(auth, db) {
     document.getElementById('btn-confirm-logout').onclick = async () => {
         try {
             await signOut(auth);
-            window.location.href = "../index.html";
+            window.location.href = "../";
         } catch (e) { console.error(e); }
     };
 
