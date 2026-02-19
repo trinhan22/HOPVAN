@@ -501,11 +501,24 @@
     let largeChartInstance = null;
 
     const EXAM_TYPES = {
-        'nlxh': { name: 'Nghị Luận Xã Hội', icon: 'fas fa-users', color: '#10b981' }, 
-        'nlvh': { name: 'Nghị Luận Văn Học', icon: 'fas fa-book-open', color: '#8b5cf6' }, 
-        'reading': { name: 'Đọc Hiểu', icon: 'fas fa-glasses', color: '#3b82f6' }, 
-        'fulltest': { name: 'Đề Tổng Hợp', icon: 'fas fa-layer-group', color: '#f59e0b' }, 
-        'random': { name: 'Luyện Ngẫu Nhiên', icon: 'fas fa-dice', color: '#ef4444' } 
+        // Các dạng luyện đề chính
+        'nlxh': { name: 'Nghị Luận Xã Hội', icon: 'fas fa-globe-asia', color: '#10b981' }, // Xanh lá
+        'nlvh': { name: 'Nghị Luận Văn Học', icon: 'fas fa-feather-alt', color: '#f59e0b' }, // Vàng cam
+        'reading': { name: 'Đọc Hiểu', icon: 'fas fa-book-reader', color: '#3b82f6' }, // Xanh dương
+        'fulltest': { name: 'Đề Tổng Hợp', icon: 'fas fa-scroll', color: '#eab308' }, // Vàng
+        'random': { name: 'Luyện Ngẫu Nhiên', icon: 'fas fa-dice', color: '#ef4444' }, // Đỏ
+        
+        // Thêm Trắc nghiệm (Cover cả 2 key lưu trữ có thể có)
+        'tracnghiem': { name: 'Trắc Nghiệm', icon: 'fas fa-check-circle', color: '#8b5cf6' }, // Tím
+        'quiz': { name: 'Trắc Nghiệm', icon: 'fas fa-check-circle', color: '#8b5cf6' }, // Tím
+        
+        // Alias thêm cho đọc hiểu (Phòng hờ dữ liệu lưu là dochieu thay vì reading)
+        'dochieu': { name: 'Đọc Hiểu', icon: 'fas fa-book-reader', color: '#3b82f6' }, 
+        'doc_hieu': { name: 'Đọc Hiểu', icon: 'fas fa-book-reader', color: '#3b82f6' },
+
+        // Thêm các hoạt động từ Nhật Ký Học Tập (Levels)
+        'journal': { name: 'Vượt Ải Hành Trình', icon: 'fas fa-flag-checkered', color: '#06b6d4' }, // Xanh lơ (Cyan)
+        'level': { name: 'Nhiệm Vụ Cấp Độ', icon: 'fas fa-shoe-prints', color: '#ec4899' } // Hồng
     };
 
     onAuthStateChanged(auth, async (user) => {
@@ -832,7 +845,7 @@
         `;
     }
 
-    // Mở Bảng Xếp Hạng (Đã Style Top 1,2,3,4 đặc biệt)
+    // Mở Bảng Xếp Hạng (Đã nâng cấp UI Rank Vàng, Bạc, Đồng)
     window.openLeaderboardModal = () => {
         const users = window.fullLeaderboardData || [];
         const myUid = window.currentUserId;
@@ -844,21 +857,37 @@
                 const name = u.email ? u.email.split('@')[0] : "User";
                 const isMe = u.id === myUid;
                 
-                // --- XỬ LÝ GIAO DIỆN HẠNG (RANK) ---
+                // --- XỬ LÝ GIAO DIỆN HẠNG (RANK) VÀNG, BẠC, ĐỒNG ---
                 let rankHtml = '';
+                
                 if (rank === 1) {
-                    rankHtml = `<div class="w-10 h-10 mx-auto bg-orange-50 rounded-lg flex items-center justify-center shadow-sm"><span class="font-black text-2xl text-yellow-500">#1</span></div>`;
+                    // Top 1: Màu vàng rực, có icon vương miện nhỏ và bóng đổ
+                    rankHtml = `
+                    <div class="w-10 h-10 mx-auto bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-lg flex flex-col items-center justify-center shadow-md shadow-yellow-500/40 border border-yellow-200 text-white relative">
+                        <i class="fas fa-crown text-[8px] absolute top-1"></i>
+                        <span class="font-black text-xl mt-1">#1</span>
+                    </div>`;
                 } else if (rank === 2) {
-                    rankHtml = `<span class="font-black text-2xl text-slate-400">#2</span>`;
+                    // Top 2: Màu bạc (Silver)
+                    rankHtml = `
+                    <div class="w-9 h-9 mx-auto bg-gradient-to-br from-gray-200 to-gray-400 rounded-lg flex items-center justify-center shadow-sm border border-gray-100 text-white">
+                        <span class="font-black text-lg">#2</span>
+                    </div>`;
                 } else if (rank === 3) {
-                    rankHtml = `<span class="font-black text-2xl text-gray-500">#3</span>`;
+                    // Top 3: Màu đồng (Bronze)
+                    rankHtml = `
+                    <div class="w-8 h-8 mx-auto bg-gradient-to-br from-orange-300 to-orange-500 rounded-lg flex items-center justify-center shadow-sm border border-orange-200 text-white">
+                        <span class="font-black text-base">#3</span>
+                    </div>`;
                 } else if (rank === 4) {
-                    rankHtml = `<span class="font-black text-xl text-gray-600">#4</span>`;
+                    // Top 4: Xám đậm, chữ to hơn bình thường một chút
+                    rankHtml = `<span class="font-black text-lg text-slate-500">#4</span>`;
                 } else {
+                    // Top 5 trở đi: Xám nhạt, size chuẩn
                     rankHtml = `<span class="font-bold text-gray-400 text-sm">#${rank}</span>`;
                 }
 
-                // --- XỬ LÝ AVATAR (MỚI THÊM) ---
+                // --- XỬ LÝ AVATAR ---
                 let avatarContent;
                 if (u.customAvatar) {
                     avatarContent = `<img src="${u.customAvatar}" class="w-full h-full object-cover rounded-full" alt="${name}">`;
@@ -877,11 +906,11 @@
                     </td>
                     <td class="py-3 pl-2 align-middle">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full bg-white border border-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 shadow-sm overflow-hidden">
+                            <div class="w-9 h-9 rounded-full bg-white border border-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 shadow-sm overflow-hidden flex-shrink-0">
                                 ${avatarContent}
                             </div>
-                            <div class="flex flex-col">
-                                <span class="font-bold text-gray-700 text-sm">${name}</span>
+                            <div class="flex flex-col overflow-hidden">
+                                <span class="font-bold text-gray-700 text-sm truncate max-w-[150px]">${name}</span>
                                 ${isMe ? '<span class="text-[10px] text-orange-500 font-extrabold uppercase tracking-wider">Bạn</span>' : ''}
                             </div>
                         </div>
