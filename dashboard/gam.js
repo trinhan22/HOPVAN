@@ -700,14 +700,14 @@ class Gamification {
                                 <div class="info-icon"><i class="fas fa-key"></i></div>
                                 <div class="info-txt">
                                     <h5>Keys dùng để làm gì?</h5>
-                                    <p>Sử dụng để mở khóa các level trong Nhật Ký Học Tập tại HopVan.</p>
+                                    <p>Đua Top Keys nhận quà khủng và mở khóa các Level trong Nhật Ký Học Tập tại HopVan.</p>
                                 </div>
                             </div>
                             <div class="info-item">
                                 <div class="info-icon"><i class="fas fa-star"></i></div>
                                 <div class="info-txt">
                                     <h5>Cách kiếm thêm Keys?</h5>
-                                    <p>Điểm danh mỗi ngày (+4), hoàn thành nhiệm vụ ngày (+1 đến +25) và duy trì chuỗi Streak.</p>
+                                    <p>Điểm danh mỗi ngày (+4), hoàn thành nhiệm vụ ngày (+1 đến +25) và Vượt Level Nhật Ký Học Tập (+5).</p>
                                 </div>
                             </div>
                             <div class="info-item">
