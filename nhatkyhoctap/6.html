@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Level 2: Đọc Hiểu Văn Bản</title>
+    <title>Level 6: Đọc Hiểu Văn Bản</title>
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -288,7 +288,7 @@
         <div class="max-w-3xl mx-auto pb-20">
             <div class="liquid-glass p-8 mb-10 relative overflow-hidden bg-gradient-to-br from-white/90 to-white/60">
                 <div class="relative z-10">
-                    <span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-widest">Level 2</span>
+                    <span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-widest">Level 6</span>
                     <h1 id="lvl-title-display" class="text-3xl font-bold text-gray-800 mt-3 mb-2">Đang tải thử thách...</h1>
                     <p class="text-gray-500 font-medium text-sm">Yêu cầu: Đạt tối thiểu <span class="text-orange-600 font-bold">6.0 điểm</span> để qua màn.</p>
                 </div>
@@ -331,7 +331,7 @@
                 <div id="feedback-content" class="space-y-4"></div>
                 
                 <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onclick="nextLevel()" id="next-btn" class="hidden w-full sm:w-auto bg-green-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-600 transition shadow-lg shadow-green-200">Mở Khóa Level 3 <i class="fas fa-lock-open ml-2"></i></button>
+                    <button onclick="nextLevel()" id="next-btn" class="hidden w-full sm:w-auto bg-green-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-600 transition shadow-lg shadow-green-200">Mở Khóa Level 7 <i class="fas fa-lock-open ml-2"></i></button>
                     <button onclick="location.reload()" id="retry-btn" class="hidden w-full sm:w-auto bg-gray-100 text-gray-600 px-8 py-3 rounded-xl font-bold hover:bg-gray-200 transition">Làm Lại Bài <i class="fas fa-redo ml-2"></i></button>
                 </div>
             </div>
@@ -390,12 +390,12 @@
     // --- 1. TẢI DỮ LIỆU ---
     async function initLevelData() {
         try {
-            const q = query(collection(db, "study_levels"), where("level", "==", 2));
+            const q = query(collection(db, "study_levels"), where("level", "==", 6));
             const snap = await getDocs(q);
             
             if (snap.empty) {
                 document.getElementById('lvl-title-display').innerText = "Chưa có dữ liệu";
-                document.getElementById('prompt-passage').innerHTML = "<p class='text-center text-red-500'>Chưa tạo nội dung cho Level 2</p>";
+                document.getElementById('prompt-passage').innerHTML = "<p class='text-center text-red-500'>Chưa tạo nội dung cho Level 6</p>";
                 return;
             }
             
@@ -503,7 +503,7 @@
                     uid: userUid, 
                     userName: auth.currentUser.displayName || "User",
                     examTitle: levelData.title, 
-                    action: `Đọc hiểu Level 2: ${safeScore}đ`, 
+                    action: `Đọc hiểu Level 6: ${safeScore}đ`, 
                     type: "journal", 
                     score: safeScore,
                     timestamp: serverTimestamp() 
@@ -514,12 +514,13 @@
                     const progressRef = doc(db, "users_progress", userUid);
                     const userRef = doc(db, "users", userUid);
                     
-                    // 1. Mở khóa Level 3 (Nếu chưa mở)
+                    // 1. Mở khóa Level 7 (Nếu chưa mở)
                     const progSnap = await getDoc(progressRef);
                     const currentLvl = progSnap.exists() ? (progSnap.data().currentLevel || 1) : 1;
                     
-                    if (currentLvl < 3) {
-                        await setDoc(progressRef, { currentLevel: 3, lastPassed: serverTimestamp() }, { merge: true });
+                    // Nếu level hiện tại nhỏ hơn 7 thì mới up lên 7 (để tránh bị lùi nếu user học lại)
+                    if (currentLvl < 7) {
+                        await setDoc(progressRef, { currentLevel: 7, lastPassed: serverTimestamp() }, { merge: true });
                     }
 
                     // 2. Thưởng 10 Keys

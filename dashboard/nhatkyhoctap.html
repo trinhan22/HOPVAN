@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>HopVan - Nhật Ký Học Tập</title>
+    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
+    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+    <meta property="og:url" content="https://hopvan.netlify.app" />
+    <meta property="og:type" content="article" />
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -58,15 +63,22 @@
         .user-avatar:hover { transform: rotate(0deg) scale(1.1); }
 
         /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
-        .stat-card {
-            background: white; padding: 20px; border-radius: 24px; display: flex; flex-direction: column; justify-content: space-between;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.03);
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px; 
+            margin-bottom: 30px; 
         }
-        .stat-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 15px 35px rgba(255, 143, 80, 0.15); }
-        .stat-card h3 { font-size: 0.9rem; color: var(--text-light); margin-bottom: 5px; display: flex; gap: 8px; align-items: center; }
-        .stat-card .value { font-size: 2rem; font-weight: 800; color: var(--text-main); line-height: 1; }
-        .stat-card .unit { font-size: 0.8rem; color: var(--primary); font-weight: 700; margin-top: 5px; }
+        .stat-card {
+            background: white; padding: 25px; border-radius: 24px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.02); transition: 0.3s;
+            border: 1px solid rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .stat-card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 15px 35px rgba(255, 143, 80, 0.15); }
+
+        .stat-card h3 { font-size: 0.95rem; color: var(--text-light); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;}
+        .stat-card .value { font-size: 2.2rem; font-weight: 800; color: var(--text-main); line-height: 1; }
+        .stat-card .unit { font-size: 0.9rem; color: var(--primary); font-weight: 700; margin-top: 5px; }
 
         .section-title { font-size: 1.4rem; font-weight: 900; color: var(--text-main); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
         
@@ -174,7 +186,7 @@
                 <h2 id="welcome-name">Xin chào,</h2>
                 <p style="color: var(--text-light); margin-top: 5px;">Hãy cùng bắt đầu học tập cùng với HopVan nhé!</p>
             </div>
-            <div class="user-avatar" id="avatar-initial"></div>
+            <div class="user-avatar overflow-hidden cursor-pointer" id="avatar-initial" onclick="window.location.href='account.html'" title="Đi đến trang cá nhân"></div>
         </div>
 
         <div class="stats-grid">
@@ -305,8 +317,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // --- DỮ LIỆU CẤU HÌNH (HTML Cứng cho Hành Trình) ---
-    // id: số level, file: tên file html trong thư mục nhatkyhoctap
+    // --- DỮ LIỆU CẤU HÌNH ---
     const JOURNEY_DATA = [
         { id: 1, file: '1.html', title: 'Bước vào chữ nghĩa', icon: 'fas fa-shoe-prints' },
         { id: 2, file: '2.html', title: 'Học cách đọc', icon: 'fas fa-book-reader' },
@@ -315,10 +326,8 @@
         { id: 5, file: '5.html', title: 'Đi qua nỗi ngược', icon: 'fas fa-mountain' },
         { id: 6, file: '6.html', title: 'Tìm tiếng nói riêng', icon: 'fas fa-microphone-alt' },
         { id: 7, file: '7.html', title: 'Ở lại với văn chương', icon: 'fas fa-heart' },
-        // Thêm các level khác nếu cần
     ];
 
-    // Dữ liệu hiển thị cho Bối Cảnh Tri Thức (Chỉ text, ko link)
     const SKILL_STEPS = {
         reading: ["Làm quen văn bản", "Hiểu từ ngữ", "Phân tích câu", "Suy luận logic", "Tư duy phản biện", "Đánh giá nội dung", "Cảm thụ văn học"],
         nlxh: ["Xác định vấn đề", "Triển khai luận điểm", "Lấy dẫn chứng", "Phản biện vấn đề", "Liên hệ thực tế", "Sáng tạo bài viết", "Hoàn thiện tư duy"],
@@ -327,30 +336,50 @@
     };
 
     let userKeys = 0;
-    let currentLevel = 1; // Level người dùng đã đạt được (hoàn thành bài học)
-    let paidLevel = 0;    // Level cao nhất đã mua vé
+    let currentLevel = 1; 
+    let paidLevel = 0; 
 
     initMenu(app);
 
-    // --- MAIN LOGIC ---
+    // --- MAIN LOGIC (CẬP NHẬT AVATAR) ---
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // ... (Phần hiển thị tên giữ nguyên) ...
             const name = user.displayName || user.email.split('@')[0];
             document.getElementById('welcome-name').innerText = `Xin chào, ${name}`;
-            document.getElementById('avatar-initial').innerText = name[0].toUpperCase();
+            
+            const avatarEl = document.getElementById('avatar-initial');
 
-            // 1. Tải Stats (Keys)
+            // 1. Tải Thông tin User (Chứa Keys, Streak và Avatar)
             const userSnap = await getDoc(doc(db, "users", user.uid));
+            
             if (userSnap.exists()) {
                 const d = userSnap.data();
                 userKeys = d.keys || 0;
                 document.getElementById('keys-val').innerText = userKeys;
                 document.getElementById('streak-val').innerText = d.streak || 0;
-                updateRank(d.streak || 0); // Hàm rank giữ nguyên
+                updateRank(d.streak || 0);
+
+                // LOGIC AVATAR ƯU TIÊN
+                let hasAvatar = false;
+                if (d.customAvatar) {
+                    avatarEl.innerHTML = `<img src="${d.customAvatar}" alt="User" style="width: 100%; height: 100%; object-fit: cover;">`;
+                    avatarEl.style.background = 'transparent';
+                    hasAvatar = true;
+                } else if (d.photoURL || user.photoURL) {
+                    avatarEl.innerHTML = `<img src="${d.photoURL || user.photoURL}" alt="User" style="width: 100%; height: 100%; object-fit: cover;">`;
+                    avatarEl.style.background = 'transparent';
+                    hasAvatar = true;
+                }
+
+                if (!hasAvatar) {
+                    avatarEl.innerHTML = "";
+                    avatarEl.innerText = name.charAt(0).toUpperCase();
+                    avatarEl.style.background = 'var(--primary-gradient)';
+                }
+
             }
 
-            // 2. Tải Progress (Lấy Level hiện tại & Level đã mua)
+            // 2. Tải Progress
             const progRef = doc(db, "users_progress", user.uid);
             const progSnap = await getDoc(progRef);
             if (progSnap.exists()) {
@@ -358,19 +387,17 @@
                 currentLevel = d.currentLevel || 1; 
                 paidLevel = d.paidLevel || 0;
             } else {
-                // Nếu là user mới tinh, tạo data mặc định
                 await setDoc(progRef, { currentLevel: 1, paidLevel: 0 });
             }
 
-            // 3. Render
-            renderSkillTree(user.uid); // Hàm này giữ nguyên
-            renderMap(); // Hàm này sửa ở bước 3
+            // 3. Render Dashboard
+            renderSkillTree(user.uid); 
+            renderMap(); 
         } else {
             window.location.href = "../log.html";
         }
     });
 
-    
     function updateRank(streak) {
         let r = "Tân Binh";
         let next = "3 ngày: Chớm lửa";
@@ -382,9 +409,8 @@
         document.getElementById('next-rank-info').innerText = next;
     }
 
-    // --- LOGIC 1: BỐI CẢNH TRI THỨC & THỐNG KÊ ---
+    // --- LOGIC 1: BỐI CẢNH TRI THỨC ---
     async function renderSkillTree(uid) {
-        // Lấy dữ liệu từ Phòng Luyện Đề
         const q = query(collection(db, "activities"), where("uid", "==", uid));
         const snap = await getDocs(q);
         
@@ -392,10 +418,8 @@
         
         snap.forEach(doc => {
             const d = doc.data();
-            // Lọc các bài có điểm số
             if (d.score !== undefined && d.score !== null) {
                 let type = d.type; 
-                // Map type về 4 nhóm chính
                 if (['trac-nghiem','reading','doc_hieu'].includes(type)) type = 'reading';
                 else if (type === 'nlxh') type = 'nlxh';
                 else if (type === 'nlvh') type = 'nlvh';
@@ -405,14 +429,12 @@
             }
         });
 
-        // Cập nhật UI cho từng cột kỹ năng
         const updateUI = (key, arr, steps) => {
             let lvl = 1;
             if (arr && arr.length > 0) {
                 const avg = arr.reduce((a,b)=>a+b,0) / arr.length;
                 let base = 1;
                 if (avg >= 8.0) base = 3; else if (avg >= 5.0) base = 2; 
-                
                 let bonus = Math.floor(arr.length / 5);
                 lvl = Math.min(7, base + bonus);
             }
@@ -421,18 +443,12 @@
             document.getElementById(`pct-${key}`).innerText = `${Math.round((lvl/7)*100)}%`;
             document.getElementById(`bar-${key}`).style.width = `${(lvl/7)*100}%`;
 
-            // Render danh sách (không có thẻ a)
             const listEl = document.getElementById(`list-${key}`);
             listEl.innerHTML = steps.map((step, index) => {
                 const isDone = index < lvl; 
                 const statusClass = isDone ? "completed" : "";
                 const icon = isDone ? "fa-check-circle" : "fa-circle"; 
-                
-                return `
-                <div class="skill-item ${statusClass}">
-                    <i class="fas ${icon}"></i> 
-                    <span>${index+1}. ${step}</span>
-                </div>`;
+                return `<div class="skill-item ${statusClass}"><i class="fas ${icon}"></i> <span>${index+1}. ${step}</span></div>`;
             }).join('');
         };
 
@@ -441,7 +457,7 @@
         updateUI('nlvh', scores.nlvh, SKILL_STEPS.nlvh);
         updateUI('lang', scores.lang, SKILL_STEPS.lang);
         
-        // --- CẬP NHẬT TỔNG SỐ BÀI ĐÃ LÀM (FIX MỚI) ---
+        // TÍNH TỔNG SỐ BÀI ĐÃ LÀM
         const totalDone = scores.reading.length + scores.nlxh.length + scores.nlvh.length + scores.lang.length;
         const totalEl = document.getElementById('total-exams');
         if (totalEl) {
@@ -453,7 +469,7 @@
         el.classList.toggle('active');
     };
 
-    // --- LOGIC 2: HÀNH TRÌNH VĂN CHƯƠNG (Logic Vé + File Cứng) ---
+    // --- LOGIC 2: HÀNH TRÌNH VĂN CHƯƠNG ---
     function renderMap() {
         const container = document.getElementById('journey-container');
         const progressBar = document.getElementById('map-progress-bar');
@@ -465,27 +481,20 @@
             let statusClass = 'locked';
             let iconHtml = '<i class="fas fa-lock"></i>';
             
-            // TRƯỜNG HỢP 1: Đã học xong (Level nhỏ hơn Level hiện tại của user)
             if (item.id < currentLevel) {
                 statusClass = 'completed';
-                iconHtml = `<i class="fas ${item.icon}"></i>`; // Hiện icon đẹp
+                iconHtml = `<i class="fas ${item.icon}"></i>`;
                 activeIndex = index + 1;
             } 
-            // TRƯỜNG HỢP 2: Đang học (Level bằng Level hiện tại)
             else if (item.id === currentLevel) {
                 statusClass = 'active';
                 activeIndex = index;
-                
-                // Kiểm tra xem đã mua vé chưa
                 if (item.id <= paidLevel) {
-                    // Đã mua vé -> Hiện nút Play
                     iconHtml = '<i class="fas fa-play"></i>';
                 } else {
-                    // Chưa mua vé -> Hiện nút Chìa khóa (để mua)
                     iconHtml = '<i class="fas fa-key text-yellow-300 animate-pulse"></i>';
                 }
             } 
-            // TRƯỜNG HỢP 3: Tương lai (Chưa mở)
             else {
                 statusClass = 'locked';
                 iconHtml = '<i class="fas fa-lock"></i>';
@@ -493,64 +502,42 @@
 
             const div = document.createElement('div');
             div.className = `map-node ${statusClass}`;
-            div.innerHTML = `
-                <div class="node-icon">${iconHtml}</div>
-                <div class="node-title">${item.title}</div>
-            `;
-            
-            // Gán sự kiện click
+            div.innerHTML = `<div class="node-icon">${iconHtml}</div><div class="node-title">${item.title}</div>`;
             div.onclick = () => handleMapClick(item);
             container.appendChild(div);
         });
 
-        // Thanh tiến độ
-        const pct = (activeIndex / JOURNEY_DATA.length) * 100;
-        progressBar.style.width = `${pct}%`;
+        progressBar.style.width = `${(activeIndex / JOURNEY_DATA.length) * 100}%`;
     }
 
     function handleMapClick(item) {
-        // 1. Bài cũ (đã xong) -> Vào luôn
         if (item.id < currentLevel) {
             window.location.href = `../nhatkyhoctap/${item.file}`;
         }
-        // 2. Bài hiện tại
         else if (item.id === currentLevel) {
-            // Đã mua vé chưa?
             if (item.id <= paidLevel) {
-                // Rồi -> Vào học
                 window.location.href = `../nhatkyhoctap/${item.file}`;
             } else {
-                // Chưa -> Hiện popup đòi tiền
-                window.pendingLevelId = item.id; // Lưu lại ID để tí trừ tiền
+                window.pendingLevelId = item.id;
                 document.getElementById('modal-unlock').classList.add('show');
             }
         }
-        // 3. Bài tương lai -> Không làm gì hoặc báo lỗi
-        else {
-            // alert("Bạn phải hoàn thành cấp độ trước đó!");
-        }
     }
 
-    // Xử lý nút MUA VÉ (-5 keys)
     document.getElementById('btn-unlock-confirm').onclick = async () => {
         if (userKeys >= 5) {
             const uid = auth.currentUser.uid;
-            
-            // 1. Trừ 5 Keys
             await updateDoc(doc(db, "users", uid), { keys: increment(-5) });
             
-            // 2. Cập nhật paidLevel (Vé thông hành)
-            // Lưu ý: Chỉ update paidLevel, KHÔNG update currentLevel
             const progRef = doc(db, "users_progress", uid);
             await updateDoc(progRef, { paidLevel: window.pendingLevelId });
             
-            // 3. Cập nhật giao diện ngay lập tức
             userKeys -= 5;
-            paidLevel = window.pendingLevelId; // Cập nhật biến local
+            paidLevel = window.pendingLevelId;
             document.getElementById('keys-val').innerText = userKeys;
             
             closeModal();
-            renderMap(); // Vẽ lại map để icon Key biến thành icon Play
+            renderMap();
         } else {
             closeModal();
             document.getElementById('modal-alert').classList.add('show');
@@ -558,6 +545,7 @@
     };
 
     window.closeModal = () => document.querySelectorAll('.hv-modal').forEach(m => m.classList.remove('show'));
+    
     window.toggleSidebar = () => {
         const sidebar = document.querySelector('aside');
         const overlay = document.getElementById('sidebar-overlay');

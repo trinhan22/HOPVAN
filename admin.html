@@ -2178,13 +2178,13 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
     };
 
 // --- 7. QUẢN LÝ THÀNH VIÊN (USER MANAGER) ---
+    // --- 7. QUẢN LÝ THÀNH VIÊN (USER MANAGER) ---
     window.loadUsers = async () => {
         const tbody = document.getElementById('user-list-body');
         tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center"><i class="fas fa-circle-notch fa-spin text-orange-500 text-2xl"></i><p class="text-xs text-gray-400 mt-2 font-bold">Đang tải danh sách tài khoản...</p></td></tr>';
 
         try {
-            // Lấy tất cả users (Sắp xếp theo lần đăng nhập cuối nếu có field đó, hoặc lấy mặc định)
-            const q = query(collection(db, "users")); // Bạn có thể thêm orderBy("lastLoginDate", "desc") nếu muốn
+            const q = query(collection(db, "users")); 
             const snap = await getDocs(q);
             
             tbody.innerHTML = "";
@@ -2198,7 +2198,6 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
                 const u = doc.data();
                 const uid = doc.id;
                 
-                // Xử lý dữ liệu hiển thị (Fallback nếu chưa có)
                 const email = u.email || "No Email";
                 const initial = email.charAt(0).toUpperCase();
                 const name = u.name || '<span class="text-gray-300 italic text-xs">Chưa cập nhật tên</span>';
@@ -2206,17 +2205,27 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
                 const grade = u.grade ? `<span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-[10px] font-bold">Khối ${u.grade}</span>` : '<span class="text-gray-300 text-xs">--</span>';
                 const keys = u.keys || 0;
                 
-                // Style đặc biệt cho Admin
+                // --- XỬ LÝ AVATAR MỚI ---
+                let avatarHtml = initial; // Mặc định là chữ cái
+                if (u.customAvatar) {
+                    avatarHtml = `<img src="${u.customAvatar}" class="w-full h-full object-cover">`;
+                } else if (u.photoURL) {
+                    avatarHtml = `<img src="${u.photoURL}" class="w-full h-full object-cover">`;
+                }
+                
                 const isAdmin = email === 'admin@hopvan.com';
                 const rowClass = isAdmin ? "bg-orange-50/30 border-l-4 border-orange-500" : "hover:bg-gray-50";
                 const roleBadge = isAdmin ? '<i class="fas fa-crown text-yellow-500 ml-2" title="Quản trị viên"></i>' : '';
 
                 const tr = document.createElement('tr');
                 tr.className = `transition border-b border-gray-50 ${rowClass}`;
+                
+                // Gắn HTML, chú ý thêm "overflow-hidden" vào class của khung chứa Avatar để ảnh được bo tròn
                 tr.innerHTML = `
-                    <td class="pl-4 py-4 whitespace-nowrap"> <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center font-black text-gray-500 shadow-inner">
-                                ${initial}
+                    <td class="pl-4 py-4 whitespace-nowrap"> 
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center font-black text-gray-500 shadow-inner overflow-hidden">
+                                ${avatarHtml}
                             </div>
                             <div class="flex flex-col">
                                 <span class="font-bold text-gray-700 text-sm flex items-center">${email.split('@')[0]} ${roleBadge}</span>
@@ -2224,7 +2233,9 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
                             </div>
                         </div>
                     </td>
-                    <td class="text-sm font-medium text-gray-600 whitespace-nowrap">${name}</td> <td class="text-sm whitespace-nowrap"> <div class="flex flex-col">
+                    <td class="text-sm font-medium text-gray-600 whitespace-nowrap">${name}</td> 
+                    <td class="text-sm whitespace-nowrap"> 
+                        <div class="flex flex-col">
                             <span class="font-bold text-gray-700 text-xs">${school}</span>
                             <span class="mt-1">${grade}</span>
                         </div>
@@ -2257,9 +2268,28 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
     // Hàm mở Modal Chi Tiết
     window.openUserDetail = (u) => {
         document.getElementById('ud-email').innerText = u.email || "Không có email";
-        document.getElementById('ud-avatar').innerText = (u.email || "U").charAt(0).toUpperCase();
         
-        // Cập nhật thông tin (nếu không có thì hiện placeholder)
+        // --- XỬ LÝ AVATAR MỚI CHO POPUP ---
+        const avatarEl = document.getElementById('ud-avatar');
+        const initial = (u.email || "U").charAt(0).toUpperCase();
+        
+        // Đảm bảo khung avatar có overflow-hidden để cắt ảnh bo tròn
+        avatarEl.classList.add('overflow-hidden');
+        
+        if (u.customAvatar) {
+            avatarEl.innerHTML = `<img src="${u.customAvatar}" class="w-full h-full object-cover">`;
+            avatarEl.style.background = 'transparent';
+        } else if (u.photoURL) {
+            avatarEl.innerHTML = `<img src="${u.photoURL}" class="w-full h-full object-cover">`;
+            avatarEl.style.background = 'transparent';
+        } else {
+            avatarEl.innerHTML = initial;
+            // Khôi phục background nếu dùng chữ
+            avatarEl.style.background = '';
+            avatarEl.classList.add('bg-gradient-to-br', 'from-orange-400', 'to-red-500');
+        }
+        
+        // Cập nhật thông tin 
         document.getElementById('ud-name').innerHTML = u.name || '<span class="text-gray-400 italic">Chưa cập nhật</span>';
         document.getElementById('ud-school').innerHTML = u.school || '<span class="text-gray-400 italic">Chưa cập nhật</span>';
         document.getElementById('ud-grade').innerText = u.grade ? `Khối ${u.grade}` : "Chưa chọn";
