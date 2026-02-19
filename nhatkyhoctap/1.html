@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         :root { --primary: #FF8F50; }
@@ -367,8 +368,6 @@
 
     // --- POPUP FUNCTION ---
     window.showPopup = (type, title, msg, confirmCallback = null) => {
-        // ... (Giữ nguyên logic popup của bạn để tiết kiệm chỗ, hoặc copy lại từ file cũ)
-        // Mình viết gọn lại logic alert ở đây cho bạn dễ copy:
         const overlay = document.createElement('div');
         overlay.className = "fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-fade-in";
         overlay.innerHTML = `
@@ -389,13 +388,17 @@
             </div>
         `;
         document.body.appendChild(overlay);
-        if(confirmCallback) document.getElementById('btn-confirm-popup').onclick = () => { overlay.remove(); confirmCallback(); };
+        // Timeout nhẹ để CSS animation chạy
+        setTimeout(() => overlay.querySelector('div').classList.remove('scale-95'), 10);
+        if(confirmCallback) {
+            document.getElementById('btn-confirm-popup').onclick = () => { overlay.remove(); confirmCallback(); };
+        }
     };
 
-    // --- TIMER LOGIC (ĐẾM NGƯỢC) ---
+    // --- TIMER LOGIC ---
     let timerInterval;
-    let timeLeft = 30 * 60; // 30 phút tính bằng giây
-    const totalTime = 30 * 60; // Dùng để tính % thanh chạy
+    let timeLeft = 30 * 60; 
+    const totalTime = 30 * 60; 
 
     function startTimer() {
         const timerText = document.getElementById('timer-text');
@@ -409,7 +412,6 @@
                 timerMini.innerText = "0";
                 timerCircle.style.strokeDasharray = "0, 100";
                 
-                // Tự động nộp bài khi hết giờ
                 showPopup('warning', 'Hết giờ!', 'Đã hết thời gian làm bài. Hệ thống sẽ tự động nộp bài.', () => {
                     submitQuizProcess();
                 });
@@ -417,22 +419,18 @@
             }
 
             timeLeft--;
-
-            // Cập nhật text (Phút : Giây)
             let m = Math.floor(timeLeft / 60);
             let s = timeLeft % 60;
             let mStr = m < 10 ? "0" + m : m;
             let sStr = s < 10 ? "0" + s : s;
             
             if (timerText) timerText.innerText = `${mStr} phút ${sStr} giây`;
-            if (timerMini) timerMini.innerText = m; // Chỉ hiện phút trên icon nhỏ
+            if (timerMini) timerMini.innerText = m; 
 
-            // Cập nhật vòng tròn (strokeDasharray từ 100 -> 0)
             if (timerCircle) {
                 const percentage = (timeLeft / totalTime) * 100;
                 timerCircle.style.strokeDasharray = `${percentage}, 100`;
                 
-                // Đổi sang màu đỏ nếu còn dưới 5 phút (300 giây)
                 if (timeLeft < 300) {
                     timerCircle.classList.remove('text-orange-500');
                     timerCircle.classList.add('text-red-500');
@@ -481,9 +479,7 @@
                 form.appendChild(div);
             });
 
-            // GỌI HÀM ĐẾM NGƯỢC Ở ĐÂY SAU KHI ĐÃ TẢI XONG ĐỀ:
             startTimer();
-
         } catch (e) { console.error(e); }
     }
 
@@ -491,11 +487,17 @@
         showPopup('warning', 'Nộp bài', 'Bạn chắc chắn muốn nộp bài chứ?', submitQuizProcess);
     };
 
-    // --- QUAN TRỌNG: LOGIC CHẤM & THƯỞNG ---
+    // --- LOGIC CHẤM & THƯỞNG (FIX CHUẨN ANTI-FARM) ---
     const submitQuizProcess = async () => {
         clearInterval(timerInterval);
         if (currentQuestions.length === 0) return;
         
+        const submitBtn = document.querySelector('#submit-area button');
+        if(submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="text-xl relative z-10"><i class="fas fa-spinner fa-spin"></i> ĐANG CHẤM ĐIỂM...</span>';
+        }
+
         let correctCount = 0;
         currentQuestions.forEach((item, index) => {
             const radios = document.getElementsByName(`q${index}`);
@@ -505,71 +507,115 @@
                 r.disabled = true; 
             }
             
-            // UI Highlight
             const correctLbl = document.getElementById(`lbl-${index}-${item.correct}`);
-            if(correctLbl) correctLbl.classList.add('correct'); // Xanh lá
+            if(correctLbl) correctLbl.classList.add('correct');
             
             if(selected === item.correct) correctCount++;
             else if (selected !== -1) {
                 const wrongLbl = document.getElementById(`lbl-${index}-${selected}`);
-                if(wrongLbl) wrongLbl.classList.add('wrong'); // Đỏ
+                if(wrongLbl) wrongLbl.classList.add('wrong');
             }
         });
 
         const totalScore = parseFloat(((correctCount / currentQuestions.length) * 10).toFixed(1));
         const pass = totalScore >= 6.0;
 
-        showResultUI(totalScore, correctCount, pass);
-
-        // LƯU DB & THƯỞNG
         if(userUid) {
             try {
-                // 1. Lưu activity log
+                document.getElementById('loading-overlay').style.display = 'flex';
+
                 await addDoc(collection(db, "activities"), {
                     uid: userUid,
                     userName: auth.currentUser.displayName || "User", 
                     examTitle: "Trắc nghiệm Level 1",
-                    action: `Vượt ải Level 1: ${totalScore} điểm`,
-                    type: "reading", // Để tính vào skill tree Reading
+                    action: `Ôn tập Level 1: ${totalScore} điểm`,
+                    type: "quiz", 
                     score: totalScore,
                     timestamp: serverTimestamp()
                 });
 
-                // 2. Nếu ĐẬU -> Mở khóa Level 2 & Thưởng 10 Keys
+                let isFirstTimePass = false;
+
                 if(pass) {
-                    const userRef = doc(db, "users", userUid);
                     const progressRef = doc(db, "users_progress", userUid);
-
-                    // Cộng Keys
-                    await updateDoc(userRef, { keys: increment(10) });
-
-                    // Update Level (Lấy level hiện tại để so sánh, tránh lùi level)
+                    const userRef = doc(db, "users", userUid);
+                    
                     const progSnap = await getDoc(progressRef);
-                    let currentLvl = 1;
-                    if(progSnap.exists()) currentLvl = progSnap.data().currentLevel || 1;
+                    const progData = progSnap.exists() ? progSnap.data() : {};
                     
-                    if(currentLvl < 2) {
-                        await setDoc(progressRef, { currentLevel: 2, lastPassed: serverTimestamp() }, { merge: true });
+                    // Lấy mảng an toàn và ép về số nguyên để so sánh chuẩn
+                    const rewardedLevels = (progData.rewardedLevels || []).map(Number);
+                    
+                    // CHỈ THƯỞNG KHI MẢNG CHƯA CÓ SỐ 1
+                    if(!rewardedLevels.includes(1)) {
+                        isFirstTimePass = true;
+                        rewardedLevels.push(1); 
+                        
+                        await setDoc(userRef, { keys: increment(10) }, { merge: true });
+                        
+                        let newCurrentLvl = Math.max(progData.currentLevel || 1, 2);
+                        let newPaidLvl = Math.max(progData.paidLevel || 0, 2);
+
+                        await setDoc(progressRef, { 
+                            currentLevel: newCurrentLvl, 
+                            paidLevel: newPaidLvl, 
+                            rewardedLevels: rewardedLevels, 
+                            lastPassed: serverTimestamp() 
+                        }, { merge: true });
                     }
-                    
-                    console.log("Đã thưởng 10 keys và mở Level 2!");
                 }
-            } catch (e) { console.error("Firebase Error:", e); }
+                
+                document.getElementById('loading-overlay').style.display = 'none';
+                showResultUI(totalScore, correctCount, pass, isFirstTimePass);
+
+            } catch (e) { 
+                console.error("Firebase Error:", e); 
+                document.getElementById('loading-overlay').style.display = 'none';
+                alert("Lỗi mạng! Chưa thể lưu kết quả."); 
+                if(submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span class="text-xl relative z-10">NỘP BÀI & CHẤM ĐIỂM</span>';
+                }
+            }
+        } else {
+            showResultUI(totalScore, correctCount, pass, false);
         }
     };
 
-    function showResultUI(score, correct, pass) {
+    // --- HÀM SHOW KẾT QUẢ ---
+    function showResultUI(score, correct, pass, isFirstTimePass) {
         document.getElementById('result-box').style.display = 'block';
         document.getElementById('submit-area').style.display = 'none';
-        document.getElementById('result-box').scrollIntoView({ behavior: 'smooth' });
+        
+        document.getElementById('result-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
 
         document.getElementById('score-text').innerText = score;
         document.getElementById('result-detail').innerText = `${correct}/${currentQuestions.length} câu đúng`;
         
         if (pass) {
-            document.getElementById('result-title').innerText = "XUẤT SẮC! NHẬN 10 KEYS";
+            if (isFirstTimePass) {
+                document.getElementById('result-title').innerText = "XUẤT SẮC! NHẬN 10 KEYS";
+                
+                // Hiệu ứng pháo giấy
+                const duration = 3 * 1000;
+                const end = Date.now() + duration;
+
+                (function frame() {
+                    confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#FF8F50', '#FF5E62', '#ffffff'] });
+                    confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#FF8F50', '#FF5E62', '#ffffff'] });
+                    if (Date.now() < end) requestAnimationFrame(frame);
+                }());
+                
+                showPopup('info', 'Mở khóa thành công!', 'Bạn vừa nhận được 10 Keys và Mở khóa Level 2. Hãy tiếp tục hành trình nhé!');
+            } else {
+                document.getElementById('result-title').innerText = "ÔN TẬP HOÀN HẢO!";
+            }
+            
             document.getElementById('result-title').className = "text-3xl font-black text-green-600 mb-1";
-            document.getElementById('next-btn').classList.remove('hidden');
+            
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.innerHTML = `Về Bản Đồ Hành Trình <i class="fas fa-map-marked-alt ml-2"></i>`;
+            nextBtn.classList.remove('hidden');
         } else {
             document.getElementById('result-title').innerText = "CỐ GẮNG LÊN!";
             document.getElementById('result-title').className = "text-3xl font-black text-red-500 mb-1";
@@ -577,7 +623,6 @@
         }
     }
     
-    // Nút mở khóa Level 2 sẽ quay về bản đồ
     window.nextLevel = () => window.location.href = "../dashboard/nhatkyhoctap.html";
 </script>
 </body>

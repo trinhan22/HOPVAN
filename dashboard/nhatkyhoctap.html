@@ -373,7 +373,8 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, updateDoc, increment, collection, query, where, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    // Thêm onSnapshot vào import để đồng bộ Real-time
+    import { getFirestore, doc, setDoc, increment, collection, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     import { initMenu } from "./menu.js";
 
     // --- CONFIG ---
@@ -406,58 +407,60 @@
 
     initMenu(app);
 
-    // --- MAIN LOGIC (CẬP NHẬT AVATAR) ---
-    onAuthStateChanged(auth, async (user) => {
+    // --- MAIN LOGIC (SỬ DỤNG ONSNAPSHOT ĐỂ ĐỒNG BỘ REAL-TIME) ---
+    onAuthStateChanged(auth, (user) => {
         if (user) {
             const name = user.displayName || user.email.split('@')[0];
             document.getElementById('welcome-name').innerText = `Xin chào, ${name}`;
-            
             const avatarEl = document.getElementById('avatar-initial');
 
-            // 1. Tải Thông tin User (Chứa Keys, Streak và Avatar)
-            const userSnap = await getDoc(doc(db, "users", user.uid));
-            
-            if (userSnap.exists()) {
-                const d = userSnap.data();
-                userKeys = d.keys || 0;
-                document.getElementById('keys-val').innerText = userKeys;
-                document.getElementById('streak-val').innerText = d.streak || 0;
-                updateRank(d.streak || 0);
+            // 1. Đồng bộ thông tin Keys & Avatar ngay lập tức
+            onSnapshot(doc(db, "users", user.uid), (userSnap) => {
+                if (userSnap.exists()) {
+                    const d = userSnap.data();
+                    userKeys = d.keys || 0;
+                    document.getElementById('keys-val').innerText = userKeys;
+                    document.getElementById('streak-val').innerText = d.streak || 0;
+                    updateRank(d.streak || 0);
 
-                // LOGIC AVATAR ƯU TIÊN
-                let hasAvatar = false;
-                if (d.customAvatar) {
-                    avatarEl.innerHTML = `<img src="${d.customAvatar}" alt="User" style="width: 100%; height: 100%; object-fit: cover;">`;
-                    avatarEl.style.background = 'transparent';
-                    hasAvatar = true;
-                } else if (d.photoURL || user.photoURL) {
-                    avatarEl.innerHTML = `<img src="${d.photoURL || user.photoURL}" alt="User" style="width: 100%; height: 100%; object-fit: cover;">`;
-                    avatarEl.style.background = 'transparent';
-                    hasAvatar = true;
+                    // LOGIC AVATAR ƯU TIÊN
+                    let hasAvatar = false;
+                    if (d.customAvatar) {
+                        avatarEl.innerHTML = `<img src="${d.customAvatar}" alt="User" style="width: 100%; height: 100%; object-fit: cover;">`;
+                        avatarEl.style.background = 'transparent';
+                        hasAvatar = true;
+                    } else if (d.photoURL || user.photoURL) {
+                        avatarEl.innerHTML = `<img src="${d.photoURL || user.photoURL}" alt="User" style="width: 100%; height: 100%; object-fit: cover;">`;
+                        avatarEl.style.background = 'transparent';
+                        hasAvatar = true;
+                    }
+
+                    if (!hasAvatar) {
+                        avatarEl.innerHTML = "";
+                        avatarEl.innerText = name.charAt(0).toUpperCase();
+                        avatarEl.style.background = 'var(--primary-gradient)';
+                    }
                 }
+            });
 
-                if (!hasAvatar) {
-                    avatarEl.innerHTML = "";
-                    avatarEl.innerText = name.charAt(0).toUpperCase();
-                    avatarEl.style.background = 'var(--primary-gradient)';
+            // 2. Đồng bộ Progress (Mở khóa Level) ngay lập tức
+            onSnapshot(doc(db, "users_progress", user.uid), (progSnap) => {
+                if (progSnap.exists()) {
+                    const d = progSnap.data();
+                    currentLevel = d.currentLevel || 1; 
+                    paidLevel = d.paidLevel || 0;
+                } else {
+                    setDoc(doc(db, "users_progress", user.uid), { currentLevel: 1, paidLevel: 0 }, { merge: true });
+                    currentLevel = 1;
+                    paidLevel = 0;
                 }
+                
+                // Mỗi khi có thay đổi level (vừa thi xong), nó tự vẽ lại Map mà không cần reload
+                renderMap(); 
+            });
 
-            }
-
-            // 2. Tải Progress
-            const progRef = doc(db, "users_progress", user.uid);
-            const progSnap = await getDoc(progRef);
-            if (progSnap.exists()) {
-                const d = progSnap.data();
-                currentLevel = d.currentLevel || 1; 
-                paidLevel = d.paidLevel || 0;
-            } else {
-                await setDoc(progRef, { currentLevel: 1, paidLevel: 0 });
-            }
-
-            // 3. Render Dashboard
+            // 3. Render Dashboard Kỹ năng
             renderSkillTree(user.uid); 
-            renderMap(); 
         } else {
             window.location.href = "../log.html";
         }
@@ -592,17 +595,12 @@
     document.getElementById('btn-unlock-confirm').onclick = async () => {
         if (userKeys >= 5) {
             const uid = auth.currentUser.uid;
-            await updateDoc(doc(db, "users", uid), { keys: increment(-5) });
-            
-            const progRef = doc(db, "users_progress", uid);
-            await updateDoc(progRef, { paidLevel: window.pendingLevelId });
-            
-            userKeys -= 5;
-            paidLevel = window.pendingLevelId;
-            document.getElementById('keys-val').innerText = userKeys;
+            // Thay vì updateDoc, dùng setDoc với merge để an toàn tuyệt đối
+            await setDoc(doc(db, "users", uid), { keys: increment(-5) }, { merge: true });
+            await setDoc(doc(db, "users_progress", uid), { paidLevel: window.pendingLevelId }, { merge: true });
             
             closeModal();
-            renderMap();
+            // Không cần gọi renderMap ở đây nữa vì onSnapshot sẽ tự động bắt thay đổi và vẽ lại map
         } else {
             closeModal();
             document.getElementById('modal-alert').classList.add('show');

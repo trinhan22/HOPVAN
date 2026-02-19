@@ -383,7 +383,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const API_URL = `/.netlify/functions/gemini-proxy`; // Logic Groq
+    const API_URL = `/.netlify/functions/gemini-proxy`; 
     let userUid = null;
     let levelData = null; 
 
@@ -445,7 +445,7 @@
         } catch (e) { console.error(e); }
     }
 
-    // --- 2. XỬ LÝ NỘP BÀI ---
+    // --- 2. XỬ LÝ NỘP BÀI (ĐÃ CHUẨN HÓA ANTI-FARM LEVEL 3) ---
     window.confirmSubmission = () => {
         if (!levelData) return;
         const content = document.getElementById('student-essay').value.trim();
@@ -458,8 +458,15 @@
     const handleRealSubmit = async () => {
         const content = document.getElementById('student-essay').value.trim();
         document.getElementById('loading-overlay').style.display = 'flex';
+        clearInterval(interval); // Dừng đồng hồ
 
-        // PROMPT CHUYÊN DỤNG CHO NLXH (GROQ/LLAMA-3)
+        // Tắt nút nộp bài
+        const submitBtn = document.querySelector('#submit-area button');
+        if(submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="relative z-10 flex items-center gap-2">ĐANG CHẤM ĐIỂM <i class="fas fa-spinner fa-spin"></i></span>';
+        }
+
         const systemPrompt = `
         BẠN LÀ: Giám khảo chấm thi THPT Quốc Gia môn Ngữ Văn (Phần Nghị Luận Xã Hội).
         NHIỆM VỤ: Chấm điểm đoạn văn 200 chữ của học sinh.
@@ -485,12 +492,11 @@
         `;
 
         try {
-            // GỬI SANG PROXY (Chuẩn Messages + Tách System Prompt)
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    systemPrompt: systemPrompt,  // Gửi riêng
+                    systemPrompt: systemPrompt,
                     messages: `BÀI LÀM CỦA HỌC SINH:\n${content}`
                 })
             });
@@ -498,14 +504,11 @@
             if (!response.ok) throw new Error("SERVER_ERROR");
 
             const data = await response.json();
-            
-            // Xử lý kết quả từ Groq
             if (!data.choices || !data.choices[0] || !data.choices[0].message) {
                 throw new Error("NO_CONTENT");
             }
 
             let rawText = data.choices[0].message.content;
-            // Làm sạch JSON
             rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
             const firstBrace = rawText.indexOf('{');
             const lastBrace = rawText.lastIndexOf('}');
@@ -517,76 +520,118 @@
             try {
                 res = JSON.parse(rawText);
             } catch (e) {
-                console.error("JSON Error:", rawText);
                 throw new Error("INVALID_JSON");
             }
 
-            // --- DATA SANITIZATION (AN TOÀN CHO FIREBASE) ---
             let safeScore = parseFloat(res.score);
             if (isNaN(safeScore)) safeScore = 0;
             if (safeScore > 10) safeScore = 10;
-            res.score = safeScore; // Gán lại giá trị chuẩn
+            res.score = safeScore; 
 
-            // Hiển thị kết quả
-            renderResult(res);
+            let isFirstTimePass = false;
 
-            // Lưu Firebase
+            // LƯU FIREBASE
             if(userUid) {
                 await addDoc(collection(db, "activities"), { 
                     uid: userUid, 
                     userName: auth.currentUser.displayName || "User",
-                    examTitle: levelData.title, 
-                    action: `Đọc hiểu Level 2: ${safeScore}đ`, 
-                    type: "journal", 
+                    examTitle: levelData.title || "Nghị Luận Xã Hội", 
+                    action: `Viết NLXH Level 3: ${safeScore}đ`, 
+                    type: "nlxh", // Sửa thành nlxh để thống kê đúng
                     score: safeScore,
                     timestamp: serverTimestamp() 
                 });
                 
-                // --- LOGIC MỚI: MỞ KHÓA & THƯỞNG KEYS ---
                 if(safeScore >= 6) {
                     const progressRef = doc(db, "users_progress", userUid);
                     const userRef = doc(db, "users", userUid);
                     
-                    // 1. Mở khóa Level 3 (Nếu chưa mở)
                     const progSnap = await getDoc(progressRef);
-                    const currentLvl = progSnap.exists() ? (progSnap.data().currentLevel || 1) : 1;
+                    const progData = progSnap.exists() ? progSnap.data() : {};
+                    const rewardedLevels = (progData.rewardedLevels || []).map(Number);
                     
-                    if (currentLvl < 3) {
-                        await setDoc(progressRef, { currentLevel: 3, lastPassed: serverTimestamp() }, { merge: true });
-                    }
+                    // CHỐNG CÀY KEYS: Kiểm tra xem đã nhận thưởng Level 3 chưa
+                    if(!rewardedLevels.includes(3)) {
+                        isFirstTimePass = true;
+                        rewardedLevels.push(3);
+                        
+                        await setDoc(userRef, { keys: increment(10) }, { merge: true });
+                        
+                        // Cập nhật mở khóa Level 4
+                        let newCurrentLvl = Math.max(progData.currentLevel || 1, 4);
+                        let newPaidLvl = Math.max(progData.paidLevel || 0, 4);
 
-                    // 2. Thưởng 10 Keys
-                    await updateDoc(userRef, { keys: increment(10) });
-                    console.log("Đã thưởng 10 keys và mở Level 4!");
+                        await setDoc(progressRef, { 
+                            currentLevel: newCurrentLvl, 
+                            paidLevel: newPaidLvl,
+                            rewardedLevels: rewardedLevels, 
+                            lastPassed: serverTimestamp() 
+                        }, { merge: true });
+                    }
                 }
             }
+
+            document.getElementById('loading-overlay').style.display = 'none';
+            renderResult(res, isFirstTimePass); // Truyền cờ vào để bắn pháo
+
         } catch (e) { 
             console.error(e);
             let msg = "Có lỗi xảy ra, vui lòng thử lại!";
             if (e.message === "SERVER_ERROR") msg = "Server AI đang bận hoặc quá tải.";
             if (e.message === "INVALID_JSON") msg = "AI trả về dữ liệu lỗi. Vui lòng nộp lại!";
+            
+            document.getElementById('loading-overlay').style.display = 'none';
             showPopup('error', 'Lỗi kết nối', msg); 
+            
+            // Bật lại nút nếu lỗi
+            if(submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span class="relative z-10 flex items-center gap-2">NỘP BÀI & CHẤM ĐIỂM <i class="fas fa-paper-plane"></i></span>';
+            }
         }
-        finally { document.getElementById('loading-overlay').style.display = 'none'; }
     };
 
-    function renderResult(res) {
+    // --- 3. SHOW KẾT QUẢ KÈM HIỆU ỨNG (RENDER) ---
+    function renderResult(res, isFirstTimePass) {
         document.getElementById('result-box').style.display = 'block';
         document.getElementById('submit-area').style.display = 'none';
-        document.getElementById('result-box').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('result-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
 
         document.getElementById('score-text').innerText = res.score;
-        document.getElementById('result-title').innerText = res.title;
         document.getElementById('result-desc').innerText = res.desc;
         document.getElementById('ai-correction').innerHTML = res.correction_html;
         document.getElementById('pros-list').innerHTML = res.pros.map(i => `<li>${i}</li>`).join('');
         document.getElementById('cons-list').innerHTML = res.cons.map(i => `<li>${i}</li>`).join('');
 
+        const title = document.getElementById('result-title');
         const ring = document.getElementById('score-ring');
+
         if (res.score >= 6) {
             ring.style.background = `conic-gradient(#10B981 ${res.score*10}%, rgba(255,255,255,0.5) 0%)`;
             document.getElementById('next-btn').classList.remove('hidden');
+
+            // XỬ LÝ TEXT VÀ PHÁO GIẤY
+            if (isFirstTimePass) {
+                title.innerText = "XUẤT SẮC! NHẬN 10 KEYS";
+                title.className = "text-2xl font-black text-green-600 mb-2";
+
+                // Pháo giấy
+                const duration = 3 * 1000;
+                const end = Date.now() + duration;
+                (function frame() {
+                    confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#FF8F50', '#FF5E62', '#ffffff'] });
+                    confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#FF8F50', '#FF5E62', '#ffffff'] });
+                    if (Date.now() < end) requestAnimationFrame(frame);
+                }());
+
+                showPopup('info', 'Mở khóa thành công!', 'Bạn vừa nhận được 10 Keys và Mở khóa Level 4. Hãy tiếp tục hành trình nhé!');
+            } else {
+                title.innerText = "ÔN TẬP HOÀN HẢO!";
+                title.className = "text-2xl font-black text-green-600 mb-2";
+            }
         } else {
+            title.innerText = "CHƯA ĐẠT"; 
+            title.className = "text-2xl font-black text-red-500 mb-2";
             ring.style.background = `conic-gradient(#EF4444 ${res.score*10}%, rgba(255,255,255,0.5) 0%)`;
             document.getElementById('retry-btn').classList.remove('hidden');
         }
@@ -601,11 +646,12 @@
 
     // Timer (60 mins)
     let totalSeconds = 3600; 
+    let interval;
     const timerText = document.getElementById('timer-text');
     const timerMini = document.getElementById('timer-mini');
     const timerCircle = document.getElementById('timer-circle');
 
-    const interval = setInterval(() => {
+    interval = setInterval(() => {
         if(totalSeconds > 0) {
             totalSeconds--;
             const m = Math.floor(totalSeconds / 60);
@@ -619,10 +665,6 @@
             showPopup('warning', 'Hết giờ!', 'Hệ thống tự động nộp bài.', handleRealSubmit);
         }
     }, 1000);
-
-    fetch('menu.html').then(r=>r.text()).then(h=>{
-        const p = document.getElementById('menu-placeholder'); if(p) p.innerHTML=h;
-    });
 
 // --- FULLSCREEN LOGIC ---
     window.enableFullscreen = () => {
@@ -655,23 +697,14 @@
     const essayArea = document.getElementById('student-essay');
 
     if (essayArea) {
-        // 1. Chặn hành động Dán (Paste)
         essayArea.addEventListener('paste', (e) => {
-            e.preventDefault(); // Ngăn chặn hành động dán
-            showPopup("Chế độ Luyện Tập", "Vui lòng tự gõ bài để rèn luyện tư duy.\nHệ thống không cho phép Copy-Paste.", "warning");
+            e.preventDefault(); 
+            showPopup("warning", "Chế độ Luyện Tập", "Vui lòng tự gõ bài để rèn luyện tư duy.\nHệ thống không cho phép Copy-Paste.");
         });
-
-        // 2. Chặn hành động Sao chép & Cắt (Copy & Cut) - Để tránh copy đề hoặc bài ra ngoài
         essayArea.addEventListener('copy', (e) => e.preventDefault());
         essayArea.addEventListener('cut', (e) => e.preventDefault());
-
-        // 3. Chặn Kéo thả text vào ô (Drop)
         essayArea.addEventListener('drop', (e) => e.preventDefault());
-
-        // 4. (Tuỳ chọn) Chặn Menu chuột phải trong ô nhập liệu
-        essayArea.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-        });
+        essayArea.addEventListener('contextmenu', (e) => e.preventDefault());
     }
 </script>
 
