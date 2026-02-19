@@ -66,37 +66,42 @@
         }
 
         /* --- HEADER --- */
-.user-header { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: 40px; 
-    
-    /* QUAN TRỌNG: Định vị nó ở lớp thấp (Layer 1) */
-    position: relative; 
-    z-index: 1; 
-}
+        .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; position: relative; z-index: 10;}
         .welcome-text h2 { font-size: 2.2rem; font-weight: 800; color: var(--text-main); }
         .user-avatar { width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.3rem; box-shadow: 0 10px 25px rgba(255, 143, 80, 0.3); transform: rotate(-5deg); transition: 0.3s; cursor: pointer; }
         .user-avatar:hover { transform: rotate(0deg) scale(1.1); }
 
         /* --- DISCORD CARD (Balanced Size) --- */
         .community-center { 
-            flex: 1; display: flex; justify-content: center; align-items: center; padding-bottom: 50px;
-            perspective: 1200px;
+            flex: 1; display: flex; justify-content: center; align-items: center; padding-bottom: 30px;
         }
 
-        .discord-card-compact {
-            width: 100%; max-width: 850px; padding: 50px 60px; border-radius: 45px;
-            display: flex; align-items: center; gap: 45px; position: relative; overflow: hidden;
-            border: 2px solid white; box-shadow: 0 30px 80px rgba(88, 101, 242, 0.12);
-            background: linear-gradient(120deg, #ffffff 0%, #f4f7ff 50%, #ffffff 100%);
-            background-size: 200% 200%; animation: auroraMove 12s ease infinite;
-            transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+        .discord-card-pro {
+            width: 100%; max-width: 900px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 1);
+            border-radius: 40px;
+            padding: 50px 60px;
+            display: flex; align-items: center; gap: 50px;
+            box-shadow: 0 20px 60px rgba(88, 101, 242, 0.12);
+            position: relative; overflow: hidden;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
         }
+
+        .discord-card-pro:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 70px rgba(88, 101, 242, 0.2);
+            background: white;
+        }
+
+        /* Ánh sáng mờ ảo bên trong Card */
+        .dc-glow { position: absolute; border-radius: 50%; filter: blur(60px); z-index: 0; pointer-events: none; }
+        .blob-top { width: 300px; height: 300px; background: rgba(88, 101, 242, 0.15); top: -100px; left: -100px; animation: pulseGlow 6s infinite alternate; }
+        .blob-bottom { width: 400px; height: 400px; background: rgba(255, 143, 80, 0.1); bottom: -150px; right: -150px; animation: pulseGlow 8s infinite alternate-reverse; }
         
-        @keyframes auroraMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
+        @keyframes pulseGlow { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(1.2); opacity: 1; } }
+        
         .discord-card-compact:hover {
             transform: translateY(-10px) rotateX(3deg) rotateY(-3deg);
             box-shadow: 0 45px 100px rgba(88, 101, 242, 0.18);
@@ -120,23 +125,63 @@
 
         @keyframes breathe { 0%, 100% { transform: scale(1) translateZ(40px); } 50% { transform: scale(1.05) translateZ(40px); } }
 
+        .dc-watermark {
+            position: absolute; right: -40px; top: -30px; font-size: 28rem;
+            color: #5865F2; opacity: 0.03; z-index: 0; transform: rotate(-15deg);
+            pointer-events: none; transition: 0.5s ease;
+        }
+
+        .discord-card-pro:hover .dc-watermark { transform: rotate(0) scale(1.05); opacity: 0.05; }
+        
+        .dc-left { position: relative; z-index: 2; flex-shrink: 0; }
+        .dc-icon-wrapper {
+            width: 150px; height: 150px;
+            background: linear-gradient(135deg, #5865F2, #4752C4);
+            border-radius: 40px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 6rem; color: white;
+            box-shadow: 0 20px 40px rgba(88, 101, 242, 0.4), inset 0 5px 15px rgba(255,255,255,0.3);
+            animation: floatLogo 4s ease-in-out infinite;
+            border: 4px solid rgba(255,255,255,0.6);
+        }
+
+        @keyframes floatLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        /* Nội dung bên phải */
+        .dc-right { position: relative; z-index: 2; flex: 1; }
+
+        .dc-badge {
+            display: inline-block; padding: 6px 16px; background: #EEF0FF; color: #5865F2;
+            font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+            border-radius: 20px; margin-bottom: 15px; border: 1px solid #D4D8FF;
+        }
+
+        .dc-title { font-size: 2.2rem; font-weight: 900; color: #2D3436; margin-bottom: 12px; letter-spacing: -1px; line-height: 1.2; }
+
+        .dc-features { list-style: none; margin-bottom: 30px; display: flex; flex-direction: column; gap: 10px; }
+        .dc-features li { display: flex; align-items: center; gap: 12px; font-weight: 700; color: #475569; font-size: 0.95rem; }
+        .dc-features i { color: #5865F2; font-size: 1.2rem; }
+
         .dc-content-side { flex: 1; text-align: left; position: relative; z-index: 2; transform: translateZ(25px); }
         .dc-title { font-size: 2.2rem; font-weight: 900; color: var(--text-main); margin-bottom: 12px; letter-spacing: -1px; line-height: 1.1; }
-        .dc-desc { font-size: 1.05rem; color: var(--text-light); line-height: 1.6; margin-bottom: 28px; }
+        .dc-desc { font-size: 1.05rem; color: var(--text-light); line-height: 1.6; margin-bottom: 20px; }
         .dc-desc strong { color: var(--discord-color); font-weight: 800; }
 
-        .btn-join-discord {
-            background: var(--discord-color); color: white; padding: 16px 45px;
-            border-radius: 100px; font-weight: 800; font-size: 1.15rem;
-            text-decoration: none; display: inline-flex; align-items: center; gap: 12px;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            box-shadow: 0 10px 25px rgba(88, 101, 242, 0.3); border: none; cursor: pointer;
+        .btn-join-discord-pro {
+            background: #5865F2; color: white; padding: 16px 35px;
+            border-radius: 20px; font-weight: 800; font-size: 1.1rem;
+            display: inline-flex; align-items: center; gap: 12px; border: none; cursor: pointer;
+            box-shadow: 0 10px 25px rgba(88, 101, 242, 0.4); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; overflow: hidden;
+        }
+        .btn-join-discord-pro::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+            transform: skewX(-25deg); transition: 0s;
         }
 
-        .btn-join-discord:hover {
-            transform: scale(1.05); background: #4752C4;
-            box-shadow: 0 15px 35px rgba(88, 101, 242, 0.4);
-        }
+        .btn-join-discord-pro:hover { transform: translateY(-3px) scale(1.02); background: #4752C4; box-shadow: 0 15px 35px rgba(88, 101, 242, 0.5); }
+        .btn-join-discord-pro:hover::before { left: 200%; transition: 0.6s ease; }
 
         .dc-float { position: absolute; font-size: 2.5rem; opacity: 0.08; animation: floatIcon 6s infinite ease-in-out; pointer-events: none; z-index: 0; color: var(--discord-color); }
         .df-1 { top: 10%; right: 10%; } 
@@ -148,47 +193,30 @@
         }
 
         /* --- MOBILE OPTIMIZATION (CẬP NHẬT MỚI) --- */
-        /* Ẩn nút toggle cũ vì đã có header mới */
         .menu-toggle { display: none; }
 
         @media (max-width: 768px) {
-            /* Hiển thị Header Mobile & Overlay logic */
             .mobile-header { display: flex; z-index: 1000; }
             #sidebar-overlay.active { display: block; }
 
-            /* Fix Sidebar - Ép menu về trái và ẩn đi */
             aside {
-                position: fixed !important; 
-                left: 0 !important; top: 0 !important; bottom: 0 !important;
-                transform: translateX(-100%); 
-                z-index: 9999 !important; 
-                width: 280px !important; 
-                background: white !important;
-                transition: transform 0.3s ease-in-out !important;
+                position: fixed !important; left: 0 !important; top: 0 !important; bottom: 0 !important;
+                transform: translateX(-100%); z-index: 9999 !important; width: 280px !important; 
+                background: white !important; transition: transform 0.3s ease-in-out !important;
             }
-            aside.open { 
-                transform: translateX(0) !important;
-                box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important;
-            }
+            aside.open { transform: translateX(0) !important; box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important; }
 
-            /* Main Content Adjustments */
-            .main-content { 
-                margin-left: 0 !important; 
-                width: 100% !important; 
-                padding: 80px 20px 30px !important; /* Padding top 80px để tránh header đè */
-            }
-
-            /* Responsive Discord Card */
-            .community-center { padding-bottom: 20px; align-items: flex-start; }
-            .discord-card-compact { flex-direction: column; text-align: center; padding: 40px 25px; gap: 30px; }
-            .dc-content-side { text-align: center; width: 100%; }
-            .dc-logo-side { width: 90px; height: 90px; font-size: 3rem; }
-            .dc-title { font-size: 1.6rem; }
-            .dc-desc { font-size: 0.95rem; }
-            .btn-join-discord { width: 100%; justify-content: center; font-size: 1rem; padding: 14px 20px; }
-            .dc-float { display: none; }
+            .main-content { margin-left: 0 !important; width: 100% !important; padding: 80px 20px 30px !important; }
             
-            /* Typography Mobile */
+            /* Sửa lại cho Card Discord Mobile */
+            .discord-card-pro { flex-direction: column; padding: 40px 25px; text-align: center; gap: 30px; }
+            .dc-icon-wrapper { width: 110px; height: 110px; font-size: 4.5rem; margin: 0 auto; animation: none; transform: translateY(-10px);}
+            .dc-title { font-size: 1.7rem; }
+            .dc-features { align-items: center; }
+            .dc-features li { justify-content: center; }
+            .btn-join-discord-pro { width: 100%; justify-content: center; }
+            .dc-watermark { display: none; }
+            
             .user-header { margin-bottom: 20px; }
             .welcome-text h2 { font-size: 1.8rem; }
         }
@@ -263,21 +291,30 @@
             </div>
 
             <div class="community-center">
-                <div class="discord-card-compact">
-                    <i class="fab fa-discord dc-float df-1"></i>
-                    <i class="fas fa-feather-alt dc-float df-2"></i>
+                <div class="discord-card-pro">
+                    <div class="dc-glow blob-top"></div>
+                    <div class="dc-glow blob-bottom"></div>
+                    <i class="fab fa-discord dc-watermark"></i>
 
-                    <div class="dc-logo-side">
-                        <i class="fab fa-discord"></i>
+                    <div class="dc-left">
+                        <div class="dc-icon-wrapper">
+                            <i class="fab fa-discord"></i>
+                        </div>
                     </div>
 
-                    <div class="dc-content-side">
+                    <div class="dc-right">
+                        <div class="dc-badge"><i class="fas fa-fire" style="color: #5865F2"></i> Cộng đồng #1</div>
                         <h1 class="dc-title">Gia nhập Server HopVan</h1>
-                        <p class="dc-desc">
-                            Cùng <strong>các bạn học khác</strong> trao đổi tài liệu, livestream chữa đề và giải đáp thắc mắc về môn Ngữ Văn.
-                        </p>
-                        <button id="btn-discord-action" class="btn-join-discord">
-                            <i class="fab fa-discord"></i> Tham gia ngay
+                        <p class="dc-desc">Nơi hội tụ của các sĩ tử HopVan, cùng nhau bứt phá điểm số môn Ngữ Văn với vô vàn đặc quyền:</p>
+                        
+                        <ul class="dc-features">
+                            <li><i class="fas fa-check-circle"></i> Trao đổi tài liệu thi cử, miễn phí, chất lượng</li>
+                            <li><i class="fas fa-check-circle"></i> Livestream chữa đề & thực chiến mỗi tuần</li>
+                            <li><i class="fas fa-check-circle"></i> Giải đáp thắc mắc 24/7 từ các Mentor</li>
+                        </ul>
+
+                        <button id="btn-discord-action" class="btn-join-discord-pro">
+                            <i class="fab fa-discord"></i> Tham gia Discord ngay
                         </button>
                     </div>
                 </div>

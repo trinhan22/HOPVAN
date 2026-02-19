@@ -65,7 +65,7 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; position: relative; z-index: 10;}
         .welcome-text h2 { font-size: 2.2rem; font-weight: 800; color: var(--text-main); }
         .user-avatar { width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.3rem; box-shadow: 0 10px 25px rgba(255, 143, 80, 0.3); transform: rotate(-5deg); transition: 0.3s; cursor: pointer; }
         .user-avatar:hover { transform: rotate(0deg) scale(1.1); }
@@ -74,6 +74,8 @@
         .content-section.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* --- TÂN TRANG GIAO DIỆN CHÍNH --- */
+        
         .stats-grid { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr);
@@ -81,71 +83,112 @@
             margin-bottom: 30px; 
         }
         .stat-card {
-            background: white; padding: 25px; border-radius: 24px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.02); transition: 0.3s;
-            border: 1px solid rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;
+            background: rgba(255, 255, 255, 0.85); padding: 25px; border-radius: 28px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 1); display: flex; flex-direction: column; justify-content: space-between;
+            position: relative; overflow: hidden; z-index: 1;
         }
-        .stat-card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 15px 35px rgba(255, 143, 80, 0.15); }
+        .stat-card:hover { 
+            transform: translateY(-8px) scale(1.02); 
+            background: white;
+            box-shadow: 0 20px 40px rgba(255, 143, 80, 0.15); 
+            border-color: var(--primary); 
+            z-index: 10;
+        }
 
-        .stat-card h3 { font-size: 0.95rem; color: var(--text-light); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;}
-        .stat-card .value { font-size: 2.2rem; font-weight: 800; color: var(--text-main); line-height: 1; }
-        .stat-card .unit { font-size: 0.9rem; color: var(--primary); font-weight: 700; margin-top: 5px; }
+        .stat-card h3 { font-size: 0.95rem; color: var(--text-light); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; position: relative; z-index: 2;}
+        .stat-card .value { font-size: 2.5rem; font-weight: 900; color: var(--text-main); line-height: 1; position: relative; z-index: 2;}
+        .stat-card .unit { font-size: 0.9rem; color: var(--primary); font-weight: 700; margin-top: 8px; position: relative; z-index: 2;}
+
+        /* Icon watermark chìm cho Stat Card (Đưa xuống góc dưới bên phải) */
+        .stat-watermark {
+            position: absolute; right: -15px; bottom: -20px; font-size: 6rem;
+            opacity: 0.05; transform: rotate(-15deg); transition: all 0.5s ease; z-index: 0; pointer-events: none;
+        }
+        .stat-card:hover .stat-watermark { transform: rotate(0deg) scale(1.1); opacity: 0.1; color: var(--primary); }
+
+        .split-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px; margin-bottom: 30px; }
 
         .banner-cta {
-            background: var(--primary-gradient); padding: 40px; border-radius: 30px; color: white;
-            text-align: center; position: relative; overflow: hidden; margin-bottom: 30px;
+            background: var(--primary-gradient); padding: 40px; border-radius: 28px; color: white;
+            text-align: center; position: relative; overflow: hidden; margin-bottom: 0;
             box-shadow: 0 15px 30px rgba(255, 94, 98, 0.25);
         }
         .banner-cta:hover .banner-decor { transform: rotate(-35deg) translate(15px, -25px) scale(1.1); opacity: 0.4; }
-        .banner-decor { position: absolute; right: 20px; bottom: -20px; font-size: 8rem; opacity: 0.2; transform: rotate(-20deg); transition: all 0.5s ease; }
-
-        .split-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px; margin-bottom: 30px; }
-        .activity-box { background: white; padding: 25px; border-radius: 24px; border: 1px solid rgba(0,0,0,0.05); }
-        .activity-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid #f0f0f0; }
-        .activity-item:hover { transform: translateX(8px); background: #fafafa; border-radius: 12px; }
-
-        .chart-box {
-            background: white; border: 1px solid rgba(0,0,0,0.05);
-            padding: 20px; border-radius: 24px; position: relative;
-            display: flex; flex-direction: column; justify-content: space-between;
-            cursor: pointer; transition: 0.3s;
+        .banner-cta:hover { 
+            transform: translateY(-5px);
+            border-color: var(--primary); box-shadow: 0 20px 40px rgba(255, 143, 80, 0.12); 
         }
-        .chart-box:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.05); border-color: var(--primary); }
-        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .chart-title { font-weight: 800; color: var(--text-main); font-size: 1rem; }
+        .banner-decor { position: absolute; right: 20px; bottom: -20px; font-size: 8rem; opacity: 0.2; transform: rotate(-20deg); transition: all 0.5s ease; pointer-events: none;}
+
+        /* Tinh chỉnh các Box (BXH, Hoạt động, Thống kê) */
+        .activity-box, .chart-box { 
+            background: rgba(255, 255, 255, 0.85); 
+            padding: 25px; border-radius: 28px; 
+            border: 1px solid white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative; overflow: hidden; /* Cực kỳ quan trọng để giấu phần dư của icon */
+            display: flex; flex-direction: column;
+        }
+        .activity-box:hover, .chart-box:hover {
+            transform: translateY(-5px); 
+            background: white;
+            box-shadow: 0 20px 40px rgba(255, 143, 80, 0.12); 
+            border-color: var(--primary);
+        }
+
+        /* Icon watermark chìm cho Box (Đưa xuống góc dưới bên phải) */
+        .box-watermark {
+            position: absolute; right: -20px; bottom: -20px; font-size: 8rem; opacity: 0.03;
+            transform: rotate(-15deg); transition: 0.5s; z-index: 0; pointer-events: none;
+        }
+        .activity-box:hover .box-watermark, .chart-box:hover .box-watermark {
+            transform: rotate(0deg) scale(1.1); opacity: 0.08; color: var(--primary);
+        }
+        
+        /* Đảm bảo nội dung chữ nổi lên trên icon */
+        .activity-box > div, .activity-box > ul, .chart-box > div { position: relative; z-index: 2; }
+
+        .activity-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid rgba(0,0,0,0.03); transition: 0.3s; }
+        .activity-item:hover { transform: translateX(8px); background: rgba(255, 143, 80, 0.05); border-radius: 12px; padding-left: 10px; border-color: transparent;}
+
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .chart-title { font-weight: 900; color: var(--text-main); font-size: 1.1rem; }
         .chart-canvas-container { flex-grow: 1; position: relative; width: 100%; height: 180px; }
 
         .section-h3 { 
-            font-size: 1.4rem; font-weight: 900; color: var(--text-main); 
-            margin-top: 65px; margin-bottom: 25px; 
-            display: flex; align-items: center; gap: 12px; padding-left: 20px; 
+            font-size: 1.5rem; font-weight: 900; color: var(--text-main); 
+            margin-top: 50px; margin-bottom: 25px; 
+            display: flex; align-items: center; gap: 12px; padding-left: 10px; 
         }
-        .tips-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; padding: 0 20px; }
+        .tips-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
         .tip-card {
-            background: white; padding: 22px; border-radius: 22px; display: flex; align-items: center; gap: 18px;
-            cursor: pointer; border: 1px solid rgba(0,0,0,0.05); transition: 0.4s;
+            background: rgba(255, 255, 255, 0.85); padding: 22px; border-radius: 28px; display: flex; align-items: center; gap: 18px;
+            cursor: pointer; border: 1px solid white; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02); position: relative; overflow: hidden;
         }
-        .tip-card:hover { transform: translateY(-5px) translateX(10px); border-color: var(--primary); box-shadow: 0 10px 25px rgba(255, 143, 80, 0.12); }
-        .tip-img { width: 70px; height: 70px; border-radius: 15px; object-fit: cover; flex-shrink: 0; }
-        .tip-content h4 { font-weight: 800; font-size: 1.05rem; margin-bottom: 6px; color: var(--text-main); }
-        .tip-content p { font-size: 0.85rem; color: var(--text-light); line-height: 1.4; }
+        .tip-card:hover { 
+            transform: translateY(-5px); background: white;
+            border-color: var(--primary); box-shadow: 0 20px 40px rgba(255, 143, 80, 0.12); 
+        }
+        .tip-img { width: 75px; height: 75px; border-radius: 18px; object-fit: cover; flex-shrink: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .tip-content h4 { font-weight: 800; font-size: 1.05rem; margin-bottom: 6px; color: var(--text-main); transition: 0.3s; }
+        .tip-card:hover .tip-content h4 { color: var(--primary); }
+        .tip-content p { font-size: 0.85rem; color: var(--text-light); line-height: 1.5; }
 
-        /* --- HIỆU ỨNG POPUP CHUYÊN NGHIỆP (ĐÃ CẬP NHẬT) --- */
+        /* --- HIỆU ỨNG POPUP CHUYÊN NGHIỆP --- */
         .modal {
-            display: none; /* Mặc định ẩn */
+            display: none; 
             position: fixed; inset: 0; 
             z-index: 9999999; 
-            background-color: rgba(45, 52, 54, 0); /* Nền trong suốt ban đầu */
+            background-color: rgba(45, 52, 54, 0); 
             backdrop-filter: blur(0px);
             justify-content: center; align-items: center;
             opacity: 0;
             transition: all 0.4s ease;
         }
-
-        /* Class hiển thị khung (nhưng chưa hiện nội dung) */
         .modal.show-flex { display: flex !important; }
-
-        /* Class kích hoạt hiệu ứng (nền tối + blur) */
         .modal.active {
             background-color: rgba(45, 52, 54, 0.3);
             backdrop-filter: blur(10px);
@@ -158,14 +201,10 @@
             position: relative; 
             box-shadow: 0 40px 100px rgba(0, 0, 0, 0.1);
             display: flex; flex-direction: column; overflow: hidden;
-            
-            /* Trạng thái ban đầu: hơi nhỏ và nằm dưới */
             transform: translateY(40px) scale(0.95);
             opacity: 0;
             transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
         }
-
-        /* Khi active: nội dung trồi lên và rõ dần */
         .modal.active .modal-content {
             transform: translateY(0) scale(1);
             opacity: 1;
@@ -219,7 +258,6 @@
             #mini-leaderboard { max-height: 250px; }
             .tips-grid { grid-template-columns: 1fr !important; gap: 15px; }
             
-            /* Modal Mobile Slide Up */
             .modal { align-items: flex-end; }
             .modal-content { 
                 width: 100% !important; max-width: 100% !important; 
@@ -289,52 +327,58 @@
                 <h2 id="welcome-name">Xin chào,</h2>
                 <p style="color: var(--text-light); margin-top: 5px;">Hãy cùng bắt đầu học tập cùng với HopVan nhé!</p>
             </div>
-            <div class="user-avatar" id="avatar-initial" onclick="window.location.href='account.html'" title="Đi đến trang cá nhân"></div>
+            <div class="user-avatar overflow-hidden cursor-pointer" id="avatar-initial" onclick="window.location.href='account.html'" title="Đi đến trang cá nhân"></div>
         </div>
 
         <div id="overview" class="content-section active">
+            
             <div class="stats-grid">
-                <div class="stat-card">
+                <div class="stat-card group">
+                    <i class="fas fa-crown stat-watermark text-yellow-500"></i>
                     <h3><i class="fas fa-crown text-yellow-500"></i> Rank</h3>
-                    <div class="value" id="rank-val" style="font-size: 1.5rem; color: #FF8F50;">Tân Binh</div>
+                    <div class="value" id="rank-val" style="color: #FF8F50;">Tân Binh</div>
                     <div class="unit" id="next-rank-info">0 ngày:</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card group">
+                    <i class="fas fa-fire stat-watermark text-red-500"></i>
                     <h3><i class="fas fa-fire" style="color: #FF5E62;"></i> Chuỗi</h3>
                     <div class="value" id="streak-value">0</div> <div class="unit">ngày liên tiếp</div>
                 </div>
-                <div class="stat-card">
-                    <h3><i class="fas fa-key  text-yellow-500"></i> Keys</h3>
+                <div class="stat-card group">
+                    <i class="fas fa-key stat-watermark text-yellow-400"></i>
+                    <h3><i class="fas fa-key text-yellow-500"></i> Keys</h3>
                     <div class="value" id="keys-value">0</div> <div class="unit">hiện có</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card group">
+                    <i class="fas fa-file-signature stat-watermark text-orange-500"></i>
                     <h3><i class="fas fa-file-alt" style="color: #FF5E62;"></i> Đã làm</h3>
                     <div class="value" id="total-exams">0</div> <div class="unit">đề thi</div>
                 </div>
             </div>
             
             <div class="split-grid" style="align-items: stretch;"> 
-                <div class="banner-cta" style="margin-bottom: 0; padding: 30px 50px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; text-align: left; height: 100%;">
+                <div class="banner-cta" style="display: flex; flex-direction: column; justify-content: center; align-items: flex-start; text-align: left; height: 100%;">
                     <div style="position: relative; z-index: 2; width: 100%;">
                         <div style="background: rgba(255,255,255,0.25); backdrop-filter: blur(5px); display: inline-flex; align-items: center; padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
                             <i class="fas fa-magic mr-2 text-yellow-300"></i> AI Powered
                         </div>
                         <h2 style="font-size: 2rem; line-height: 1.2; margin-bottom: 12px; color: white; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.1);">Sẵn sàng bứt phá?</h2>
                         <p style="opacity: 0.95; margin-bottom: 28px; font-size: 1rem; font-weight: 500; max-width: 85%; line-height: 1.6;">Hệ thống AI sẽ phân tích điểm mạnh, điểm yếu <br>và đề xuất lộ trình ôn thi riêng biệt cho bạn.</p>
-                        <a href="phongluyende.html" class="hover:scale-105 hover:shadow-xl hover:bg-white/90 active:scale-95 transition-all duration-300 ease-out" style="background: white; color: #FF5E62; padding: 14px 32px; border: none; border-radius: 16px; font-weight: 800; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">Vào phòng luyện <i class="fas fa-arrow-right"></i></a>
+                        <a class='hover:scale-105 hover:shadow-xl hover:bg-white/90 active:scale-95 transition-all duration-300 ease-out' href='/dashboard/phongluyende.html' style='background: white; color: #FF5E62; padding: 14px 32px; border: none; border-radius: 16px; font-weight: 800; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);'>Vào phòng luyện <i class="fas fa-arrow-right"></i></a>
                     </div>
-                    <i class="fas fa-rocket banner-decor" style="font-size: 9rem; right: -20px; bottom: -40px; opacity: 0.15; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));"></i>
+                    <i class="fas fa-rocket banner-decor" style="filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));"></i>
                 </div>
 
-                <div class="chart-box" style="padding: 20px; overflow: hidden; height: 100%; min-height: 320px;">
-                    <div class="chart-header" style="margin-bottom: 15px;">
+                <div class="chart-box" style="height: 100%; min-height: 320px;">
+                    <i class="fas fa-trophy box-watermark text-yellow-400"></i>
+                    <div class="chart-header">
                         <h3 class="chart-title"><i class="fas fa-trophy text-yellow-500 mr-2"></i> BXH Keys</h3>
-                        <button onclick="openLeaderboardModal()" class="text-xs font-bold text-orange-500 hover:underline">Xem tất cả</button>
+                        <button onclick="openLeaderboardModal()" class="text-xs font-bold text-orange-500 hover:underline relative z-10">Xem tất cả</button>
                     </div>
-                    <div id="mini-leaderboard" class="flex-grow flex flex-col gap-3 overflow-y-auto custom-scrollbar pr-1">
+                    <div id="mini-leaderboard" class="flex-grow flex flex-col gap-3 overflow-y-auto custom-scrollbar pr-1 relative z-10">
                         <div class="text-center text-gray-400 text-xs py-4">Đang tải...</div>
                     </div>
-                    <div id="my-rank-footer" class="mt-auto pt-3 border-t border-dashed border-gray-200 flex justify-between items-center text-xs font-bold text-gray-600">
+                    <div id="my-rank-footer" class="mt-auto pt-3 border-t border-dashed border-gray-200 flex justify-between items-center text-xs font-bold text-gray-600 relative z-10">
                         <span>Hạng của bạn:</span> <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-lg">--</span>
                     </div>
                 </div>
@@ -342,7 +386,8 @@
 
             <div class="split-grid">
                 <div class="activity-box">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <i class="fas fa-history box-watermark text-orange-400"></i>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; z-index: 10;">
                         <h3 style="font-weight: 800; display: flex; align-items: center; color: var(--text-main); margin-bottom: 0;"><i class="fas fa-history" style="margin-right: 10px; color: var(--primary);"></i> Hoạt động gần đây</h3>
                         <button onclick="openActivityModal()" style="background: none; border: none; color: #FF8F50; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 5px;">Xem tất cả <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i></button>
                     </div>
@@ -352,17 +397,18 @@
                 </div>
 
                 <div class="chart-box" onclick="openStatsModal()">
+                    <i class="fas fa-chart-pie box-watermark text-red-400"></i>
                     <div class="chart-header">
                         <h3 class="chart-title"><i class="fas fa-chart-pie text-orange-500 mr-2"></i> Thống kê Kết quả Học tập</h3>
-                        <i class="fas fa-expand-alt text-gray-400"></i>
+                        <i class="fas fa-expand-alt text-gray-400 relative z-10"></i>
                     </div>
-                    <div class="chart-canvas-container">
+                    <div class="chart-canvas-container relative z-10">
                         <canvas id="miniChart"></canvas>
                     </div>
                 </div>
             </div>
 
-            <h3 class="section-h3"><i class="fas fa-lightbulb" style="color: #FF8F50;"></i> Bí kíp điểm cao</h3>
+            <h3 class="section-h3"><i class="fas fa-lightbulb text-orange-500"></i> Bí kíp điểm cao</h3>
             <div class="tips-grid">
                 <div class="tip-card" onclick="window.location.href='bantinvanhoc.html'">
                     <img src="https://img.freepik.com/free-vector/creative-writing-concept-illustration_114360-8139.jpg" class="tip-img" alt="Tip">
@@ -757,7 +803,7 @@
             }
 
             return `
-            <div class="flex items-center justify-between p-2 rounded-xl border ${isMe}">
+            <div class="flex items-center justify-between p-2 rounded-xl border ${isMe} relative z-10">
                 <div class="flex items-center gap-3">
                     <div class="w-6 text-center">${rankBadge}</div>
                     <div class="flex items-center gap-2">
@@ -798,7 +844,7 @@
                 const name = u.email ? u.email.split('@')[0] : "User";
                 const isMe = u.id === myUid;
                 
-                // --- XỬ LÝ RANK (GIỮ NGUYÊN) ---
+                // --- XỬ LÝ GIAO DIỆN HẠNG (RANK) ---
                 let rankHtml = '';
                 if (rank === 1) {
                     rankHtml = `<div class="w-10 h-10 mx-auto bg-orange-50 rounded-lg flex items-center justify-center shadow-sm"><span class="font-black text-2xl text-yellow-500">#1</span></div>`;
@@ -815,13 +861,10 @@
                 // --- XỬ LÝ AVATAR (MỚI THÊM) ---
                 let avatarContent;
                 if (u.customAvatar) {
-                    // Ưu tiên 1: Ảnh tự upload (Base64)
                     avatarContent = `<img src="${u.customAvatar}" class="w-full h-full object-cover rounded-full" alt="${name}">`;
                 } else if (u.photoURL) {
-                    // Ưu tiên 2: Ảnh Google
                     avatarContent = `<img src="${u.photoURL}" class="w-full h-full object-cover rounded-full" alt="${name}">`;
                 } else {
-                    // Mặc định: Chữ cái đầu
                     avatarContent = name.charAt(0).toUpperCase();
                 }
 
@@ -878,7 +921,7 @@
         sessionStorage.setItem('skipped_profile_update', 'true');
     };
     window.toggleSidebar = () => {
-        const sidebar = document.querySelector('aside') || document.getElementById('main-sidebar');
+        const sidebar = document.querySelector('aside');
         const overlay = document.getElementById('sidebar-overlay');
         if (sidebar && overlay) {
             sidebar.classList.toggle('open');
