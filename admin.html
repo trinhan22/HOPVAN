@@ -1117,7 +1117,6 @@
         newsEditors[`${rowId}_close`] = new Quill(`#ed-${rowId}-close`, { theme: 'snow', modules: { toolbar: miniToolbar }});
         newsEditors[`${rowId}_close`].clipboard.dangerouslyPasteHTML(rData ? rData.close : "");
     };
-    // ------------------------------------------
     // --- KHAI BÁO TOOLBAR ĐẦY ĐỦ (GLOBAL) ---
     const FULL_TOOLBAR = [
         ['bold', 'italic', 'underline', 'strike'],
@@ -1126,18 +1125,6 @@
         ['highlight'],                // Nút Highlight
         [{ 'list': 'ordered'}, { 'list': 'bullet' }],
         [{ 'align': [] }],
-        ['clean']
-    ];
-
-// --- THÊM ĐOẠN NÀY VÀO NHÉ (TOOLBAR CÓ BẢNG) ---
-    const NEWS_TOOLBAR = [
-        ['bold', 'italic', 'underline', 'strike'],
-        [{ 'header': [2, 3, false] }],
-        ['blockquote', 'art-quote'],
-        ['highlight'],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        [{ 'align': [] }],
-        ['table'], // <--- QUAN TRỌNG: Nút tạo bảng ở đây
         ['clean']
     ];
 
@@ -1152,41 +1139,23 @@
     const Block = Quill.import('blots/block');
     class ArtQuoteBlot extends Block {}
     ArtQuoteBlot.blotName = 'art-quote';
-    ArtQuoteBlot.tagName = 'p'; // Dùng thẻ p nhưng gán class nghệ thuật
+    ArtQuoteBlot.tagName = 'p'; 
     ArtQuoteBlot.className = 'ql-art-quote';
     Quill.register(ArtQuoteBlot);
 
-    // --- HÀM TẠO EDITOR (DÙNG CHUNG CHO MỌI CHỖ) ---
-    // --- HÀM TẠO EDITOR (CẬP NHẬT: HỖ TRỢ TABLE) ---
-    const createQ = (sel, content, isNewsMode = false) => {
+    // --- HÀM TẠO EDITOR (ĐÃ FIX LỖI CRASH QUIL BẢN TIN) ---
+    const createQ = (sel, content) => {
         const el = document.querySelector(sel);
         if (!el) return null;
         el.innerHTML = ''; 
         
-        // Cấu hình module
-        const modules = {
-            toolbar: isNewsMode ? NEWS_TOOLBAR : FULL_TOOLBAR,
-            table: isNewsMode // Bật module table nếu là News
-        };
-
         const q = new Quill(sel, { 
             theme: 'snow', 
-            modules: modules,
+            modules: {
+                toolbar: FULL_TOOLBAR // Dùng chung 1 loại Toolbar an toàn
+            },
             placeholder: ''
         });
-
-        // XỬ LÝ NÚT TABLE CHO BẢN TIN
-        if (isNewsMode) {
-            const toolbar = q.getModule('toolbar');
-            toolbar.addHandler('table', function() {
-                // Mặc định chèn bảng 3 dòng 2 cột
-                this.quill.getModule('table').insertTable(3, 2);
-            });
-            
-            // Thay icon mặc định xấu xí bằng icon đẹp
-            const tableBtn = document.querySelector(`${sel} .ql-table`);
-            if(tableBtn) tableBtn.innerHTML = '<i class="fas fa-table" title="Chèn bảng (3x2)"></i>';
-        }
         
         if (content) {
             q.clipboard.dangerouslyPasteHTML(content);
@@ -2015,7 +1984,7 @@ const CAT_MAP = {
         }
     };
 
-    // 5. SAVE DATA
+    // 5. SAVE DATA (ĐÃ CẬP NHẬT FULL LOGIC VÀ LỆNH LƯU)
     window.saveExamData = async () => {
         const id = document.getElementById('exam-id').value;
         const colName = document.getElementById('exam-collection').value;
@@ -2076,14 +2045,12 @@ const CAT_MAP = {
                 const div = document.createElement("div"); div.innerHTML = docData.intro;
                 docData.summary = div.textContent.substring(0, 150) + "...";
             }
-            
-            // B. XỬ LÝ CÁC LOẠI ĐỀ KHÁC (GIỮ NGUYÊN CODE CŨ CỦA BẠN)
+            // B. XỬ LÝ CÁC LOẠI ĐỀ KHÁC
             else if (colName === 'fulltest_bank') {
                docData.reading_text = editors.readText.root.innerHTML;
                docData.reading_questions = editors.readQs.root.innerHTML.split('[NEXT]').map(q => q.replace(/<[^>]*>/g, '').trim()).filter(x => x);
                docData.nlxh_topic = editors.nlxh.root.innerHTML;
                docData.nlvh_topic = editors.nlvh.root.innerHTML;
-               // THÊM LƯU HINT
                docData.hint = editors.hint.root.innerHTML;
             } else if (colName === 'quiz_bank') {
                docData.question = editors.q.root.innerHTML;
@@ -2093,7 +2060,6 @@ const CAT_MAP = {
                docData.title = document.getElementById('ex-title').value;
                docData.text = editors.text.root.innerHTML;
                docData.questions = editors.qs.root.innerHTML.split('[NEXT]').map(q => ({ q: q.replace(/<[^>]*>/g, '').trim() })).filter(x => x.q);
-               // THÊM LƯU HINT
                docData.hint = editors.hint.root.innerHTML;
             } else {
                docData.type = document.getElementById('ex-type').value;
@@ -2106,7 +2072,7 @@ const CAT_MAP = {
                }
             }
 
-            // GHI VÀO DATABASE
+            // === LỆNH THỰC THI LƯU VÀO FIREBASE (PHẦN BỊ THIẾU TRONG CODE CỦA BẠN) ===
             if (id === 'new') {
                 docData.createdAt = serverTimestamp();
                 await addDoc(collection(db, colName), docData);
@@ -2114,18 +2080,19 @@ const CAT_MAP = {
                 await updateDoc(doc(db, colName, id), docData);
             }
 
+            // Hoàn tất
             showToast("Đã lưu dữ liệu thành công!");
             closeModal();
             if (colName === 'literary_news') loadNews('all'); else loadBank(colName);
             loadStats();
 
         } catch (e) {
-            console.error(e); alert("Lỗi khi lưu: " + e.message);
+            console.error(e); 
+            alert("Lỗi khi lưu: " + e.message);
         } finally {
             btnSave.innerHTML = 'Lưu Dữ Liệu';
             btnSave.disabled = false;
-            // Reset tempFiles sau khi lưu
-            tempFiles = { main: null, sections: {} }; 
+            tempFiles = { main: null, sections: {} }; // Reset file sau khi lưu
         }
     };
 
