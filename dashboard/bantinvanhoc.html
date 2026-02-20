@@ -125,7 +125,7 @@
 
         /* --- NÂNG CẤP CARD GIAO DIỆN (ĐÃ CĂN TRÁI TEXT) --- */
         .card { 
-            background: rgba(255, 255, 255, 0.9); border-radius: 36px; overflow: hidden; 
+            background: rgba(255, 255, 255, 0.9); border-radius: 36px; overflow: hidden; /* Sửa 3px thành 36px */
             box-shadow: 0 15px 35px rgba(0,0,0,0.04); 
             border: 1px solid rgba(255,255,255,0.8);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
@@ -138,7 +138,8 @@
             background: white;
         }
         
-        .c-img-box { height: 220px; overflow: hidden; position: relative; margin: 10px 10px 0; border-radius: 24px; }
+        /* Đã tăng lề và độ bo góc của ảnh con để hài hòa với card cha */
+        .c-img-box { height: 220px; overflow: hidden; position: relative; margin: 12px 12px 0; border-radius: 28px; }
         .c-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
         .card:hover .c-img { transform: scale(1.08); }
         
@@ -187,17 +188,30 @@
         }
         .card:hover .read-link { gap: 10px; background: var(--primary); color: white; }
 
-        /* FEATURED CARD */
+        /* --- FEATURED CARD (Đã sửa ảnh bo tròn 4 góc lọt lòng) --- */
         .featured-card {
             grid-column: 1 / -1; /* Chiếm full chiều ngang */
             display: grid; grid-template-columns: 1.5fr 1fr; gap: 0;
-            background: white; border-radius: 30px; overflow: hidden;
+            /* Đồng bộ border-radius 36px và border mờ giống card nhỏ */
+            background: white; border-radius: 36px; overflow: hidden;
             box-shadow: 0 15px 40px rgba(0,0,0,0.05); margin-bottom: 20px;
-            cursor: pointer; height: 380px; transition: 0.4s;
-            border: 2px solid white;
+            cursor: pointer; min-height: 380px; /* Dùng min-height cho an toàn */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255,255,255,0.8);
         }
-        .featured-card:hover { transform: translateY(-5px); box-shadow: 0 25px 60px rgba(255, 143, 80, 0.2); }
-        .featured-card .c-img-box { height: 100%; }
+        .featured-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 25px 60px rgba(255, 143, 80, 0.2); 
+        }
+        
+        /* ĐÃ FIX: Chỉnh lại margin đều 4 phía để ảnh nằm lọt vào trong */
+        .featured-card .c-img-box { 
+            height: auto; /* Để tự động tính toán chiều cao */
+            align-self: stretch; /* Kéo giãn cho bằng chiều cao cột bên phải */
+            margin: 10px; /* QUAN TRỌNG: Cách đều 4 cạnh 10px */
+            border-radius: 24px; /* Bo tròn góc ảnh */
+        }
+
         /* FIX RIÊNG CHO FEATURED CARD ĐỂ NÓ CŨNG CĂN TRÁI */
         .featured-card .c-body {
             padding: 40px;
@@ -351,9 +365,9 @@
         <div class="page-header" style="margin-bottom: 50px;">
             <div style="display: inline-block; background: rgba(255, 143, 80, 0.1); padding: 8px 20px; border-radius: 50px; color: #FF8F50; font-weight: 800; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px;">Thư viện tri thức</div>
             <h1 class="page-title" style="font-size: 3.5rem;">Bản Tin <span class="text-gradient">Văn Học</span></h1>
-            <p class="page-subtitle" style="font-size: 1.1rem; max-width: 600px; margin: 15px auto 0; line-height: 1.6;">Khám phá kho tàng dẫn chứng, lý luận và bài văn mẫu chất lượng cao dành riêng cho bạn.</p>
+            <p class="page-subtitle" style="font-size: 1.1rem; max-width: 600px; margin: 11px auto 0; line-height: 1.6;">Khám phá kho tàng dẫn chứng, lý luận và bài văn mẫu chất lượng cao dành riêng cho bạn.</p>
             
-        <div class="header-actions" style="margin-top: 40px; gap: 15px;">
+        <div class="header-actions" style="margin-top: 20px; gap: 15px;">
             <div class="search-box-wrap">
                 <input type="text" id="search-input" class="search-inp" placeholder="Nhập tên tác phẩm, tác giả hoặc từ khóa..." style="padding: 18px 25px 18px 60px; font-size: 1rem; border-radius: 24px;">
                 <i class="fas fa-search search-icon" style="font-size: 1.2rem; left: 25px;"></i>
