@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Loading...</title>
+    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
+    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
+    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
+    <meta property="og:url" content="https://hopvan.netlify.app" />
+    <meta property="og:type" content="article" />
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --text-heading: #363636;
+            --text-body: #444444;
+            --bg-body: #fff6ee;
+        }
+
+        body { background-color: var(--bg-body); font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-body); overflow-x: hidden; }
+
+        /* --- 1. CURTAIN LOADING (Rèm cửa) --- */
+        #intro-overlay { position: fixed; inset: 0; z-index: 9999; display: flex; transition: opacity 0.5s; }
+        .curtain-panel { height: 100%; width: 50%; background: #111; position: relative; z-index: 20; transform-origin: center; }
+        .curtain-left { border-right: 1px solid #222; }
+        .curtain-right { border-left: 1px solid #222; }
+        .intro-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 30; text-align: center; width: 80%; color: white; }
+        .intro-cate { font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; color: var(--primary); font-weight: 700; margin-bottom: 20px; }
+        .intro-title { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: 600; line-height: 1.2; margin-bottom: 30px; }
+        .intro-sapo { font-family: 'Merriweather', serif; font-size: 0.9rem; line-height: 1.6; opacity: 0.8; max-width: 600px; margin: 0 auto; font-style: italic; }
+
+        /* --- 2. HERO SECTION --- */
+        html, body { height: 100%; margin: 0; padding: 0; }
+        #hero-section { display: block; width: 100%; height: 100vh; height: 100dvh; min-height: 100dvh; position: relative; overflow: hidden; }
+        #hero-viewport { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; margin: 0; padding: 0; }
+        .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
+        .hero-img { position: absolute; top: 0; left: 0; width: 100% !important; height: 100% !important; object-fit: cover !important; object-position: center center !important; filter: brightness(0.6); transform: scale(1.1); will-change: transform; display: block; z-index: 1; }
+        .hero-overlay { position: absolute; inset: 0; z-index: 2; background: rgba(0,0,0,0.3); width: 100%; height: 100%; }
+
+        .stage-1-ui { position: absolute; top: 40px; left: 40px; z-index: 5; color: rgba(255,255,255,0.8); font-family: 'Playfair Display', serif; font-size: 6vw; font-weight: 600; line-height: 0.9; text-transform: uppercase; pointer-events: none; }
+        .stage-2-ui { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 0 20px; opacity: 0; visibility: hidden; width: 100%; height: 100%; }
+        .h-cate { font-weight: 600; letter-spacing: 3px; color: var(--primary); text-transform: uppercase; font-size: 0.75rem; margin-bottom: 20px; background: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 50px; }
+        .h-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 600; line-height: 1.2; margin-bottom: 25px; text-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .h-sapo-36 { font-family: 'Merriweather', serif; font-size: 1.1rem; line-height: 1.8; color: rgba(255,255,255,0.9); max-width: 700px; margin-bottom: 40px; font-style: italic; font-weight: 300; }
+        .btn-fav-hero { background: white; color: #111; padding: 12px 35px; border-radius: 50px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .btn-fav-hero:hover { background: var(--primary); color: white; transform: translateY(-3px); }
+
+        /* --- 3. MAIN CONTENT --- */
+        .article-main { position: relative; z-index: 20; background: var(--bg-body); min-height: 100vh; }
+        .wc-grid { display: grid; grid-template-columns: 1fr; gap: 60px; max-width: 1200px; margin: 0 auto; padding: 100px 25px; }
+        @media (min-width: 1024px) { .wc-grid { grid-template-columns: 300px 1fr; gap: 80px; } }
+
+        /* Sidebar */
+        .side-sticky { position: sticky; top: 100px; height: fit-content; }
+        .back-btn { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 40px; cursor: pointer; transition: 0.3s; }
+        .back-btn:hover { color: var(--primary); transform: translateX(-5px); }
+        .s-label { font-size: 0.7rem; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .s-value { font-size: 1.1rem; font-weight: 600; color: #222; margin-bottom: 25px; line-height: 1.3; font-family: 'Playfair Display', serif; }
+        .s-hl { color: var(--primary); }
+
+        /* Typography */
+        .article-body { font-family: 'Merriweather', serif; font-size: 1.1rem; line-height: 2; color: #333; text-align: justify; }
+        .article-body h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 600; margin: 50px 0 20px; line-height: 1.3; color: #111; clear: both; }
+        .mag-img-wrap { width: 100%; margin: 30px 0; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        @media (min-width: 768px) { .mag-img-wrap { float: right; width: 45%; margin: 10px 0 20px 30px; } }
+        .mag-img-wrap img { width: 100%; height: auto; display: block; transition: 0.5s; }
+
+        /* Font Control */
+        .font-control { display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        .fc-btn { width: 35px; height: 35px; border-radius: 50%; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: sans-serif; font-weight: 600; color: #666; transition: 0.2s; font-size: 0.8rem; }
+        .fc-btn:hover { background: #eee; color: black; }
+
+        /* Ending */
+        .ending-box { margin-top: 80px; padding: 50px; background: #fff; border: 2px solid #f0f0f0; border-radius: 20px; text-align: center; font-style: italic; font-weight: 500; color: #555; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.03); }
+        .ending-box::before { content: '“'; font-family: serif; font-size: 6rem; color: var(--primary); opacity: 0.2; position: absolute; top: -10px; left: 30px; }
+
+        /* --- BẢNG VIEW 2 (MỚI THÊM) --- */
+        .table-view-container {
+            width: 100%;
+            overflow-x: auto; /* Cho phép cuộn ngang trên điện thoại */
+            margin: 40px 0;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.05);
+        }
+        .hopvan-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px; /* Đảm bảo bảng không bị bóp méo quá mức */
+            font-family: 'Merriweather', serif;
+        }
+        .hopvan-table th, .hopvan-table td {
+            border: 1px solid #222;
+            padding: 20px 15px;
+            vertical-align: top;
+            color: #333;
+        }
+        .hopvan-table th {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            text-align: center;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            background-color: #fdfdfd;
+        }
+        .hopvan-table td.col-stt { text-align: center; font-weight: bold; width: 6%; }
+        .hopvan-table td.col-type { text-align: center; font-weight: bold; width: 14%; font-family: 'Plus Jakarta Sans', sans-serif;}
+        .hopvan-table td.col-content { text-align: justify; line-height: 1.9; width: 40%; font-size: 1.05rem; }
+
+        /* Toast */
+        #toast { position: fixed; top: 30px; right: 30px; background: white; padding: 15px 25px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; z-index: 10000; transform: translateX(200%); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #toast.show { transform: translateX(0); }
+
+        /* Footer */
+        .mag-footer { background: #1a1a1a; color: #fff; padding: 80px 20px; text-align: center; }
+        .f-slogan { font-weight: 700; letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; color: #666; margin-top: 20px; }
+
+        /* Nút Lưu */
+        .btn-fav-hero.is-liked { background: #ff4757 !important; color: white !important; }
+        .btn-fav-hero.is-liked i { color: white !important; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent !important; }
+        ::-webkit-scrollbar-thumb { background-color: transparent; border-radius: 20px; transition: background-color 0.4s ease; }
+        body:hover::-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.15); }
+        ::-webkit-scrollbar-thumb:hover { background-color: var(--primary) !important; }
+
+        .article-body p { margin-bottom: 25px; line-height: 2; text-align: justify; }
+    </style>
+</head>
+<body>
+
+    <div id="intro-overlay">
+        <div class="curtain-panel curtain-left"></div>
+        <div class="curtain-panel curtain-right"></div>
+        <div class="intro-content" id="intro-content">
+            <div class="intro-cate" id="loading-cate">LOADING...</div>
+            <h1 class="intro-title" id="loading-title">Đang tải dữ liệu</h1>
+            <div class="intro-sapo" id="loading-sapo">Vui lòng chờ trong giây lát...</div>
+            <div class="mt-10"><i class="fas fa-circle-notch fa-spin text-3xl text-orange-500"></i></div>
+        </div>
+    </div>
+
+    <div id="hero-section">
+        <div id="hero-viewport">
+            <div class="hero-bg">
+                <img id="hero-img" src="" alt="">
+                <div class="hero-overlay" id="hero-overlay"></div>
+            </div>
+            <div class="stage-1-ui" id="s1-text">HOPVAN</div>
+            <div class="stage-2-ui" id="s2-text">
+                <span class="h-cate" id="h-cate">...</span>
+                <h1 class="h-title" id="h-title">...</h1>
+                <div class="h-sapo-36" id="h-sapo">...</div>
+                <div class="btn-fav-hero" id="hero-btn-fav" onclick="saveFav()">
+                    <i class="far fa-heart text-red-500" id="h-icon-hero"></i> 
+                    <span id="hero-fav-text">Lưu vào yêu thích</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="article-main">
+        <div class="wc-grid">
+            <aside class="side-panel">
+                <div class="side-sticky">
+                    <div onclick="history.back()" class="back-btn"><i class="fas fa-arrow-left"></i> Quay lại</div>
+                    <div class="s-label">Chuyên mục</div>
+                    <div class="s-value s-hl uppercase" id="s-cate">...</div>
+                    <div class="s-label">Tác giả</div>
+                    <div class="s-value">Ban Biên Tập</div>
+                    <div class="s-label">Ngày đăng</div>
+                    <div class="s-value" id="s-date">...</div>
+                    <div class="mt-10 border-t border-gray-200 pt-6">
+                        <button onclick="copyLink()" class="flex items-center gap-3 text-[11px] font-black tracking-widest text-gray-400 hover:text-black transition">
+                            <i class="fas fa-link"></i> SAO CHÉP LINK
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <article>
+                <div class="font-control">
+                    <button class="fc-btn" onclick="changeFontSize(-1)">A-</button>
+                    <button class="fc-btn" onclick="changeFontSize(1)">A+</button>
+                </div>
+                <div id="article-body" class="article-body"></div>
+                <div class="ending-box" id="article-ending" style="display:none"></div>
+            </article>
+        </div>
+
+        <footer class="mag-footer">
+            <img src="../LOGO.WEBP" class="w-12 mx-auto opacity-50 grayscale">
+            <div class="f-slogan">© 2026 HopVan. All Rights Reserved By HopTeam.</div>
+        </footer>
+    </div>
+
+    <div id="toast"><i class="fas fa-check-circle text-green-500"></i> <span id="toast-msg" class="font-bold text-sm">Thông báo</span></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where, limit, setDoc, updateDoc, increment, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const params = new URLSearchParams(window.location.search);
+    const paramId = params.get('id');
+    const paramSlug = params.get('slug');
+
+    let currentDocId = null; 
+    let currentUser = null;
+    let isLiked = false;
+    let currentFontSize = 18;
+
+    const CAT_MAP = {
+        'dauchan': 'Dấu chân thời đại', 'chandung': 'Chân dung bút lực', 'diahat': 'Địa hạt chữ nghĩa',
+        'maicau': 'Mài câu sáng chữ', 'vetsang': 'Vệt sáng ngôn từ', 'liluan': 'Lí luận văn học',
+        'cuango': 'Cửa ngõ văn chương', 'khoinguon': 'Khơi nguồn diễn đạt'
+    };
+
+    function triggerReveal() {
+        const tl = gsap.timeline();
+        tl.to("#intro-content", { opacity: 0, y: -50, duration: 0.5 })
+          .to(".curtain-left", { x: "-100%", duration: 1.5, ease: "power4.inOut" }, "-=0.2")
+          .to(".curtain-right", { x: "100%", duration: 1.5, ease: "power4.inOut" }, "<")
+          .to("#hero-viewport", { opacity: 1, duration: 0.5 }, "-=1.0") 
+          .set("#intro-overlay", { display: "none" });
+        setTimeout(initGSAP, 1000);
+    }
+
+    async function loadContent() {
+        if (!paramId && !paramSlug) { 
+            setTimeout(() => { document.getElementById('intro-overlay').style.display = 'none'; }, 1000); 
+            return; 
+        }
+
+        try {
+            let snap;
+            if (paramId) {
+                currentDocId = paramId;
+                snap = await getDoc(doc(db, "literary_news", currentDocId));
+            } else if (paramSlug) {
+                const q = query(collection(db, "literary_news"), where("slug", "==", paramSlug), limit(1));
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    snap = querySnapshot.docs[0];
+                    currentDocId = snap.id;
+                }
+            }
+
+            if (snap && snap.exists()) {
+                const data = (typeof snap.data === 'function') ? snap.data() : snap.data(); 
+                const catName = CAT_MAP[data.type] || "Tạp chí Văn học";
+
+                document.title = data.title;
+                document.getElementById('loading-title').innerText = data.title;
+                document.getElementById('loading-cate').innerText = catName;
+                
+                const tempDiv = document.createElement('div'); tempDiv.innerHTML = data.intro || data.content || "";
+                const sapoShort = (tempDiv.textContent || "").split(/\s+/).slice(0, 36).join(" ") + "...";
+                document.getElementById('loading-sapo').innerText = sapoShort;
+
+                document.getElementById('hero-img').src = data.img || '../panel.webp';
+                document.getElementById('h-title').innerText = data.title;
+                document.getElementById('h-cate').innerText = catName;
+                document.getElementById('h-sapo').innerText = sapoShort;
+                document.getElementById('s-cate').innerText = catName;
+                document.getElementById('s-date').innerText = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('vi-VN') : 'Mới cập nhật';
+
+                // --- RENDER BODY CONTENT (TÍCH HỢP BẢNG VIEW 2) ---
+                const bodyEl = document.getElementById('article-body');
+                let htmlContent = "";
+
+                // 1. Render Intro
+                if (data.intro) htmlContent += `<div class="mb-10 text-lg">${data.intro}</div>`; 
+
+                // Kiểm tra loại bài viết có thuộc 3 nhóm dùng Bảng không
+                const isTableView = ['maicau', 'cuango', 'khoinguon'].includes(data.type);
+
+                // 2. Render Body
+                if (isTableView && data.tableRows && data.tableRows.length > 0) {
+                    // VIEW 2: Dạng Bảng (Dùng khi firebase có mảng tableRows)
+                    htmlContent += `
+                    <div class="table-view-container">
+                        <table class="hopvan-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-stt">STT</th>
+                                    <th class="col-type">Thể Loại</th>
+                                    <th>Mở Bài</th>
+                                    <th>Kết Bài</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                    
+                    data.tableRows.forEach((row, index) => {
+                        htmlContent += `
+                            <tr>
+                                <td class="col-stt">${index + 1}</td>
+                                <td class="col-type">${row.type || ''}</td>
+                                <td class="col-content">${row.open || ''}</td>
+                                <td class="col-content">${row.close || ''}</td>
+                            </tr>`;
+                    });
+                    
+                    htmlContent += `</tbody></table></div>`;
+
+                } else if (data.sections && data.sections.length > 0) {
+                    // VIEW 1: Dạng đoạn văn bình thường (Như cũ)
+                    data.sections.forEach((sec) => {
+                        let imgsHtml = '';
+                        if(sec.images && sec.images.length > 0) {
+                            imgsHtml = `<div class="mag-img-wrap"><img src="${sec.images[0]}" loading="lazy"></div>`;
+                        }
+                        htmlContent += `
+                            <div class="wc-section-block" style="overflow:hidden; margin-bottom: 40px;">
+                                ${sec.h2 ? `<h2>${sec.h2}</h2>` : ''} 
+                                ${imgsHtml}
+                                <div class="sec-paragraph">${sec.p}</div> 
+                            </div>`;
+                    });
+                } else { 
+                    // Fallback
+                    htmlContent += `<div>${data.content || ""}</div>`; 
+                }
+
+                // 3. Render Ending
+                if(data.ending) {
+                    htmlContent += `<div class="mt-10 pt-10 border-t border-gray-200 text-lg italic text-gray-500">${data.ending}</div>`;
+                }
+
+                bodyEl.innerHTML = htmlContent;
+
+                updateDoc(doc(db, "literary_news", currentDocId), { views: increment(1) }).catch(err => console.log("View err:", err));
+                checkFavoriteStatus();
+                setTimeout(triggerReveal, 800);
+            } else {
+                alert("Không tìm thấy bài viết!");
+                setTimeout(() => { document.getElementById('intro-overlay').style.display = 'none'; }, 1000);
+            }
+        } catch(e) { 
+            console.error("Load Error:", e);
+            setTimeout(() => { document.getElementById('intro-overlay').style.display = 'none'; }, 2000);
+        }
+    }
+
+    function initGSAP() {
+        gsap.registerPlugin(ScrollTrigger);
+        let tl = gsap.timeline({ scrollTrigger: { trigger: "#hero-section", start: "top top", end: "+=150%", scrub: 1, pin: true } });
+        tl.to("#s1-text", { opacity: 0, y: -50, duration: 1 })
+          .to("#hero-overlay", { background: "rgba(0,0,0,0.8)", duration: 1 }, 0)
+          .to("#hero-img", { scale: 1.2, duration: 2 }, 0)
+          .to("#s2-text", { opacity: 1, visibility: "visible", duration: 1 }, 0.5);
+    }
+
+    window.changeFontSize = (step) => {
+        currentFontSize += step;
+        if(currentFontSize < 14) currentFontSize = 14;
+        if(currentFontSize > 24) currentFontSize = 24;
+        document.getElementById('article-body').style.fontSize = currentFontSize + 'px';
+    };
+
+    function updateBtnUI() {
+        const hIcon = document.getElementById('h-icon-hero');
+        const hText = document.getElementById('hero-fav-text');
+        const hBtn = document.getElementById('hero-btn-fav');
+
+        if (isLiked) {
+            if(hIcon) hIcon.className = "fas fa-heart text-white";
+            if(hText) hText.innerText = "Đã lưu";
+            if(hBtn) hBtn.classList.add('is-liked');
+        } else {
+            if(hIcon) hIcon.className = "far fa-heart text-red-500";
+            if(hText) hText.innerText = "Lưu vào yêu thích";
+            if(hBtn) hBtn.classList.remove('is-liked');
+        }
+    }
+
+    async function checkFavoriteStatus() {
+        if (!currentUser || !currentDocId) return;
+        try {
+            const favSnap = await getDoc(doc(db, "favorites", currentUser.uid));
+            if (favSnap.exists() && favSnap.data().list?.includes(currentDocId)) {
+                isLiked = true;
+                updateBtnUI();
+            }
+        } catch(e) { console.log("Check fav err:", e); }
+    }
+
+    window.saveFav = async () => {
+        if(!currentUser) { showToast("Vui lòng đăng nhập!"); return; }
+        if(!currentDocId) return;
+
+        const favRef = doc(db, "favorites", currentUser.uid);
+        try {
+            if(isLiked) {
+                await setDoc(favRef, { list: arrayRemove(currentDocId) }, { merge: true });
+                isLiked = false;
+                showToast("Đã bỏ lưu bài!");
+            } else {
+                await setDoc(favRef, { list: arrayUnion(currentDocId) }, { merge: true });
+                isLiked = true;
+                showToast("Đã lưu vào bộ sưu tập!");
+            }
+            updateBtnUI();
+        } catch(e) { 
+            console.error("SaveError:", e);
+            showToast("Lỗi hệ thống"); 
+        }
+    };
+
+    window.copyLink = () => { navigator.clipboard.writeText(window.location.href); showToast("Đã sao chép link!"); };
+    window.showToast = (msg) => {
+        const t = document.getElementById('toast');
+        document.getElementById('toast-msg').innerText = msg;
+        t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+    };
+
+    onAuthStateChanged(auth, u => { currentUser = u; loadContent(); });
+</script>
+</body>
+</html>
