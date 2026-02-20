@@ -528,8 +528,7 @@
             if (featured) {
                 const cat = getCatInfo(featured.category);
                html += `
-                <div class="featured-card card" onclick="goToDetail('${featured.slug || featured.id}', '${featured.slug ? 'slug' : 'id'}')">
-                    <div class="c-img-box f-img-wrap">
+                    <div class="featured-card card" onclick="goToDetail('${featured.slug || featured.id}', '${featured.slug ? 'slug' : 'id'}', '${featured.category}')">                    <div class="c-img-box f-img-wrap">
                         <img src="${featured.img}" class="c-img f-img" loading="lazy">
                         <div class="c-badge" style="background:var(--primary); color:white; border:none;">MỚI NHẤT</div>
                     </div>
@@ -550,7 +549,7 @@
             list.forEach(item => {
                 const cat = getCatInfo(item.category);
                 html += `
-                <div class="card" onclick="goToDetail('${item.slug || item.id}', '${item.slug ? 'slug' : 'id'}')">
+                <div class="card" onclick="goToDetail('${item.slug || item.id}', '${item.slug ? 'slug' : 'id'}', '${item.category}')">
                     <div class="c-img-box">
                         <img src="${item.img}" class="c-img" loading="lazy">
                         <div class="c-badge">${cat.name}</div>
@@ -594,11 +593,18 @@
             container.scrollBy({ left: 300 * direction, behavior: 'smooth' });
         };
 
-        window.goToDetail = (val, type) => {
+        // --- ĐÃ CẬP NHẬT: LOGIC ĐIỀU HƯỚNG VIEW 1 & VIEW 2 ---
+        window.goToDetail = (val, type, category) => {
+            // Danh sách các danh mục dùng View 2 (Dạng bảng)
+            const view2Categories = ['maicau', 'cuango', 'khoinguon'];
+            
+            // Kiểm tra xem bài viết có thuộc 3 danh mục đặc biệt không
+            const targetView = view2Categories.includes(category) ? 'view2.html' : 'view.html';
+
             if (type === 'slug') {
-                window.location.href = `../bantinvanhoc/view.html?slug=${val}`;
+                window.location.href = `../bantinvanhoc/${targetView}?slug=${val}`;
             } else {
-                window.location.href = `../bantinvanhoc/view.html?id=${val}`;
+                window.location.href = `../bantinvanhoc/${targetView}?id=${val}`;
             }
         };
 
