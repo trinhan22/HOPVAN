@@ -114,12 +114,12 @@
             text-align: center; position: relative; overflow: hidden; margin-bottom: 0;
             box-shadow: 0 15px 30px rgba(255, 94, 98, 0.25);
         }
-        .banner-cta:hover .banner-decor { transform: rotate(-35deg) translate(15px, -25px) scale(1.1); opacity: 0.4; }
+        .banner-cta:hover .banner-decor { transform: rotate(-35deg) translate(15px, -25px) scale(1.1); opacity: 0.3; }
         .banner-cta:hover { 
             transform: translateY(-5px);
             border-color: var(--primary); box-shadow: 0 20px 40px rgba(255, 143, 80, 0.12); 
         }
-        .banner-decor { position: absolute; right: 20px; bottom: -20px; font-size: 8rem; opacity: 0.2; transform: rotate(-20deg); transition: all 0.5s ease; pointer-events: none;}
+        .banner-decor { position: absolute; right: 20px; bottom: -20px; font-size: 8rem; opacity: 0.1; transform: rotate(-20deg); transition: all 0.5s ease; pointer-events: none;}
 
         /* Tinh chỉnh các Box (BXH, Hoạt động, Thống kê) */
         .activity-box, .chart-box { 
@@ -139,13 +139,8 @@
         }
 
         /* Icon watermark chìm cho Box (Đưa xuống góc dưới bên phải) */
-        .box-watermark {
-            position: absolute; right: -20px; bottom: -20px; font-size: 8rem; opacity: 0.03;
-            transform: rotate(-15deg); transition: 0.5s; z-index: 0; pointer-events: none;
-        }
-        .activity-box:hover .box-watermark, .chart-box:hover .box-watermark {
-            transform: rotate(0deg) scale(1.1); opacity: 0.08; color: var(--primary);
-        }
+        .box-watermark { position: absolute; right: 20px; bottom: -20px; font-size: 8rem; opacity: 0.1; transform: rotate(-20deg); transition: all 0.5s ease; pointer-events: none;}
+        .activity-box:hover .box-watermark, .chart-box:hover .box-watermark { transform: rotate(-35deg) translate(15px, -25px) scale(1.1); opacity: 0.3; }
         
         /* Đảm bảo nội dung chữ nổi lên trên icon */
         .activity-box > div, .activity-box > ul, .chart-box > div { position: relative; z-index: 2; }
