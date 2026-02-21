@@ -448,8 +448,9 @@
             onSnapshot(doc(db, "users_progress", user.uid), (progSnap) => {
                 if (progSnap.exists()) {
                     const d = progSnap.data();
-                    currentLevel = d.currentLevel || 1; 
-                    paidLevel = d.paidLevel || 0;
+                    // ĐÃ FIX LỖI: Ép kiểu dữ liệu về Số (Number) để hàm click nhận diện đúng
+                    currentLevel = Number(d.currentLevel) || 1; 
+                    paidLevel = Number(d.paidLevel) || 0;
                 } else {
                     setDoc(doc(db, "users_progress", user.uid), { currentLevel: 1, paidLevel: 0 }, { merge: true });
                     currentLevel = 1;
@@ -538,33 +539,41 @@
         el.classList.toggle('active');
     };
 
-    // --- LOGIC 2: HÀNH TRÌNH VĂN CHƯƠNG ---
+    // --- ĐÃ CẬP NHẬT: LOGIC 2: HÀNH TRÌNH VĂN CHƯƠNG ---
     function renderMap() {
         const container = document.getElementById('journey-container');
         const progressBar = document.getElementById('map-progress-bar');
         container.innerHTML = "";
 
         let activeIndex = 0;
+        
+        // Đảm bảo dữ liệu chắc chắn là dạng Số (Number)
+        const currLv = Number(currentLevel) || 1;
+        const pLv = Number(paidLevel) || 0;
 
         JOURNEY_DATA.forEach((item, index) => {
             let statusClass = 'locked';
             let iconHtml = '<i class="fas fa-lock"></i>';
+            const itemId = Number(item.id);
             
-            if (item.id < currentLevel) {
+            if (itemId < currLv) {
+                // Bài cũ đã hoàn thành
                 statusClass = 'completed';
                 iconHtml = `<i class="fas ${item.icon}"></i>`;
                 activeIndex = index + 1;
             } 
-            else if (item.id === currentLevel) {
+            else if (itemId === currLv) {
+                // Bài hiện tại đang học
                 statusClass = 'active';
                 activeIndex = index;
-                if (item.id <= paidLevel) {
-                    iconHtml = '<i class="fas fa-play"></i>';
+                if (itemId <= pLv) {
+                    iconHtml = '<i class="fas fa-play"></i>'; // Đã mở khóa
                 } else {
-                    iconHtml = '<i class="fas fa-key text-yellow-300 animate-pulse"></i>';
+                    iconHtml = '<i class="fas fa-key text-yellow-500 animate-pulse"></i>'; // Chưa mở khóa
                 }
             } 
             else {
+                // Bài tương lai (bị khóa)
                 statusClass = 'locked';
                 iconHtml = '<i class="fas fa-lock"></i>';
             }
@@ -572,6 +581,8 @@
             const div = document.createElement('div');
             div.className = `map-node ${statusClass}`;
             div.innerHTML = `<div class="node-icon">${iconHtml}</div><div class="node-title">${item.title}</div>`;
+            
+            // Gắn sự kiện click
             div.onclick = () => handleMapClick(item);
             container.appendChild(div);
         });
@@ -579,17 +590,30 @@
         progressBar.style.width = `${(activeIndex / JOURNEY_DATA.length) * 100}%`;
     }
 
+    // ĐÃ FIX: Hàm xử lý Click bao quát mọi trường hợp
     function handleMapClick(item) {
-        if (item.id < currentLevel) {
+        const targetId = Number(item.id);
+        const currLv = Number(currentLevel) || 1;
+        const pLv = Number(paidLevel) || 0;
+
+        if (targetId < currLv) {
+            // Đã học qua rồi -> Bấm vào để ôn tập lại (Không tốn key)
             window.location.href = `../nhatkyhoctap/${item.file}`;
         }
-        else if (item.id === currentLevel) {
-            if (item.id <= paidLevel) {
+        else if (targetId === currLv) {
+            // Đang ở level này -> Kiểm tra key
+            if (targetId <= pLv) {
+                // Đã dùng 5 keys để mở -> Vào thẳng
                 window.location.href = `../nhatkyhoctap/${item.file}`;
             } else {
-                window.pendingLevelId = item.id;
+                // Chưa mở khóa -> Bật popup yêu cầu 5 keys
+                window.pendingLevelId = targetId;
                 document.getElementById('modal-unlock').classList.add('show');
             }
+        }
+        else {
+            // Level cao hơn chưa tới lượt -> Thông báo cho người dùng biết
+            alert(`Khóa chặn! Bạn cần hoàn thành Level ${currLv} trước khi học bài này nhé.`);
         }
     }
 

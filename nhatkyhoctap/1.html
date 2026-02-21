@@ -553,8 +553,12 @@
                         
                         await setDoc(userRef, { keys: increment(10) }, { merge: true });
                         
-                        let newCurrentLvl = Math.max(progData.currentLevel || 1, 2);
-                        let newPaidLvl = Math.max(progData.paidLevel || 0, 2);
+                        // --- ĐÃ SỬA LỖI LOGIC TẠI ĐÂY ---
+                        // Nâng currentLevel lên 2 để hiện Level 2 trên bản đồ (nhưng bị khóa)
+                        let newCurrentLvl = Math.max(Number(progData.currentLevel) || 1, 2);
+                        
+                        // Tuyệt đối CHỈ LƯU paidLevel là 1 (Xác nhận đã trả tiền cho Level 1, ko phải Level 2)
+                        let newPaidLvl = Math.max(Number(progData.paidLevel) || 0, 1);
 
                         await setDoc(progressRef, { 
                             currentLevel: newCurrentLvl, 

@@ -562,9 +562,12 @@
                         
                         await setDoc(userRef, { keys: increment(10) }, { merge: true });
                         
-                        // Mở khóa Level 5
-                        let newCurrentLvl = Math.max(progData.currentLevel || 1, 5);
-                        let newPaidLvl = Math.max(progData.paidLevel || 0, 5);
+                        // --- ĐÃ SỬA LỖI LOGIC TẠI ĐÂY ---
+                        // Nâng currentLevel lên 5 để hiện Level 5 trên bản đồ
+                        let newCurrentLvl = Math.max(Number(progData.currentLevel) || 1, 5);
+                        
+                        // Tuyệt đối CHỈ LƯU paidLevel là 4 (Xác nhận đã trả tiền cho Level 4)
+                        let newPaidLvl = Math.max(Number(progData.paidLevel) || 0, 4);
 
                         await setDoc(progressRef, { 
                             currentLevel: newCurrentLvl, 

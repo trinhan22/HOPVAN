@@ -453,18 +453,18 @@
             let isFirstTimePass = false;
 
             if(userUid) {
-                // Luôn lưu activity
+                // 1. Lưu lịch sử hoạt động
                 await addDoc(collection(db, "activities"), { 
                     uid: userUid, 
                     userName: auth.currentUser.displayName || "User",
                     examTitle: levelData.title || "Bài đọc hiểu Level 2", 
                     action: `Đọc hiểu Level 2: ${safeScore}đ`, 
-                    type: "reading", // Sửa thành reading để chart phân loại đúng
+                    type: "reading", 
                     score: safeScore,
                     timestamp: serverTimestamp() 
                 });
                 
-                // Logic thưởng và chống cày keys
+                // 2. Logic mở khóa Level tiếp theo (NẾU ĐẠT >= 6 ĐIỂM)
                 if(safeScore >= 6) {
                     const progressRef = doc(db, "users_progress", userUid);
                     const userRef = doc(db, "users", userUid);
@@ -472,20 +472,23 @@
                     const progSnap = await getDoc(progressRef);
                     const progData = progSnap.exists() ? progSnap.data() : {};
                     
-                    // LẤY MẢNG VÀ ÉP KIỂU VỀ NUMBER (CHỐNG LỖI FIREBASE TRẢ VỀ STRING)
+                    // Mảng các level đã nhận thưởng (Keys)
                     const rewardedLevels = (progData.rewardedLevels || []).map(Number);
                     
-                    // Nếu số 2 chưa nằm trong mảng -> Lần đầu qua ải
+                    // Nếu Level 2 chưa nhận thưởng -> Cộng 10 Keys
                     if(!rewardedLevels.includes(2)) {
                         isFirstTimePass = true;
-                        rewardedLevels.push(2); // Cập nhật mảng
+                        rewardedLevels.push(2); 
                         
                         await setDoc(userRef, { keys: increment(10) }, { merge: true });
                         
-                        let newCurrentLvl = Math.max(progData.currentLevel || 1, 3);
-                        let newPaidLvl = Math.max(progData.paidLevel || 0, 3);
+                        // --- ĐOẠN QUAN TRỌNG ĐÃ FIX ---
+                        // Mở khóa nhìn thấy Level 3
+                        let newCurrentLvl = Math.max(Number(progData.currentLevel) || 1, 3);
+                        
+                        // Chỉ xác nhận đã trả phí cho Level 2 (KHÔNG ĐƯỢC SET LÊN 3)
+                        let newPaidLvl = Math.max(Number(progData.paidLevel) || 0, 2);
 
-                        // LƯU LẠI MẢNG REWARDEDLEVELS
                         await setDoc(progressRef, { 
                             currentLevel: newCurrentLvl, 
                             paidLevel: newPaidLvl, 

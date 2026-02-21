@@ -557,9 +557,11 @@
                         
                         await setDoc(userRef, { keys: increment(10) }, { merge: true });
                         
-                        // Cập nhật mở khóa Level 4
-                        let newCurrentLvl = Math.max(progData.currentLevel || 1, 4);
-                        let newPaidLvl = Math.max(progData.paidLevel || 0, 4);
+                        // Cập nhật mở khóa Level 4 (hiện trên bản đồ)
+                        let newCurrentLvl = Math.max(Number(progData.currentLevel) || 1, 4);
+                        
+                        // CHỈ XÁC NHẬN ĐÃ TRẢ PHÍ CHO LEVEL 3 (Tuyệt đối không set lên 4)
+                        let newPaidLvl = Math.max(Number(progData.paidLevel) || 0, 3);
 
                         await setDoc(progressRef, { 
                             currentLevel: newCurrentLvl, 
