@@ -105,7 +105,7 @@
             position: absolute; right: -20px; bottom: -20px; font-size: 8rem;
             opacity: 0.08; transform: rotate(-15deg); transition: all 0.5s ease; z-index: 0; pointer-events: none;
         }
-        .stat-card:hover .stat-watermark { transform: rotate(0deg) scale(1.1); opacity: 0.1; color: var(--primary); }
+        .stat-card:hover .stat-watermark { transform: rotate(0deg) scale(1.1); opacity: 0.1; }
 
         .split-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px; margin-bottom: 30px; }
 
@@ -114,12 +114,12 @@
             text-align: center; position: relative; overflow: hidden; margin-bottom: 0;
             box-shadow: 0 15px 30px rgba(255, 94, 98, 0.25);
         }
-        .banner-cta:hover .banner-decor { transform: rotate(-35deg) translate(15px, -25px) scale(1.1); opacity: 0.3; }
+        .banner-cta:hover .banner-decor { transform: rotate(-45deg) translate(15px, -25px) scale(1.1); opacity: 0.2; }
         .banner-cta:hover { 
             transform: translateY(-5px);
             border-color: var(--primary); box-shadow: 0 20px 40px rgba(255, 143, 80, 0.12); 
         }
-        .banner-decor { position: absolute; right: 10px; bottom: -20px; font-size: 8rem; opacity: 0.1; transform: rotate(-20deg); transition: all 0.5s ease; pointer-events: none;}
+        .banner-decor { position: absolute; right: -20px; bottom: -30px; font-size: 10rem; opacity: 0.1; transform: rotate(-60deg); transition: all 0.5s ease; pointer-events: none;}
 
         /* --- Tinh chỉnh 3 Box (BXH, Hoạt động, Thống kê) --- */
         /* Thêm class leaderboard-box phòng trường hợp bạn dùng tên này cho BXH */
@@ -142,9 +142,9 @@
 
         /* --- ĐÃ FIX: Icon watermark chìm ĐỒNG BỘ MÀU CAM --- */
         .box-watermark { 
-            position: absolute; right: 20px; bottom: -20px; 
-            font-size: 8rem; 
-            transform: rotate(15deg); 
+            position: absolute; right: -20px; bottom: -20px; 
+            font-size: 10rem; 
+            transform: rotate(-15deg); 
             transition: all 0.5s ease; 
             pointer-events: none;
             
@@ -158,10 +158,9 @@
         .chart-box:hover .box-watermark,
         .leaderboard-box:hover .box-watermark { 
             color: #FFB380 !important; /* Màu cam nhạt hơn xíu */
-            opacity: 0.3; /* Rõ lên một chút */
+            opacity: 0.2; /* Rõ lên một chút */
             transform: rotate(0deg) translate(15px, -25px) scale(1.1); 
         }
-        
         /* Đảm bảo nội dung chữ nổi lên trên icon */
         .activity-box > div, .activity-box > ul, .chart-box > div { position: relative; z-index: 2; }
 
