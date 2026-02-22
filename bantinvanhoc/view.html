@@ -56,53 +56,50 @@
             margin: 0; padding: 0;
         }
 
-        /* Khung bao ngoài cùng */
-        #hero-section {
-            display: block;
-            width: 100%;
-            height: 100vh;      /* Fallback cho trình duyệt cũ */
-            height: 100dvh;     /* Fix lỗi thanh địa chỉ trên Mobile */
-            min-height: 100dvh; /* Đảm bảo không bao giờ bị co lại */
-            position: relative;
-            overflow: hidden;
+        /* --- 2. HERO SECTION (FULLSCREEN TỐI ƯU PC & MOBILE) --- */
+        /* --- 2. HERO SECTION (FULLSCREEN TỐI ƯU PC & MOBILE) --- */
+        #hero-section { 
+            display: block; 
+            width: 100%; /* Sửa thành 100% thay vì 100vw để chống thanh cuộn ngang làm lùn màn hình */
+            height: 100vh; 
+            height: 100dvh; 
+            min-height: 100dvh; 
+            position: relative; 
+            overflow: hidden; 
         }
 
-        /* Khung hiển thị nội dung */
         #hero-viewport { 
-            position: absolute; /* Neo chặt vào khung cha */
-            inset: 0;
+            position: absolute; 
+            inset: 0; 
             width: 100%; 
             height: 100%; 
             overflow: hidden; 
-            margin: 0; padding: 0; 
         }
-        
-        /* Lớp nền */
+
         .hero-bg { 
             position: absolute; 
-            inset: 0; 
-            width: 100%; height: 100%; 
+            top: -2%; left: -2%; right: -2%; bottom: -2%;
+            width: 104%; height: 104%;
             z-index: 1; 
         }
-        
-        /* ẢNH HERO - QUAN TRỌNG NHẤT */
+
         .hero-img { 
-            position: absolute; /* Neo 4 góc */
-            top: 0; left: 0;
+            position: absolute; 
+            top: 0; left: 0; 
             width: 100% !important; 
-            height: 100% !important; /* Bắt buộc cao 100% khung chứa */
-            
-            /* Lấp đầy khung hình mà không bị méo */
-            object-fit: cover !important; 
-            object-position: center center !important; 
-            
+            height: 100% !important; 
+            /* CHỈNH SỬA TẠI ĐÂY: Thay 'cover' bằng 'contain' và neo 'bottom' */
+            object-fit: contain !important; 
+            object-position: center bottom !important; 
             filter: brightness(0.6); 
-            transform: scale(1.1); /* Zoom nhẹ */
-            will-change: transform;
-            display: block;
-            z-index: 1;
+            transform: scale(1); 
+            will-change: transform; 
+            display: block; 
+            z-index: 1; 
+            /* Thêm màu nền đồng bộ để che khoảng trống (nếu có) khi dùng contain */
+            background-color: #000; 
         }
-        
+
         .hero-overlay { 
             position: absolute; 
             inset: 0; 
@@ -112,81 +109,45 @@
         }
 
         /* --- UI ELEMENTS TRÊN HERO --- */
-        /* Stage 1: Chữ to góc trái */
-        .stage-1-ui {
-            position: absolute; top: 40px; left: 40px; z-index: 5;
-            color: rgba(255,255,255,0.8); font-family: 'Playfair Display', serif;
-            font-size: 6vw; font-weight: 600; line-height: 0.9; text-transform: uppercase;
-            pointer-events: none;
+        .stage-1-ui { 
+            position: absolute; top: 40px; left: 40px; z-index: 5; 
+            color: rgba(255,255,255,0.8); font-family: 'Playfair Display', serif; 
+            font-size: 6vw; font-weight: 600; line-height: 0.9; text-transform: uppercase; 
+            pointer-events: none; 
         }
 
-        /* Stage 2: Nội dung trung tâm */
-        .stage-2-ui {
-            position: absolute; inset: 0; z-index: 10;
-            display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; /* Căn giữa hoàn toàn */
-            color: white; text-align: center; padding: 0 20px;
-            opacity: 0; visibility: hidden;
-            width: 100%; height: 100%; /* Đảm bảo khung nội dung cũng full */
+        .stage-2-ui { 
+            position: absolute; inset: 0; z-index: 10; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            color: white; text-align: center; padding: 0 20px; 
+            opacity: 0; visibility: hidden; width: 100%; height: 100%; 
         }
 
         .h-cate { 
-            font-weight: 600; letter-spacing: 3px; color: var(--primary); 
-            text-transform: uppercase; font-size: 0.75rem; margin-bottom: 20px; 
-            background: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 50px;
+            font-weight: 600; letter-spacing: 3px; color: var(--primary); text-transform: uppercase; 
+            font-size: 0.75rem; margin-bottom: 20px; background: rgba(0,0,0,0.6); 
+            padding: 5px 15px; border-radius: 50px; 
         }
+
         .h-title { 
             font-family: 'Playfair Display', serif; 
-            font-size: clamp(2rem, 5vw, 3.5rem); /* Responsive font size */
-            font-weight: 600; line-height: 1.2; margin-bottom: 25px; 
-            text-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 600; 
+            line-height: 1.2; margin-bottom: 25px; text-shadow: 0 10px 30px rgba(0,0,0,0.5); 
         }
+
         .h-sapo-36 { 
             font-family: 'Merriweather', serif; font-size: 1.1rem; line-height: 1.8; 
             color: rgba(255,255,255,0.9); max-width: 700px; margin-bottom: 40px; 
-            font-style: italic; font-weight: 300;
+            font-style: italic; font-weight: 300; 
         }
 
-        /* Stage 1: Chữ to góc trái */
-        .stage-1-ui {
-            position: absolute; top: 40px; left: 40px; z-index: 5;
-            color: rgba(255,255,255,0.8); font-family: 'Playfair Display', serif;
-            font-size: 6vw; font-weight: 600; line-height: 0.9; text-transform: uppercase; /* Đã giảm độ đậm */
-            pointer-events: none;
+        .btn-fav-hero { 
+            background: white; color: #111; padding: 12px 35px; border-radius: 50px; 
+            font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; 
+            display: inline-flex; align-items: center; gap: 10px; cursor: pointer; 
+            transition: 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
         }
-
-        /* Stage 2: Nội dung trung tâm (Hiện khi cuộn) */
-        .stage-2-ui {
-            position: absolute; inset: 0; z-index: 10;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: white; text-align: center; padding: 0 20px;
-            opacity: 0; visibility: hidden;
-        }
-        .h-cate { 
-            font-weight: 600; letter-spacing: 3px; color: var(--primary); 
-            text-transform: uppercase; font-size: 0.75rem; margin-bottom: 20px; 
-            background: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 50px;
-        }
-        /* TITLE ĐÃ CHỈNH NHỎ LẠI & MỎNG HƠN */
-        .h-title { 
-            font-family: 'Playfair Display', serif; 
-            font-size: clamp(2rem, 4vw, 3.5rem); /* Nhỏ hơn */
-            font-weight: 600; /* Mỏng hơn */
-            line-height: 1.2; margin-bottom: 25px; 
-            text-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-        }
-        .h-sapo-36 { 
-            font-family: 'Merriweather', serif; font-size: 1.1rem; line-height: 1.8; 
-            color: rgba(255,255,255,0.9); max-width: 700px; margin-bottom: 40px; 
-            font-style: italic; font-weight: 300;
-        }
-
-        .btn-fav-hero {
-            background: white; color: #111; padding: 12px 35px; border-radius: 50px;
-            font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;
-            display: inline-flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.3s;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
+        
         .btn-fav-hero:hover { background: var(--primary); color: white; transform: translateY(-3px); }
 
         /* --- 3. MAIN CONTENT --- */
@@ -362,6 +323,42 @@
     line-height: 2;
     text-align: justify;
 }
+
+        /* --- THEME: SEPIA (VÀNG NHẠT BẢO VỆ MẮT) --- */
+        body.sepia-mode, .article-main.sepia-mode { background-color: #fbf0d9 !important; }
+        .sepia-mode .quote-box { background-color: #f4e6c8 !important; border-color: #e2d1b3 !important; }
+        .sepia-mode .table-view-container { background-color: #fbf0d9 !important; }
+
+        /* --- THEME: DARK MODE (CHẾ ĐỘ TỐI) --- */
+        body.dark-mode, .article-main.dark-mode { background-color: #121212 !important; color: #e0e0e0 !important; }
+        
+        /* ĐÃ FIX: Ép màu chữ trắng/xám sáng cho TẤT CẢ các thẻ bên trong nội dung bài viết */
+        .dark-mode .article-body, 
+        .dark-mode .article-body p, 
+        .dark-mode .article-body span, 
+        .dark-mode .article-body div, 
+        .dark-mode .article-body li { 
+            color: #d1d5db !important; 
+        }
+        .dark-mode .article-body h1, 
+        .dark-mode .article-body h2, 
+        .dark-mode .article-body h3, 
+        .dark-mode .article-body strong, 
+        .dark-mode .article-body b { 
+            color: #f3f4f6 !important; 
+        }
+        
+        .dark-mode .s-value, .dark-mode .s-label { color: #e5e7eb !important; }
+        .dark-mode .quote-box { background-color: #1f2937 !important; border-color: #374151 !important; color: #d1d5db !important; }
+        .dark-mode .quote-box strong { color: #f3f4f6 !important; }
+        .dark-mode .glass-header { background: rgba(30, 30, 30, 0.8) !important; border-color: rgba(255,255,255,0.1) !important; }
+        .dark-mode .hopvan-table th, .dark-mode .hopvan-table td { border-color: #374151 !important; color: #d1d5db !important; }
+        .dark-mode .hopvan-table th { background-color: #1f2937 !important; color: #f3f4f6 !important; }
+        .dark-mode .fc-btn { border-color: #374151 !important; color: #9ca3af !important; background: transparent; }
+        .dark-mode .fc-btn:hover { background: #374151 !important; color: #fff !important; }
+        .dark-mode .table-view-container { background: transparent !important; }
+        .dark-mode .back-btn { color: #9ca3af !important; }
+        .dark-mode .back-btn:hover { color: var(--primary) !important; }
 </style>
 </head>
 <body>
@@ -425,9 +422,15 @@
             </aside>
 
             <article>
-                <div class="font-control">
-                    <button class="fc-btn" onclick="changeFontSize(-1)">A-</button>
-                    <button class="fc-btn" onclick="changeFontSize(1)">A+</button>
+                <div class="font-control flex justify-between items-center w-full">
+                    <div class="flex gap-2">
+                        <button class="fc-btn" onclick="changeFontSize(-1)" title="Giảm cỡ chữ">A-</button>
+                        <button class="fc-btn" onclick="changeFontSize(1)" title="Tăng cỡ chữ">A+</button>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="fc-btn" onclick="toggleSepiaMode()" title="Chế độ bảo vệ mắt (Nền vàng)"><i class="fas fa-book-open"></i></button>
+                        <button class="fc-btn" onclick="toggleDarkMode()" title="Chế độ tối (Dark Mode)"><i class="fas fa-moon"></i></button>
+                    </div>
                 </div>
 
                 <div id="article-body" class="article-body"></div>
@@ -479,7 +482,9 @@
           .to(".curtain-right", { x: "100%", duration: 1.5, ease: "power4.inOut" }, "<")
           .to("#hero-viewport", { opacity: 1, duration: 0.5 }, "-=1.0") 
           .set("#intro-overlay", { display: "none" });
+          
         setTimeout(initGSAP, 1000);
+        // Đã xóa phần gọi Popup Fullscreen ở đây
     }
 
     // --- LOAD DATA (LOGIC MỚI: ID HOẶC SLUG) ---
@@ -585,7 +590,8 @@
         let tl = gsap.timeline({ scrollTrigger: { trigger: "#hero-section", start: "top top", end: "+=150%", scrub: 1, pin: true } });
         tl.to("#s1-text", { opacity: 0, y: -50, duration: 1 })
           .to("#hero-overlay", { background: "rgba(0,0,0,0.8)", duration: 1 }, 0)
-          .to("#hero-img", { scale: 1.2, duration: 2 }, 0)
+          /* ĐÃ SỬA: Chỉ zoom lên 1.05 để hạn chế mất góc ảnh */
+          .to("#hero-img", { scale: 1.05, duration: 2 }, 0)
           .to("#s2-text", { opacity: 1, visibility: "visible", duration: 1 }, 0.5);
     }
 
@@ -669,6 +675,46 @@
     };
 
     onAuthStateChanged(auth, u => { currentUser = u; loadContent(); });
+
+    // --- READING MODES (SÁNG / TỐI / VÀNG NHẠT) ---
+    let isDarkMode = false;
+    let isSepiaMode = false;
+
+    window.toggleDarkMode = () => {
+        isDarkMode = !isDarkMode;
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+            document.querySelector('.article-main').classList.add('dark-mode');
+            
+            // Tắt Sepia nếu đang bật
+            isSepiaMode = false;
+            document.body.classList.remove('sepia-mode');
+            document.querySelector('.article-main').classList.remove('sepia-mode');
+            showToast("Đã bật Chế độ tối");
+        } else {
+            document.body.classList.remove('dark-mode');
+            document.querySelector('.article-main').classList.remove('dark-mode');
+            showToast("Đã tắt Chế độ tối");
+        }
+    };
+
+    window.toggleSepiaMode = () => {
+        isSepiaMode = !isSepiaMode;
+        if (isSepiaMode) {
+            document.body.classList.add('sepia-mode');
+            document.querySelector('.article-main').classList.add('sepia-mode');
+            
+            // Tắt Dark mode nếu đang bật
+            isDarkMode = false;
+            document.body.classList.remove('dark-mode');
+            document.querySelector('.article-main').classList.remove('dark-mode');
+            showToast("Đã bật Chế độ bảo vệ mắt");
+        } else {
+            document.body.classList.remove('sepia-mode');
+            document.querySelector('.article-main').classList.remove('sepia-mode');
+            showToast("Đã về Chế độ mặc định");
+        }
+    };
 </script>
 </body>
 </html>

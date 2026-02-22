@@ -137,6 +137,43 @@
         ::-webkit-scrollbar-thumb:hover { background-color: var(--primary) !important; }
 
         .article-body p { margin-bottom: 25px; line-height: 2; text-align: justify; }
+
+/* --- THEME: SEPIA (VÀNG NHẠT BẢO VỆ MẮT) --- */
+        body.sepia-mode, .article-main.sepia-mode { background-color: #fbf0d9 !important; }
+        .sepia-mode .quote-box { background-color: #f4e6c8 !important; border-color: #e2d1b3 !important; }
+        .sepia-mode .table-view-container { background-color: #fbf0d9 !important; }
+        .sepia-mode .hopvan-table th { background-color: #f4e6c8 !important; border-color: #d1bfae !important; }
+        .sepia-mode .hopvan-table td { border-color: #d1bfae !important; }
+
+        /* --- THEME: DARK MODE (CHẾ ĐỘ TỐI) --- */
+        body.dark-mode, .article-main.dark-mode { background-color: #121212 !important; color: #e0e0e0 !important; }
+        
+        .dark-mode .article-body, 
+        .dark-mode .article-body p, 
+        .dark-mode .article-body span, 
+        .dark-mode .article-body div, 
+        .dark-mode .article-body li { color: #d1d5db !important; }
+        
+        .dark-mode .article-body h1, 
+        .dark-mode .article-body h2, 
+        .dark-mode .article-body h3, 
+        .dark-mode .article-body strong, 
+        .dark-mode .article-body b { color: #f3f4f6 !important; }
+        
+        .dark-mode .s-value, .dark-mode .s-label { color: #e5e7eb !important; }
+        .dark-mode .quote-box { background-color: #1f2937 !important; border-color: #374151 !important; color: #d1d5db !important; }
+        .dark-mode .quote-box strong { color: #f3f4f6 !important; }
+        
+        /* Dark mode cho View Bảng */
+        .dark-mode .table-view-container { background-color: transparent !important; box-shadow: none !important; }
+        .dark-mode .hopvan-table th, .dark-mode .hopvan-table td { border-color: #374151 !important; color: #d1d5db !important; }
+        .dark-mode .hopvan-table th { background-color: #1f2937 !important; color: #f3f4f6 !important; }
+        
+        .dark-mode .fc-btn { border-color: #374151 !important; color: #9ca3af !important; background: transparent; }
+        .dark-mode .fc-btn:hover { background: #374151 !important; color: #fff !important; }
+        .dark-mode .back-btn { color: #9ca3af !important; }
+        .dark-mode .back-btn:hover { color: var(--primary) !important; }
+        .dark-mode .ending-box { background: #1a1a1a !important; border-color: #333 !important; color: #bbb !important; }
     </style>
 </head>
 <body>
@@ -191,9 +228,15 @@
             </aside>
 
             <article>
-                <div class="font-control">
-                    <button class="fc-btn" onclick="changeFontSize(-1)">A-</button>
-                    <button class="fc-btn" onclick="changeFontSize(1)">A+</button>
+                <div class="font-control flex justify-between items-center w-full">
+                    <div class="flex gap-2">
+                        <button class="fc-btn" onclick="changeFontSize(-1)" title="Giảm cỡ chữ">A-</button>
+                        <button class="fc-btn" onclick="changeFontSize(1)" title="Tăng cỡ chữ">A+</button>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="fc-btn" onclick="toggleSepiaMode()" title="Chế độ bảo vệ mắt (Nền vàng)"><i class="fas fa-book-open"></i></button>
+                        <button class="fc-btn" onclick="toggleDarkMode()" title="Chế độ tối (Dark Mode)"><i class="fas fa-moon"></i></button>
+                    </div>
                 </div>
                 <div id="article-body" class="article-body"></div>
                 <div class="ending-box" id="article-ending" style="display:none"></div>
@@ -438,6 +481,46 @@
     };
 
     onAuthStateChanged(auth, u => { currentUser = u; loadContent(); });
+
+// --- READING MODES (SÁNG / TỐI / VÀNG NHẠT) ---
+    let isDarkMode = false;
+    let isSepiaMode = false;
+
+    window.toggleDarkMode = () => {
+        isDarkMode = !isDarkMode;
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+            document.querySelector('.article-main').classList.add('dark-mode');
+            
+            // Tắt Sepia nếu đang bật
+            isSepiaMode = false;
+            document.body.classList.remove('sepia-mode');
+            document.querySelector('.article-main').classList.remove('sepia-mode');
+            showToast("Đã bật Chế độ tối");
+        } else {
+            document.body.classList.remove('dark-mode');
+            document.querySelector('.article-main').classList.remove('dark-mode');
+            showToast("Đã tắt Chế độ tối");
+        }
+    };
+
+    window.toggleSepiaMode = () => {
+        isSepiaMode = !isSepiaMode;
+        if (isSepiaMode) {
+            document.body.classList.add('sepia-mode');
+            document.querySelector('.article-main').classList.add('sepia-mode');
+            
+            // Tắt Dark mode nếu đang bật
+            isDarkMode = false;
+            document.body.classList.remove('dark-mode');
+            document.querySelector('.article-main').classList.remove('dark-mode');
+            showToast("Đã bật Chế độ bảo vệ mắt");
+        } else {
+            document.body.classList.remove('sepia-mode');
+            document.querySelector('.article-main').classList.remove('sepia-mode');
+            showToast("Đã về Chế độ mặc định");
+        }
+    };
 </script>
 </body>
 </html>
