@@ -1076,6 +1076,7 @@
         }
     };
 
+    // --- ĐÃ FIX: CHO PHÉP TÙY CHỈNH CẢ 3 TIÊU ĐỀ CỦA BẢNG ---
     window.addTableRow = (rData = null) => {
         const list = document.getElementById('table-rows-list');
         const rowId = `trow-${Date.now()}-${tableRowCounter++}`;
@@ -1088,18 +1089,28 @@
             <button type="button" onclick="this.closest('.table-row-item').remove(); delete newsEditors['${rowId}_open']; delete newsEditors['${rowId}_close'];" class="absolute -right-2 -top-2 w-8 h-8 bg-red-100 text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition z-20 hover:bg-red-500 hover:text-white flex items-center justify-center"><i class="fas fa-times"></i></button>
             <div class="grid grid-cols-12 gap-4">
                 <div class="col-span-12 md:col-span-3">
-                    <label class="text-[10px] font-bold text-gray-400 uppercase">Thể loại</label>
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-pen text-gray-400 text-sm"></i>
+                        <input class="row-title-type text-[10px] font-bold text-gray-400 uppercase bg-transparent border-b border-dashed border-gray-300 focus:border-gray-500 outline-none w-full pb-1" placeholder="Nhập tiêu đề (VD: THỂ LOẠI)" value="${rData && rData.titleType ? rData.titleType : 'Thể loại'}">
+                    </div>
                     <input class="row-type glass-input font-bold bg-orange-50 border-orange-100" placeholder="VD: Thơ, Truyện..." value="${rData ? rData.type : ''}">
                 </div>
                 <div class="col-span-12 md:col-span-9 space-y-4">
                     <div>
-                        <label class="text-[10px] font-bold text-emerald-500 uppercase">Nội dung Mở bài</label>
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fas fa-pen text-emerald-500 text-sm"></i>
+                            <input class="row-title-1 text-[10px] font-bold text-emerald-600 uppercase bg-transparent border-b border-dashed border-emerald-200 focus:border-emerald-500 outline-none w-full pb-1" placeholder="Nhập tiêu đề cột (VD: NỘI DUNG MỞ BÀI)" value="${rData && rData.title1 ? rData.title1 : 'Nội dung Mở bài'}">
+                        </div>
                         <div class="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden">
                             <div id="ed-${rowId}-open" style="height: 100px;"></div>
                         </div>
                     </div>
+                    
                     <div>
-                        <label class="text-[10px] font-bold text-purple-500 uppercase">Nội dung Kết bài</label>
+                        <div class="flex items-center gap-2 mb-2 mt-4">
+                            <i class="fas fa-pen text-purple-500 text-sm"></i>
+                            <input class="row-title-2 text-[10px] font-bold text-purple-600 uppercase bg-transparent border-b border-dashed border-purple-200 focus:border-purple-500 outline-none w-full pb-1" placeholder="Nhập tiêu đề cột (VD: NỘI DUNG KẾT BÀI)" value="${rData && rData.title2 ? rData.title2 : 'Nội dung Kết bài'}">
+                        </div>
                         <div class="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden">
                             <div id="ed-${rowId}-close" style="height: 100px;"></div>
                         </div>
@@ -1117,6 +1128,7 @@
         newsEditors[`${rowId}_close`] = new Quill(`#ed-${rowId}-close`, { theme: 'snow', modules: { toolbar: miniToolbar }});
         newsEditors[`${rowId}_close`].clipboard.dangerouslyPasteHTML(rData ? rData.close : "");
     };
+
     // --- KHAI BÁO TOOLBAR ĐẦY ĐỦ (GLOBAL) ---
     const FULL_TOOLBAR = [
         ['bold', 'italic', 'underline', 'strike'],
@@ -2007,15 +2019,27 @@ const CAT_MAP = {
 
                 // KIỂM TRA ĐANG Ở VIEW NÀO ĐỂ LƯU DATA
                 if (['maicau', 'cuango', 'khoinguon'].includes(type)) {
-                    // LƯU DẠNG BẢNG (VIEW 2)
+                    // LƯU DẠNG BẢNG (VIEW 2) - ĐÃ LƯU KÈM TẤT CẢ TITLE TÙY CHỈNH
                     docData.tableRows = [];
                     const rowEls = document.querySelectorAll('.table-row-item');
                     for (let el of rowEls) {
                         const rId = el.getAttribute('data-row-id');
                         const rType = el.querySelector('.row-type').value;
+                        const rTitleType = el.querySelector('.row-title-type').value; // Lấy title Thể loại
+                        const rTitle1 = el.querySelector('.row-title-1').value; // Lấy title 1
+                        const rTitle2 = el.querySelector('.row-title-2').value; // Lấy title 2
                         const rOpen = newsEditors[`${rId}_open`].root.innerHTML;
                         const rClose = newsEditors[`${rId}_close`].root.innerHTML;
-                        docData.tableRows.push({ type: rType, open: rOpen, close: rClose });
+                        
+                        // Lưu tất cả vào Database
+                        docData.tableRows.push({ 
+                            type: rType, 
+                            titleType: rTitleType, // Lưu biến title mới
+                            title1: rTitle1, 
+                            title2: rTitle2, 
+                            open: rOpen, 
+                            close: rClose 
+                        });
                     }
                     docData.sections = []; // Xóa rác sections cũ
                 } else {

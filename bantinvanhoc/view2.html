@@ -294,6 +294,12 @@
 
                 // 2. Render Body
                 if (isTableView && data.tableRows && data.tableRows.length > 0) {
+                    // Lấy tiêu đề cột từ dòng đầu tiên (Fallback về mặc định nếu bài viết cũ chưa có)
+                    const firstRow = data.tableRows[0];
+                    const colTypeTitle = firstRow.titleType || 'Thể Loại'; // Tiêu đề cột 2
+                    const col1Title = firstRow.title1 || 'Mở Bài';         // Tiêu đề cột 3
+                    const col2Title = firstRow.title2 || 'Kết Bài';        // Tiêu đề cột 4
+
                     // VIEW 2: Dạng Bảng (Dùng khi firebase có mảng tableRows)
                     htmlContent += `
                     <div class="table-view-container">
@@ -301,9 +307,9 @@
                             <thead>
                                 <tr>
                                     <th class="col-stt">STT</th>
-                                    <th class="col-type">Thể Loại</th>
-                                    <th>Mở Bài</th>
-                                    <th>Kết Bài</th>
+                                    <th class="col-type">${colTypeTitle}</th>
+                                    <th>${col1Title}</th>
+                                    <th>${col2Title}</th>
                                 </tr>
                             </thead>
                             <tbody>`;
