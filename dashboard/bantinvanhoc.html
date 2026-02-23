@@ -559,7 +559,7 @@
             }
         }
 
-        // --- RENDER CARD GIAO DIỆN MỚI ---
+        // --- RENDER CARD GIAO DIỆN MỚI (ĐÃ TỐI ƯU SEO VỚI THẺ A) ---
         function renderLayout(articles) {
             const container = document.getElementById('content-area');
             container.innerHTML = '';
@@ -579,32 +579,42 @@
 
             let html = '';
 
-            // Featured Card (Bài nổi bật to đùng)
+            // Danh sách các danh mục dùng View 2 (Dạng bảng) để chia link
+            const view2Categories = ['maicau', 'cuango', 'khoinguon'];
+
+            // 1. Featured Card (Bài nổi bật to đùng)
             if (featured) {
                 const cat = getCatInfo(featured.category);
-               html += `
-                    <div class="featured-card card" onclick="goToDetail('${featured.slug || featured.id}', '${featured.slug ? 'slug' : 'id'}', '${featured.category}')">                    <div class="c-img-box f-img-wrap">
-                        <img src="${featured.img}" class="c-img f-img" loading="lazy">
-                        <div class="c-badge" style="background:var(--primary); color:white; border:none;">MỚI NHẤT</div>
-                    </div>
-                    <div class="c-body f-content">
-                        <div class="c-badge" style="position:static; width:fit-content; margin-bottom:10px; background:rgba(255,143,80,0.1); color:#FF8F50;">${cat.name}</div>
-                        <h2 class="c-title f-title" style="font-size:2rem;">${featured.title}</h2>
-                        <p class="c-desc f-desc">${featured.summary}</p>
-                        <div class="c-footer">
-                            <span>${featured.date}</span>
-                            <span class="read-link">Đọc ngay <i class="fas fa-arrow-right"></i></span>
+                const targetView = view2Categories.includes(featured.category) ? 'view2.html' : 'view.html';
+                const link = `../bantinvanhoc/${targetView}?${featured.slug ? `slug=${featured.slug}` : `id=${featured.id}`}`;
+
+                html += `
+                    <a href="${link}" class="featured-card card" style="display: grid; text-decoration: none;">  
+                        <div class="c-img-box f-img-wrap">
+                            <img src="${featured.img}" class="c-img f-img" loading="lazy">
+                            <div class="c-badge" style="background:var(--primary); color:white; border:none;">MỚI NHẤT</div>
                         </div>
-                    </div>
-                </div>`;
+                        <div class="c-body f-content">
+                            <div class="c-badge" style="position:static; width:fit-content; margin-bottom:10px; background:rgba(255,143,80,0.1); color:#FF8F50;">${cat.name}</div>
+                            <h2 class="c-title f-title" style="font-size:2rem;">${featured.title}</h2>
+                            <p class="c-desc f-desc">${featured.summary}</p>
+                            <div class="c-footer">
+                                <span>${featured.date}</span>
+                                <span class="read-link">Đọc ngay <i class="fas fa-arrow-right"></i></span>
+                            </div>
+                        </div>
+                    </a>`;
             }
 
-            // Grid Cards (Các bài còn lại)
+            // 2. Grid Cards (Các bài còn lại)
             html += '<div class="news-grid">';
             list.forEach(item => {
                 const cat = getCatInfo(item.category);
+                const targetView = view2Categories.includes(item.category) ? 'view2.html' : 'view.html';
+                const link = `../bantinvanhoc/${targetView}?${item.slug ? `slug=${item.slug}` : `id=${item.id}`}`;
+
                 html += `
-                <div class="card" onclick="goToDetail('${item.slug || item.id}', '${item.slug ? 'slug' : 'id'}', '${item.category}')">
+                <a href="${link}" class="card" style="text-decoration: none;">
                     <div class="c-img-box">
                         <img src="${item.img}" class="c-img" loading="lazy">
                         <div class="c-badge">${cat.name}</div>
@@ -617,7 +627,7 @@
                             <span class="read-link">Xem <i class="fas fa-chevron-right"></i></span>
                         </div>
                     </div>
-                </div>`;
+                </a>`;
             });
             html += '</div>';
 
