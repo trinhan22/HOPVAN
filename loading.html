@@ -115,24 +115,28 @@
     <script>
         const audio = document.getElementById('bg-music');
         
+        // Timeline chính
         const tl = gsap.timeline({ 
             paused: true,
             onComplete: () => { 
-                gsap.to("body", { opacity: 0, duration: 0.3, onComplete: () => {
-                    window.location.href = 'dashboard'; 
+                gsap.to("body", { opacity: 0, duration: 0.4, onComplete: () => {
+                    // --- CHUYỂN HƯỚNG SAU 3 GIÂY ---
+                    window.location.href = 'dashboard/'; 
                 }});
             }
         });
 
         function initAnimation() {
-            // 1. THANH PROGRESS CHẠY RIÊNG (Đúng 5 giây)
-            gsap.to("#bar", { width: "100%", duration: 5, ease: "none" });
+            // 1. THANH PROGRESS: Chạy trong 3 giây
+            gsap.to("#bar", { width: "100%", duration: 3, ease: "none" });
 
-            // 2. TIMELINE SCENE (Tổng 5 giây cho 4 cảnh)
+            // 2. SCENES: Ép 4 cảnh hiển thị hết trong vòng 3 giây
             const ids = ['#s1', '#s2', '#s3', '#s4'];
-            const fadeTime = 0.5; // Tăng nhẹ thời gian fade để mượt hơn
-            const stayTime = 0.6; // Tăng nhẹ thời gian dừng vì còn ít cảnh
-            const overlap = "-=0.2"; 
+            
+            // Tính toán: 4 cảnh trong 3s => Mỗi cảnh xuất hiện rất nhanh
+            const fadeTime = 0.3; // Thời gian hiện lên (nhanh hơn)
+            const stayTime = 0.35; // Thời gian dừng lại đọc chữ (ngắn hơn)
+            const overlap = "-=0.15"; // Gối đầu lên nhau để mượt
 
             ids.forEach((id, index) => {
                 // Fade In
@@ -143,7 +147,7 @@
                     ease: "sine.inOut" 
                 }, index === 0 ? 0 : overlap);
                 
-                // Fade Out (Trừ cảnh cuối cùng s4)
+                // Fade Out (Trừ cảnh cuối cùng s4 để nó giữ lại lúc chuyển trang)
                 if (index < ids.length - 1) {
                     tl.to(id, { 
                         autoAlpha: 0, 

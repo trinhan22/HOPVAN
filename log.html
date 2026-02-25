@@ -3,392 +3,451 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HopVan - Đăng Nhập</title>
-    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
-    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
-    <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
-    <meta property="og:url" content="https://hopvan.netlify.app" />
-    <meta property="og:type" content="article" />
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/webp" href="LOGO.WEBP" />
+    <title>HopVan - Đăng Nhập & Đăng Ký</title>
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         :root {
             --primary: #FF8F50;
-            --primary-light: #FFB085;
-            --text-main: #2D3436;
-            --text-light: #636E72;
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.8);
-            --blur: 20px;
-            --white: #ffffff;
+            --primary-dark: #FF6B6B;
         }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FFF5EC; }
+        
+        /* Background Blobs Animation */
+        .blob { position: fixed; filter: blur(80px); opacity: 0.5; z-index: -1; animation: float 10s infinite alternate; }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #FFD1D1; }
+        .blob-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #FFE4C4; animation-delay: -5s; }
+        @keyframes float { 0% { transform: translate(0,0); } 100% { transform: translate(30px, 50px); } }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        body {
-            background-color: #FFF5EC;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* --- BACKGROUND BLOBS (Đồng bộ với Index) --- */
-        .background-blobs {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-        }
-
-        .blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.6;
-            animation: floatBlob 10s infinite alternate;
-        }
-
-        .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
-        .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
-        .blob-3 { width: 300px; height: 300px; background: #FFD1D1; top: 40%; left: 40%; animation-delay: -2s; }
-
-        @keyframes floatBlob {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, 50px) scale(1.1); }
-        }
-
-        /* --- LOGIN CARD (Glassmorphism) --- */
-        .login-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--blur));
-            -webkit-backdrop-filter: blur(var(--blur));
-            border: 1px solid var(--glass-border);
-            padding: 40px;
-            border-radius: 30px;
-            width: 100%;
-            max-width: 450px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
-            animation: fadeIn 0.8s ease-out;
-            margin: 20px;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .header-section {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .logo-img {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            margin-bottom: 15px;
-        }
-
-        h2 {
-            color: var(--text-main);
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: var(--text-light);
-            font-size: 0.95rem;
-        }
-
-        .subtitle a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 700;
-        }
-
-        /* --- FORM STYLES --- */
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text-main);
-            font-size: 0.9rem;
-        }
-
+        /* Custom Styles */
         .input-field {
-            width: 100%;
-            padding: 12px 20px;
-            border-radius: 50px; /* Bo tròn kiểu pill */
-            border: 1px solid rgba(0,0,0,0.1);
-            background: rgba(255,255,255,0.8);
-            font-size: 1rem;
-            transition: all 0.3s;
-            outline: none;
+            transition: all 0.3s ease;
         }
-
         .input-field:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(255, 143, 80, 0.2);
-            background: white;
+            box-shadow: 0 0 0 4px rgba(255, 143, 80, 0.15);
         }
-
-        /* Checkbox & Forgot Password */
-        .actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            font-size: 0.9rem;
+        .btn-gradient {
+            background: linear-gradient(135deg, #FF8F50 0%, #FF6B6B 100%);
+            transition: all 0.3s ease;
         }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-
-        .remember-me input {
-            accent-color: var(--primary);
-            width: 16px;
-            height: 16px;
-        }
-
-        .forgot-pass {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        /* Buttons */
-        .btn-submit {
-            width: 100%;
-            background: linear-gradient(135deg, var(--primary), #FF758C);
-            color: white;
-            padding: 14px;
-            border-radius: 50px;
-            border: none;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(255, 143, 80, 0.3);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .btn-submit:hover {
+        .btn-gradient:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 25px rgba(255, 143, 80, 0.4);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+        .btn-gradient:disabled {
+            opacity: 0.7; transform: none; cursor: not-allowed;
+        }
+        
+        /* Tab Styles */
+        .tab-btn { position: relative; transition: 0.3s; color: #94A3B8; }
+        .tab-btn.active { color: var(--primary); }
+        .tab-btn.active::after {
+            content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 3px;
+            background: var(--primary); border-radius: 10px;
         }
 
-        .divider {
-            margin: 25px 0;
-            display: flex;
-            align-items: center;
-            color: var(--text-light);
-            font-size: 0.85rem;
+        /* Animation Fade In Up */
+        .animate-fade-up { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(30px); }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* Left Side Gradient Style */
+        .left-panel-gradient {
+            background: linear-gradient(135deg, #FF8F50 0%, #FF6B6B 100%);
+            position: relative; overflow: hidden;
+        }
+        .left-pattern {
+            position: absolute; inset: 0; opacity: 0.15;
+            background-image: radial-gradient(#fff 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
         }
 
-        .divider::before, .divider::after {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background: rgba(0,0,0,0.1);
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
+            z-index: 100; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: 0.3s;
         }
-
-        .divider span {
-            padding: 0 10px;
+        .modal-overlay.show { opacity: 1; visibility: visible; }
+        .modal-content {
+            background: white; padding: 30px; border-radius: 24px; text-align: center;
+            transform: scale(0.9); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1); max-width: 400px; width: 90%;
         }
-
-        .btn-google {
-            width: 100%;
-            background: white;
-            color: var(--text-main);
-            padding: 12px;
-            border-radius: 50px;
-            border: 1px solid rgba(0,0,0,0.1);
-            font-weight: 600;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-google:hover {
-            background: #f9f9f9;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-
-        .back-home {
-            position: absolute;
-            top: 30px;
-            left: 30px;
-            text-decoration: none;
-            color: var(--text-main);
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            opacity: 0.7;
-            transition: opacity 0.3s;
-        }
-        .back-home:hover { opacity: 1; }
-
+        .modal-overlay.show .modal-content { transform: scale(1); }
     </style>
 </head>
-<body>
+<body class="flex items-center justify-center min-h-screen p-4 sm:p-6">
 
     <div class="background-blobs">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
     </div>
 
-    <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Trang chủ</a>
+    <div class="bg-white rounded-[32px] shadow-2xl overflow-hidden w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 min-h-[600px] animate-fade-up border border-white/50 backdrop-blur-xl">
+        
+        <div class="left-panel-gradient hidden md:flex flex-col justify-between p-12 text-white">
+            <div class="left-pattern"></div>
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
+            <div class="absolute -bottom-32 -left-32 w-64 h-64 bg-orange-300/30 rounded-full blur-3xl"></div>
+            <div class="absolute -top-32 -right-32 w-64 h-64 bg-red-300/20 rounded-full blur-3xl"></div>
+            
+            <div class="relative z-10 flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20 border border-white/30">
+                    <img src="../LOGO.WEBP" class="w-7 h-7 object-contain">
+                </div>
+                <div>
+                    <h2 class="font-black text-2xl tracking-widest drop-shadow-sm leading-none">HOPVAN</h2>
+                    <p class="text-orange-100 text-xs font-bold tracking-wider opacity-80">AI LEARNING PLATFORM</p>
+                </div>
+            </div>
 
-    <div class="login-card">
-        <div class="header-section">
-            <img src="../LOGO.WEBP" alt="Logo" class="logo-img">
-            <h2>Chào mừng trở lại</h2>
-            <p class="subtitle">Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a></p>
+            <div class="relative z-10 mb-8">
+                <h2 class="text-5xl font-black mb-6 leading-tight drop-shadow-sm">
+                    Khơi Nguồn <br>
+                    <span class="text-orange-100">Cảm Hứng</span> Văn Học
+                </h2>
+                <p class="text-orange-50 font-medium text-lg opacity-90 max-w-md leading-relaxed drop-shadow-sm">
+                    Nền tảng học tập thông minh tích hợp AI, giúp bạn chinh phục Ngữ Văn một cách dễ dàng.
+                </p>
+            </div>
+
+            <div class="relative z-10 text-xs font-bold opacity-60 flex items-center gap-2">
+                <div class="h-px w-8 bg-white/50"></div>
+                © 2026 HopVan. All Rights Reserved By HopTeam.
+            </div>
         </div>
 
-        <form id="login-form">
-            <div class="input-group">
-                <label for="login-email">Email</label>
-                <input type="email" id="login-email" class="input-field" placeholder="name@example.com" required>
+        <div class="p-8 md:p-12 flex flex-col justify-center bg-white relative">
+            <a href="index.html" class="absolute top-6 right-6 text-gray-400 hover:text-orange-500 transition z-20"><i class="fas fa-times text-xl"></i></a>
+
+            <div class="text-center mb-6 md:hidden">
+                <img src="../LOGO.WEBP" class="w-12 h-12 mx-auto mb-2">
+                <h3 class="font-black text-2xl text-gray-800">HOPVAN</h3>
             </div>
 
-            <div class="input-group">
-                <label for="login-password">Mật khẩu</label>
-                <input type="password" id="login-password" class="input-field" placeholder="••••••••" required>
+            <div class="flex border-b border-gray-100 mb-6">
+                <button onclick="switchTab('login')" id="tab-login" class="flex-1 pb-3 text-center font-bold text-sm tab-btn active uppercase tracking-wider">Đăng nhập</button>
+                <button onclick="switchTab('register')" id="tab-register" class="flex-1 pb-3 text-center font-bold text-sm tab-btn uppercase tracking-wider">Đăng ký</button>
             </div>
 
-            <div class="actions">
-                <label class="remember-me">
-                    <input type="checkbox" id="remember-me">
-                    <span>Ghi nhớ tôi</span>
-                </label>
-                <a href="#" class="forgot-pass">Quên mật khẩu?</a>
+            <form id="login-form" class="space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Email</label>
+                    <div class="relative">
+                        <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="email" id="login-email" class="input-field w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-gray-700 placeholder-gray-400" placeholder="example@email.com" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Mật khẩu</label>
+                    <div class="relative">
+                        <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="password" id="login-password" class="input-field w-full pl-11 pr-11 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-gray-700 placeholder-gray-400" placeholder="••••••••" required>
+                        <i class="fas fa-eye absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-orange-500 transition" onclick="togglePassword(this, 'login-password')"></i>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center text-xs font-bold text-gray-500 pl-1 pt-1">
+                    <label class="flex items-center gap-2 cursor-pointer hover:text-orange-500 transition">
+                        <input type="checkbox" id="remember-me" class="accent-orange-500 w-4 h-4 rounded-md">
+                        Ghi nhớ
+                    </label>
+                    <a href="#" onclick="openForgotModal()" class="text-orange-500 hover:underline">Quên mật khẩu?</a>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 rounded-xl text-white font-bold btn-gradient flex justify-center items-center gap-2 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/40 mt-2">
+                    <span>Đăng nhập</span>
+                </button>
+            </form>
+
+            <form id="register-form" class="space-y-3 hidden">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Tên hiển thị</label>
+                    <div class="relative">
+                        <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="reg-name" class="input-field w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="Nguyễn Văn A" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Email</label>
+                    <div class="relative">
+                        <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="email" id="reg-email" class="input-field w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="example@email.com" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Mật khẩu</label>
+                        <div class="relative">
+                            <input type="password" id="reg-pass" class="input-field w-full px-4 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="••••••••" required>
+                            <i class="fas fa-eye absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-orange-500 text-xs transition" onclick="togglePassword(this, 'reg-pass')"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Nhập lại</label>
+                        <div class="relative">
+                            <input type="password" id="reg-confirm" class="input-field w-full px-4 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="••••••••" required>
+                            <i class="fas fa-eye absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-orange-500 text-xs transition" onclick="togglePassword(this, 'reg-confirm')"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" id="reg-submit-btn" class="w-full py-3.5 rounded-xl text-white font-bold btn-gradient flex justify-center items-center gap-2 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/40 mt-2">
+                    <span>Tạo tài khoản mới</span>
+                </button>
+            </form>
+
+            <div class="relative my-5 text-center">
+                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-100"></div></div>
+                <span class="relative bg-white px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Hoặc tiếp tục với</span>
             </div>
 
-            <button type="submit" class="btn-submit">Đăng nhập</button>
-        </form>
+            <button id="google-login-btn" class="w-full py-3 rounded-xl border-2 border-gray-100 bg-white text-gray-700 font-bold hover:bg-gray-50 hover:border-gray-200 transition flex justify-center items-center gap-3 group">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5 group-hover:scale-110 transition">
+                <span>Google Account</span>
+            </button>
 
-        <div class="divider">
-            <span>hoặc đăng nhập với</span>
+            <div id="loading-overlay" class="absolute inset-0 bg-white/90 backdrop-blur-sm flex-col justify-center items-center z-50 hidden rounded-[32px]">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-orange-500 mb-4"></div>
+                <p class="text-sm font-bold text-gray-600 animate-pulse">Đang kết nối đến máy chủ...</p>
+            </div>
+
         </div>
+    </div>
 
-        <button id="google-login-btn" class="btn-google">
-            <svg width="20" height="20" viewBox="0 0 48 48">
-                <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path>
-                <path fill="#FF3D00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"></path>
-                <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path>
-                <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C41.383 34.613 44 29.833 44 24c0-1.341-.138-2.65-.389-3.917z"></path>
-            </svg>
-            Đăng nhập với Google
-        </button>
+    <div id="forgot-modal" class="modal-overlay">
+        <div class="modal-content text-left">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-black text-gray-800">Đặt lại mật khẩu</h3>
+                <button onclick="closeForgotModal()" class="text-gray-400 hover:text-red-500"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div id="forgot-input-section">
+                <p class="text-sm text-gray-500 mb-4 font-medium">Nhập email của bạn. Chúng tôi sẽ gửi liên kết để đặt lại mật khẩu.</p>
+                <form id="forgot-form" class="space-y-4">
+                    <div class="relative">
+                        <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="email" id="forgot-email" class="input-field w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-gray-700 text-sm" placeholder="Nhập email của bạn..." required>
+                    </div>
+                    <button type="submit" id="forgot-btn" class="w-full py-3 rounded-xl text-white font-bold btn-gradient shadow-lg shadow-orange-500/20">
+                        Gửi liên kết xác nhận
+                    </button>
+                </form>
+            </div>
+
+            <div id="forgot-success-section" class="hidden flex-col items-center justify-center py-2 animate-fade-up">
+                <div class="bg-green-50 text-green-700 p-5 rounded-2xl border border-green-200 w-full text-center">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 text-green-600">
+                        <i class="fas fa-check text-xl"></i>
+                    </div>
+                    <p class="font-bold mb-2">Email đã được gửi!</p>
+                    <p class="text-xs font-medium opacity-90">Vui lòng kiểm tra hộp thư của bạn (kể cả thư rác).</p>
+                </div>
+                <button onclick="closeForgotModal()" class="mt-4 w-full py-3 rounded-xl bg-gray-100 text-gray-600 font-bold hover:bg-gray-200 transition text-sm">Đóng</button>
+            </div>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
-            getAuth, 
-            signInWithEmailAndPassword, 
-            GoogleAuthProvider, 
-            signInWithPopup, 
-            onAuthStateChanged,
-            setPersistence, 
-            browserLocalPersistence,
-            browserSessionPersistence 
+            getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
+            GoogleAuthProvider, signInWithPopup, onAuthStateChanged, updateProfile,
+            setPersistence, browserLocalPersistence, browserSessionPersistence, 
+            signOut, sendPasswordResetEmail 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE",
-            authDomain: "hopvan-9a648.firebaseapp.com",
-            projectId: "hopvan-9a648",
-            storageBucket: "hopvan-9a648.appspot.com",
-            messagingSenderId: "429347196227",
-            appId: "1:429347196227:web:917b8d019f0efd0f7833f6",
-            measurementId: "G-1BG8PSRG0R"
-        };
+        // Config Firebase
+        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        
-        // --- QUAN TRỌNG: Sửa đường dẫn về index.html để test ---
-        const REDIRECT_URL = "loading.html"; 
+        const db = getFirestore(app);
 
-        // 1. Tự động chuyển hướng nếu đã đăng nhập
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log("Đã đăng nhập, chuyển hướng...");
-                window.location.href = REDIRECT_URL; 
+        // --- UI FUNCTIONS ---
+        window.switchTab = (tab) => {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const tabLogin = document.getElementById('tab-login');
+            const tabRegister = document.getElementById('tab-register');
+
+            loginForm.reset(); registerForm.reset();
+
+            // Reset icon mắt
+            document.querySelectorAll('.fa-eye').forEach(icon => {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            });
+            document.querySelectorAll('input[type="text"]').forEach(inp => {
+                if(inp.id.includes('pass') || inp.id.includes('confirm') || inp.id.includes('password')) inp.type = 'password';
+            });
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden'); loginForm.classList.add('animate-fade-up');
+                registerForm.classList.add('hidden'); registerForm.classList.remove('animate-fade-up');
+                tabLogin.classList.add('active'); tabRegister.classList.remove('active');
+            } else {
+                loginForm.classList.add('hidden'); loginForm.classList.remove('animate-fade-up');
+                registerForm.classList.remove('hidden'); registerForm.classList.add('animate-fade-up');
+                tabLogin.classList.remove('active'); tabRegister.classList.add('active');
             }
-        });
+        };
 
-        // 2. Login Email/Pass
-        document.getElementById("login-form").addEventListener("submit", async (e) => {
+        const setLoading = (isLoading) => {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.classList.toggle('hidden', !isLoading);
+            overlay.classList.toggle('flex', isLoading);
+        };
+
+        // --- TOGGLE PASSWORD ---
+        window.togglePassword = (btn, inputId) => {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.classList.remove('fa-eye-slash');
+                btn.classList.add('fa-eye');
+            } else {
+                input.type = 'password';
+                btn.classList.remove('fa-eye');
+                btn.classList.add('fa-eye-slash');
+            }
+        };
+
+        // --- FORGOT PASSWORD LOGIC (UPDATED) ---
+        const inputSection = document.getElementById('forgot-input-section');
+        const successSection = document.getElementById('forgot-success-section');
+
+        window.openForgotModal = () => {
+            // Reset trạng thái về ban đầu (nhập email)
+            inputSection.classList.remove('hidden');
+            successSection.classList.add('hidden');
+            successSection.classList.remove('flex'); // vì dùng flex để căn giữa
+            
+            document.getElementById('forgot-modal').classList.add('show');
+            
+            // Tự điền email
+            const loginEmail = document.getElementById('login-email').value;
+            if(loginEmail) document.getElementById('forgot-email').value = loginEmail;
+        };
+        
+        window.closeForgotModal = () => document.getElementById('forgot-modal').classList.remove('show');
+
+        // Xử lý gửi email
+        document.getElementById('forgot-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById("login-email").value;
-            const password = document.getElementById("login-password").value;
-            const rememberMe = document.getElementById("remember-me").checked; 
-            const submitBtn = document.querySelector(".btn-submit");
-
-            submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Đang xử lý...';
+            const email = document.getElementById('forgot-email').value;
+            const btn = document.getElementById('forgot-btn');
+            
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Đang gửi...';
+            btn.disabled = true;
 
             try {
-                if (rememberMe) {
-                    await setPersistence(auth, browserLocalPersistence);
-                } else {
-                    await setPersistence(auth, browserSessionPersistence);
-                }
+                await sendPasswordResetEmail(auth, email);
                 
-                await signInWithEmailAndPassword(auth, email, password);
-                // AuthStateChanged sẽ tự bắt sự kiện và chuyển hướng
+                // THÀNH CÔNG: Chuyển sang giao diện thông báo xanh lá
+                inputSection.classList.add('hidden');
+                successSection.classList.remove('hidden');
+                successSection.classList.add('flex'); // Bật flex để căn giữa đẹp
+                
             } catch (err) {
-                submitBtn.innerText = 'Đăng nhập';
-                let message = "Lỗi đăng nhập.";
-                if (err.code === "auth/invalid-credential" || err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
-                    message = "Sai email hoặc mật khẩu.";
-                } else if (err.code === "auth/too-many-requests") {
-                    message = "Bạn thử lại quá nhiều lần. Vui lòng đợi chút nhé.";
-                }
-                alert(message);
-                console.error(err);
+                let msg = "Có lỗi xảy ra.";
+                if (err.code === 'auth/user-not-found') msg = "Email này chưa được đăng ký.";
+                if (err.code === 'auth/invalid-email') msg = "Email không hợp lệ.";
+                alert(msg);
+            } finally {
+                btn.innerHTML = 'Gửi liên kết xác nhận';
+                btn.disabled = false;
             }
         });
 
-        // 3. Login Google
+        // --- AUTH LOGIC ---
+        const REDIRECT_URL = "loading.html"; 
+        onAuthStateChanged(auth, (user) => { if (user) window.location.href = REDIRECT_URL; });
+
+        // 1. ĐĂNG NHẬP
+        document.getElementById("login-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            setLoading(true);
+            try {
+                await setPersistence(auth, document.getElementById("remember-me").checked ? browserLocalPersistence : browserSessionPersistence);
+                await signInWithEmailAndPassword(auth, document.getElementById("login-email").value, document.getElementById("login-password").value);
+            } catch (err) {
+                setLoading(false);
+                let msg = "Lỗi đăng nhập.";
+                if (err.code.includes("invalid-credential") || err.code.includes("user-not-found") || err.code.includes("wrong-password")) msg = "Sai email hoặc mật khẩu.";
+                alert(msg);
+            }
+        });
+
+        // 2. ĐĂNG KÝ
+        document.getElementById("register-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const name = document.getElementById("reg-name").value.trim();
+            const email = document.getElementById("reg-email").value.trim();
+            const pass = document.getElementById("reg-pass").value;
+            const confirmPass = document.getElementById("reg-confirm").value;
+
+            if (name.length < 2) { alert("Tên hiển thị quá ngắn!"); return; }
+            if (pass.length < 6) { alert("Mật khẩu phải từ 6 ký tự trở lên!"); return; }
+            if (pass !== confirmPass) { alert("Mật khẩu nhập lại không khớp!"); return; }
+
+            setLoading(true);
+            try {
+                const userCred = await createUserWithEmailAndPassword(auth, email, pass);
+                const user = userCred.user;
+                await updateProfile(user, { displayName: name });
+                
+                await setDoc(doc(db, "users", user.uid), {
+                    uid: user.uid,
+                    name: name,
+                    email: email,
+                    grade: 10,
+                    role: "student",
+                    school: "THPT (Chưa cập nhật)",
+                    keys: 0, streak: 0, createdAt: serverTimestamp()
+                });
+                await setDoc(doc(db, "users_progress", user.uid), { currentLevel: 1, paidLevel: 0 });
+
+            } catch (err) {
+                setLoading(false);
+                alert(err.code === "auth/email-already-in-use" ? "Email này đã được sử dụng." : "Đăng ký thất bại.");
+            }
+        });
+
+        // 3. XỬ LÝ GOOGLE LOGIN
         document.getElementById("google-login-btn").addEventListener("click", async () => {
             const provider = new GoogleAuthProvider();
             try {
                 await setPersistence(auth, browserLocalPersistence);
-                await signInWithPopup(auth, provider);
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                setLoading(true);
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (!userDoc.exists()) {
+                    await setDoc(doc(db, "users", user.uid), {
+                        uid: user.uid,
+                        name: user.displayName,
+                        email: user.email,
+                        photoURL: user.photoURL,
+                        role: "student",
+                        grade: 10, school: "THPT (Chưa cập nhật)",
+                        keys: 0, streak: 0, createdAt: serverTimestamp()
+                    });
+                    await setDoc(doc(db, "users_progress", user.uid), { currentLevel: 1, paidLevel: 0 });
+                }
             } catch (err) {
-                console.error("Lỗi Google Login:", err);
-                alert("Đăng nhập Google thất bại.");
+                setLoading(false);
+                if (err.code !== 'auth/popup-closed-by-user') alert("Lỗi đăng nhập Google.");
             }
         });
     </script>
-
 </body>
 </html>
