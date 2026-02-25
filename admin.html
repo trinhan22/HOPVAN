@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -194,7 +195,7 @@
 }
 
 /* Typography */
-.ac-title { font-size: 1.1rem; font-weight: 900; color: #2d3436; margin-bottom: 4px; z-index: 2; position: relative; }
+.ac-title { font-size: 1.05rem; font-weight: 900; color: #2d3436; margin-bottom: 4px; z-index: 2; position: relative; }
 .ac-desc { font-size: 0.75rem; font-weight: 700; color: #b2bec3; text-transform: uppercase; letter-spacing: 1px; z-index: 2; position: relative; }
 
 /* Icon Box chung */
@@ -257,6 +258,36 @@
     border-color: #ff6b6b;
 }
 
+/* 6. Neon Amber (Nhật Ký Học Tập) */
+.card-yellow { border-color: #fef3c7; }
+.card-yellow .icon-box { background: linear-gradient(135deg, #ffab19, #ea830c); box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4); }
+.card-yellow:hover { 
+    transform: translateY(-3px) scale(1.02); 
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.4); /* Glow vàng rực */
+    border-color: #f59e0b; 
+}
+/* Màu icon chìm */
+.card-yellow .bg-icon-decor { color: #fcd34d; }
+
+/* 7. Neon Indigo (Quản Lý Tài Khoản) */
+.card-indigo { border-color: #e0e7ff; }
+.card-indigo .icon-box { background: linear-gradient(135deg, #6366f1, #4f46e5); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4); }
+.card-indigo:hover { 
+    transform: translateY(-3px) scale(1.02); 
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.4); /* Glow màu chàm */
+    border-color: #6366f1; 
+}
+.card-indigo .bg-icon-decor { color: #818cf8; }
+
+/* 8. Neon Lime (Góp Ý & Phản Hồi) */
+.card-lime { border-color: #f9eb9d; }
+.card-lime .icon-box { background: linear-gradient(135deg, #ccc016, #a39e0d); box-shadow: 0 10px 25px rgba(204, 198, 22, 0.4); }
+.card-lime:hover { 
+    transform: translateY(-3px) scale(1.02); 
+    box-shadow: 0 0 30px rgba(204, 201, 22, 0.4); /* Glow xanh nõn chuối rực rỡ */
+    border-color: #ccc016; 
+}
+.card-lime .bg-icon-decor { color: #fcf9cb; }
 
 /* --- CARD ĐẶC BIỆT: FULL TEST (BRAND GRADIENT GLOW) --- */
 .action-card.special-card {
@@ -660,7 +691,7 @@
         <div class="icon-box"><i class="fas fa-brain"></i></div>
         <div>
             <h4 class="ac-title">Trắc Nghiệm</h4>
-            <p class="ac-desc">Câu hỏi ngắn 4 đáp án</p>
+            <p class="ac-desc">Câu hỏi 4 đáp án</p>
         </div>
         <i class="fas fa-brain bg-icon-decor text-purple-400"></i>
     </div>
@@ -669,9 +700,36 @@
         <div class="icon-box"><i class="fas fa-newspaper"></i></div>
         <div>
             <h4 class="ac-title">Bản Tin Văn Học</h4>
-            <p class="ac-desc">Dẫn chứng & Lý luận</p>
+            <p class="ac-desc">Bài viết văn học</p>
         </div>
         <i class="fas fa-newspaper bg-icon-decor text-rose-400"></i>
+    </div>
+
+    <div onclick="switchView('journal')" class="action-card card-yellow">
+        <div class="icon-box"><i class="fas fa-map-marked-alt"></i></div>
+        <div>
+            <h4 class="ac-title">Nhật Ký Học Tập</h4>
+            <p class="ac-desc">Quản lý Lộ trình</p>
+        </div>
+        <i class="fas fa-map-marked-alt bg-icon-decor"></i>
+    </div>
+
+    <div onclick="switchView('history')" class="action-card card-indigo">
+        <div class="icon-box"><i class="fas fa-users-cog"></i></div>
+        <div>
+            <h4 class="ac-title">Quản Lý Tài Khoản</h4>
+            <p class="ac-desc">Danh sách & Tiến độ</p>
+        </div>
+        <i class="fas fa-users-cog bg-icon-decor"></i>
+    </div>
+
+    <div onclick="switchView('feedbacks')" class="action-card card-lime">
+        <div class="icon-box"><i class="fas fa-comments"></i></div>
+        <div>
+            <h4 class="ac-title">Góp Ý & Phản Hồi</h4>
+            <p class="ac-desc">Xem phản hồi</p>
+        </div>
+        <i class="fas fa-comments bg-icon-decor text-lime-200"></i>
     </div>
 </div>
                 </div>
