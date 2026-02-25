@@ -157,6 +157,33 @@
             from { transform: scale(0.9); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
+
+        /* --- CSS CHẤM CHỮA CỦA GIÁO VIÊN AI --- */
+        .text-bad { 
+            background-color: #fee2e2; /* Nền đỏ nhạt */
+            color: #dc2626; /* Chữ đỏ đậm */
+            text-decoration: line-through; /* Gạch ngang phần sai */
+            padding: 2px 4px;
+            border-radius: 4px;
+            margin-right: 4px;
+        }
+
+        .text-fix {
+            background-color: #fef9c3; /* Nền vàng nhạt */
+            color: #b45309; /* Chữ vàng đậm/cam */
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px dashed #facc15;
+        }
+        
+        .text-good {
+            background-color: #dcfce7; /* Nền xanh nhạt */
+            color: #166534; /* Chữ xanh đậm */
+            font-style: italic;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -471,86 +498,104 @@
             </div>`;
     }
 
-    // --- 2. HÀM NỘP BÀI (GROQ VERSION) ---
+    // --- 2. HÀM NỘP BÀI (CHUYÊN GIA NLXH - QUY TRÌNH 3 BƯỚC K12) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
+        // Kiểm tra độ dài tối thiểu (NLXH cần ít nhất 50 từ để chấm)
         if(content.split(/\s+/).filter(x => x).length < 50) { 
             document.getElementById('short-essay-popup').style.display = 'flex'; return; 
         }
         
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex'; 
-        clearInterval(timerInterval); // Dừng đồng hồ khi nộp bài
+        clearInterval(timerInterval); // Dừng đồng hồ
 
         const q = window.currentExamData;
         
+        // --- PROMPT GIÁO VIÊN NLXH K12 ---
         const systemPrompt = `
-        BẠN LÀ: Trưởng hội đồng chấm thi Ngữ văn - Chuyên gia cao cấp về Nghị luận Xã hội (GDPT 2018).
-        VAI TRÒ: Giám khảo có nhãn quan sắc bén, bài trừ tuyệt đối văn mẫu rập khuôn và hành vi dùng AI viết bài.
-        THÁI ĐỘ: Quyết liệt, ngôn ngữ phê bình hàn lâm. Tập trung vào tư duy phản biện và tính thời sự.
+        VAI TRÒ: Bạn là Giáo viên Ngữ văn lớp 12 (Chatbot Giáo viên Ngữ văn K12).
+        CHUYÊN MÔN: Chuyên gia về Nghị luận Xã hội, am hiểu các vấn đề thời sự, tư tưởng đạo đức và đạo lý.
+        
+        THÁI ĐỘ CHẤM BÀI: 
+        - Nghiêm túc, sắc sảo, thẳng thắn. 
+        - Đặc biệt bài trừ các dẫn chứng "xác ướp" (Edison, Nick Vujicic...) dùng hời hợt và các cấu trúc văn mẫu AI (Ví dụ: "Trong xã hội hiện nay...", "Bên cạnh đó...", "Tóm lại...").
 
-        NHIỆM VỤ: Chấm điểm bài làm NLXH (Đoạn văn ~200 chữ hoặc Bài văn ~600 chữ).
+        BAREM ĐIỂM (THANG 10) - NGHỊ LUẬN XÃ HỘI:
+        1. Xác định vấn đề (0.5đ): Nêu đúng vấn đề cần nghị luận.
+        2. Triển khai lập luận (7.0đ):
+           - Giải thích vấn đề rõ ràng.
+           - Phân tích & Bàn luận: Lập luận chặt chẽ, đa chiều.
+           - Dẫn chứng: Phải có thực tế, mang tính thời sự, chứng minh thuyết phục cho luận điểm.
+           - Phản đề: Mở rộng vấn đề, phê phán các biểu hiện trái ngược.
+        3. Bài học & Hành động (0.5đ): Rút ra ý nghĩa thực tiễn cho bản thân.
+        4. Sáng tạo & Diễn đạt (2.0đ): Văn phong sắc bén, cá tính, không rập khuôn.
 
-        === TRUY QUÉT AI & DẪN CHỨNG "XÁC ƯỚP" ===
-        - human_score (0-100): Trừ nặng điểm nếu dùng từ nối sáo rỗng rập khuôn của AI.
-        - Bài trừ các dẫn chứng lối mòn (Nick Vujicic, Edison, thầy Nguyễn Ngọc Ký...) nếu dùng một cách hời hợt. Ưu tiên dẫn chứng thực tế, mới mẻ.
+        QUY TRÌNH NHẬN XÉT (BẮT BUỘC 3 BƯỚC):
+        Bước 1: Đánh giá tổng quát (Điểm tích cực & Hạn chế):
+           - Khen ngợi tư duy sáng tạo, dẫn chứng mới mẻ.
+           - Chỉ ra lỗi logic, lặp từ, hoặc diễn đạt vô hồn kiểu máy móc.
+        Bước 2: Sửa bài chi tiết (Highlight trực tiếp vào bài làm):
+           - Sử dụng thẻ <span class='text-bad'>...</span> (TÔ ĐỎ) cho những từ ngữ sáo rỗng, lỗi diễn đạt, dẫn chứng cũ kỹ.
+           - Sử dụng thẻ <span class='text-fix'>...</span> (TÔ VÀNG) ngay bên cạnh để đề xuất nội dung viết lại sắc bén hơn, mang tính học thuật cao hơn.
+        Bước 3: Tổng kết và Định hướng: 
+           - Đưa ra lời khuyên để nâng tầm tư duy phản biện.
 
-        YÊU CẦU TRẢ VỀ JSON DUY NHẤT:
+        OUTPUT JSON FORMAT (DUY NHẤT):
         {
-            "human_score": (int),
-            "ai_comment": "Nhận xét đanh thép về văn phong máy hay người.",
-            "score": (float thang 10, làm tròn 0.25),
-            "essay_type": "Nhận diện: Đoạn văn 200 chữ hoặc Bài văn 600 chữ",
-            "general_comment": "Lời phê sắc sảo của Giám khảo.",
-            "strengths": ["Điểm sáng tư duy 1", "..."],
-            "weaknesses": ["Lỗi logic/hời hợt 1", "Dẫn chứng cũ kĩ 2"],
-            "correction_html": "HTML bài sửa. Ép font Merriweather. Dùng <span class='text-bad'>[Lỗi]</span>, <span class='text-good'>[Hay]</span>, <span class='text-fix'>[Gợi ý sửa]</span>.",
-            "orientation": "Lời khuyên để nâng tầm tư duy phản biện cá nhân."
+            "human_score": (int 0-100, độ chân thực của văn phong),
+            "score": (float 0-10.0, làm tròn 0.25),
+            "essay_type": "Nghị luận Xã hội",
+            "general_comment": "Lời phê tổng quát (Bước 1)",
+            "ai_comment": "Nhận xét về tính 'người' của văn phong, phát hiện AI/văn mẫu.",
+            "strengths": ["Ưu điểm 1", "Ưu điểm 2"],
+            "weaknesses": ["Hạn chế 1", "Hạn chế 2"],
+            "correction_html": "Nội dung bài làm đã được gắn thẻ highlight đỏ/vàng (Bước 2)",
+            "orientation": "Định hướng rèn luyện (Bước 3)"
         }
 
-        ĐỀ BÀI: ${q.topic}
-        BÀI LÀM: ${content}
+        DỮ LIỆU ĐỀ BÀI:
+        - Yêu cầu: "${q.topic}"
+        - Ngữ liệu tham khảo: "${q.text || "Không có"}"
         `;
 
         try {
-            // GỬI SANG BACKEND GROQ
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ 
-                    systemPrompt: systemPrompt,
-                    messages: `BÀI LÀM CỦA HỌC SINH:\n${content}`
+                    systemPrompt: systemPrompt, 
+                    messages: `BÀI LÀM CỦA HỌC SINH:\n${content}` 
                 }) 
             });
 
             if (!res.ok) throw new Error("SERVER_ERROR");
-
             const data = await res.json();
             
-            // XỬ LÝ KẾT QUẢ GROQ
-            if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                throw new Error("NO_CONTENT");
-            }
+            if (!data.choices || !data.choices[0]) throw new Error("NO_CONTENT");
 
-            const rawText = data.choices[0].message.content;
+            let rawText = data.choices[0].message.content.replace(/```json/g, "").replace(/```/g, "").trim();
+            const result = JSON.parse(rawText.match(/\{[\s\S]*\}/)[0]);
             
-            const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) throw new Error("INVALID_FORMAT");
+            let safeScore = parseFloat(result.score);
+            if(isNaN(safeScore)) safeScore = 0; if(safeScore > 10) safeScore = 10;
+            result.score = safeScore;
 
-            const result = JSON.parse(jsonMatch[0]);
             renderAIResult(result);
 
             if (auth.currentUser) { 
                 await addDoc(collection(db, "activities"), { 
-                    uid: auth.currentUser.uid, type: "nlxh", score: result.score, timeSpent: document.getElementById('timer').innerText, timestamp: serverTimestamp() 
+                    uid: auth.currentUser.uid, 
+                    type: "nlxh", 
+                    score: safeScore, 
+                    timeSpent: document.getElementById('timer').innerText, 
+                    timestamp: serverTimestamp(),
+                    examId: q.id
                 }); 
             }
         } catch(e) { 
             console.error(e); 
-            let msg = "Có lỗi xảy ra, vui lòng thử lại!";
-            if (e.message === "SERVER_ERROR") msg = "Server đang bận. Bạn hãy bấm nộp lại nhé!";
-            if (e.message === "INVALID_FORMAT") msg = "Dữ liệu trả về bị lỗi. Vui lòng bấm nộp lại!";
-            showPopup("Lỗi AI", msg, "error");
+            showPopup("Lỗi AI", "Có lỗi xử lý dữ liệu, vui lòng nộp bài lại nhé!", "error");
         } finally { 
             loading.style.display = 'none'; 
         }

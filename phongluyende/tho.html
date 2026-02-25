@@ -157,6 +157,33 @@
             from { transform: scale(0.9); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
+
+        /* --- CSS CHẤM CHỮA CỦA GIÁO VIÊN AI --- */
+        .text-bad { 
+            background-color: #fee2e2; /* Nền đỏ nhạt */
+            color: #dc2626; /* Chữ đỏ đậm */
+            text-decoration: line-through; /* Gạch ngang phần sai */
+            padding: 2px 4px;
+            border-radius: 4px;
+            margin-right: 4px;
+        }
+
+        .text-fix {
+            background-color: #fef9c3; /* Nền vàng nhạt */
+            color: #b45309; /* Chữ vàng đậm/cam */
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px dashed #facc15;
+        }
+        
+        .text-good {
+            background-color: #dcfce7; /* Nền xanh nhạt */
+            color: #166534; /* Chữ xanh đậm */
+            font-style: italic;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -477,57 +504,75 @@
             </div>`;
     }
 
-    // --- 2. HÀM NỘP BÀI (PROMPT CHUYÊN VỀ THƠ) ---
+    // --- 2. HÀM NỘP BÀI (CHUYÊN GIA THƠ CA - QUY TRÌNH 3 BƯỚC K12) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
-        if(content.split(/\s+/).filter(x => x).length < 100) { 
+        // Kiểm tra độ dài tối thiểu (Nghị luận thơ cần sâu sắc nên yêu cầu ít nhất 50 từ)
+        if(content.split(/\s+/).filter(x => x).length < 50) { 
             document.getElementById('short-essay-popup').style.display = 'flex'; return; 
         }
         
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex'; 
-        clearInterval(timerInterval); 
+        clearInterval(timerInterval); // Dừng đồng hồ
 
         const q = window.currentExamData;
         
-        // --- PROMPT: CHUYÊN GIA THƠ CA ---
+        // --- PROMPT GIÁO VIÊN THƠ CA K12 ---
         const systemPrompt = `
-        BẠN LÀ: Giáo viên Ngữ văn lớp 12 - Chuyên gia thẩm bình văn học Trữ tình (Thơ ca).
-        NHIỆM VỤ: Chấm bài Nghị luận văn học về một đoạn trích/bài thơ.
+        VAI TRÒ: Bạn là Giáo viên Ngữ văn lớp 12 (Chatbot Giáo viên Ngữ văn K12).
+        CHUYÊN MÔN: Chuyên gia thẩm bình và phân tích THƠ CA (Văn bản trữ tình).
+        
+        THÁI ĐỘ CHẤM BÀI: 
+        - Nghiêm túc, tỉ mỉ, giàu cảm xúc văn chương.
+        - QUAN TRỌNG: Cực kỳ khắt khe với lỗi "diễn xuôi ý thơ" (chỉ kể lại nội dung thơ bằng văn xuôi mà không phân tích tín hiệu nghệ thuật).
 
-        THÔNG TIN ĐỀ BÀI:
-        - Yêu cầu: "${q.topic}"
-        - Đoạn thơ/Bài thơ: "${(q.text || 'Học sinh tự vận dụng').replace(/"/g, "'")}"
-        - Gợi ý: "${q.hint || ''}"
+        BAREM ĐIỂM (THANG 10) - NGHỊ LUẬN VĂN HỌC (THƠ):
+        1. Mở bài (0.5đ): Giới thiệu tác giả (phong cách), tác phẩm (hoàn cảnh sáng tác) và vấn đề nghị luận/đoạn trích.
+        2. Thân bài (7.0đ):
+           - Phân tích HÌNH TƯỢNG THƠ & CẢM XÚC: Làm rõ tâm trạng, suy tư của nhân vật trữ tình.
+           - Phân tích NGHỆ THUẬT: Thể thơ, nhịp điệu, gieo vần, hình ảnh độc đáo và các biện pháp tu từ (ẩn dụ, hoán dụ, điệp từ...).
+           - Lý luận văn học: Liên hệ đặc trưng thể loại thơ (sự cô đọng, tính nhạc, tính họa).
+        3. Kết bài (0.5đ): Khẳng định giá trị tư tưởng và sức sống của bài thơ.
+        4. Sáng tạo & Hình thức (2.0đ): Văn phong giàu chất thơ, lập luận chặt chẽ, không lỗi diễn đạt.
 
-        TIÊU CHÍ CHẤM (Thang 10):
-        1. Mở bài (0.5đ): Giới thiệu tác giả, phong cách nghệ thuật, bài thơ và đoạn trích.
-        2. Thân bài (7.0đ): 
-           - Cảm nhận sâu sắc về hình tượng thơ, tâm trạng nhân vật trữ tình.
-           - Phân tích đặc sắc nghệ thuật: Thể thơ, nhịp điệu, hình ảnh, các biện pháp tu từ (ẩn dụ, hoán dụ...).
-           - Tuyệt đối không "diễn xuôi" ý thơ (dịch thơ sang văn xuôi một cách thô thiển).
-        3. Kết bài (0.5đ): Đánh giá lại giá trị tư tưởng và nghệ thuật.
-        4. Sáng tạo & Hình thức (2.0đ): Văn phong giàu cảm xúc, ngôn ngữ mượt mà.
+        QUY TRÌNH NHẬN XÉT (BẮT BUỘC 3 BƯỚC):
+        Bước 1: Đánh giá tổng quát (Điểm tích cực & Hạn chế):
+           - Khen ngợi những phát hiện tinh tế về từ ngữ, hình ảnh thơ.
+           - Chỉ ra lỗi thiếu dẫn chứng thơ hoặc phân tích nghệ thuật hời hợt.
+        Bước 2: Sửa bài chi tiết (Highlight trực tiếp):
+           - Sử dụng thẻ <span class='text-bad'>...</span> (TÔ ĐỎ) cho những đoạn diễn xuôi, dùng từ chưa chuẩn, sai kiến thức.
+           - Sử dụng thẻ <span class='text-fix'>...</span> (TÔ VÀNG) ngay bên cạnh để đề xuất cách diễn đạt giàu tính thẩm mỹ và đúng thuật ngữ văn học hơn.
+        Bước 3: Tổng kết và Định hướng: 
+           - Lời khuyên để học sinh cảm thụ thơ sâu sắc hơn, "chạm" vào linh hồn bản văn.
 
-        YÊU CẦU OUTPUT JSON DUY NHẤT:
+        OUTPUT JSON FORMAT (DUY NHẤT):
         {
-            "human_score": (int 0-100),
-            "ai_comment": "Nhận xét về độ cảm xúc và sự tự nhiên trong văn phong.",
-            "score": (số thực 0-10.0, lẻ 0.25),
+            "human_score": (int 0-100, độ chân thực của văn phong),
+            "score": (float 0-10.0, làm tròn 0.25),
             "essay_type": "Nghị luận Văn học (Thơ)",
-            "general_comment": "Nhận xét tổng quát về khả năng cảm thụ thơ.",
-            "strengths": ["Phát hiện tinh tế 1", "Phân tích nghệ thuật tốt..."],
-            "weaknesses": ["Còn diễn xuôi thơ", "Thiếu liên hệ mở rộng..."],
-            "correction_html": "Bài làm đã chấm (dùng <span class='text-bad'>[Lỗi]</span>, <span class='text-fix'>[Sửa]</span>, <span class='text-good'>[Hay]</span>).",
-            "orientation": "Gợi ý để viết văn cảm xúc hơn."
+            "general_comment": "Lời phê tổng quát (Bước 1)",
+            "ai_comment": "Nhận xét về tính 'người' của bài viết, phát hiện văn mẫu.",
+            "strengths": ["Ưu điểm 1", "Ưu điểm 2"],
+            "weaknesses": ["Hạn chế 1", "Hạn chế 2"],
+            "correction_html": "Nội dung bài làm đã gắn thẻ highlight đỏ/vàng (Bước 2)",
+            "orientation": "Định hướng rèn luyện (Bước 3)"
         }
+
+        DỮ LIỆU ĐỀ BÀI:
+        - Yêu cầu: "${q.topic}"
+        - Văn bản thơ: "${(q.text || "Học sinh tự chọn").replace(/"/g, "'")}"
+        - Gợi ý: "${q.hint || "Phân tích nội dung và nghệ thuật thơ."}"
         `;
 
         try {
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify({ systemPrompt: systemPrompt, messages: `BÀI LÀM:\n${content}` }) 
+                body: JSON.stringify({ 
+                    systemPrompt: systemPrompt, 
+                    messages: `Học sinh gửi bài làm Nghị luận Thơ. Hãy chấm theo quy trình 3 bước của Giáo viên K12.` 
+                }) 
             });
 
             if (!res.ok) throw new Error("SERVER_ERROR");
@@ -538,7 +583,6 @@
             let rawText = data.choices[0].message.content.replace(/```json/g, "").replace(/```/g, "").trim();
             const result = JSON.parse(rawText.match(/\{[\s\S]*\}/)[0]);
             
-            // Ép điểm
             let safeScore = parseFloat(result.score);
             if(isNaN(safeScore)) safeScore = 0; if(safeScore > 10) safeScore = 10;
             result.score = safeScore;
@@ -549,7 +593,7 @@
                 await addDoc(collection(db, "activities"), { 
                     uid: auth.currentUser.uid, 
                     type: "nlvh", 
-                    genre: "Thơ", // <--- QUAN TRỌNG: Lưu đúng thể loại Thơ
+                    genre: "Thơ",
                     score: safeScore, 
                     timeSpent: document.getElementById('timer').innerText, 
                     timestamp: serverTimestamp(),
@@ -558,7 +602,7 @@
             }
         } catch(e) { 
             console.error(e); 
-            showPopup("Lỗi AI", "Có lỗi xử lý, vui lòng nộp lại.", "error");
+            showPopup("Lỗi AI", "Có lỗi xử lý dữ liệu, vui lòng nộp bài lại!", "error");
         } finally { 
             loading.style.display = 'none'; 
         }

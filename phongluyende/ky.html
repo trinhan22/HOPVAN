@@ -157,6 +157,33 @@
             from { transform: scale(0.9); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
+
+        /* --- CSS CHẤM CHỮA CỦA GIÁO VIÊN AI --- */
+        .text-bad { 
+            background-color: #fee2e2; /* Nền đỏ nhạt */
+            color: #dc2626; /* Chữ đỏ đậm */
+            text-decoration: line-through; /* Gạch ngang phần sai */
+            padding: 2px 4px;
+            border-radius: 4px;
+            margin-right: 4px;
+        }
+
+        .text-fix {
+            background-color: #fef9c3; /* Nền vàng nhạt */
+            color: #b45309; /* Chữ vàng đậm/cam */
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px dashed #facc15;
+        }
+        
+        .text-good {
+            background-color: #dcfce7; /* Nền xanh nhạt */
+            color: #166534; /* Chữ xanh đậm */
+            font-style: italic;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -476,10 +503,10 @@
             </div>`;
     }
 
-    // --- 2. HÀM NỘP BÀI (PROMPT CHUYÊN GIA KÝ) ---
+    // --- 2. HÀM NỘP BÀI (TỐI ƯU CHO THỂ LOẠI KÝ - K12) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
-        if(content.split(/\s+/).filter(x => x).length < 100) { 
+        if(content.split(/\s+/).filter(x => x).length < 50) { 
             document.getElementById('short-essay-popup').style.display = 'flex'; return; 
         }
         
@@ -489,38 +516,47 @@
 
         const q = window.currentExamData;
         
-        // --- PROMPT: CHUYÊN GIA VĂN HỌC KÝ ---
+        // --- PROMPT CHUYÊN GIA KÝ K12 ---
         const systemPrompt = `
-        BẠN LÀ: Giáo viên Ngữ văn lớp 12 - Chuyên gia phân tích thể loại Ký (Bút ký, Tùy bút).
-        NHIỆM VỤ: Chấm bài Nghị luận văn học về một tác phẩm Ký.
+        VAI TRÒ: Bạn là Giáo viên Ngữ văn lớp 12 (Chatbot Giáo viên Ngữ văn K12).
+        CHUYÊN MÔN: Chuyên gia phân tích thể loại KÝ (Tùy bút, Bút ký).
+        
+        THÁI ĐỘ: Nghiêm túc, học thuật, khắt khe với lỗi diễn xuôi (kể lể sự việc).
+        
+        BAREM ĐIỂM (THANG 10):
+        1. Mở bài (0.5đ): Dẫn dắt, giới thiệu tác giả (phong cách tài hoa, uyên bác), tác phẩm và vấn đề nghị luận.
+        2. Thân bài (7.0đ):
+           - Phân tích "Cái tôi" của tác giả: Sự quan sát tinh tế, chiều sâu suy cảm, vốn kiến thức đa dạng (lịch sử, địa lý, văn hóa...).
+           - Phân tích hình tượng đối tượng (con người/thiên nhiên): Chất hiện thực và chất trữ tình.
+           - Nghệ thuật đặc sắc: Ngôn ngữ giàu hình ảnh, liên tưởng độc đáo, nhịp điệu văn xuôi.
+           - Lưu ý: Trừ điểm nặng nếu học sinh chỉ kể lại nội dung văn bản.
+        3. Kết bài (0.5đ): Tổng kết giá trị tư tưởng và phong cách cá nhân tác giả.
+        4. Sáng tạo & Hình thức (2.0đ): Văn phong giàu cảm xúc, lập luận sắc bén.
 
-        THÔNG TIN ĐỀ BÀI:
-        - Yêu cầu: "${q.topic}"
-        - Đoạn trích/Tác phẩm: "${(q.text || 'Học sinh tự vận dụng').replace(/"/g, "'")}"
-        - Gợi ý: "${q.hint || ''}"
+        QUY TRÌNH CHẤM 3 BƯỚC:
+        Bước 1: Đánh giá tổng quát (Điểm tích cực & Hạn chế).
+        Bước 2: Sửa bài chi tiết (Highlight):
+           - Trích dẫn bài làm của HS, dùng <span class='text-bad'>[Lỗi]</span> cho phần diễn đạt kém/sai ý.
+           - Dùng <span class='text-fix'>[Sửa]</span> để đưa ra phương án viết lại tài hoa hơn, đúng chất Ký hơn.
+        Bước 3: Tổng kết và Định hướng kỹ năng.
 
-        TIÊU CHÍ CHẤM (Thang 10):
-        1. Mở bài (0.5đ): Giới thiệu tác giả (phong cách tài hoa/uyên bác...), tác phẩm và đoạn trích.
-        2. Thân bài (7.0đ): 
-           - Phân tích "CÁI TÔI" tác giả: Cảm xúc, suy tư, vốn sống, sự quan sát tinh tế.
-           - Phân tích đối tượng miêu tả (Chất hiện thực).
-           - Phân tích nghệ thuật: Ngôn ngữ giàu hình ảnh, liên tưởng độc đáo, sự kết hợp giữa tự sự và trữ tình.
-           - Tránh lỗi diễn xuôi (kể lại sự việc đơn thuần).
-        3. Kết bài (0.5đ): Đánh giá giá trị nội dung và nghệ thuật.
-        4. Sáng tạo & Hình thức (2.0đ): Văn phong mượt mà, giàu hình ảnh.
-
-        YÊU CẦU OUTPUT JSON DUY NHẤT:
+        OUTPUT JSON:
         {
-            "human_score": (int 0-100),
-            "ai_comment": "Nhận xét về độ cảm xúc và vốn từ vựng.",
-            "score": (số thực 0-10.0, lẻ 0.25),
+            "human_score": (int 0-100, độ chân thực),
+            "score": (float 0-10.0),
             "essay_type": "Nghị luận Văn học (Ký)",
-            "general_comment": "Nhận xét tổng quát về khả năng cảm thụ cái tôi tác giả.",
-            "strengths": ["Phân tích cái tôi tốt", "Ngôn ngữ trau chuốt..."],
-            "weaknesses": ["Còn kể lể sự việc", "Chưa làm rõ chất trữ tình..."],
-            "correction_html": "Bài làm đã chấm (dùng <span class='text-bad'>[Lỗi]</span>, <span class='text-fix'>[Sửa]</span>, <span class='text-good'>[Hay]</span>).",
-            "orientation": "Gợi ý để viết Ký hay hơn."
+            "general_comment": "Nhận xét tổng quát Bước 1.",
+            "ai_comment": "Đánh giá văn phong có bị 'máy móc' hay dùng AI không.",
+            "strengths": ["Liệt kê ưu điểm..."],
+            "weaknesses": ["Liệt kê hạn chế..."],
+            "correction_html": "Toàn bộ bài sửa có gắn thẻ highlight đỏ/vàng.",
+            "orientation": "Lời khuyên định hướng Bước 3."
         }
+
+        DỮ LIỆU ĐỀ:
+        - Yêu cầu: ${q.topic}
+        - Ngữ liệu: ${q.text || "Học sinh tự vận dụng"}
+        - Gợi ý: ${q.hint || ""}
         `;
 
         try {
@@ -548,16 +584,15 @@
                 await addDoc(collection(db, "activities"), { 
                     uid: auth.currentUser.uid, 
                     type: "nlvh", 
-                    genre: "Ký", // <--- QUAN TRỌNG: Lưu đúng thể loại Ký
+                    genre: "Ký",
                     score: safeScore, 
-                    timeSpent: document.getElementById('timer').innerText, 
                     timestamp: serverTimestamp(),
                     examId: q.id
                 }); 
             }
         } catch(e) { 
             console.error(e); 
-            showPopup("Lỗi AI", "Có lỗi xử lý, vui lòng nộp lại.", "error");
+            showPopup("Lỗi AI", "Vui lòng bấm nộp bài lại.", "error");
         } finally { 
             loading.style.display = 'none'; 
         }

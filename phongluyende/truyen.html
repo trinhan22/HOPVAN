@@ -157,6 +157,33 @@
             from { transform: scale(0.9); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
+
+        /* --- CSS CHẤM CHỮA CỦA GIÁO VIÊN AI --- */
+        .text-bad { 
+            background-color: #fee2e2; /* Nền đỏ nhạt */
+            color: #dc2626; /* Chữ đỏ đậm */
+            text-decoration: line-through; /* Gạch ngang phần sai */
+            padding: 2px 4px;
+            border-radius: 4px;
+            margin-right: 4px;
+        }
+
+        .text-fix {
+            background-color: #fef9c3; /* Nền vàng nhạt */
+            color: #b45309; /* Chữ vàng đậm/cam */
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 4px;
+            border: 1px dashed #facc15;
+        }
+        
+        .text-good {
+            background-color: #dcfce7; /* Nền xanh nhạt */
+            color: #166534; /* Chữ xanh đậm */
+            font-style: italic;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -479,65 +506,73 @@
             </div>`;
     }
 
-    // --- 2. HÀM NỘP BÀI (GROQ VERSION) ---
+    // --- 2. HÀM NỘP BÀI (CHUYÊN GIA TRUYỆN HIỆN ĐẠI - THEO TÀI LIỆU K12) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
-        // NLVH cần viết dài hơn, tăng limit lên 100 từ
-        if(content.split(/\s+/).filter(x => x).length < 100) { 
+        // Kiểm tra độ dài tối thiểu (Nghị luận văn học truyện cần phân tích sâu)
+        if(content.split(/\s+/).filter(x => x).length < 80) { 
             document.getElementById('short-essay-popup').style.display = 'flex'; return; 
         }
-        
+
         const loading = document.getElementById('loading-overlay');
-        loading.style.display = 'flex'; 
+        loading.style.display = 'flex';
         clearInterval(timerInterval); // Dừng đồng hồ
 
         const q = window.currentExamData;
-        
-        // --- PROMPT CHUYÊN BIỆT CHO NLVH (TRUYỆN) ---
-        const systemPrompt = `
-        BẠN LÀ: Giáo viên Ngữ văn lớp 12 (Chương trình GDPT 2018), chuyên gia về Lý luận văn học và thể loại Tự sự (Truyện ngắn/Tiểu thuyết).
-        THÁI ĐỘ: Nghiêm túc, tỉ mỉ, ngôn ngữ phê bình hàn lâm, đậm chất văn học. Không dùng từ ngữ sáo rỗng.
-
-        THÔNG TIN ĐỀ BÀI:
-        - Yêu cầu (Đề): "${q.topic}"
-        - Tác phẩm/Đoạn trích: "${(q.text || 'Học sinh tự vận dụng tác phẩm').replace(/"/g, "'")}"
-        - Gợi ý chấm: "${q.hint || ''}"
-
-        NHIỆM VỤ: Chấm bài theo quy trình 3 bước nghiêm ngặt sau:
-
-        1. ĐÁNH GIÁ ĐẶC TRƯNG THỂ LOẠI & CẤU TRÚC (Bước 1):
-           - Kiểm tra kiến thức về Truyện (tính cô đúc, chi tiết ám ảnh, tình huống bất ngờ...) hoặc Tiểu thuyết (đời tư, kết cấu đa tầng).
-           - Phạt nặng lỗi "diễn xuôi" (kể lại cốt truyện thay vì phân tích).
-           - Kiểm tra nghệ thuật: Ngôi kể, điểm nhìn, xây dựng nhân vật (ngoại hình -> hành động -> tâm lý).
-
-        2. SỬA BÀI CHI TIẾT (Bước 2 - Quan trọng nhất):
-           - Trả về định dạng HTML cho phần sửa bài.
-           - Dùng thẻ <span class='text-bad'>[Lỗi]</span> cho phần diễn đạt kém, sai kiến thức.
-           - Dùng thẻ <span class='text-fix'>[Gợi ý sửa]</span> ngay bên cạnh để đề xuất câu văn học thuật hơn.
-           - Dùng thẻ <span class='text-good'>[Hay]</span> cho những đoạn văn sáng tạo, cảm xúc.
-
-        3. TỔNG KẾT & ĐỊNH HƯỚNG (Bước 3):
-           - Đánh giá cá tính sáng tạo.
-           - Lời khuyên cụ thể để nâng tầm tư duy.
-
-        YÊU CẦU OUTPUT JSON DUY NHẤT (KHÔNG MARKDOWN, KHÔNG GIẢI THÍCH THÊM):
-        {
-            "human_score": (int 0-100: đánh giá độ tự nhiên, trừ điểm nếu văn phong giống AI máy móc),
-            "ai_comment": "Nhận xét ngắn về văn phong thực tế của học sinh.",
-            "score": (số thực 0-10.0, thang điểm chuẩn BGD, lẻ 0.25),
-            "essay_type": "Nghị luận Văn học (Truyện)",
-            "general_comment": "Nhận xét tổng quan (đậm chất văn học, đánh giá việc xác định đề tài/chủ đề).",
-            "strengths": [
-                "Điểm sáng 1 (VD: Sáng tạo, dẫn chứng đắt giá...)", 
-                "Điểm sáng 2..."
-            ],
-            "weaknesses": [
-                "Hạn chế 1 (VD: Còn diễn xuôi, thiếu phân tích nghệ thuật...)", 
-                "Hạn chế 2..."
-            ],
-            "correction_html": "Nội dung bài làm đã được chấm (giữ nguyên văn bản gốc, chèn thêm các thẻ span class='text-bad'/'text-fix'/'text-good' vào đúng vị trí lỗi).",
-            "orientation": "Lời khuyên định hướng tư duy cho bài sau."
+        if (!q) {
+            showPopup("Lỗi", "Dữ liệu đề bị trống. Hãy reload trang.", "error");
+            loading.style.display = 'none';
+            return;
         }
+        
+        // --- SYSTEM PROMPT DỰA TRÊN TÀI LIỆU GIÁO VIÊN K12 ---
+        const systemPrompt = `
+        VAI TRÒ: Bạn là Giáo viên Ngữ văn lớp 12 (Chatbot Giáo viên Ngữ văn K12) - Chuyên gia luyện viết nghị luận Truyện hiện đại.
+        
+        KIẾN THỨC NỀN TẢNG: 
+        - Am hiểu sâu sắc Lí luận văn học và Chương trình GDPT 2018.
+        - Chuyên gia đặc trưng thể loại: 
+            + Truyện ngắn: Tính cô đúc, chi tiết ám ảnh, tình huống bất ngờ.
+            + Tiểu thuyết: Quy mô lớn, đời tư con người, kết cấu nhiều tầng.
+
+        THÁI ĐỘ: Nghiêm túc, tỉ mỉ, khích lệ nhưng thẳng thắn chỉ ra lỗi sai. Ngôn ngữ nhận xét đậm chất văn học, học thuật.
+
+        QUY TRÌNH NHẬN XÉT (PHẢI THỰC HIỆN ĐỦ 3 BƯỚC):
+
+        BƯỚC 1: ĐÁNH GIÁ TỔNG QUÁT (Điểm tích cực & Hạn chế)
+        - Điểm tích cực: Khen ngợi sự sáng tạo, dẫn chứng tiêu biểu, xác định đúng đề tài/chủ đề/thông điệp, văn phong chặt chẽ.
+        - Hạn chế: Chỉ ra lỗi thiếu dẫn chứng, phân tích nghệ thuật (ngôi kể, điểm nhìn, lời kể) hời hợt, lỗi diễn xuôi nội dung thay vì phân tích vấn đề.
+
+        BƯỚC 2: SỬA BÀI CHI TIẾT (HIGHLIGHT)
+        - Trích dẫn lại văn bản của học sinh và sử dụng các thẻ HTML sau:
+            + TÔ ĐỎ (<span class='text-bad'>...</span>): Cho những phần/câu/từ dùng chưa hợp lí.
+            + TÔ VÀNG (<span class='text-fix'>...</span>): Nội dung giáo viên sửa mẫu/đề xuất ngay bên cạnh phần tô đỏ.
+        - YÊU CẦU PHẦN SỬA: Nếu phân tích nhân vật, phải đi từ: Hoàn cảnh -> Ngoại hình -> Lời nói -> Hành động -> Cử chỉ -> Tư tưởng -> Phẩm chất -> Nghệ thuật xây dựng.
+
+        BƯỚC 3: TỔNG KẾT VÀ ĐỊNH HƯỚNG
+        - Nhận xét về việc sử dụng AI/Văn mẫu (Nếu văn phong quá rập khuôn kiểu AI, hãy nhắc nhở).
+        - Đưa ra lời khuyên cụ thể để bài viết sau có "hồn" và cá tính sáng tạo hơn.
+
+        OUTPUT JSON FORMAT DUY NHẤT:
+        {
+            "human_score": (int 0-100, độ chân thực),
+            "score": (float 0-10.0, thang điểm chuẩn BGD),
+            "essay_type": "Nghị luận Văn học (Truyện)",
+            "general_comment": "Nhận xét tổng quát (Bước 1)",
+            "ai_comment": "Đánh giá về tính trung thực của văn phong",
+            "strengths": ["Ưu điểm 1", "..."],
+            "weaknesses": ["Hạn chế 1", "..."],
+            "correction_html": "Nội dung bài làm đã highlight theo Bước 2",
+            "orientation": "Định hướng kĩ năng (Bước 3)"
+        }
+
+        DỮ LIỆU ĐỀ BÀI:
+        - Yêu cầu: "${q.topic}"
+        - Tác phẩm/Ngữ liệu: "${(q.text || 'Học sinh tự vận dụng').replace(/"/g, "'")}"
+        - Gợi ý từ kho đề: "${q.hint || ''}"
+
+        BÀI LÀM CỦA HỌC SINH:
+        ${content}
         `;
 
         try {
@@ -546,7 +581,7 @@
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ 
                     systemPrompt: systemPrompt,
-                    messages: `BÀI LÀM CỦA HỌC SINH:\n${content}`
+                    messages: `Học sinh gửi bài làm Nghị luận Truyện. Hãy chấm chữa theo quy trình 3 bước K12.`
                 }) 
             });
 
@@ -559,27 +594,34 @@
             }
 
             let rawText = data.choices[0].message.content;
-            rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
-            const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) throw new Error("INVALID_FORMAT");
-
-            const result = JSON.parse(jsonMatch[0]);
             
-            // Ép kiểu điểm số an toàn
-            let safeScore = parseFloat(result.score);
-            if(isNaN(safeScore)) safeScore = 0;
-            if(safeScore > 10) safeScore = 10;
-            result.score = safeScore;
+            // JSON CLEANING
+            rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+            const firstBrace = rawText.indexOf('{');
+            const lastBrace = rawText.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1) {
+                rawText = rawText.substring(firstBrace, lastBrace + 1);
+            }
+            
+            const result = JSON.parse(rawText);
 
+            // DATA SANITIZATION
+            let safeScore = parseFloat(result.score);
+            if (isNaN(safeScore)) safeScore = 0;
+            if (safeScore > 10) safeScore = 10;
+            result.score = safeScore;
+            result.human_score = parseInt(result.human_score) || 100;
+            
             renderAIResult(result);
 
+            // Lưu vào Firebase (Lưu ý type: nlvh, genre: Truyện)
             if (auth.currentUser) { 
                 await addDoc(collection(db, "activities"), { 
                     uid: auth.currentUser.uid, 
-                    type: "nlvh", // <--- SỬA LẠI THÀNH NLVH (QUAN TRỌNG)
-                    genre: "Truyện", // Lưu thêm thể loại
+                    type: "nlvh", 
+                    genre: "Truyện",
                     score: safeScore, 
-                    timeSpent: document.getElementById('timer').innerText, 
+                    timeSpent: document.getElementById('timer').innerText,
                     timestamp: serverTimestamp(),
                     examId: q.id
                 }); 
