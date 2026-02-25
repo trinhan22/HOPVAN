@@ -153,6 +153,13 @@
         .btn-confirm-danger { background: #dc2626; color: white; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3); }
         .btn-confirm-danger:hover { background: #b91c1c; }
 
+        /* --- GLOBAL SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
+        ::-webkit-scrollbar-button { display: none; }
+
         /* Mobile */
         @media (max-width: 768px) {
             aside { display: none; } 
@@ -193,7 +200,7 @@
                 <h1 class="text-2xl font-black text-gray-800">Quản lý tài khoản</h1>
                 <p class="text-gray-500 text-sm mt-1">Quản lý thông tin cá nhân và bảo mật.</p>
             </div>
-            <a href="dashboard.html" class="md:hidden w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-gray-500">
+            <a href="../dashboard/" class="md:hidden w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-gray-500">
                 <i class="fas fa-arrow-left"></i>
             </a>
         </div>

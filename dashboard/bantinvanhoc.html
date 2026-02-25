@@ -224,17 +224,52 @@
         /* LOADING */
         .loading-state { text-align: center; padding: 100px 0; color: #ccc; font-weight: 600; }
 
-        /* --- MOBILE --- */
+        /* --- MOBILE MENU FIX (ĐÃ SỬA) --- */
         .mobile-header { display: none; }
+        
         @media (max-width: 1023px) {
-            .mobile-header { display: flex; position: fixed; top: 0; left: 0; right: 0; height: 70px; background: rgba(255,255,255,0.95); z-index: 1000; align-items: center; padding: 0 20px; }
-            #menu-placeholder { width: 0; }
-            aside { position: fixed; left: -280px; top: 0; bottom: 0; width: 280px; transition: 0.3s; z-index: 1001; }
-            aside.open { left: 0; }
-            #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 999; }
-            #sidebar-overlay.active { display: block; }
+            /* 1. Header: Nằm thấp nhất trong nhóm nổi */
+            .mobile-header { 
+                display: flex; position: fixed; top: 0; left: 0; right: 0; height: 70px; 
+                background: rgba(255,255,255,0.98); backdrop-filter: blur(10px);
+                align-items: center; padding: 0 20px; 
+                box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+                z-index: 90; /* Thấp hơn Overlay */
+            }
             
-            .main-content { margin-left: 0; width: 100%; padding: 100px 20px 40px; }
+            #menu-placeholder { width: 0; }
+            
+            /* 2. Overlay: Nằm đè lên Header */
+            #sidebar-overlay { 
+                display: block; position: fixed; inset: 0; 
+                background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
+                z-index: 99; /* Cao hơn Header */
+                opacity: 0; visibility: hidden; transition: 0.3s;
+            }
+            #sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+            /* 3. Sidebar: Nằm trên cùng (Cao nhất) */
+            aside, .sidebar { 
+                position: fixed !important; 
+                left: -285px !important; /* Giấu sang trái */
+                top: 0; bottom: 0; 
+                width: 280px; 
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important; 
+                z-index: 100 !important; /* Cao nhất */
+                background: white !important; 
+                box-shadow: 5px 0 30px rgba(0,0,0,0.1);
+                display: flex !important; flex-direction: column; /* Đảm bảo layout flex */
+            }
+            
+            /* Class kích hoạt: Trượt ra */
+            aside.open, .sidebar.open { transform: translateX(285px) !important; }
+            
+            /* Đẩy nội dung xuống để không bị Header che */
+            .main-content { 
+                margin-left: 0; width: 100%; 
+                padding: 90px 20px 40px; 
+            }
+            
             .nav-wrapper { padding: 0; } .nav-arrow { display: none; }
             .nav-container { padding: 0 10px; }
             
@@ -242,8 +277,11 @@
             .featured-card .c-img-box { height: 200px; }
             .featured-card .c-body { padding: 25px; }
             .featured-card .c-title { font-size: 1.5rem; }
+            
+            .page-title { font-size: 2.2rem; }
+            .page-subtitle { font-size: 0.9rem; }
         }
-        
+
         /* Background Blobs */
         .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
         .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatBlob 10s infinite alternate; }
@@ -674,11 +712,15 @@
         };
 
         window.toggleSidebar = () => {
-            const sidebar = document.querySelector('aside');
+            // Tìm thẻ aside HOẶC thẻ có class .sidebar (ưu tiên cái nào tìm thấy trước)
+            const sidebar = document.querySelector('aside') || document.querySelector('.sidebar');
             const overlay = document.getElementById('sidebar-overlay');
-            if(sidebar) {
+            
+            if(sidebar && overlay) {
                 sidebar.classList.toggle('open');
-                if(overlay) overlay.classList.toggle('active');
+                overlay.classList.toggle('active');
+            } else {
+                console.log("Chưa load xong Menu hoặc Overlay");
             }
         };
 

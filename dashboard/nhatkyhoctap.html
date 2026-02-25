@@ -210,17 +210,50 @@
         .hv-btn-gray { background: #f1f5f9; color: #64748b; }
         .hv-btn-gray:hover { background: #e2e8f0; color: #334155; }
 
+        /* --- MOBILE RESPONSIVE (NHẬT KÝ HỌC TẬP - ĐÃ SỬA STATS THÀNH 2 CỘT) --- */
         @media (max-width: 768px) {
             .mobile-header { display: flex; }
             #sidebar-overlay.active { display: block; }
             #menu-placeholder { width: 0; }
             .main-content { margin-left: 0; width: 100%; padding: 80px 20px 40px; }
-            aside { position: fixed !important; transform: translateX(-100%); z-index: 10002; width: 280px !important; }
+            
+            aside { 
+                position: fixed !important; transform: translateX(-100%); 
+                z-index: 10002; width: 280px !important; 
+            }
             aside.open { transform: translateX(0) !important; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+
+            /* --- PHẦN SỬA ĐỔI: STATS GRID THÀNH 2 CỘT (GIỐNG DASHBOARD) --- */
+            .stats-grid { 
+                display: grid !important; /* Dùng Grid */
+                grid-template-columns: repeat(2, 1fr); /* Chia 2 cột đều */
+                gap: 15px; 
+                margin-bottom: 30px;
+                overflow-x: visible; /* Tắt cuộn ngang */
+                padding-bottom: 0;
+                margin-right: 0;
+            }
+            
+            /* Tắt thanh cuộn (dư thừa nhưng cứ để cho chắc) */
+            .stats-grid::-webkit-scrollbar { display: none; }
+            
+            .stat-card {
+                min-width: 0; /* Bỏ chiều rộng cố định để co giãn theo cột */
+                width: auto; 
+                padding: 15px; /* Thu nhỏ padding xíu cho gọn */
+            }
+
+            /* Chỉnh lại cỡ chữ cho vừa vặn trong ô nhỏ */
+            .stat-card .value { font-size: 1.6rem; } 
+            .stat-card h3 { font-size: 0.75rem; }
+            /* ------------------------------------------------------------- */
+
+            /* Các phần khác giữ nguyên của Nhật Ký */
             .skill-grid { grid-template-columns: 1fr; }
             .map-node { width: 120px; height: 140px; }
         }
+
+        
     </style>
 </head>
 <body>

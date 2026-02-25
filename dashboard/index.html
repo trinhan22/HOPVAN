@@ -236,19 +236,22 @@
 
         /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 768px) { 
-            body { height: 100%; overflow: auto; }
-            .mobile-header { display: flex; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+            body { height: auto; overflow: auto; }
+            
+            .mobile-header { display: flex; }
+            
             .main-content { 
                 margin-left: 0 !important; width: 100% !important; 
-                padding: 80px 20px 40px !important; height: auto !important; overflow: visible !important; 
-            } 
-            aside {
-                position: fixed !important; left: 0 !important; top: 0 !important; bottom: 0 !important;
-                transform: translateX(-100%); z-index: 9999 !important; width: 280px !important; 
-                background: white !important; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                padding: 90px 20px 40px !important; 
+                height: auto !important; 
+                border-left: none;
             }
-            aside.open { transform: translateX(0) !important; box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important; }
-            #sidebar-overlay { z-index: 9998 !important; background: rgba(0,0,0,0.5) !important; backdrop-filter: blur(4px); }
+            aside { 
+                position: fixed !important; left: -280px !important; top: 0 !important; bottom: 0 !important; 
+                width: 280px !important; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important; 
+                z-index: 1001 !important; background: white !important; 
+            }
+            aside.open { transform: translateX(280px) !important; }
             #sidebar-overlay.active { display: block !important; }
 
             .user-header { margin-bottom: 25px; }
@@ -256,21 +259,32 @@
             .user-avatar { width: 45px; height: 45px; font-size: 1.1rem; }
 
             .stats-grid { 
-                display: flex !important; overflow-x: auto; scroll-snap-type: x mandatory; 
-                gap: 15px; padding-bottom: 20px; margin: 0 -20px 20px -20px; padding-left: 20px; padding-right: 20px;
-                scrollbar-width: none;
+                display: grid !important; /* Dùng Grid */
+                grid-template-columns: repeat(2, 1fr); /* Chia 2 cột đều nhau */
+                gap: 15px; 
+                margin-bottom: 30px;
+                overflow-x: visible; /* Tắt cuộn ngang */
+                padding-bottom: 0;
+                margin-right: 0;
             }
             .stats-grid::-webkit-scrollbar { display: none; }
-            .stat-card { min-width: 150px; width: 150px; scroll-snap-align: start; flex-shrink: 0; }
+            .stat-card {
+                min-width: 0; /* Bỏ chiều rộng cố định */
+                width: auto; /* Tự co giãn theo cột */
+                padding: 20px 15px; /* Căn chỉnh padding cho gọn */
+            }
 
-            .split-grid { display: flex !important; flex-direction: column; gap: 20px; }
+            .stat-card .value { font-size: 1.8rem; } 
+            .stat-card h3 { font-size: 0.8rem; }
+
+            .split-grid { grid-template-columns: 1fr; gap: 20px; }
             .banner-cta { padding: 25px 20px !important; align-items: center !important; text-align: center !important; min-height: auto !important; }
             .banner-cta h2 { font-size: 1.5rem !important; }
             .banner-decor { opacity: 0.1 !important; font-size: 6rem !important; bottom: -10px !important; }
 
             .chart-box { min-height: auto !important; height: auto !important; }
             #mini-leaderboard { max-height: 250px; }
-            .tips-grid { grid-template-columns: 1fr !important; gap: 15px; }
+            .tips-grid { grid-template-columns: 1fr; gap: 15px; } /* Tips xếp dọc */
             
             .modal { align-items: flex-end; }
             .modal-content { 
