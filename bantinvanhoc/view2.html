@@ -174,6 +174,74 @@
         .dark-mode .back-btn { color: #9ca3af !important; }
         .dark-mode .back-btn:hover { color: var(--primary) !important; }
         .dark-mode .ending-box { background: #1a1a1a !important; border-color: #333 !important; color: #bbb !important; }
+
+
+        /* --- SPECIAL LAYOUTS (MỚI THÊM) --- */
+        .special-block { margin-bottom: 40px; animation: slideUp 0.5s ease; }
+        
+        /* 1. Mài Câu Sáng Chữ (So sánh) */
+        .mc-container { display: flex; flex-direction: column; gap: 20px; }
+        @media (min-width: 768px) { .mc-container { flex-direction: row; align-items: stretch; } }
+        
+        .mc-box { flex: 1; padding: 25px; border-radius: 20px; position: relative; font-size: 1rem; line-height: 1.7; }
+        .mc-bad { background: #fef2f2; border: 1px solid #fee2e2; color: #7f1d1d; }
+        .mc-good { background: #f0fdf4; border: 1px solid #dcfce7; color: #14532d; }
+        
+        .mc-badge { 
+            position: absolute; top: -12px; left: 20px; padding: 4px 12px; border-radius: 20px;
+            font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+            background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .mc-arrow { display: flex; align-items: center; justify-content: center; color: #fb923c; font-size: 1.5rem; }
+        @media (max-width: 768px) { .mc-arrow { transform: rotate(90deg); margin: -10px 0; } }
+
+        /* 2. Lí Luận & Cửa Ngõ (Card Grid) */
+        .topic-header { 
+            display: inline-block; background: var(--primary); color: white; 
+            padding: 8px 20px; border-radius: 12px; font-weight: 700; margin-bottom: 20px;
+            font-size: 0.9rem; box-shadow: 0 5px 15px rgba(255, 143, 80, 0.3);
+        }
+        .grid-2-col { display: grid; grid-template-columns: 1fr; gap: 25px; }
+        @media (min-width: 768px) { .grid-2-col { grid-template-columns: 1fr 1fr; } }
+        
+        .content-card { 
+            background: white; border-radius: 20px; overflow: hidden; 
+            border: 1px solid #f1f5f9; box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            transition: 0.3s;
+        }
+        .content-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.08); }
+        
+        .cc-header { 
+            padding: 12px 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; 
+            display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px;
+        }
+        .cc-body { padding: 25px; font-size: 1rem; line-height: 1.8; color: #334155; }
+
+        /* Màu sắc Header Card */
+        .h-blue { background: #eff6ff; color: #2563eb; }
+        .h-orange { background: #fff7ed; color: #ea580c; }
+        .h-gray { background: #f8fafc; color: #64748b; }
+        .h-rose { background: #fff1f2; color: #e11d48; }
+
+        /* 3. Khơi Nguồn (Prompt Box) */
+        .prompt-box { 
+            background: #fffbeb; border: 2px dashed #fcd34d; padding: 25px; 
+            border-radius: 20px; margin-bottom: 25px; position: relative;
+        }
+        .prompt-label {
+            position: absolute; top: -10px; left: 20px; background: #fbbf24; color: #78350f;
+            padding: 2px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
+        }
+        .prompt-text { font-family: 'Merriweather', serif; font-weight: 700; color: #92400e; font-size: 1.1rem; }
+
+        /* Dark mode overrides */
+        .dark-mode .mc-bad { background: #450a0a; border-color: #7f1d1d; color: #fca5a5; }
+        .dark-mode .mc-good { background: #052e16; border-color: #14532d; color: #86efac; }
+        .dark-mode .content-card { background: #1e293b; border-color: #334155; }
+        .dark-mode .cc-header { background: #0f172a !important; color: #cbd5e1 !important; }
+        .dark-mode .cc-body { color: #e2e8f0; }
+        .dark-mode .prompt-box { background: #422006; border-color: #b45309; }
+        .dark-mode .prompt-text { color: #fcd34d; }
     </style>
 </head>
 <body>
@@ -335,43 +403,89 @@
                 // Kiểm tra loại bài viết có thuộc 3 nhóm dùng Bảng không
                 const isTableView = ['maicau', 'cuango', 'khoinguon'].includes(data.type);
 
-                // 2. Render Body
+                // --- UPDATE MỚI: XỬ LÝ GIAO DIỆN ĐẶC BIỆT ---
                 if (isTableView && data.tableRows && data.tableRows.length > 0) {
-                    // Lấy tiêu đề cột từ dòng đầu tiên (Fallback về mặc định nếu bài viết cũ chưa có)
-                    const firstRow = data.tableRows[0];
-                    const colTypeTitle = firstRow.titleType || 'Thể Loại'; // Tiêu đề cột 2
-                    const col1Title = firstRow.title1 || 'Mở Bài';         // Tiêu đề cột 3
-                    const col2Title = firstRow.title2 || 'Kết Bài';        // Tiêu đề cột 4
-
-                    // VIEW 2: Dạng Bảng (Dùng khi firebase có mảng tableRows)
-                    htmlContent += `
-                    <div class="table-view-container">
-                        <table class="hopvan-table">
-                            <thead>
-                                <tr>
-                                    <th class="col-stt">STT</th>
-                                    <th class="col-type">${colTypeTitle}</th>
-                                    <th>${col1Title}</th>
-                                    <th>${col2Title}</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
                     
                     data.tableRows.forEach((row, index) => {
-                        htmlContent += `
-                            <tr>
-                                <td class="col-stt">${index + 1}</td>
-                                <td class="col-type">${row.type || ''}</td>
-                                <td class="col-content">${row.open || ''}</td>
-                                <td class="col-content">${row.close || ''}</td>
-                            </tr>`;
+                        htmlContent += `<div class="special-block">`;
+
+                        // --- LOẠI 1: MÀI CÂU SÁNG CHỮ (SO SÁNH) ---
+                        if (row.type === 'maicau') {
+                            htmlContent += `
+                                <div class="mc-container">
+                                    <div class="mc-box mc-bad">
+                                        <div class="mc-badge text-red-500">Thay vì viết</div>
+                                        <div>${row.col1}</div>
+                                    </div>
+                                    <div class="mc-arrow"><i class="fas fa-arrow-right"></i></div>
+                                    <div class="mc-box mc-good">
+                                        <div class="mc-badge text-green-600">Hãy viết</div>
+                                        <div>${row.col2}</div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        
+                        // --- LOẠI 2: LÍ LUẬN VĂN HỌC (CHỦ ĐỀ -> NHẬN ĐỊNH -> ÁP DỤNG) ---
+                        else if (row.type === 'liluan') {
+                            if(row.col1) htmlContent += `<div class="topic-header"><i class="fas fa-tag mr-2"></i>${row.col1}</div>`;
+                            htmlContent += `
+                                <div class="grid-2-col">
+                                    <div class="content-card">
+                                        <div class="cc-header h-blue"><span>Nhận định / Lý luận</span> <i class="fas fa-quote-right"></i></div>
+                                        <div class="cc-body">${row.col2}</div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="cc-header h-orange"><span>Áp dụng vào bài</span> <i class="fas fa-pen-nib"></i></div>
+                                        <div class="cc-body">${row.col3}</div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                        // --- LOẠI 3: CỬA NGÕ VĂN CHƯƠNG (TÁC PHẨM -> MỞ -> KẾT) ---
+                        else if (row.type === 'cuango') {
+                            if(row.col1) htmlContent += `<div class="topic-header" style="background:#e11d48"><i class="fas fa-book mr-2"></i>${row.col1}</div>`;
+                            htmlContent += `
+                                <div class="grid-2-col">
+                                    <div class="content-card">
+                                        <div class="cc-header h-gray"><span>Mở bài mẫu</span> <i class="fas fa-door-open"></i></div>
+                                        <div class="cc-body">${row.col2}</div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="cc-header h-rose"><span>Kết bài mẫu</span> <i class="fas fa-door-closed"></i></div>
+                                        <div class="cc-body">${row.col3}</div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                        // --- LOẠI 4: KHƠI NGUỒN DIỄN ĐẠT (ĐỀ -> BÀI LÀM -> TIÊU CHÍ) ---
+                        else if (row.type === 'khoinguon') {
+                            htmlContent += `
+                                <div class="prompt-box">
+                                    <span class="prompt-label">Đề bài / Tình huống</span>
+                                    <div class="prompt-text">${row.col1}</div>
+                                </div>
+                                <div class="grid-2-col">
+                                    <div class="content-card">
+                                        <div class="cc-header h-gray"><span>Bài làm tham khảo</span> <i class="fas fa-file-alt"></i></div>
+                                        <div class="cc-body">${row.col2}</div>
+                                    </div>
+                                    <div class="content-card">
+                                        <div class="cc-header h-orange"><span>Bình luận & Tiêu chí</span> <i class="fas fa-check-double"></i></div>
+                                        <div class="cc-body">${row.col3}</div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                        htmlContent += `</div>`; // End special-block
                     });
-                    
-                    htmlContent += `</tbody></table></div>`;
 
                 } else if (data.sections && data.sections.length > 0) {
-                    // VIEW 1: Dạng đoạn văn bình thường (Như cũ)
-                    data.sections.forEach((sec) => {
+                    // ... (Giữ nguyên logic render sections cũ) ...
+                     data.sections.forEach((sec) => {
                         let imgsHtml = '';
                         if(sec.images && sec.images.length > 0) {
                             imgsHtml = `<div class="mag-img-wrap"><img src="${sec.images[0]}" loading="lazy"></div>`;

@@ -1119,72 +1119,202 @@
     // --- CODE MỚI: QUẢN LÝ VIEW 2 (DẠNG BẢNG) ---
     let tableRowCounter = 0;
     
+    // ----------------------------------------------------------------------
+    // 1. QUẢN LÝ GIAO DIỆN NHẬP LIỆU (THEO TỪNG LOẠI BẢN TIN)
+    // ----------------------------------------------------------------------
+    
+    // Hàm chuyển đổi chế độ nhập liệu
     window.toggleNewsViewMode = () => {
         const type = document.getElementById('news-type')?.value;
-        const v1 = document.getElementById('view1-sections');
-        const v2 = document.getElementById('view2-tables');
-        if(!v1 || !v2) return;
-        
-        if (['maicau', 'cuango', 'khoinguon'].includes(type)) {
+        const v1 = document.getElementById('view1-sections'); // Giao diện thường (Đoạn văn + Ảnh)
+        const v2 = document.getElementById('view2-tables');   // Giao diện đặc biệt (Bảng/Grid)
+        const btnAddRow = document.getElementById('btn-add-row');
+
+        if (!v1 || !v2) return;
+
+        // Các loại dùng giao diện đặc biệt
+        const specialTypes = ['maicau', 'liluan', 'cuango', 'khoinguon'];
+
+        if (specialTypes.includes(type)) {
             v1.classList.add('hidden');
             v2.classList.remove('hidden');
+            
+            // Đổi tên nút thêm mới cho phù hợp ngữ cảnh
+            if (type === 'maicau') btnAddRow.innerHTML = '<i class="fas fa-plus"></i> Thêm cặp câu So sánh';
+            else if (type === 'khoinguon') btnAddRow.innerHTML = '<i class="fas fa-plus"></i> Thêm Đề bài & Phân tích';
+            else btnAddRow.innerHTML = '<i class="fas fa-plus"></i> Thêm dòng dữ liệu';
         } else {
             v1.classList.remove('hidden');
             v2.classList.add('hidden');
         }
     };
 
-    // --- ĐÃ FIX: CHO PHÉP TÙY CHỈNH CẢ 3 TIÊU ĐỀ CỦA BẢNG ---
+    // Hàm xóa dòng (có dọn dẹp editor để tránh nặng máy)
+    window.deleteTableRow = (rowId) => {
+        if(confirm("Xóa khối nội dung này?")) {
+            const el = document.querySelector(`[data-row-id='${rowId}']`);
+            if(el) el.remove();
+            // Xóa instance Quill khỏi bộ nhớ
+            delete newsEditors[`ed-${rowId}-col1`];
+            delete newsEditors[`ed-${rowId}-col2`];
+            delete newsEditors[`ed-${rowId}-col3`];
+        }
+    };
+
+    // ----------------------------------------------------------------------
+    // 2. HÀM TẠO FORM NHẬP LIỆU CHI TIẾT (ADD ROW)
+    // ----------------------------------------------------------------------
     window.addTableRow = (rData = null) => {
         const list = document.getElementById('table-rows-list');
-        const rowId = `trow-${Date.now()}-${tableRowCounter++}`;
-        
+        const type = document.getElementById('news-type').value;
+        const rowId = `row-${Date.now()}-${Math.floor(Math.random()*1000)}`;
+
         const div = document.createElement('div');
-        div.className = "table-row-item bg-white p-5 rounded-2xl border border-orange-100 relative group animate-fade-in";
+        // Style chung cho khối bao ngoài: Trắng, Bo góc, Bóng đổ nhẹ
+        div.className = "table-row-item bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative group animate-fade-in mb-6 hover:shadow-md transition-all";
         div.setAttribute('data-row-id', rowId);
+        div.setAttribute('data-row-type', type); // Lưu loại để lúc save biết đường lấy
+
+        const closeBtn = `<button type="button" onclick="deleteTableRow('${rowId}')" class="absolute -right-3 -top-3 w-8 h-8 bg-red-100 text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition z-20 hover:bg-red-500 hover:text-white flex items-center justify-center shadow-md"><i class="fas fa-times"></i></button>`;
         
-        div.innerHTML = `
-            <button type="button" onclick="this.closest('.table-row-item').remove(); delete newsEditors['${rowId}_open']; delete newsEditors['${rowId}_close'];" class="absolute -right-2 -top-2 w-8 h-8 bg-red-100 text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition z-20 hover:bg-red-500 hover:text-white flex items-center justify-center"><i class="fas fa-times"></i></button>
-            <div class="grid grid-cols-12 gap-4">
-                <div class="col-span-12 md:col-span-3">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-pen text-gray-400 text-sm"></i>
-                        <input class="row-title-type text-[10px] font-bold text-gray-400 uppercase bg-transparent border-b border-dashed border-gray-300 focus:border-gray-500 outline-none w-full pb-1" placeholder="Nhập tiêu đề (VD: THỂ LOẠI)" value="${rData && rData.titleType ? rData.titleType : 'Thể loại'}">
+        let innerHTML = '';
+
+        // --- BỐ CỤC 1: MÀI CÂU SÁNG CHỮ (SO SÁNH) ---
+        if (type === 'maicau') {
+            innerHTML = `
+                ${closeBtn}
+                <div class="flex flex-col md:flex-row gap-4 items-stretch">
+                    <div class="flex-1 bg-red-50/40 rounded-2xl p-4 border border-red-100 relative pt-6">
+                        <span class="absolute -top-3 left-4 bg-white text-red-500 px-3 py-1 text-[10px] font-black uppercase tracking-wider border border-red-100 rounded-full shadow-sm">
+                            <i class="fas fa-times-circle mr-1"></i> Thay vì viết
+                        </span>
+                        <div id="ed-${rowId}-col1" style="height: 100px;" class="bg-white rounded-xl"></div>
                     </div>
-                    <input class="row-type glass-input font-bold bg-orange-50 border-orange-100" placeholder="VD: Thơ, Truyện..." value="${rData ? rData.type : ''}">
-                </div>
-                <div class="col-span-12 md:col-span-9 space-y-4">
-                    <div>
-                        <div class="flex items-center gap-2 mb-2">
-                            <i class="fas fa-pen text-emerald-500 text-sm"></i>
-                            <input class="row-title-1 text-[10px] font-bold text-emerald-600 uppercase bg-transparent border-b border-dashed border-emerald-200 focus:border-emerald-500 outline-none w-full pb-1" placeholder="Nhập tiêu đề cột (VD: NỘI DUNG MỞ BÀI)" value="${rData && rData.title1 ? rData.title1 : 'Nội dung Mở bài'}">
-                        </div>
-                        <div class="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden">
-                            <div id="ed-${rowId}-open" style="height: 100px;"></div>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <div class="flex items-center gap-2 mb-2 mt-4">
-                            <i class="fas fa-pen text-purple-500 text-sm"></i>
-                            <input class="row-title-2 text-[10px] font-bold text-purple-600 uppercase bg-transparent border-b border-dashed border-purple-200 focus:border-purple-500 outline-none w-full pb-1" placeholder="Nhập tiêu đề cột (VD: NỘI DUNG KẾT BÀI)" value="${rData && rData.title2 ? rData.title2 : 'Nội dung Kết bài'}">
-                        </div>
-                        <div class="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden">
-                            <div id="ed-${rowId}-close" style="height: 100px;"></div>
-                        </div>
+
+                    <div class="flex items-center justify-center text-orange-300 text-xl"><i class="fas fa-arrow-right"></i></div>
+
+                    <div class="flex-1 bg-green-50/40 rounded-2xl p-4 border border-green-100 relative pt-6">
+                        <span class="absolute -top-3 left-4 bg-white text-green-600 px-3 py-1 text-[10px] font-black uppercase tracking-wider border border-green-100 rounded-full shadow-sm">
+                            <i class="fas fa-check-circle mr-1"></i> Hãy viết
+                        </span>
+                        <div id="ed-${rowId}-col2" style="height: 100px;" class="bg-white rounded-xl"></div>
                     </div>
                 </div>
-            </div>
-        `;
+            `;
+        } 
+        // --- BỐ CỤC 2: LÍ LUẬN VĂN HỌC (3 CỘT: CHỦ ĐỀ - NHẬN ĐỊNH - ÁP DỤNG) ---
+        else if (type === 'liluan') {
+            innerHTML = `
+                ${closeBtn}
+                <div class="grid grid-cols-12 gap-5">
+                    <div class="col-span-12 md:col-span-3">
+                        <label class="label-custom text-purple-600">Chủ đề / Từ khóa</label>
+                        <input id="inp-${rowId}-col1" class="glass-input font-bold text-purple-700 bg-purple-50/30 border-purple-100" placeholder="VD: Chức năng văn học..." value="${rData?.col1 || ''}">
+                    </div>
+
+                    <div class="col-span-12 md:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="bg-blue-50/30 p-3 rounded-2xl border border-blue-50">
+                            <label class="label-custom text-blue-500 mb-2 block">Nhận định / Lý luận</label>
+                            <div class="bg-white rounded-xl border border-blue-100 overflow-hidden">
+                                <div id="ed-${rowId}-col2" style="height: 150px;"></div>
+                            </div>
+                        </div>
+                        <div class="bg-orange-50/30 p-3 rounded-2xl border border-orange-50">
+                            <label class="label-custom text-orange-500 mb-2 block">Áp dụng vào bài</label>
+                            <div class="bg-white rounded-xl border border-orange-100 overflow-hidden">
+                                <div id="ed-${rowId}-col3" style="height: 150px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } 
+        // --- BỐ CỤC 3: CỬA NGÕ VĂN CHƯƠNG (3 CỘT: TÁC PHẨM - MỞ BÀI - KẾT BÀI) ---
+        else if (type === 'cuango') {
+            innerHTML = `
+                ${closeBtn}
+                <div class="space-y-4">
+                    <div>
+                        <label class="label-custom text-rose-500">Tên tác phẩm / Chủ đề</label>
+                        <div class="relative">
+                            <i class="fas fa-book absolute left-4 top-1/2 -translate-y-1/2 text-rose-300"></i>
+                            <input id="inp-${rowId}-col1" class="glass-input pl-10 font-black text-rose-600 bg-rose-50/30 border-rose-100" placeholder="VD: Vợ nhặt - Kim Lân" value="${rData?.col1 || ''}">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-1 rounded-2xl border border-gray-200 shadow-sm">
+                            <div class="bg-gray-100 px-4 py-2 rounded-t-xl text-[10px] font-bold text-gray-500 uppercase flex justify-between items-center">
+                                <span>Mở bài mẫu</span> <i class="fas fa-door-open"></i>
+                            </div>
+                            <div id="ed-${rowId}-col2" style="height: 180px;"></div>
+                        </div>
+                        <div class="bg-white p-1 rounded-2xl border border-orange-200 shadow-sm">
+                            <div class="bg-orange-50 px-4 py-2 rounded-t-xl text-[10px] font-bold text-orange-500 uppercase flex justify-between items-center">
+                                <span>Kết bài mẫu</span> <i class="fas fa-door-closed"></i>
+                            </div>
+                            <div id="ed-${rowId}-col3" style="height: 180px;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } 
+        // --- BỐ CỤC 4: KHƠI NGUỒN DIỄN ĐẠT (ĐỀ BÀI - BÀI LÀM - TIÊU CHÍ) ---
+        else if (type === 'khoinguon') {
+            innerHTML = `
+                ${closeBtn}
+                <div class="space-y-5">
+                    <div class="bg-amber-50/50 p-4 rounded-2xl border border-amber-100 relative">
+                         <span class="absolute -top-2 left-4 bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-bold uppercase rounded-md">Đề bài / Tình huống</span>
+                        <div class="bg-white rounded-xl border border-amber-200 overflow-hidden mt-2">
+                            <div id="ed-${rowId}-col1" style="height: 80px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="label-custom text-gray-500 flex items-center gap-2"><i class="fas fa-pen-nib"></i> Bài làm tham khảo</label>
+                            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                                <div id="ed-${rowId}-col2" style="height: 250px;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="label-custom text-gray-500 flex items-center gap-2"><i class="fas fa-check-double"></i> Tiêu chí chấm / Bình luận</label>
+                            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                                <div id="ed-${rowId}-col3" style="height: 250px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        div.innerHTML = innerHTML;
         list.appendChild(div);
 
-        // Khởi tạo Editor gọn nhẹ cho Bảng
-        const miniToolbar = [['bold', 'italic', 'underline'], ['clean']];
-        newsEditors[`${rowId}_open`] = new Quill(`#ed-${rowId}-open`, { theme: 'snow', modules: { toolbar: miniToolbar }});
-        newsEditors[`${rowId}_open`].clipboard.dangerouslyPasteHTML(rData ? rData.open : "");
-        
-        newsEditors[`${rowId}_close`] = new Quill(`#ed-${rowId}-close`, { theme: 'snow', modules: { toolbar: miniToolbar }});
-        newsEditors[`${rowId}_close`].clipboard.dangerouslyPasteHTML(rData ? rData.close : "");
+        // --- KHỞI TẠO QUILL CHO TỪNG Ô (Mini Toolbar) ---
+        const miniToolbar = [['bold', 'italic', 'underline', 'strike'], [{ 'list': 'bullet' }], ['clean']];
+        const createMiniQ = (id, content) => {
+            const el = document.getElementById(id);
+            if(el) {
+                const q = new Quill('#'+id, { theme: 'snow', modules: { toolbar: miniToolbar }, placeholder: 'Nhập nội dung...' });
+                if(content) q.clipboard.dangerouslyPasteHTML(content);
+                newsEditors[id] = q; // Lưu vào biến toàn cục để lát lấy data
+            }
+        };
+
+        // Init dựa trên loại
+        if(type === 'maicau') {
+            createMiniQ(`ed-${rowId}-col1`, rData?.col1);
+            createMiniQ(`ed-${rowId}-col2`, rData?.col2);
+        } else if (type === 'liluan' || type === 'cuango') {
+            createMiniQ(`ed-${rowId}-col2`, rData?.col2);
+            createMiniQ(`ed-${rowId}-col3`, rData?.col3);
+        } else if (type === 'khoinguon') {
+            createMiniQ(`ed-${rowId}-col1`, rData?.col1);
+            createMiniQ(`ed-${rowId}-col2`, rData?.col2);
+            createMiniQ(`ed-${rowId}-col3`, rData?.col3);
+        }
     };
 
     // --- KHAI BÁO TOOLBAR ĐẦY ĐỦ (GLOBAL) ---
@@ -1337,11 +1467,16 @@ const CAT_MAP = {
 
                         <div id="view2-tables" class="space-y-6 hidden">
                             <label class="label-custom text-orange-500 border-b pb-2 block">3. Thân bài (Dạng bảng cấu trúc)</label>
+                            
                             <div class="bg-orange-50 p-4 rounded-xl text-xs text-orange-700 font-medium flex items-center gap-2 border border-orange-100">
                                 <i class="fas fa-info-circle"></i> Chuyên mục này hỗ trợ hiển thị nội dung theo định dạng Bảng phân loại.
                             </div>
+
                             <div id="table-rows-list" class="space-y-6"></div>
-                            <button type="button" onclick="addTableRow()" class="w-full py-4 border-2 border-dashed border-orange-200 rounded-2xl font-bold text-orange-500 hover:bg-orange-50 transition-all">+ Thêm Dòng Bảng Mới</button>
+
+                            <button id="btn-add-row" type="button" onclick="addTableRow()" class="w-full py-4 border-2 border-dashed border-orange-200 rounded-2xl font-bold text-orange-500 hover:bg-orange-50 transition-all">
+                                + Thêm dòng dữ liệu
+                            </button>
                         </div>
                     </div>
 
@@ -1440,20 +1575,22 @@ const CAT_MAP = {
                 newsEditors.ending = createQ('#editor-ending', data.ending);
 
                 // Kích hoạt View (Bảng/Đoạn) tương ứng
-                toggleNewsViewMode(); 
-                
+                toggleNewsViewMode(); // Kích hoạt giao diện đúng loại
+
+                // Load dữ liệu bảng
                 if (data.tableRows && data.tableRows.length > 0) {
                     data.tableRows.forEach(r => addTableRow(r));
-                } else if (['maicau', 'cuango', 'khoinguon'].includes(data.type) && id === 'new') {
-                    addTableRow(); 
+                } else if (['maicau', 'cuango', 'khoinguon', 'liluan'].includes(data.type) && id === 'new') {
+                    addTableRow(); // Tạo sẵn 1 dòng trống nếu là bài mới
                 }
-                
+
+                // Load dữ liệu đoạn văn (sections) nếu không phải loại đặc biệt
                 if (data.sections && data.sections.length > 0) {
                     data.sections.forEach(s => addNewsSec(s));
-                } else if (!['maicau', 'cuango', 'khoinguon'].includes(data.type) && id === 'new') {
-                    addNewsSec(); 
+                } else if (!['maicau', 'cuango', 'khoinguon', 'liluan'].includes(data.type) && id === 'new') {
+                    addNewsSec();
                 }
-            } 
+            }
             else if (colName === 'fulltest_bank') {
                 editors.readText = createQ('#edit-ft-read-text', data.reading_text);
                 editors.readQs = createQ('#edit-ft-read-qs', (data.reading_questions||[]).join('<p>[NEXT]</p>'));
@@ -1716,11 +1853,16 @@ const CAT_MAP = {
 
                         <div id="view2-tables" class="space-y-6 hidden">
                             <label class="label-custom text-orange-500 border-b pb-2 block">3. Thân bài (Dạng bảng cấu trúc)</label>
+                            
                             <div class="bg-orange-50 p-4 rounded-xl text-xs text-orange-700 font-medium flex items-center gap-2 border border-orange-100">
-                                <i class="fas fa-info-circle"></i> Chuyên mục này hỗ trợ hiển thị nội dung theo định dạng Bảng.
+                                <i class="fas fa-info-circle"></i> Chuyên mục này hỗ trợ hiển thị nội dung theo định dạng Bảng phân loại.
                             </div>
+
                             <div id="table-rows-list" class="space-y-6"></div>
-                            <button type="button" onclick="addTableRow()" class="w-full py-4 border-2 border-dashed border-orange-200 rounded-2xl font-bold text-orange-500 hover:bg-orange-50 transition-all">+ Thêm Dòng Bảng Mới</button>
+
+                            <button id="btn-add-row" type="button" onclick="addTableRow()" class="w-full py-4 border-2 border-dashed border-orange-200 rounded-2xl font-bold text-orange-500 hover:bg-orange-50 transition-all">
+                                + Thêm dòng dữ liệu
+                            </button>
                         </div>
                     </div>
 
@@ -2075,31 +2217,42 @@ const CAT_MAP = {
                 docData.ending = newsEditors.ending.root.innerHTML;
                 docData.img = tempFiles.main ? await uploadToImgBB(tempFiles.main) : document.getElementById('main-preview').src;
 
-                // KIỂM TRA ĐANG Ở VIEW NÀO ĐỂ LƯU DATA
-                if (['maicau', 'cuango', 'khoinguon'].includes(type)) {
-                    // LƯU DẠNG BẢNG (VIEW 2) - ĐÃ LƯU KÈM TẤT CẢ TITLE TÙY CHỈNH
-                    docData.tableRows = [];
+                // XỬ LÝ LƯU DATA CHO CÁC LOẠI ĐẶC BIỆT
+                if (['maicau', 'liluan', 'cuango', 'khoinguon'].includes(type)) {
+                    docData.tableRows = []; // Reset mảng cũ
                     const rowEls = document.querySelectorAll('.table-row-item');
+                    
                     for (let el of rowEls) {
                         const rId = el.getAttribute('data-row-id');
-                        const rType = el.querySelector('.row-type').value;
-                        const rTitleType = el.querySelector('.row-title-type').value; // Lấy title Thể loại
-                        const rTitle1 = el.querySelector('.row-title-1').value; // Lấy title 1
-                        const rTitle2 = el.querySelector('.row-title-2').value; // Lấy title 2
-                        const rOpen = newsEditors[`${rId}_open`].root.innerHTML;
-                        const rClose = newsEditors[`${rId}_close`].root.innerHTML;
+                        const rType = el.getAttribute('data-row-type'); // Lấy đúng loại của dòng đó
                         
-                        // Lưu tất cả vào Database
+                        let c1 = '', c2 = '', c3 = '';
+
+                        // Lấy dữ liệu tùy theo loại layout
+                        if (rType === 'maicau') {
+                            c1 = newsEditors[`ed-${rId}-col1`].root.innerHTML; // Thay vì
+                            c2 = newsEditors[`ed-${rId}-col2`].root.innerHTML; // Hãy viết
+                        } 
+                        else if (rType === 'liluan' || rType === 'cuango') {
+                            c1 = document.getElementById(`inp-${rId}-col1`).value; // Chủ đề (Input)
+                            c2 = newsEditors[`ed-${rId}-col2`].root.innerHTML; // Cột 2
+                            c3 = newsEditors[`ed-${rId}-col3`].root.innerHTML; // Cột 3
+                        } 
+                        else if (rType === 'khoinguon') {
+                            c1 = newsEditors[`ed-${rId}-col1`].root.innerHTML; // Đề bài
+                            c2 = newsEditors[`ed-${rId}-col2`].root.innerHTML; // Bài làm
+                            c3 = newsEditors[`ed-${rId}-col3`].root.innerHTML; // Tiêu chí
+                        }
+
+                        // Lưu vào mảng chuẩn
                         docData.tableRows.push({ 
                             type: rType, 
-                            titleType: rTitleType, // Lưu biến title mới
-                            title1: rTitle1, 
-                            title2: rTitle2, 
-                            open: rOpen, 
-                            close: rClose 
+                            col1: c1, 
+                            col2: c2, 
+                            col3: c3 
                         });
                     }
-                    docData.sections = []; // Xóa rác sections cũ
+                    docData.sections = []; // Xóa data sections nếu chuyển từ dạng thường sang đặc biệt
                 } else {
                     // LƯU DẠNG ĐOẠN VĂN (VIEW 1)
                     docData.sections = [];
