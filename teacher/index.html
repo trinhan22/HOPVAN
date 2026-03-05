@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Điều Khiển - HopVan</title>
+
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --secondary: #FF6B6B;
+            --bg-glass: rgba(255, 255, 255, 0.75);
+            --border-glass: rgba(255, 255, 255, 0.6);
+            --shadow-soft: 0 10px 40px -10px rgba(255, 143, 80, 0.15);
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #FFF5EC; 
+            color: #334155;
+            overflow: hidden; 
+        }
+
+        /* --- BACKGROUND --- */
+        .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.2; animation: floatBlob 10s infinite alternate; }
+        .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
+        .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
+        .blob-3 { width: 300px; height: 300px; background: #FFD1D1; top: 40%; left: 40%; animation-delay: -2s; }
+        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
+
+        /* --- GLASS COMPONENTS --- */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-glass);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(30px);
+            border-right: 1px solid white;
+        }
+
+        /* --- NAVIGATION --- */
+        .nav-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 24px; margin: 4px 16px; border-radius: 16px;
+            color: #64748B; font-weight: 700; font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer; position: relative; overflow: hidden;
+            text-decoration: none;
+        }
+        .nav-item:hover { background: rgba(255, 143, 80, 0.08); color: var(--primary); }
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+        .nav-item.active i { color: white; }
+
+        /* --- STATS CARD (Admin Style) --- */
+        .stat-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            overflow: hidden;
+            display: flex; flex-direction: column; justify-content: center;
+            min-height: 140px;
+        }
+        .stat-card:hover { transform: translateY(-5px) scale(1.02); background: white; z-index: 10; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+        
+        .stat-card h3 { font-size: 2.5rem; font-weight: 900; line-height: 1; margin-bottom: 4px; position: relative; z-index: 2; color: #2d3436; }
+        .stat-card p { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; position: relative; z-index: 2; }
+        
+        .watermark-icon {
+            position: absolute; right: -15px; bottom: -20px; font-size: 5rem; opacity: 0.1;
+            transform: rotate(-15deg); transition: all 0.5s ease; z-index: 1;
+        }
+        .stat-card:hover .watermark-icon { transform: rotate(0deg) scale(1.1) translate(-5px, -5px); opacity: 0.15; }
+
+        /* Color Themes for Stats */
+        .card-blue:hover { border-color: #74b9ff; } .card-blue:hover h3 { color: #0984e3; } .card-blue .watermark-icon { color: #74b9ff; }
+        .card-green:hover { border-color: #55efc4; } .card-green:hover h3 { color: #00b894; } .card-green .watermark-icon { color: #55efc4; }
+        .card-orange:hover { border-color: #fab1a0; } .card-orange:hover h3 { color: #e17055; } .card-orange .watermark-icon { color: #fab1a0; }
+
+        /* --- ACTION CARD (Admin Style) --- */
+        .action-card {
+            position: relative; overflow: hidden;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 24px; padding: 24px;
+            border: 2px solid transparent;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; height: 180px;
+        }
+        .ac-title { font-size: 1.1rem; font-weight: 900; color: #2d3436; margin-bottom: 4px; z-index: 2; position: relative; }
+        .ac-desc { font-size: 0.75rem; font-weight: 700; color: #b2bec3; text-transform: uppercase; letter-spacing: 1px; z-index: 2; position: relative; }
+        
+        .action-card .icon-box {
+            width: 60px; height: 60px; border-radius: 20px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+            margin-bottom: 15px; color: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative; z-index: 2;
+        }
+        .action-card:hover .icon-box { transform: translateY(-5px) rotate(-10deg) scale(1.1); }
+        .bg-icon-decor { position: absolute; right: -20px; bottom: -30px; font-size: 8rem; opacity: 0.05; transform: rotate(25deg); transition: 0.5s; z-index: 0; }
+        .action-card:hover .bg-icon-decor { transform: rotate(0deg) scale(1.2) translate(-10px, -10px); opacity: 0.1; }
+
+        /* Specific Action Card Colors */
+        .ac-create-class { border-color: #dcfce7; }
+        .ac-create-class .icon-box { background: linear-gradient(135deg, #10ac84, #1dd1a1); box-shadow: 0 10px 25px rgba(29, 209, 161, 0.4); }
+        .ac-create-class:hover { transform: translateY(-3px) scale(1.02); border-color: #1dd1a1; box-shadow: 0 0 30px rgba(29, 209, 161, 0.2); }
+        .ac-create-class .bg-icon-decor { color: #1dd1a1; }
+
+        .ac-create-test { border-color: #e0f2fe; }
+        .ac-create-test .icon-box { background: linear-gradient(135deg, #2e86de, #54a0ff); box-shadow: 0 10px 25px rgba(84, 160, 255, 0.4); }
+        .ac-create-test:hover { transform: translateY(-3px) scale(1.02); border-color: #54a0ff; box-shadow: 0 0 30px rgba(84, 160, 255, 0.2); }
+        .ac-create-test .bg-icon-decor { color: #54a0ff; }
+
+        .ac-bank { border-color: #f3e8ff; }
+        .ac-bank .icon-box { background: linear-gradient(135deg, #8854d0, #a55eea); box-shadow: 0 10px 25px rgba(165, 94, 234, 0.4); }
+        .ac-bank:hover { transform: translateY(-3px) scale(1.02); border-color: #a55eea; box-shadow: 0 0 30px rgba(165, 94, 234, 0.2); }
+        .ac-bank .bg-icon-decor { color: #a55eea; }
+
+        /* --- GLOBAL SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
+        ::-webkit-scrollbar-button { display: none; }
+
+        /* --- MOBILE --- */
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-100%); transition: transform 0.3s; z-index: 50; }
+            .sidebar.open { transform: translateX(0); box-shadow: 10px 0 50px rgba(0,0,0,0.2); }
+            header { padding-left: 20px; padding-right: 20px; }
+            main { padding: 20px; }
+        }
+    </style>
+</head>
+<body class="h-screen flex">
+
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden backdrop-blur-sm md:hidden" onclick="toggleSidebar()"></div>
+
+    <aside id="sidebar" class="w-[280px] sidebar hidden md:flex flex-col z-50 h-full shadow-xl">
+        <a class='p-8 flex items-center gap-4 hover:opacity-80 transition-opacity cursor-pointer group' href='#'>
+            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20 border border-orange-50 overflow-hidden">
+                <img src="../LOGO.WEBP" alt="Logo" class="w-12 h-12 object-contain drop-shadow-md bg-white rounded-xl p-1 group-hover:scale-105 transition-transform">
+            </div>
+            <div>
+                <h1 class="block text-2xl font-black text-gray-800 tracking-tight leading-none group-hover:text-orange-500 transition-colors">TEACHER</h1>
+                <p class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Dashboard</p>
+            </div>
+        </a>
+
+        <nav class="flex-1 py-4 overflow-y-auto">
+            <a href="index.html" class="nav-item active">
+                <i class="fas fa-th-large w-6"></i> Tổng quan
+            </a>
+            
+            <div class="px-6 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Quản Lý Giảng Dạy</div>
+            <a href="classrooms.html" class="nav-item">
+                <i class="fas fa-chalkboard-teacher w-6"></i> Lớp học của tôi
+            </a>
+            <a href="tests.html" class="nav-item">
+                <i class="fas fa-file-alt w-6"></i> Quản lý đề thi
+            </a>
+            <a href="question-bank.html" class="nav-item">
+                <i class="fas fa-database w-6"></i> Ngân hàng câu hỏi
+            </a>
+
+            <div class="px-6 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Cá Nhân</div>
+            <a href="account.html" class="nav-item">
+                <i class="fas fa-user-cog w-6"></i> Thông tin tài khoản
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-gray-100">
+            <button id="logout-btn" class="w-full py-4 rounded-2xl bg-red-50 text-red-500 font-bold text-sm hover:bg-red-500 hover:text-white transition flex items-center justify-center gap-2 group">
+                <i class="fas fa-sign-out-alt group-hover:-translate-x-1 transition"></i> Đăng xuất
+            </button>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+        
+        <header class="h-24 px-10 flex items-center justify-between flex-shrink-0 z-40">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="md:hidden text-orange-500 text-2xl"><i class="fas fa-bars"></i></button>
+                <div>
+                    <h2 class="text-2xl font-black text-gray-800" id="welcome-msg">Xin chào, Giáo viên</h2>
+                    <p class="text-sm text-gray-500 font-medium" id="current-date">...</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4 bg-white/60 backdrop-blur-md p-2 pl-6 rounded-full border border-white shadow-sm">
+                <div class="text-right hidden sm:block">
+                    <div class="text-[10px] font-bold text-gray-400 uppercase">Giáo Viên</div>
+                    <div class="text-sm font-bold text-gray-800 leading-none truncate max-w-[150px]" id="teacher-name">Loading...</div>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-red-500 text-white flex items-center justify-center font-bold shadow-md overflow-hidden" id="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto p-10 pt-0 relative z-10 custom-scrollbar">
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 animate-fade-in">
+                <div class="stat-card card-blue group">
+                    <div>
+                        <h3 id="count-classes">0</h3>
+                        <p>Lớp học</p>
+                    </div>
+                    <i class="fas fa-chalkboard watermark-icon"></i>
+                </div>
+                <div class="stat-card card-green group">
+                    <div>
+                        <h3 id="count-students">0</h3>
+                        <p>Học sinh</p>
+                    </div>
+                    <i class="fas fa-user-graduate watermark-icon"></i>
+                </div>
+                <div class="stat-card card-orange group">
+                    <div>
+                        <h3 id="count-tests">0</h3>
+                        <p>Đề thi đã tạo</p>
+                    </div>
+                    <i class="fas fa-file-signature watermark-icon"></i>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-lg font-black text-gray-700 mb-6 flex items-center gap-2">
+                    <i class="fas fa-bolt text-yellow-500"></i> Tác vụ nhanh
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div onclick="window.location.href='classrooms.html'" class="action-card ac-create-class group">
+                        <div class="icon-box"><i class="fas fa-plus"></i></div>
+                        <div>
+                            <h4 class="ac-title">Tạo Lớp Mới</h4>
+                            <p class="ac-desc">Thêm lớp & Mời học sinh</p>
+                        </div>
+                        <i class="fas fa-users bg-icon-decor"></i>
+                    </div>
+
+                    <div onclick="window.location.href='create-test.html'" class="action-card ac-create-test group">
+                        <div class="icon-box"><i class="fas fa-file-medical"></i></div>
+                        <div>
+                            <h4 class="ac-title">Soạn Đề Thi</h4>
+                            <p class="ac-desc">Tạo đề & Giao bài tập</p>
+                        </div>
+                        <i class="fas fa-file-alt bg-icon-decor"></i>
+                    </div>
+
+                    <div onclick="window.location.href='question-bank.html'" class="action-card ac-bank group">
+                        <div class="icon-box"><i class="fas fa-database"></i></div>
+                        <div>
+                            <h4 class="ac-title">Ngân Hàng Câu Hỏi</h4>
+                            <p class="ac-desc">Quản lý kho dữ liệu</p>
+                        </div>
+                        <i class="fas fa-layer-group bg-icon-decor"></i>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // UI
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('vi-VN', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
+
+        window.toggleSidebar = () => {
+            const sb = document.getElementById('sidebar');
+            const ol = document.getElementById('sidebar-overlay');
+            if (sb.classList.contains('hidden')) {
+                sb.classList.remove('hidden'); ol.classList.remove('hidden'); // Mobile logic if needed
+            } else {
+                sb.classList.toggle('open'); ol.classList.toggle('hidden');
+            }
+        };
+
+        // AUTH & DATA
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userRef = doc(db, "users", user.uid);
+                const snap = await getDoc(userRef);
+
+                if (snap.exists()) {
+                    const data = snap.data();
+                    
+                    // Check Role
+                    if (data.role !== 'teacher') {
+                        alert("Quyền hạn không hợp lệ!");
+                        window.location.href = data.role === 'admin' ? '/admin.html' : '../index.html';
+                        return;
+                    }
+
+                    // Render Info
+                    document.getElementById('welcome-msg').innerText = `Xin chào, ${data.name}`;
+                    document.getElementById('teacher-name').innerText = data.name;
+                    
+                    if (data.photoURL || data.customAvatar) {
+                        document.getElementById('user-avatar').innerHTML = `<img src="${data.customAvatar || data.photoURL}" class="w-full h-full object-cover">`;
+                    } else {
+                        document.getElementById('user-avatar').innerHTML = (data.name || "T").charAt(0).toUpperCase();
+                    }
+
+                    // Realtime Stats
+                    listenStats(user.uid);
+                } else {
+                    window.location.href = "../log.html";
+                }
+            } else {
+                window.location.href = "../log.html";
+            }
+        });
+
+        function listenStats(uid) {
+            // Count Classes & Students
+            const qClass = query(collection(db, "classrooms"), where("teacherId", "==", uid));
+            onSnapshot(qClass, (snap) => {
+                document.getElementById('count-classes').innerText = snap.size;
+                let totalStudents = 0;
+                snap.forEach(d => { totalStudents += (d.data().students || []).length; });
+                document.getElementById('count-students').innerText = totalStudents;
+            });
+
+            // Count Tests
+            const qTests = query(collection(db, "tests"), where("authorId", "==", uid));
+            onSnapshot(qTests, (snap) => {
+                document.getElementById('count-tests').innerText = snap.size;
+            });
+        }
+
+        document.getElementById('logout-btn').onclick = () => signOut(auth);
+    </script>
+</body>
+</html>

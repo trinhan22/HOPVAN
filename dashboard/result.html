@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết Quả & Chấm Thi - HopVan</title>
+    
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        :root { --primary: #FF8F50; --primary-dark: #ea580c; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #FFF5EC; min-height: 100vh; color: #334155; overflow-x: hidden; }
+        
+        /* Background */
+        .fixed-bg { position: fixed; inset: 0; z-index: -10; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.6; animation: float 10s infinite alternate; }
+        .blob-1 { width: 500px; height: 500px; background: #ffe4d3; top: -100px; left: -100px; }
+        .blob-2 { width: 400px; height: 400px; background: #ffdec2; bottom: -50px; right: -50px; }
+        @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 50px); } }
+
+        /* UI Components */
+        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border: 1px solid white; box-shadow: 0 20px 60px -10px rgba(255, 143, 80, 0.15); border-radius: 28px; }
+        
+        .score-circle { width: 150px; height: 150px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; margin: 0 auto; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); transition: 0.5s; }
+        .score-circle.graded { background: conic-gradient(var(--primary) 0%, #fed7aa 0%); box-shadow: 0 10px 40px rgba(255, 143, 80, 0.3); }
+        .score-inner { width: 120px; height: 120px; background: white; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+        .q-card { background: white; border-radius: 20px; padding: 28px; margin-bottom: 24px; border: 1px solid #f1f5f9; box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: 0.2s; position: relative; }
+        .q-content { font-family: 'Merriweather', serif; font-size: 1.05rem; line-height: 1.8; color: #1e293b; margin-bottom: 20px; }
+        
+        .ans-box { padding: 14px 18px; border-radius: 14px; margin-top: 10px; border: 2px solid transparent; font-size: 0.95rem; font-weight: 600; display: flex; align-items: flex-start; gap: 12px; }
+        .ans-correct { background: #dcfce7; border-color: #22c55e; color: #14532d; }
+        .ans-wrong { background: #fee2e2; border-color: #ef4444; color: #7f1d1d; }
+        .ans-neutral { background: #f8fafc; border-color: #e2e8f0; color: #64748b; }
+        .ans-selected { background: #eff6ff; border-color: #3b82f6; color: #1e40af; }
+
+        /* GRADING UI (TEACHER) */
+        .grading-panel { background: #fff7ed; border: 2px dashed #fed7aa; border-radius: 18px; padding: 20px; margin-top: 24px; position: relative; }
+        .grading-label { position: absolute; top: -12px; left: 24px; background: #fff7ed; color: #ea580c; font-weight: 900; font-size: 0.75rem; padding: 2px 10px; border-radius: 6px; letter-spacing: 1px; border: 1px solid #fed7aa; }
+        
+        .grade-input { width: 100%; border: 1px solid #fdba74; border-radius: 12px; padding: 12px; outline: none; transition: 0.2s; background: white; font-weight: 600; color: #c2410c; }
+        .grade-input:focus { border-color: #ea580c; box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.1); }
+        .grade-score-input { font-size: 1.5rem; text-align: center; color: #ea580c; font-weight: 900; }
+
+        /* STUDENT VIEW (READ ONLY) */
+        .grading-readonly { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px; padding: 20px; margin-top: 20px; }
+        .grading-readonly .label { color: #15803d; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; margin-bottom: 4px; }
+
+        /* Sticky Footer */
+        .teacher-footer { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(15px); border-top: 1px solid #fed7aa; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; z-index: 50; box-shadow: 0 -10px 30px rgba(0,0,0,0.05); transform: translateY(100%); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .teacher-footer.active { transform: translateY(0); }
+
+        /* Status Badges */
+        .st-badge { padding: 6px 16px; border-radius: 30px; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px; }
+        .st-wait { background: #fef9c3; color: #854d0e; border: 1px solid #facc15; }
+        .st-done { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
+
+        /* --- GLOBAL SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
+        ::-webkit-scrollbar-button { display: none; }
+    </style>
+</head>
+<body class="p-4 md:p-8 overflow-y-auto custom-scrollbar pb-40">
+
+    <div class="fixed-bg"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="max-w-5xl mx-auto flex justify-between items-center mb-8 relative z-20">
+        <button onclick="history.back()" class="flex items-center gap-2 text-gray-500 font-bold hover:text-orange-600 transition bg-white/60 px-5 py-2.5 rounded-xl backdrop-blur-sm shadow-sm hover:shadow-md">
+            <i class="fas fa-arrow-left"></i> <span>Quay lại</span>
+        </button>
+        <div class="flex items-center gap-3 bg-white/80 p-2 pr-5 rounded-full shadow-sm backdrop-blur-sm border border-white">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-red-500 text-white flex items-center justify-center font-bold shadow-md" id="user-avatar">U</div>
+            <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase" id="role-badge">Học sinh</p>
+                <p class="text-sm font-bold text-gray-800 leading-none truncate max-w-[150px]" id="user-name"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading" class="flex flex-col items-center justify-center py-40">
+        <div class="relative">
+            <div class="w-16 h-16 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin"></div>
+            <div class="absolute inset-0 flex items-center justify-center font-black text-orange-500 text-xs"></div>
+        </div>
+        <p class="text-gray-500 font-bold mt-4 animate-pulse">Đang tải kết quả...</p>
+    </div>
+
+    <div id="error-screen" class="hidden flex flex-col items-center justify-center py-20 text-center">
+        <div class="w-24 h-24 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-4xl mb-6 shadow-sm"><i class="fas fa-search"></i></div>
+        <h3 class="text-2xl font-black text-gray-800">Không tìm thấy bài làm</h3>
+        <p class="text-gray-500 mt-2 max-w-md mx-auto" id="error-msg">Hệ thống không tìm thấy dữ liệu phù hợp.</p>
+        <button onclick="location.href='index.html'" class="mt-8 px-8 py-3 bg-gray-800 text-white rounded-xl font-bold hover:bg-black transition shadow-lg">Về trang chủ</button>
+    </div>
+
+    <div id="main-content" class="max-w-5xl mx-auto hidden animate-fade-in">
+        
+        <div class="glass-panel p-8 mb-8 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-orange-400 to-red-500"></div>
+            
+            <div class="text-center mb-10">
+                <span id="status-badge" class="st-badge st-wait mb-4 inline-block shadow-sm">Đang tải...</span>
+                <h1 class="text-3xl md:text-4xl font-black text-gray-800 mb-2 leading-tight" id="test-name"></h1>
+                <p class="text-gray-500 font-medium flex items-center justify-center gap-2">
+                    <i class="far fa-clock"></i> <span id="submit-time">--:--</span>
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center relative z-10">
+                <div class="score-circle" id="score-ring">
+                    <div class="score-inner">
+                        <span class="text-5xl font-black text-gray-800 tracking-tighter" id="final-score">--</span>
+                        <span class="text-[10px] font-bold text-gray-400 uppercase mt-1 tracking-wider">Tổng Điểm</span>
+                    </div>
+                </div>
+
+                <div class="col-span-2 grid grid-cols-2 gap-4">
+                    <div class="bg-white/60 p-6 rounded-2xl border border-white shadow-sm hover:shadow-md transition">
+                        <div class="flex items-center gap-2 mb-2 text-blue-600 font-black text-xs uppercase tracking-wider">
+                            <i class="fas fa-check-square text-lg"></i> Trắc Nghiệm
+                        </div>
+                        <p class="text-4xl font-black text-gray-800" id="mcq-score">0</p>
+                        <p class="text-xs text-gray-500 font-medium mt-1" id="mcq-detail">0 câu đúng</p>
+                    </div>
+                    <div class="bg-white/60 p-6 rounded-2xl border border-white shadow-sm hover:shadow-md transition">
+                        <div class="flex items-center gap-2 mb-2 text-orange-600 font-black text-xs uppercase tracking-wider">
+                            <i class="fas fa-pen-nib text-lg"></i> Tự Luận
+                        </div>
+                        <p class="text-4xl font-black text-gray-800" id="essay-score">--</p>
+                        <p class="text-xs text-gray-500 font-medium mt-1 italic" id="essay-status">Chờ chấm...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-section" class="mt-10 pt-8 border-t border-gray-100">
+                <label class="block text-xs font-black text-gray-400 uppercase mb-4 tracking-widest flex items-center gap-2">
+                    <i class="fas fa-comment-dots text-orange-500"></i> Lời phê của giáo viên
+                </label>
+                <div id="feedback-area">
+                    </div>
+            </div>
+        </div>
+
+        <div class="glass-panel p-6 md:p-10 bg-white/95">
+            <div class="flex justify-between items-center mb-8 border-b pb-6 border-gray-100">
+                <h3 class="text-xl font-black text-gray-800 flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center"><i class="fas fa-list-ul"></i></span>
+                    Chi tiết bài làm
+                </h3>
+                <div class="text-xs font-bold text-gray-500 bg-gray-100 px-4 py-2 rounded-full border border-gray-200 shadow-sm" id="view-mode"></div>
+            </div>
+            
+            <div id="questions-list" class="space-y-8"></div>
+        </div>
+    </div>
+
+    <div id="teacher-footer" class="teacher-footer">
+        <div class="flex items-center gap-4">
+            <div class="bg-orange-500 text-white p-3 rounded-2xl font-bold text-2xl w-16 h-16 flex items-center justify-center shadow-lg shadow-orange-500/30 border-4 border-white">
+                <span id="live-total-score">--</span>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">TỔNG ĐIỂM DỰ KIẾN</p>
+                <p class="text-sm font-bold text-gray-800">Đang chấm bài...</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-6">
+            <label class="flex items-center gap-3 cursor-pointer group">
+                <div class="relative">
+                    <input type="checkbox" id="publish-check" class="peer sr-only">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                </div>
+                <span class="text-sm font-bold text-gray-600 group-hover:text-gray-900 transition">Công bố điểm cho HS</span>
+            </label>
+            <button onclick="saveGrading()" id="save-btn" class="bg-gray-900 text-white px-8 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl hover:-translate-y-1 transition flex items-center gap-3">
+                <i class="fas fa-save"></i> <span>Lưu Kết Quả</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-900/90 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-2xl transition-all duration-300 translate-y-20 opacity-0 font-bold text-sm z-[200] flex items-center gap-3 border border-white/10">
+        <i class="fas fa-check-circle text-green-400"></i> <span id="toast-msg">Success</span>
+    </div>
+
+<script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, serverTimestamp, collection, getDocs, query, where, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- STATE ---
+        let currentUser = null;
+        let currentRole = 'student';
+        let submissionId = null;
+        let submissionData = null;
+        let questions = [];
+        let gradingData = { scores: {}, comments: {} };
+
+        // --- 1. KHỞI TẠO & AUTH ---
+        onAuthStateChanged(auth, async (user) => {
+            if(user) {
+                currentUser = user;
+                try {
+                    // Lấy Role
+                    const uSnap = await getDoc(doc(db, "users", user.uid));
+                    if(uSnap.exists()) {
+                        const uData = uSnap.data();
+                        currentRole = uData.role || 'student';
+                        document.getElementById('user-name').innerText = uData.name || "Người dùng";
+                        document.getElementById('role-badge').innerText = currentRole === 'teacher' ? 'GIÁO VIÊN' : 'HỌC SINH';
+                        document.getElementById('user-avatar').innerText = (uData.name || 'U').charAt(0).toUpperCase();
+                    }
+                    // Bắt đầu tìm bài làm
+                    await detectSubmissionStrategy();
+                } catch (e) {
+                    console.error(e);
+                    showError("Lỗi xác thực người dùng.");
+                }
+            } else window.location.href = "../log.html";
+        });
+
+        // --- 2. CHIẾN THUẬT TÌM BÀI LÀM (QUAN TRỌNG) ---
+        async function detectSubmissionStrategy() {
+            const params = new URLSearchParams(window.location.search);
+            let urlSubId = params.get('submissionId');
+            const urlTestId = params.get('testId');
+
+            // Case 1: Có ID bài làm trực tiếp (submissionId)
+            if (urlSubId && urlSubId !== "undefined" && urlSubId !== "null") {
+                console.log("🎯 Chiến thuật 1: Load theo ID trực tiếp");
+                await loadData(urlSubId);
+                return;
+            }
+
+            // Case 2: Chỉ có ID đề thi (testId) -> Tự đi tìm bài làm của User này
+            if (urlTestId && currentRole === 'student') {
+                console.log("🔍 Chiến thuật 2: Auto-find bài làm cho đề " + urlTestId);
+                try {
+                    // Query đơn giản (Không dùng orderBy để tránh lỗi Index)
+                    const q = query(
+                        collection(db, "submissions"),
+                        where("testId", "==", urlTestId),
+                        where("studentId", "==", currentUser.uid)
+                    );
+                    
+                    const snap = await getDocs(q);
+                    
+                    if (snap.empty) {
+                        showError("Bạn chưa làm bài kiểm tra này, hoặc dữ liệu chưa được lưu.");
+                        return;
+                    }
+
+                    // Lọc lấy bài mới nhất bằng JS (Client-side sorting)
+                    const submissions = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                    submissions.sort((a, b) => {
+                        const tA = a.submittedAt?.toMillis() || 0;
+                        const tB = b.submittedAt?.toMillis() || 0;
+                        return tB - tA; // Mới nhất lên đầu
+                    });
+
+                    const latestSubId = submissions[0].id;
+                    
+                    // Cập nhật URL để lần sau F5 nhanh hơn
+                    const newUrl = new URL(window.location);
+                    newUrl.searchParams.set('submissionId', latestSubId);
+                    window.history.replaceState({}, '', newUrl);
+
+                    await loadData(latestSubId);
+
+                } catch (e) {
+                    console.error("Auto-find error:", e);
+                    showError("Lỗi tìm kiếm dữ liệu: " + e.message);
+                }
+                return;
+            }
+            
+            // Case 3: Thử lấy từ Session Storage (Cứu cánh cuối cùng)
+            const sessionSubId = sessionStorage.getItem('latestResultId');
+            if (sessionSubId && sessionSubId !== "undefined") {
+                console.log("📦 Chiến thuật 3: Load từ bộ nhớ tạm");
+                await loadData(sessionSubId);
+                return;
+            }
+
+            showError("Không tìm thấy thông tin bài làm. Vui lòng kiểm tra lại đường dẫn.");
+        }
+
+        // --- 3. TẢI DỮ LIỆU ---
+        async function loadData(id) {
+            submissionId = id;
+            try {
+                const subRef = doc(db, "submissions", id);
+                const subSnap = await getDoc(subRef);
+                
+                if (!subSnap.exists()) throw new Error("Bài làm không tồn tại trên hệ thống.");
+                
+                submissionData = subSnap.data();
+
+                // Bảo mật: Học sinh không xem bài người khác
+                if (currentRole === 'student' && submissionData.studentId !== currentUser.uid) {
+                    throw new Error("Bạn không có quyền truy cập bài làm này.");
+                }
+
+                // Init Grading Data (Teacher)
+                if (currentRole === 'teacher') {
+                    gradingData.scores = submissionData.essayScores || {};
+                    gradingData.comments = submissionData.questionComments || {};
+                }
+
+                // Tải câu hỏi
+                questions = await fetchQuestions(submissionData.testId);
+                
+                // Render UI
+                renderUI();
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+
+            } catch(e) {
+                console.error(e);
+                showError(e.message);
+            }
+        }
+
+        async function fetchQuestions(testId) {
+            const snap = await getDoc(doc(db, "tests", testId));
+            if(!snap.exists()) return []; 
+            const d = snap.data();
+            
+            let qs = [];
+            // Case 1: Câu hỏi nhúng sẵn
+            if (d.questions && d.questions.length > 0) {
+                qs = d.questions.map((q,i)=>({...q, id:q.id||`q_${i}`}));
+            } 
+            // Case 2: Tham chiếu ID (Chunking)
+            else if (d.questionIds && d.questionIds.length > 0) {
+                const ids = d.questionIds;
+                const chunks = [];
+                for(let i=0; i<ids.length; i+=10) chunks.push(ids.slice(i,i+10));
+                
+                for(const chunk of chunks) {
+                    const qSnap = await getDocs(query(collection(db,"questions"), where("__name__","in",chunk)));
+                    qSnap.forEach(doc => qs.push({id:doc.id, ...doc.data()}));
+                }
+                qs.sort((a,b) => ids.indexOf(a.id) - ids.indexOf(b.id));
+            }
+            return qs;
+        }
+
+        // --- 4. RENDER GIAO DIỆN ---
+        function renderUI() {
+            const isTeacher = currentRole === 'teacher';
+            const isPublished = submissionData.isPublished === true;
+            const canViewFull = isTeacher || isPublished;
+
+            // INFO
+            document.getElementById('test-name').innerText = submissionData.testName || "Bài Kiểm Tra";
+            document.getElementById('submit-time').innerText = "Nộp: " + (submissionData.submittedAt?.toDate().toLocaleString('vi-VN') || "N/A");
+
+            // SCORES
+            const mcqScore = submissionData.quizScore || 0;
+            const totalMcq = submissionData.totalQuiz || 0;
+            document.getElementById('mcq-score').innerText = mcqScore;
+            document.getElementById('mcq-detail').innerText = `${mcqScore}/${totalMcq} câu đúng`;
+
+            // Logic tính điểm tổng hiển thị
+            let finalScore = submissionData.score || 0;
+            // Nếu là GV đang xem và chưa lưu điểm tổng, tự cộng live
+            if (isTeacher && finalScore === 0) {
+                const essayTotal = Object.values(gradingData.scores).reduce((a,b)=>a+b, 0);
+                finalScore = mcqScore + essayTotal; 
+            }
+
+            if (canViewFull) {
+                // VIEW: PUBLIC / TEACHER
+                document.getElementById('final-score').innerText = Number(finalScore).toFixed(1);
+                document.getElementById('essay-score').innerText = submissionData.essayScore || 0;
+                document.getElementById('essay-status').innerText = isPublished ? "Đã chấm xong" : "Đang chấm...";
+                
+                // Ring Color
+                const ring = document.getElementById('score-ring');
+                ring.classList.add('graded');
+                const color = finalScore >= 8 ? '#10B981' : (finalScore >= 5 ? '#F59E0B' : '#EF4444');
+                ring.style.background = `conic-gradient(${color} ${(finalScore/10)*100}%, #f1f5f9 0%)`;
+
+                // Badge
+                const badge = document.getElementById('status-badge');
+                if(isPublished) { badge.innerText="ĐÃ CÔNG BỐ"; badge.className="st-badge st-done"; }
+                else { badge.innerText="ĐANG CHẤM"; badge.className="st-badge st-wait"; }
+
+                if(finalScore >= 8 && !isTeacher) launchConfetti();
+            } else {
+                // VIEW: STUDENT PENDING
+                document.getElementById('status-badge').innerText = "CHỜ CHẤM ĐIỂM";
+                document.getElementById('final-score').innerHTML = '<i class="fas fa-hourglass-half opacity-20"></i>';
+                document.getElementById('essay-score').innerText = "--";
+            }
+
+            // FEEDBACK AREA
+            const fbArea = document.getElementById('feedback-area');
+            if(isTeacher) {
+                fbArea.innerHTML = `<textarea id="teacher-general-feedback" class="w-full p-4 border border-orange-200 rounded-2xl bg-white focus:border-orange-500 outline-none transition shadow-sm h-32 resize-none text-gray-700" placeholder="Nhập lời phê chung...">${submissionData.teacherComment || ''}</textarea>`;
+                document.getElementById('teacher-footer').classList.add('active');
+                document.getElementById('live-total-score').innerText = Number(finalScore).toFixed(1);
+                document.getElementById('publish-check').checked = isPublished;
+            } else {
+                if(canViewFull && submissionData.teacherComment) {
+                    fbArea.innerHTML = `<div class="bg-orange-50 p-5 rounded-2xl border border-orange-100 italic text-gray-700 relative"><i class="fas fa-quote-left text-orange-200 absolute top-2 left-2 text-2xl"></i><span class="relative z-10 ml-4">${submissionData.teacherComment}</span></div>`;
+                } else {
+                    fbArea.innerHTML = `<p class="text-gray-400 italic text-sm text-center">Chưa có nhận xét.</p>`;
+                }
+            }
+
+            // QUESTIONS LIST
+            const listEl = document.getElementById('questions-list');
+            document.getElementById('view-mode').innerText = canViewFull ? "Chi tiết đầy đủ" : "Ẩn đáp án đúng";
+            
+            if (questions.length === 0) {
+                listEl.innerHTML = `<p class="text-center text-gray-400">Không tải được nội dung đề thi gốc (Có thể đề đã bị xóa).</p>`;
+                return;
+            }
+
+            listEl.innerHTML = questions.map((q, idx) => {
+                const ans = submissionData.answers ? submissionData.answers[q.id] : null;
+                const num = idx + 1;
+
+                if (q.type === 'quiz') {
+                    // --- MCQ ---
+                    const opts = (q.options||[]).map((opt, i) => {
+                        const char = String.fromCharCode(65+i);
+                        let cls = "ans-neutral";
+                        let icon = "";
+                        
+                        if (canViewFull) {
+                            if (String(i) === String(q.correct)) { cls = "ans-correct"; icon = '<i class="fas fa-check text-green-700"></i>'; }
+                            else if (String(i) === String(ans) && String(i) !== String(q.correct)) { cls = "ans-wrong"; icon = '<i class="fas fa-times text-red-700"></i>'; }
+                        } else {
+                            if (String(i) === String(ans)) { cls = "ans-selected"; icon = '<i class="fas fa-user text-blue-500"></i>'; }
+                        }
+                        return `<div class="ans-box ${cls}"><span class="font-black w-6 text-gray-400">${char}.</span><span class="flex-1">${opt}</span>${icon}</div>`;
+                    }).join('');
+
+                    return `
+                    <div class="q-card">
+                        <div class="flex justify-between mb-3 pl-1">
+                            <span class="font-black text-gray-400 text-sm">CÂU ${num}</span>
+                            ${canViewFull ? (String(ans)===String(q.correct)?'<span class="text-green-600 font-bold text-xs bg-green-100 px-2 py-1 rounded">ĐÚNG</span>':'<span class="text-red-600 font-bold text-xs bg-red-100 px-2 py-1 rounded">SAI</span>') : '<span class="text-gray-400 font-bold text-xs bg-gray-100 px-2 py-1 rounded">ĐÃ LÀM</span>'}
+                        </div>
+                        <div class="q-content font-bold text-gray-800">${q.question}</div>
+                        <div class="space-y-1">${opts}</div>
+                        ${(canViewFull && q.explanation) ? `<div class="mt-4 p-4 bg-blue-50 text-blue-800 text-sm rounded-xl border border-blue-100 leading-relaxed">💡 <b>Giải thích:</b> ${q.explanation}</div>` : ''}
+                    </div>`;
+                } 
+                else {
+                    // --- ESSAY ---
+                    let teacherTools = '';
+                    if (isTeacher) {
+                        const curScore = gradingData.scores[q.id] || 0;
+                        const curCmt = gradingData.comments[q.id] || '';
+                        teacherTools = `
+                        <div class="grading-panel">
+                            <div class="grading-label">CHẤM ĐIỂM</div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Điểm số (0-10)</label>
+                                    <input type="number" class="grade-input grade-score-input" value="${curScore}" min="0" max="10" step="0.25" oninput="window.updateLiveScore('${q.id}', this.value)">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Nhận xét chi tiết</label>
+                                    <input type="text" class="grade-input text-sm h-[54px]" value="${curCmt}" placeholder="Nhập nhận xét..." onchange="window.updateComment('${q.id}', this.value)">
+                                </div>
+                            </div>
+                        </div>`;
+                    } else if (canViewFull) {
+                        const s = submissionData.essayScores?.[q.id];
+                        const c = submissionData.questionComments?.[q.id];
+                        if (s !== undefined || c) {
+                            teacherTools = `
+                            <div class="grading-readonly">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="label">ĐÁNH GIÁ CỦA GIÁO VIÊN</span>
+                                    ${s !== undefined ? `<span class="bg-green-100 text-green-700 font-black px-3 py-1 rounded-full text-sm">+${s} điểm</span>` : ''}
+                                </div>
+                                ${c ? `<p class="text-sm text-gray-800 bg-white p-3 rounded-lg border border-green-100">"${c}"</p>` : ''}
+                            </div>`;
+                        }
+                    }
+
+                    return `
+                    <div class="q-card border-l-4 border-orange-400">
+                        <div class="flex justify-between mb-3 pl-1">
+                            <span class="font-black text-gray-400 text-sm">CÂU ${num} (Tự luận)</span>
+                            <span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-xs font-bold border border-orange-200">
+                                ${isTeacher || isPublished ? 'ĐÃ CHẤM' : 'CHỜ CHẤM'}
+                            </span>
+                        </div>
+                        <div class="q-content text-sm text-gray-600 bg-gray-50 p-4 rounded-xl mb-4 italic leading-relaxed border border-gray-100">
+                            ${q.type === 'reading' ? `(Đọc hiểu) ${q.text.substring(0,100)}...` : q.topic}
+                        </div>
+                        <div class="p-5 bg-white rounded-xl border-2 border-gray-100">
+                            <p class="text-xs font-bold text-gray-400 uppercase mb-2 flex items-center gap-1"><i class="fas fa-pen"></i> Bài làm của bạn:</p>
+                            <p class="text-gray-800 font-serif whitespace-pre-wrap text-sm leading-7">${formatEssay(ans)}</p>
+                        </div>
+                        ${teacherTools}
+                    </div>`;
+                }
+            }).join('');
+
+            if(window.renderMathInElement) renderMathInElement(listEl);
+        }
+
+        // --- GLOBAL ACTIONS ---
+        window.updateLiveScore = (qId, val) => {
+            gradingData.scores[qId] = parseFloat(val) || 0;
+            const totalEssay = Object.values(gradingData.scores).reduce((a,b)=>a+b, 0);
+            const final = (submissionData.quizScore || 0) + totalEssay;
+            document.getElementById('live-total-score').innerText = final.toFixed(1);
+        };
+
+        window.updateComment = (qId, val) => { gradingData.comments[qId] = val; };
+
+        window.saveGrading = async () => {
+            const btn = document.querySelector('#save-btn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>Đang lưu...</span>`;
+            btn.disabled = true;
+
+            try {
+                const totalEssay = Object.values(gradingData.scores).reduce((a,b)=>a+b, 0);
+                const finalScore = (submissionData.quizScore || 0) + totalEssay;
+                const genCmt = document.getElementById('teacher-general-feedback').value;
+                const doPublish = document.getElementById('publish-check').checked;
+
+                await updateDoc(doc(db, "submissions", submissionId), {
+                    essayScore: totalEssay,
+                    essayScores: gradingData.scores,
+                    questionComments: gradingData.comments,
+                    teacherComment: genCmt,
+                    score: finalScore,
+                    isPublished: doPublish,
+                    gradedAt: serverTimestamp()
+                });
+
+                showToast("Đã lưu kết quả thành công!");
+                setTimeout(() => location.reload(), 1000);
+            } catch(e) {
+                console.error(e);
+                alert("Lỗi lưu: " + e.message);
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            }
+        };
+
+        // --- UTILS ---
+        function formatEssay(ans) {
+            if(!ans) return "(Bỏ trống)";
+            if(typeof ans === 'object') return Object.entries(ans).map(([k,v]) => `Ý ${parseInt(k)+1}: ${v}`).join('\n\n');
+            return ans;
+        }
+        function showError(msg) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error-screen').classList.remove('hidden');
+            document.getElementById('error-msg').innerText = msg;
+        }
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            t.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(()=>t.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+        function launchConfetti() {
+            const c = document.getElementById('confetti-canvas'); const ctx = c.getContext('2d');
+            c.width=innerWidth; c.height=innerHeight;
+            let p=[]; for(let i=0;i<100;i++) p.push({x:Math.random()*c.width,y:Math.random()*c.height-c.height,r:Math.random()*6+2,d:Math.random()*100,c:`hsl(${Math.random()*360},100%,60%)`,t:Math.random()*10-10});
+            function d(){ctx.clearRect(0,0,c.width,c.height);p.forEach(x=>{ctx.beginPath();ctx.lineWidth=x.r;ctx.strokeStyle=x.c;ctx.moveTo(x.x+x.t,x.y);ctx.lineTo(x.x,x.y+x.r*2);ctx.stroke();x.y+=5;x.t=Math.sin(x.d)*5});requestAnimationFrame(d)} d();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài Khoản Giáo Viên - HopVan</title>
+    
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
+            --bg-glass: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --blur: 25px;
+            --sidebar-width: 260px;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #FFF5EC; 
+            height: 100vh; overflow: hidden; display: flex; 
+        }
+
+        /* --- BACKGROUND --- */
+        .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.2; animation: floatBlob 10s infinite alternate; }
+        .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
+        .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
+        .blob-3 { width: 300px; height: 300px; background: #FFD1D1; top: 40%; left: 40%; animation-delay: -2s; }
+        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
+
+        /* --- SIDEBAR --- */
+        aside { width: var(--sidebar-width); background: rgba(255,255,255,0.9); border-right: 1px solid white; display: flex; flex-direction: column; z-index: 50; backdrop-filter: blur(20px); }
+        .nav-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 24px; margin: 4px 16px; border-radius: 16px;
+            color: #64748B; font-weight: 700; font-size: 0.95rem;
+            cursor: pointer; text-decoration: none; transition: 0.3s;
+        }
+        .nav-item:hover { background: rgba(255, 143, 80, 0.1); color: var(--primary); }
+        .nav-item.active { background: var(--primary-gradient); color: white; box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4); }
+        .nav-item.active i { color: white; }
+
+        /* --- MAIN CONTENT --- */
+        .right-panel { 
+            flex: 1; display: flex; flex-direction: column; 
+            background: var(--bg-glass); backdrop-filter: blur(var(--blur)); 
+            border-left: 1px solid var(--glass-border); position: relative; 
+        }
+
+        /* --- GLASS PANEL & INPUTS --- */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px);
+            border: 1px solid white; border-radius: 24px; padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.03); position: relative; overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .glass-panel:hover { transform: translateY(-3px); box-shadow: 0 20px 40px rgba(255, 143, 80, 0.1); border-color: #ffedd5; }
+        
+        .panel-watermark {
+            position: absolute; right: -20px; bottom: -20px; font-size: 10rem; 
+            opacity: 0.05; transform: rotate(-15deg); pointer-events: none; transition: 0.5s;
+        }
+        .glass-panel:hover .panel-watermark { transform: rotate(0deg) scale(1.1); opacity: 0.1; }
+
+        .glass-input {
+            width: 100%; padding: 12px 16px; border-radius: 14px; background: #f9fafb; border: 1px solid #e5e7eb;
+            font-weight: 600; color: #374151; outline: none; transition: 0.2s;
+        }
+        .glass-input:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(255, 143, 80, 0.15); }
+        .glass-input:disabled { background: #f3f4f6; color: #9ca3af; cursor: not-allowed; }
+
+        .label-custom { display: block; font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+
+        /* --- AVATAR --- */
+        .avatar-container { position: relative; width: 120px; height: 120px; margin: 0 auto 20px; }
+        .avatar-circle {
+            width: 100%; height: 100%; border-radius: 50%; border: 4px solid white;
+            background: var(--primary-gradient); display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 3rem; font-weight: 800; box-shadow: 0 10px 30px rgba(255, 143, 80, 0.3);
+            overflow: hidden;
+        }
+        .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-edit {
+            position: absolute; bottom: 0; right: 0; width: 36px; height: 36px;
+            background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: #64748b; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.2s; border: 1px solid #e2e8f0;
+        }
+        .avatar-edit:hover { background: var(--primary); color: white; transform: scale(1.1); }
+
+        /* --- BUTTONS --- */
+        .btn-primary {
+            background: var(--primary-gradient); color: white; padding: 12px 24px; border-radius: 12px; font-weight: 800;
+            transition: all 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 15px rgba(255, 143, 80, 0.3);
+        }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 143, 80, 0.4); }
+        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        .btn-danger { background: #fee2e2; color: #ef4444; padding: 10px 20px; border-radius: 12px; font-weight: 700; transition: 0.2s; }
+        .btn-danger:hover { background: #fecaca; }
+
+        /* --- TOAST --- */
+        #toast { position: fixed; top: 30px; right: 30px; background: white; padding: 15px 25px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 10000; transform: translateX(200%); transition: 0.5s; }
+        #toast.show { transform: translateX(0); }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            aside { position: fixed; left: -100%; top: 0; bottom: 0; z-index: 50; transition: 0.3s; }
+            aside.open { left: 0; }
+            .grid-layout { grid-template-columns: 1fr; }
+        }
+
+        /* --- GLOBAL SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
+        ::-webkit-scrollbar-button { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white z-40 flex items-center justify-between px-5 border-b border-gray-100">
+        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl"><i class="fas fa-bars"></i></button>
+        <span class="font-black text-gray-800 text-lg">TÀI KHOẢN</span>
+        <div class="w-8"></div>
+    </div>
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden backdrop-blur-sm md:hidden" onclick="toggleSidebar()"></div>
+
+    <aside id="sidebar" class="w-[280px] sidebar hidden md:flex flex-col z-50 h-full shadow-xl">
+        <a class='p-8 flex items-center gap-4 hover:opacity-80 transition-opacity cursor-pointer group' href='#'>
+            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20 border border-orange-50 overflow-hidden">
+                <img src="../LOGO.WEBP" alt="Logo" class="w-12 h-12 object-contain drop-shadow-md bg-white rounded-xl p-1 group-hover:scale-105 transition-transform">
+            </div>
+            <div>
+                <h1 class="block text-2xl font-black text-gray-800 tracking-tight leading-none group-hover:text-orange-500 transition-colors">TEACHER</h1>
+                <p class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Dashboard</p>
+            </div>
+        </a>
+
+        <nav class="flex-1 py-4 overflow-y-auto">
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-th-large w-6"></i> Tổng quan
+            </a>
+            
+            <div class="px-6 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Quản Lý Giảng Dạy</div>
+            <a href="classrooms.html" class="nav-item">
+                <i class="fas fa-chalkboard-teacher w-6"></i> Lớp học của tôi
+            </a>
+            <a href="tests.html" class="nav-item">
+                <i class="fas fa-file-alt w-6"></i> Quản lý đề thi
+            </a>
+            <a href="question-bank.html" class="nav-item">
+                <i class="fas fa-database w-6"></i> Ngân hàng câu hỏi
+            </a>
+
+            <div class="px-6 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Cá Nhân</div>
+            <a href="account.html" class="nav-item active">
+                <i class="fas fa-user-cog w-6"></i> Thông tin tài khoản
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-gray-100">
+            <button id="logout-btn" class="w-full py-4 rounded-2xl bg-red-50 text-red-500 font-bold text-sm hover:bg-red-500 hover:text-white transition flex items-center justify-center gap-2 group">
+                <i class="fas fa-sign-out-alt group-hover:-translate-x-1 transition"></i> Đăng xuất
+            </button>
+        </div>
+    </aside>
+
+    <div class="right-panel">
+        <header class="h-24 px-10 flex items-center justify-between flex-shrink-0 pt-16 md:pt-0 z-40 bg-white/40 backdrop-blur-md border-b border-white">
+            <div>
+                <h2 class="text-3xl font-black text-gray-800">Thông Tin Cá Nhân</h2>
+                <p class="text-gray-500 font-medium text-sm mt-1">Quản lý hồ sơ giáo viên và bảo mật</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden sm:block">
+                    <div class="text-[10px] font-bold text-gray-400 uppercase">Giáo Viên</div>
+                    <div class="text-sm font-bold text-gray-800" id="header-name">Loading...</div>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-red-500 text-white flex items-center justify-center font-bold shadow-md overflow-hidden" id="header-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto px-10 pb-12 pt-8 custom-scroll">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 grid-layout">
+                
+                <div class="lg:col-span-2 glass-panel">
+                    <i class="fas fa-id-card panel-watermark text-orange-400"></i>
+                    
+                    <div class="text-center mb-8">
+                        <div class="avatar-container">
+                            <div class="avatar-circle" id="profile-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <label for="avatar-upload" class="avatar-edit" title="Đổi ảnh đại diện">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                            <input type="file" id="avatar-upload" hidden accept="image/*">
+                        </div>
+                        <h2 class="text-2xl font-black text-gray-800" id="display-name">Loading...</h2>
+                        <span class="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-xs font-bold uppercase tracking-widest mt-2 inline-block">Giáo Viên</span>
+                    </div>
+
+                    <form id="profile-form" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="label-custom">Họ và tên</label>
+                                <input type="text" id="inp-name" class="glass-input" placeholder="Nhập họ tên...">
+                            </div>
+                            <div>
+                                <label class="label-custom">Email đăng nhập</label>
+                                <input type="email" id="inp-email" class="glass-input" disabled>
+                            </div>
+                            <div>
+                                <label class="label-custom">Số điện thoại</label>
+                                <input type="text" id="inp-phone" class="glass-input" placeholder="Nhập số điện thoại...">
+                            </div>
+                            <div>
+                                <label class="label-custom">Trường / Đơn vị công tác</label>
+                                <input type="text" id="inp-school" class="glass-input" placeholder="Nhập tên trường...">
+                            </div>
+                        </div>
+                        <div class="flex justify-end pt-4">
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save"></i> Lưu Thay Đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="glass-panel h-fit">
+                    <h3 class="text-lg font-black text-gray-800 mb-6 flex items-center gap-2">
+                        <i class="fas fa-shield-alt text-orange-500"></i> Bảo Mật
+                    </h3>
+                    
+                    <form id="password-form" class="space-y-5">
+                        <div>
+                            <label class="label-custom">Mật khẩu mới</label>
+                            <input type="password" id="new-pass" class="glass-input" placeholder="••••••••">
+                        </div>
+                        <div>
+                            <label class="label-custom">Xác nhận mật khẩu</label>
+                            <input type="password" id="confirm-pass" class="glass-input" placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="w-full btn-primary bg-gray-800 shadow-none hover:shadow-lg">
+                            Đổi Mật Khẩu
+                        </button>
+                    </form>
+
+                    <div class="mt-8 pt-6 border-t border-gray-100">
+                        <h4 class="text-sm font-bold text-red-500 mb-2">Vùng nguy hiểm</h4>
+                        <p class="text-xs text-gray-400 mb-4">Xóa tài khoản sẽ mất toàn bộ dữ liệu lớp học và đề thi.</p>
+                        <button onclick="alert('Tính năng đang phát triển!')" class="w-full btn-danger">
+                            <i class="fas fa-trash-alt mr-2"></i> Xóa Tài Khoản
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <div id="toast"><i class="fas fa-check-circle"></i> <span id="toast-msg"></span></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+
+        // UI Helpers
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebar-overlay').classList.toggle('hidden');
+        };
+
+        function showToast(msg, type='success') {
+            const t = document.getElementById('toast');
+            const icon = t.querySelector('i');
+            document.getElementById('toast-msg').innerText = msg;
+            
+            if(type === 'error') {
+                t.className = 'text-red-500'; 
+                icon.className = 'fas fa-exclamation-circle';
+            } else {
+                t.className = 'text-green-500';
+                icon.className = 'fas fa-check-circle';
+            }
+            
+            t.classList.add('show'); 
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // Auth
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                loadProfile();
+            } else {
+                window.location.href = "../log.html";
+            }
+        });
+
+        async function loadProfile() {
+            try {
+                const docSnap = await getDoc(doc(db, "users", currentUser.uid));
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    // Fill Data
+                    document.getElementById('display-name').innerText = data.name || "Giáo Viên";
+                    document.getElementById('header-name').innerText = data.name || "Giáo Viên";
+                    document.getElementById('inp-name').value = data.name || "";
+                    document.getElementById('inp-email').value = currentUser.email;
+                    document.getElementById('inp-phone').value = data.phone || "";
+                    document.getElementById('inp-school').value = data.school || "";
+
+                    // Avatar
+                    const avtHtml = (data.photoURL || data.customAvatar) 
+                        ? `<img src="${data.customAvatar || data.photoURL}" class="w-full h-full object-cover">`
+                        : (data.name || "T").charAt(0).toUpperCase();
+                    
+                    document.getElementById('profile-avatar').innerHTML = avtHtml;
+                    document.getElementById('header-avatar').innerHTML = avtHtml;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        // Update Profile
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Đang lưu...'; btn.disabled = true;
+
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    name: document.getElementById('inp-name').value,
+                    phone: document.getElementById('inp-phone').value,
+                    school: document.getElementById('inp-school').value
+                });
+                showToast("Cập nhật hồ sơ thành công!");
+                loadProfile(); // Refresh UI
+            } catch (e) {
+                showToast("Lỗi cập nhật!", 'error');
+            } finally {
+                btn.innerHTML = '<i class="fas fa-save"></i> Lưu Thay Đổi'; btn.disabled = false;
+            }
+        });
+
+        // Upload Avatar
+        document.getElementById('avatar-upload').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 2 * 1024 * 1024) return showToast("Ảnh quá lớn (>2MB)!", 'error');
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async () => {
+                try {
+                    const base64 = reader.result;
+                    await updateDoc(doc(db, "users", currentUser.uid), { customAvatar: base64 });
+                    showToast("Đổi ảnh đại diện thành công!");
+                    loadProfile();
+                } catch (e) { showToast("Lỗi tải ảnh!", 'error'); }
+            };
+        });
+
+        // Change Password
+        document.getElementById('password-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const p1 = document.getElementById('new-pass').value;
+            const p2 = document.getElementById('confirm-pass').value;
+
+            if (p1.length < 6) return showToast("Mật khẩu phải từ 6 ký tự!", 'error');
+            if (p1 !== p2) return showToast("Mật khẩu xác nhận không khớp!", 'error');
+
+            const btn = e.target.querySelector('button');
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Đang đổi...'; btn.disabled = true;
+
+            try {
+                await updatePassword(currentUser, p1);
+                showToast("Đổi mật khẩu thành công!");
+                e.target.reset();
+            } catch (e) {
+                if (e.code === 'auth/requires-recent-login') showToast("Vui lòng đăng nhập lại để đổi mật khẩu!", 'error');
+                else showToast("Lỗi: " + e.message, 'error');
+            } finally {
+                btn.innerHTML = 'Đổi Mật Khẩu'; btn.disabled = false;
+            }
+        });
+
+        document.getElementById('logout-btn').onclick = () => signOut(auth);
+    </script>
+</body>
+</html>

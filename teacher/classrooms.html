@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Lớp Học - HopVan</title>
+    
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
+            --bg-glass: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --blur: 25px;
+            --sidebar-width: 260px;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #FFF5EC; 
+            height: 100vh; overflow: hidden; display: flex; 
+        }
+
+        /* --- BACKGROUND --- */
+        .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.2; animation: floatBlob 10s infinite alternate; }
+        .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
+        .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
+        .blob-3 { width: 300px; height: 300px; background: #FFD1D1; top: 40%; left: 40%; animation-delay: -2s; }
+        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
+
+        aside { width: var(--sidebar-width); background: rgba(255,255,255,0.9); border-right: 1px solid white; display: flex; flex-direction: column; z-index: 50; backdrop-filter: blur(20px); }
+        .nav-item {
+            display: flex; align-items: center; gap: 14px; padding: 14px 24px; margin: 4px 16px; border-radius: 16px;
+            color: #64748B; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-decoration: none; transition: 0.3s;
+        }
+        .nav-item:hover { background: rgba(255, 143, 80, 0.1); color: var(--primary); }
+        .nav-item.active { background: var(--primary-gradient); color: white; box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4); }
+        .nav-item.active i { color: white; }
+
+        /* Main Layout Fix */
+        .right-panel { flex: 1; display: flex; flex-direction: column; background: var(--bg-glass); backdrop-filter: blur(var(--blur)); border-left: 1px solid var(--glass-border); position: relative; }
+        
+        /* Class Card */
+        .class-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; padding-bottom: 80px; }
+        .class-card {
+            background: rgba(255, 255, 255, 0.95); border-radius: 24px; padding: 24px;
+            border: 1px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            transition: all 0.3s; position: relative; overflow: hidden; display: flex; flex-direction: column;
+        }
+        .class-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(255, 143, 80, 0.15); border-color: var(--primary); }
+        
+        .cc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .cc-icon { width: 48px; height: 48px; background: #dcfce7; color: #10b981; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+        .cc-menu-btn { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #94a3b8; cursor: pointer; transition: 0.2s; }
+        .cc-menu-btn:hover { background: #fee2e2; color: #ef4444; }
+
+        .cc-title { font-size: 1.1rem; font-weight: 800; color: #1e293b; line-height: 1.3; cursor: pointer; transition: 0.2s; }
+        .cc-title:hover { color: var(--primary); }
+        .cc-info { font-size: 0.8rem; font-weight: 600; color: #64748b; margin-top: 4px; }
+        
+        .cc-code-box { 
+            background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; 
+            padding: 10px 14px; margin-top: 15px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .cc-code { font-family: monospace; font-weight: 800; color: #ea580c; font-size: 1rem; letter-spacing: 1px; }
+
+        .cc-stats { display: flex; gap: 15px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #f1f5f9; }
+        .cc-stat-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: #64748b; }
+        .cc-stat-item i { color: var(--primary); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px);
+            display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.open { display: flex; opacity: 1; }
+        .modal-box {
+            background: white; width: 90%; max-width: 500px; border-radius: 24px; padding: 30px;
+            transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+        }
+        .modal-overlay.open .modal-box { transform: scale(1); }
+
+        .glass-input {
+            width: 100%; padding: 12px 16px; border-radius: 14px; background: #f8fafc; border: 1px solid #e2e8f0;
+            font-weight: 600; color: #334155; outline: none; transition: 0.2s;
+        }
+        .glass-input:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(255, 143, 80, 0.15); }
+        .label-custom { display: block; font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; }
+
+        #toast { position: fixed; top: 30px; right: 30px; background: white; padding: 15px 25px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 10000; transform: translateX(200%); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #toast.show { transform: translateX(0); }
+
+        @media (max-width: 768px) {
+            aside { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-100%); transition: transform 0.3s; z-index: 50; }
+            aside.open { transform: translateX(0); box-shadow: 10px 0 50px rgba(0,0,0,0.2); }
+            .class-grid { grid-template-columns: 1fr; }
+        }
+
+        /* --- GLOBAL SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
+        ::-webkit-scrollbar-button { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-white z-40 flex items-center justify-between px-5 border-b border-gray-100">
+        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl"><i class="fas fa-bars"></i></button>
+        <span class="font-black text-gray-800 text-lg">QUẢN LÝ LỚP HỌC</span>
+        <div class="w-8"></div>
+    </div>
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden backdrop-blur-sm md:hidden" onclick="toggleSidebar()"></div>
+
+    <aside id="sidebar" class="w-[280px] sidebar hidden md:flex flex-col z-50 h-full shadow-xl">
+        <a class='p-8 flex items-center gap-4 hover:opacity-80 transition-opacity cursor-pointer group' href='#'>
+            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20 border border-orange-50 overflow-hidden">
+                <img src="../LOGO.WEBP" alt="Logo" class="w-12 h-12 object-contain drop-shadow-md bg-white rounded-xl p-1 group-hover:scale-105 transition-transform">
+            </div>
+            <div>
+                <h1 class="block text-2xl font-black text-gray-800 tracking-tight leading-none group-hover:text-orange-500 transition-colors">TEACHER</h1>
+                <p class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Dashboard</p>
+            </div>
+        </a>
+
+        <nav class="flex-1 py-4 overflow-y-auto">
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-th-large w-6"></i> Tổng quan
+            </a>
+            
+            <div class="px-6 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Quản Lý Giảng Dạy</div>
+            <a href="classrooms.html" class="nav-item active">
+                <i class="fas fa-chalkboard-teacher w-6"></i> Lớp học của tôi
+            </a>
+            <a href="tests.html" class="nav-item">
+                <i class="fas fa-file-alt w-6"></i> Quản lý đề thi
+            </a>
+            <a href="question-bank.html" class="nav-item">
+                <i class="fas fa-database w-6"></i> Ngân hàng câu hỏi
+            </a>
+
+            <div class="px-6 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Cá Nhân</div>
+            <a href="account.html" class="nav-item">
+                <i class="fas fa-user-cog w-6"></i> Thông tin tài khoản
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-gray-100">
+            <button id="logout-btn" class="w-full py-4 rounded-2xl bg-red-50 text-red-500 font-bold text-sm hover:bg-red-500 hover:text-white transition flex items-center justify-center gap-2 group">
+                <i class="fas fa-sign-out-alt group-hover:-translate-x-1 transition"></i> Đăng xuất
+            </button>
+        </div>
+    </aside>
+
+    <div class="right-panel">
+        
+        <header class="h-24 px-10 flex items-center justify-end flex-shrink-0 z-40">
+            <div class="flex items-center gap-4 bg-white/60 backdrop-blur-md p-2 pl-6 rounded-full border border-white shadow-sm">
+                <div class="text-right hidden sm:block">
+                    <div class="text-[10px] font-bold text-gray-400 uppercase">Giáo Viên</div>
+                    <div class="text-sm font-bold text-gray-800 leading-none truncate max-w-[150px]" id="teacher-name">Loading...</div>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-red-500 text-white flex items-center justify-center font-bold shadow-md overflow-hidden" id="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto px-8 pb-8 custom-scrollbar">
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <div>
+                    <h2 class="text-3xl font-black text-gray-800">Lớp Học Của Tôi</h2>
+                    <p class="text-gray-500 font-medium text-sm mt-1">Quản lý lớp, học sinh và bài tập</p>
+                </div>
+                <button onclick="openModal('add')" class="w-full md:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold shadow-lg hover:shadow-orange-500/30 hover:-translate-y-1 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-plus"></i> Tạo Lớp Mới
+                </button>
+            </div>
+
+            <div id="loading-area" class="text-center py-20 hidden">
+                <i class="fas fa-circle-notch fa-spin text-4xl text-orange-500 mb-3"></i>
+                <p class="text-gray-400 font-bold text-sm">Đang tải dữ liệu...</p>
+            </div>
+
+            <div id="classrooms-grid" class="class-grid"></div>
+
+            <div id="empty-state" class="hidden text-center py-24 bg-white/50 rounded-3xl border-2 border-dashed border-gray-300">
+                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl text-gray-400">
+                    <i class="fas fa-chalkboard"></i>
+                </div>
+                <h3 class="text-xl font-black text-gray-600">Chưa có lớp học nào</h3>
+                <p class="text-gray-400 text-sm mt-2 mb-6 max-w-md mx-auto">Tạo lớp học đầu tiên để bắt đầu hành trình giảng dạy 4.0.</p>
+                <button onclick="openModal('add')" class="px-6 py-2 rounded-xl bg-white border border-gray-300 text-gray-600 font-bold hover:border-orange-500 hover:text-orange-500 transition">
+                    + Tạo ngay
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <div id="classroom-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-black text-gray-800" id="modal-title">Tạo Lớp Học</h3>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-red-100 hover:text-red-500 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <form id="classroom-form" class="space-y-5 text-left">
+                <input type="hidden" id="class-id">
+                <div>
+                    <label class="label-custom">Tên lớp học</label>
+                    <input type="text" id="class-name" class="glass-input" placeholder="VD: 12A1 - Chuyên Văn" required>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label-custom">Môn học</label>
+                        <select id="class-subject" class="glass-input cursor-pointer appearance-none">
+                            <option value="Ngữ Văn">Ngữ Văn</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="label-custom">Khối lớp</label>
+                        <select id="class-grade" class="glass-input cursor-pointer appearance-none">
+                            <option value="10">Lớp 10</option>
+                            <option value="11">Lớp 11</option>
+                            <option value="12">Lớp 12</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200 transition">Hủy</button>
+                    <button type="submit" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold shadow-lg hover:shadow-orange-500/30 hover:-translate-y-1 transition">Lưu Lớp Học</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast"><i class="fas fa-check-circle text-green-500"></i> <span id="toast-msg" class="font-bold text-sm">Thành công</span></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let classrooms = [];
+
+        // UI Helpers
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebar-overlay').classList.toggle('hidden');
+        };
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // Auth Check
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                
+                // Load User Info for Header
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if(userDoc.exists()) {
+                    const data = userDoc.data();
+                    document.getElementById('teacher-name').innerText = data.name;
+                    if (data.photoURL || data.customAvatar) {
+                        document.getElementById('user-avatar').innerHTML = `<img src="${data.customAvatar || data.photoURL}" class="w-full h-full object-cover">`;
+                    } else {
+                        document.getElementById('user-avatar').innerHTML = (data.name || "T").charAt(0).toUpperCase();
+                    }
+                }
+
+                loadClassrooms();
+            } else {
+                window.location.href = "../log.html";
+            }
+        });
+
+        // Load Data Realtime
+        function loadClassrooms() {
+            const grid = document.getElementById('classrooms-grid');
+            const loader = document.getElementById('loading-area');
+            const empty = document.getElementById('empty-state');
+
+            loader.classList.remove('hidden');
+            grid.innerHTML = '';
+            
+            const q = query(collection(db, "classrooms"), where("teacherId", "==", currentUser.uid));
+            
+            onSnapshot(q, (snapshot) => {
+                loader.classList.add('hidden');
+                classrooms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                if (classrooms.length === 0) {
+                    empty.classList.remove('hidden');
+                    grid.innerHTML = '';
+                    return;
+                }
+
+                empty.classList.add('hidden');
+                grid.innerHTML = classrooms.map(c => `
+                    <div class="class-card group">
+                        <div class="cc-header">
+                            <div class="cc-icon"><i class="fas fa-chalkboard"></i></div>
+                            <div class="relative">
+                                <button onclick="deleteClass('${c.id}')" class="cc-menu-btn" title="Xóa lớp"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
+                        
+                        <h4 class="cc-title" onclick="openModal('edit', '${c.id}')">${c.className}</h4>
+                        <p class="cc-info">${c.subjectId} • Khối ${c.grade}</p>
+
+                        <div class="cc-code-box">
+                            <span class="text-xs text-gray-400 font-bold uppercase">MÃ LỚP:</span>
+                            <div class="flex items-center gap-2">
+                                <span class="cc-code">${c.classCode}</span>
+                                <i class="fas fa-copy cc-copy-btn" onclick="copyCode('${c.classCode}')" title="Sao chép"></i>
+                            </div>
+                        </div>
+
+                        <div class="cc-stats">
+                            <div class="cc-stat-item"><i class="fas fa-users"></i> ${c.students ? c.students.length : 0} Học sinh</div>
+                            <div class="cc-stat-item"><i class="fas fa-file-alt"></i> ${c.assignments ? c.assignments.length : 0} Bài tập</div>
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-gray-100 flex gap-2">
+                             <a href="student-progress.html?classId=${c.id}" class="flex-1 py-2 text-center rounded-lg bg-gray-50 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-orange-600 transition">Xem Chi Tiết</a>
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        // Modal Logic
+        window.openModal = (mode, id = null) => {
+            const modal = document.getElementById('classroom-modal');
+            const title = document.getElementById('modal-title');
+            const form = document.getElementById('classroom-form');
+
+            if (mode === 'add') {
+                title.innerText = "Tạo Lớp Học Mới";
+                form.reset();
+                document.getElementById('class-id').value = "";
+            } else {
+                title.innerText = "Chỉnh Sửa Lớp Học";
+                const c = classrooms.find(x => x.id === id);
+                if(c) {
+                    document.getElementById('class-id').value = c.id;
+                    document.getElementById('class-name').value = c.className;
+                    document.getElementById('class-subject').value = c.subjectId;
+                    document.getElementById('class-grade').value = c.grade;
+                }
+            }
+            modal.classList.add('open');
+        };
+
+        window.closeModal = () => document.getElementById('classroom-modal').classList.remove('open');
+
+        // Form Submit
+        document.getElementById('classroom-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('class-id').value;
+            const data = {
+                className: document.getElementById('class-name').value,
+                subjectId: document.getElementById('class-subject').value,
+                grade: document.getElementById('class-grade').value,
+                teacherId: currentUser.uid,
+                updatedAt: serverTimestamp()
+            };
+
+            const btnSubmit = document.querySelector('#classroom-form button[type="submit"]');
+            const originalText = btnSubmit.innerText;
+            btnSubmit.innerText = "Đang lưu...";
+            btnSubmit.disabled = true;
+
+            try {
+                if (id) {
+                    await updateDoc(doc(db, "classrooms", id), data);
+                    showToast("Cập nhật thành công!");
+                } else {
+                    data.classCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                    data.students = [];
+                    data.assignments = [];
+                    data.createdAt = serverTimestamp();
+                    await addDoc(collection(db, "classrooms"), data);
+                    showToast("Tạo lớp mới thành công!");
+                }
+                closeModal();
+            } catch (err) {
+                console.error(err);
+                if (err.code === 'permission-denied') {
+                    alert("Lỗi quyền truy cập! Vui lòng cập nhật Rules trên Firebase.");
+                } else {
+                    alert("Có lỗi xảy ra: " + err.message);
+                }
+            } finally {
+                btnSubmit.innerText = originalText;
+                btnSubmit.disabled = false;
+            }
+        });
+
+        // Delete Class
+        window.deleteClass = async (id) => {
+            if (confirm("Bạn có chắc muốn xóa lớp học này?")) {
+                try {
+                    await deleteDoc(doc(db, "classrooms", id));
+                    showToast("Đã xóa lớp học.");
+                } catch (err) {
+                    console.error(err);
+                    alert("Lỗi khi xóa.");
+                }
+            }
+        };
+
+        // Copy Code
+        window.copyCode = (code) => {
+            navigator.clipboard.writeText(code);
+            showToast("Đã sao chép mã lớp!");
+        };
+
+        document.getElementById('logout-btn').onclick = () => signOut(auth);
+    </script>
+</body>
+</html>

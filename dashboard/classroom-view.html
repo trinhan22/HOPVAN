@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chi Tiết Lớp Học - HopVan</title>
+    
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
+            --bg-glass: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --blur: 25px;
+            --sidebar-width: 260px;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #FFF5EC; height: 100vh; overflow: hidden; display: flex; }
+
+        /* --- BACKGROUND --- */
+        .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatBlob 10s infinite alternate; }
+        .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
+        .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
+        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
+
+        /* --- LAYOUT --- */
+        .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 60px; background: white; z-index: 100; align-items: center; padding: 0 20px; border-bottom: 1px solid #eee; }
+        #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); z-index: 998; }
+
+        .main-content {
+            margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); height: 100%;
+            background: var(--bg-glass); backdrop-filter: blur(var(--blur)); border-left: 1px solid var(--glass-border);
+            padding: 40px; overflow-y: auto; position: relative;
+        }
+
+        /* --- CLASS INFO HEADER --- */
+        .class-header {
+            background: white; border-radius: 24px; padding: 30px; margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid white;
+            display: flex; justify-content: space-between; align-items: center;
+            position: relative; overflow: hidden;
+        }
+        .class-title h1 { font-size: 1.8rem; font-weight: 900; color: #2D3436; margin-bottom: 5px; }
+        .class-subtitle { color: #636E72; font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        
+        .class-watermark {
+            position: absolute; right: -20px; bottom: -30px; font-size: 8rem; color: #FF8F50;
+            opacity: 0.1; transform: rotate(-15deg); pointer-events: none;
+        }
+
+        /* --- ASSIGNMENT CARD --- */
+        .assignment-card {
+            background: rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 24px; margin-bottom: 20px;
+            border: 1px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            transition: all 0.3s; display: flex; justify-content: space-between; align-items: center;
+        }
+        .assignment-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255, 143, 80, 0.1); border-color: #ffedd5; background: white; }
+
+        .asg-icon {
+            width: 50px; height: 50px; border-radius: 14px; background: #fff7ed; color: #FF8F50;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;
+        }
+        .asg-info h3 { font-weight: 800; color: #2D3436; font-size: 1.1rem; margin-bottom: 4px; }
+        .asg-meta { font-size: 0.85rem; color: #636E72; display: flex; gap: 15px; }
+        
+        .btn-start {
+            background: var(--primary-gradient); color: white; padding: 10px 24px; border-radius: 12px;
+            font-weight: 700; text-decoration: none; box-shadow: 0 5px 15px rgba(255, 94, 98, 0.25);
+            transition: 0.2s; white-space: nowrap; display: inline-flex; align-items: center;
+        }
+        .btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 94, 98, 0.35); }
+
+        .btn-result {
+            background: white; color: #2D3436; border: 2px solid #e5e7eb; padding: 10px 24px; border-radius: 12px;
+            font-weight: 700; text-decoration: none; transition: 0.2s; white-space: nowrap; display: inline-flex; align-items: center;
+        }
+        .btn-result:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* --- SIDEBAR WIDGET --- */
+        .widget-box { background: white; border-radius: 20px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid white; }
+        .widget-title { font-weight: 800; color: #2D3436; margin-bottom: 20px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+        
+        .member-item { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #f1f5f9; }
+        .member-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .member-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #eee; }
+        .member-info h4 { font-weight: 700; font-size: 0.9rem; color: #2D3436; }
+        .member-info p { font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
+
+        /* --- TOAST --- */
+        #toast { position: fixed; top: 30px; right: 30px; background: white; padding: 15px 25px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 10000; transform: translateX(200%); transition: 0.5s; }
+        #toast.show { transform: translateX(0); }
+
+        /* Mobile */
+        @media (max-width: 1024px) {
+            .grid-layout { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            aside { display: none; }
+            .mobile-header { display: flex; }
+            .main-content { margin-left: 0; width: 100%; padding: 80px 20px; border-left: none; }
+        }
+
+        /* --- GLOBAL SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
+        ::-webkit-scrollbar-button { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+
+    <div class="mobile-header lg:hidden">
+        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl mr-4 focus:outline-none"><i class="fas fa-bars"></i></button>
+        <div class="flex items-center gap-2"><img src="../LOGO.WEBP" alt="Logo" class="w-8 h-8"><span class="font-black text-orange-500 text-lg">HOPVAN</span></div>
+    </div>
+    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <div id="menu-placeholder"></div>
+
+    <main class="main-content">
+        
+        <a href="classrooms.html" class="inline-flex items-center gap-2 text-gray-400 hover:text-orange-500 font-bold mb-6 transition">
+            <i class="fas fa-arrow-left"></i> Quay lại danh sách lớp
+        </a>
+
+        <div class="class-header">
+            <div class="class-title">
+                <h1 id="class-name">Đang tải...</h1>
+                <div class="class-subtitle">
+                    <i class="fas fa-book-open text-orange-400"></i> <span id="class-subject"></span>
+                    <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                    <i class="fas fa-layer-group text-orange-400"></i> <span id="class-grade"></span>
+                </div>
+            </div>
+            <i class="fas fa-chalkboard class-watermark"></i>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 grid-layout">
+            
+            <div class="lg:col-span-2">
+                <h2 class="text-xl font-black text-gray-800 mb-6">Bài Tập Được Giao</h2>
+                <div id="assignments-list" class="space-y-4">
+                    <div class="text-center py-10 text-gray-400">
+                        <i class="fas fa-circle-notch fa-spin text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1 space-y-6">
+                
+                <div class="widget-box">
+                    <h3 class="widget-title"><i class="fas fa-chalkboard-teacher text-orange-500"></i> Giáo Viên</h3>
+                    <div class="member-item">
+                        <img id="teacher-avatar" src="" class="member-avatar">
+                        <div class="member-info">
+                            <h4 id="teacher-name"></h4>
+                            <p>Giáo viên</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget-box">
+                    <h3 class="widget-title">
+                        <i class="fas fa-users text-orange-500"></i> Thành Viên 
+                        <span class="bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full text-xs ml-auto" id="student-count">0</span>
+                    </h3>
+                    <div id="students-list" class="max-h-60 overflow-y-auto custom-scrollbar pr-2">
+                        </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <div id="toast"><i class="fas fa-check-circle text-green-500"></i> <span id="toast-msg">Thông báo</span></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs, documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initMenu } from "./menu.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Khởi tạo menu (Không truyền page để tự xử lý sau)
+        initMenu(app);
+
+        // State
+        let currentUser = null;
+        const urlParams = new URLSearchParams(window.location.search);
+        const classId = urlParams.get('classId');
+
+        // Force Highlight Menu 'Lớp học của tôi'
+        setTimeout(() => {
+            const links = document.querySelectorAll('.sb-link');
+            links.forEach(l => l.classList.remove('active'));
+            const classroomLink = document.querySelector('.sb-link[data-page="classrooms"]');
+            if (classroomLink) classroomLink.classList.add('active');
+        }, 300); // Đợi menu render xong
+
+        // UI Helpers
+        window.toggleSidebar = () => {
+            const sidebar = document.querySelector('aside');
+            const overlay = document.getElementById('sidebar-overlay');
+            if(sidebar && overlay) { sidebar.classList.toggle('open'); overlay.classList.toggle('active'); }
+        };
+
+        function showToast(msg, type='success') {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            t.className = type === 'error' ? 'text-red-500' : 'text-green-500';
+            t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // Auth
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                if(!classId) { window.location.href = 'classrooms.html'; return; }
+                loadClassData();
+            } else window.location.href = "../log.html";
+        });
+
+        async function loadClassData() {
+            try {
+                // 1. Get Class Info
+                const classSnap = await getDoc(doc(db, "classrooms", classId));
+                if (!classSnap.exists()) throw new Error("Lớp không tồn tại");
+                const classData = classSnap.data();
+
+                // Render Header
+                document.getElementById('class-name').innerText = classData.className;
+                document.getElementById('class-grade').innerText = `Khối ${classData.grade}`;
+                document.getElementById('class-subject').innerText = classData.subjectName || "Ngữ Văn";
+
+                // 2. Fetch Teacher
+                const teacherSnap = await getDoc(doc(db, "users", classData.teacherId));
+                if (teacherSnap.exists()) {
+                    const t = teacherSnap.data();
+                    document.getElementById('teacher-name').innerText = t.name;
+                    document.getElementById('teacher-avatar').src = t.customAvatar || t.photoURL || `https://placehold.co/50x50/FF8F50/ffffff?text=${t.name.charAt(0)}`;
+                }
+
+                // 3. Fetch Students (Chỉ lấy 20 người đầu tiên để demo)
+                const studentIds = classData.students || [];
+                document.getElementById('student-count').innerText = studentIds.length;
+                
+                // Fetch student docs in chunks if needed, here simplified
+                const sList = document.getElementById('students-list');
+                sList.innerHTML = '';
+                
+                const visibleStudents = studentIds.slice(0, 20); // Limit query
+                if (visibleStudents.length > 0) {
+                    // SỬA LỖI QUERY ID: Dùng documentId() thay vì __name__
+                    const qStudents = query(collection(db, "users"), where(documentId(), "in", visibleStudents));
+                    const sSnaps = await getDocs(qStudents);
+                    
+                    sSnaps.forEach(s => {
+                        const d = s.data();
+                        const avt = d.customAvatar || d.photoURL || `https://placehold.co/40x40/ddd/555?text=${(d.name||'U').charAt(0)}`;
+                        sList.innerHTML += `
+                        <div class="member-item">
+                            <img src="${avt}" class="member-avatar">
+                            <div class="member-info"><h4>${d.name}</h4><p>Học sinh</p></div>
+                        </div>`;
+                    });
+                }
+
+                // 4. Fetch Assignments (Bài tập)
+                const aList = document.getElementById('assignments-list');
+                const assignments = classData.assignments || []; // Array of objects { testId, assignedAt }
+                
+                if (assignments.length === 0) {
+                    aList.innerHTML = `<div class="text-center py-10 bg-white/50 rounded-2xl border-2 border-dashed border-gray-200"><p class="text-gray-400 font-bold">Chưa có bài tập nào.</p></div>`;
+                    return;
+                }
+
+                // Lấy danh sách ID đề thi
+                const testIds = assignments.map(a => a.testId);
+                
+                // Fetch Tests Details (SỬA LỖI documentId)
+                // Firestore 'in' query supports max 10 items. Cần chia chunk nếu > 10.
+                const testsData = await fetchDocsInChunks(collection(db, "tests"), testIds);
+
+                // Fetch Submissions để xem đã làm chưa
+                const submissionsSnap = await getDocs(query(collection(db, "submissions"), where("studentId", "==", currentUser.uid), where("classId", "==", classId)));
+                const submissions = submissionsSnap.docs.map(d => d.data());
+
+                aList.innerHTML = testsData.map(t => {
+                    const sub = submissions.find(s => s.testId === t.id);
+                    const isDone = !!sub;
+                    
+                    return `
+                    <div class="assignment-card group">
+                        <div class="flex items-center gap-4">
+                            <div class="asg-icon"><i class="fas fa-file-alt"></i></div>
+                            <div class="asg-info">
+                                <h3>${t.name}</h3>
+                                <div class="asg-meta">
+                                    <span><i class="far fa-clock"></i> ${t.timeLimit} phút</span>
+                                    <span><i class="far fa-question-circle"></i> ${t.questions ? t.questions.length : 0} câu</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            ${isDone 
+                                ? `<a href="result.html?submissionId=${sub.id}" class="btn-result">Xem Kết Quả</a>`
+                                : `<a href="do-test.html?testId=${t.id}&classId=${classId}" class="btn-start">Làm Bài Ngay <i class="fas fa-arrow-right ml-2"></i></a>`
+                            }
+                        </div>
+                    </div>`;
+                }).join('');
+
+            } catch (e) {
+                console.error("Lỗi:", e);
+                document.getElementById('class-name').innerText = "Lỗi tải dữ liệu";
+                showToast("Lỗi tải lớp học: " + e.message, "error");
+            }
+        }
+
+        // Hàm hỗ trợ fetch chunk (SỬA LỖI QUAN TRỌNG)
+        async function fetchDocsInChunks(collectionRef, ids) {
+            if (!ids || ids.length === 0) return [];
+            const allDocsData = [];
+            
+            // Chia mảng ID thành các nhóm 10 (giới hạn của 'in' query)
+            for (let i = 0; i < ids.length; i += 10) {
+                const chunk = ids.slice(i, i + 10);
+                if (chunk.length > 0) {
+                    // Dùng documentId() thay vì chuỗi "__name__"
+                    const q = query(collectionRef, where(documentId(), "in", chunk));
+                    const snapshot = await getDocs(q);
+                    snapshot.forEach(doc => allDocsData.push({id: doc.id, ...doc.data()}));
+                }
+            }
+            return allDocsData;
+        }
+    </script>
+</body>
+</html>

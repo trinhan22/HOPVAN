@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Giám Sát - HopVan</title>
+    
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
+            --bg-glass: rgba(255, 255, 255, 0.7);
+            --blur: 20px;
+            --sidebar-w: 280px;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #FFF5EC; height: 100vh; overflow: hidden; display: flex; }
+
+        /* --- BACKGROUND --- */
+        .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.2; animation: floatBlob 10s infinite alternate; }
+        .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
+        .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
+        .blob-3 { width: 300px; height: 300px; background: #FFD1D1; top: 40%; left: 40%; animation-delay: -2s; }
+        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
+
+        /* --- SIDEBAR --- */
+        aside { width: var(--sidebar-w); background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border-right: 1px solid white; display: flex; flex-direction: column; z-index: 50; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; margin: 4px 16px; border-radius: 14px; color: #64748B; font-weight: 700; transition: 0.2s; }
+        .nav-item:hover { background: #fff7ed; color: var(--primary); }
+        .nav-item.active { background: var(--primary-gradient); color: white; box-shadow: 0 8px 20px rgba(255, 143, 80, 0.3); }
+
+        /* --- MAIN --- */
+        .main-panel { flex: 1; display: flex; flex-direction: column; background: rgba(255,255,255,0.4); backdrop-filter: blur(20px); position: relative; }
+
+        /* --- STATS CARDS --- */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card {
+            background: white; border-radius: 20px; padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02); border: 1px solid white;
+            display: flex; align-items: center; justify-content: space-between;
+            transition: 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .stat-icon-box { width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        
+        .st-online .stat-icon-box { background: #dcfce7; color: #16a34a; }
+        .st-finished .stat-icon-box { background: #dbeafe; color: #2563eb; }
+        .st-violation .stat-icon-box { background: #fee2e2; color: #dc2626; }
+        .st-offline .stat-icon-box { background: #f1f5f9; color: #64748b; }
+
+        .stat-info h4 { font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
+        .stat-info p { font-size: 2rem; font-weight: 900; color: #1e293b; line-height: 1; }
+
+        /* --- STUDENT GRID --- */
+        .student-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding-bottom: 100px; }
+        
+        .student-card {
+            background: white; border-radius: 20px; padding: 20px;
+            border: 2px solid transparent; box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            transition: 0.3s; position: relative; overflow: hidden;
+        }
+
+        /* Status States */
+        /* Online */
+        .sc-online { border-color: #86efac; }
+        .sc-online .status-dot { background: #22c55e; box-shadow: 0 0 0 3px #dcfce7; }
+        
+        /* Finished */
+        .sc-finished { border-color: #93c5fd; background: #f8fafc; opacity: 0.8; }
+        .sc-finished .status-dot { background: #3b82f6; }
+
+        /* Locked / Violation */
+        .sc-locked { 
+            border-color: #fca5a5; background: #fff1f2; 
+            animation: shake 0.5s ease-in-out infinite alternate;
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
+        }
+        .sc-locked .status-dot { background: #ef4444; animation: pulseRed 1s infinite; }
+
+        /* Offline */
+        .sc-offline { border-color: #e2e8f0; opacity: 0.6; filter: grayscale(1); }
+        .sc-offline .status-dot { background: #94a3b8; }
+
+        @keyframes shake { 0% { transform: translateX(0); } 100% { transform: translateX(2px); } }
+        @keyframes pulseRed { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* Card Content */
+        .sc-header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+        .sc-avatar { width: 48px; height: 48px; border-radius: 12px; background: #e0f2fe; color: #0369a1; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; position: relative; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; position: absolute; bottom: -2px; right: -2px; border: 2px solid white; }
+
+        .sc-progress { height: 6px; background: #e2e8f0; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .sc-bar { height: 100%; background: var(--primary-gradient); transition: width 0.5s ease; border-radius: 10px; }
+
+        .violation-badge { 
+            background: #fee2e2; color: #dc2626; padding: 8px; border-radius: 10px; 
+            font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 6px; margin-top: 10px;
+        }
+
+        .sc-actions { 
+            display: flex; gap: 8px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #e2e8f0; 
+        }
+        .btn-action { flex: 1; padding: 8px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-unlock { background: #dcfce7; color: #15803d; } .btn-unlock:hover { background: #22c55e; color: white; }
+        .btn-force { background: #fee2e2; color: #b91c1c; } .btn-force:hover { background: #ef4444; color: white; }
+
+        /* Filter Tabs */
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .filter-chip { 
+            padding: 8px 16px; border-radius: 20px; background: white; border: 1px solid #e2e8f0; 
+            font-size: 0.85rem; font-weight: 700; color: #64748b; cursor: pointer; transition: 0.2s; white-space: nowrap;
+        }
+        .filter-chip:hover { background: #f8fafc; color: var(--primary); border-color: #fed7aa; }
+        .filter-chip.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(255, 143, 80, 0.3); }
+
+        /* Toast */
+        #toast { position: fixed; top: 30px; right: 30px; background: white; padding: 16px 24px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 12px; z-index: 2000; transform: translateX(200%); transition: 0.5s; font-weight: 700; border: 1px solid #f1f5f9; }
+        #toast.show { transform: translateX(0); }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            aside { position: fixed; left: -100%; height: 100%; transition: 0.3s; }
+            aside.open { left: 0; }
+            .stats-row { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* --- CHIPS INDICATOR CODE --- */
+.filter-chip {
+    position: relative;
+    padding-left: 32px !important; /* Chừa chỗ cho dấu chấm */
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Dấu chấm cơ bản */
+.filter-chip::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+/* Hiệu ứng sóng lan tỏa (Pulse) */
+.filter-chip::after {
+    content: '';
+    position: absolute;
+    left: 14px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0;
+}
+
+/* 🚨 Trạng thái Vi phạm: Đỏ rực và nháy nhanh */
+.filter-chip[onclick*="violation"]::before { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+.filter-chip[onclick*="violation"]::after { background: #ef4444; animation: statusPulse 1s infinite; opacity: 0.6; }
+
+/* 🟢 Trạng thái Đang thi: Xanh lá nhịp thở chậm */
+.filter-chip[onclick*="online"]::before { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+.filter-chip[onclick*="online"]::after { background: #22c55e; animation: statusPulse 2s infinite; opacity: 0.6; }
+
+/* 🔵 Trạng thái Đã nộp: Xanh dương đứng yên hoặc xoay nhẹ */
+.filter-chip[onclick*="finished"]::before { background: #3b82f6; box-shadow: 0 0 8px #3b82f6; }
+
+/* Trạng thái Tất cả: Không có dấu chấm */
+.filter-chip[onclick*="all"] { padding-left: 16px !important; }
+.filter-chip[onclick*="all"]::before { display: none; }
+
+/* Animation Pulse */
+@keyframes statusPulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(3.5); opacity: 0; }
+}
+
+/* Khi Chip được Active */
+.filter-chip.active {
+    background: var(--primary-gradient) !important;
+    color: white !important;
+    border-color: transparent !important;
+}
+.filter-chip.active::before { background: white !important; box-shadow: 0 0 10px white; }
+
+        /* --- GLOBAL SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
+        ::-webkit-scrollbar-button { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="md:hidden fixed top-0 w-full h-16 bg-white/90 backdrop-blur z-40 flex items-center justify-between px-5 border-b border-gray-100">
+        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl"><i class="fas fa-bars"></i></button>
+        <span class="font-black text-gray-800">GIÁM SÁT THI</span>
+        <div class="w-8"></div>
+    </div>
+    <div id="overlay" class="fixed inset-0 bg-black/20 z-40 hidden md:hidden backdrop-blur-sm" onclick="toggleSidebar()"></div>
+
+    <aside id="sidebar">
+        <div class="p-8 flex items-center gap-3">
+            <img src="../LOGO.WEBP" class="w-10 h-10 object-contain">
+            <div><h1 class="font-black text-gray-800 text-xl leading-none">TEACHER</h1><p class="text-[10px] font-bold text-orange-500 tracking-widest uppercase">Dashboard</p></div>
+        </div>
+        <nav class="flex-1 px-2 space-y-1">
+            <a href="index.html" class="nav-item"><i class="fas fa-th-large"></i> Tổng quan</a>
+            <div class="px-5 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase">Quản Lý</div>
+            <a href="classrooms.html" class="nav-item"><i class="fas fa-chalkboard-teacher"></i> Lớp học</a>
+            <a href="tests.html" class="nav-item active"><i class="fas fa-file-alt"></i> Đề thi</a>
+            <a href="question-bank.html" class="nav-item"><i class="fas fa-database"></i> Ngân hàng câu hỏi</a>
+            <div class="px-5 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase">Cá Nhân</div>
+            <a href="account.html" class="nav-item"><i class="fas fa-user-cog"></i> Tài khoản</a>
+        </nav>
+        <div class="p-6"><button id="logout-btn" class="w-full py-3 rounded-xl bg-red-50 text-red-500 font-bold text-sm hover:bg-red-500 hover:text-white transition flex items-center justify-center gap-2"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button></div>
+    </aside>
+
+    <div class="main-panel">
+        <header class="h-20 px-8 flex items-center justify-between mt-16 md:mt-0">
+            <div class="flex items-center gap-4">
+                <a href="tests.html" class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-gray-500 hover:text-orange-500 hover:shadow-md transition"><i class="fas fa-arrow-left"></i></a>
+                <div>
+                    <h2 class="text-xl font-black text-gray-800 flex items-center gap-2">
+                        <i class="fas fa-satellite-dish text-red-500 animate-pulse"></i> Phòng Giám Sát
+                    </h2>
+                    <p class="text-xs font-bold text-gray-500 mt-0.5" id="test-info">Đang tải...</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden sm:block"><div class="text-[10px] font-bold text-gray-400 uppercase">Giáo Viên</div><div class="text-sm font-bold text-gray-800" id="teacher-name">...</div></div>
+                <img id="user-avatar" class="w-10 h-10 rounded-full bg-gray-200 object-cover border-2 border-white shadow-md">
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-hidden px-8 pb-4 flex flex-col">
+            
+            <div class="stats-row">
+                <div class="stat-card st-online">
+                    <div class="stat-info"><h4>Đang Làm Bài</h4><p id="count-online">0</p></div>
+                    <div class="stat-icon-box"><i class="fas fa-pen-nib"></i></div>
+                </div>
+                <div class="stat-card st-finished">
+                    <div class="stat-info"><h4>Đã Nộp Bài</h4><p id="count-finished">0</p></div>
+                    <div class="stat-icon-box"><i class="fas fa-check-circle"></i></div>
+                </div>
+                <div class="stat-card st-violation">
+                    <div class="stat-info"><h4>Vi Phạm / Khóa</h4><p id="count-violated">0</p></div>
+                    <div class="stat-icon-box"><i class="fas fa-exclamation-triangle animate-pulse"></i></div>
+                </div>
+                <div class="stat-card st-offline">
+                    <div class="stat-info"><h4>Vắng Mặt</h4><p id="count-offline">0</p></div>
+                    <div class="stat-icon-box"><i class="fas fa-user-slash"></i></div>
+                </div>
+            </div>
+
+            <div class="filter-bar no-scrollbar py-4">
+                <button class="filter-chip active" onclick="filterGrid('all', this)">
+                    Tất cả
+                </button>
+                
+                <button class="filter-chip" onclick="filterGrid('violation', this)">
+                    Có vi phạm
+                </button>
+                
+                <button class="filter-chip" onclick="filterGrid('online', this)">
+                    Đang làm bài
+                </button>
+                
+                <button class="filter-chip" onclick="filterGrid('finished', this)">
+                    Đã nộp bài
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto custom-scrollbar pr-2 relative">
+                <div id="loading-area" class="text-center py-20">
+                    <i class="fas fa-circle-notch fa-spin text-4xl text-orange-500 mb-3"></i>
+                    <p class="font-bold text-sm text-gray-400">Đang kết nối...</p>
+                </div>
+
+                <div id="student-grid" class="student-grid"></div>
+
+                <div id="empty-state" class="hidden absolute inset-0 flex flex-col items-center justify-center text-center">
+                    <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-3xl text-gray-400">
+                        <i class="fas fa-user-astronaut"></i>
+                    </div>
+                    <h3 class="text-lg font-black text-gray-600">Chưa có tín hiệu</h3>
+                    <p class="text-gray-400 text-sm mt-1">Học sinh chưa tham gia phòng thi.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="toast"><i class="fas fa-check-circle text-green-500 text-xl"></i> <span id="toast-msg">Thành công</span></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, updateDoc, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // State
+        let currentUser = null;
+        let currentTestId = new URLSearchParams(window.location.search).get('testId');
+        let currentClassId = new URLSearchParams(window.location.search).get('classId');
+        let studentSessions = new Map();
+        let currentFilter = 'all';
+        let heartbeatInterval = null;
+
+        // UI Helpers
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('hidden');
+        };
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        window.filterGrid = (type, btn) => {
+            currentFilter = type;
+            document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderGrid();
+        };
+
+        // Init
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                loadUserProfile(user.uid);
+                
+                if(currentTestId && currentClassId) {
+                    loadMetaData();
+                    startListening();
+                } else {
+                    alert("Thiếu thông tin phòng thi!");
+                    window.location.href = "tests.html";
+                }
+            } else window.location.href = "../log.html";
+        });
+
+        async function loadUserProfile(uid) {
+            const snap = await getDoc(doc(db, "users", uid));
+            if(snap.exists()) {
+                const d = snap.data();
+                document.getElementById('teacher-name').innerText = d.name;
+                document.getElementById('user-avatar').src = d.customAvatar || d.photoURL || `https://placehold.co/40x40/FF8F50/ffffff?text=${d.name.charAt(0)}`;
+            }
+        }
+
+        async function loadMetaData() {
+            const [tSnap, cSnap] = await Promise.all([
+                getDoc(doc(db, "tests", currentTestId)),
+                getDoc(doc(db, "classrooms", currentClassId))
+            ]);
+            
+            if(tSnap.exists() && cSnap.exists()) {
+                document.getElementById('test-info').innerText = `${tSnap.data().name} • ${cSnap.data().className}`;
+            }
+        }
+
+        function startListening() {
+            const q = query(
+                collection(db, "test_sessions"), 
+                where("testId", "==", currentTestId), 
+                where("classId", "==", currentClassId)
+            );
+
+            onSnapshot(q, (snapshot) => {
+                document.getElementById('loading-area').classList.add('hidden');
+                
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === "removed") studentSessions.delete(change.doc.id);
+                    else studentSessions.set(change.doc.id, { id: change.doc.id, ...change.doc.data() });
+                });
+                
+                renderGrid();
+                updateStats();
+            });
+
+            // Heartbeat check every 5s
+            heartbeatInterval = setInterval(() => {
+                const now = Date.now();
+                let hasChanges = false;
+                studentSessions.forEach((s) => {
+                    const last = s.lastUpdated?.toDate().getTime() || 0;
+                    // If silent for > 15s, mark offline
+                    if (now - last > 15000 && (s.status === 'online' || s.status === 'warning')) {
+                        s.status = 'offline';
+                        hasChanges = true;
+                    }
+                });
+                if(hasChanges) { renderGrid(); updateStats(); }
+            }, 5000);
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('student-grid');
+            let sessions = Array.from(studentSessions.values());
+
+            // Filter Logic
+            if (currentFilter === 'violation') sessions = sessions.filter(s => s.violations > 0 || s.status === 'locked');
+            else if (currentFilter === 'online') sessions = sessions.filter(s => s.status === 'online');
+            else if (currentFilter === 'finished') sessions = sessions.filter(s => s.status === 'finished');
+
+            // Sort: Locked/Violation first, then Online, then Finished
+            sessions.sort((a, b) => {
+                const scoreA = getStatusScore(a);
+                const scoreB = getStatusScore(b);
+                return scoreB - scoreA;
+            });
+
+            if (sessions.length === 0) {
+                grid.innerHTML = '';
+                document.getElementById('empty-state').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('empty-state').classList.add('hidden');
+
+            grid.innerHTML = sessions.map(s => {
+                let css = 'sc-offline';
+                let badge = 'Offline';
+                let icon = 'fas fa-user-slash';
+                
+                if(s.status === 'online') { css = 'sc-online'; badge = 'Online'; icon = 'fas fa-wifi'; }
+                else if(s.status === 'warning') { css = 'sc-locked'; badge = 'Cảnh Báo'; icon = 'fas fa-exclamation'; }
+                else if(s.status === 'locked') { css = 'sc-locked'; badge = 'BỊ KHÓA'; icon = 'fas fa-lock'; }
+                else if(s.status === 'finished') { css = 'sc-finished'; badge = 'Đã Nộp'; icon = 'fas fa-check'; }
+
+                const progress = s.totalQuestions > 0 ? (s.progress / s.totalQuestions) * 100 : 0;
+                
+                return `
+                <div class="student-card ${css}">
+                    <div class="sc-header">
+                        <div class="sc-avatar">
+                            ${(s.studentName||'U').charAt(0)}
+                            <div class="status-dot"></div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-black text-gray-800 text-sm truncate">${s.studentName}</h4>
+                            <p class="text-xs text-gray-500 font-bold flex items-center gap-1">
+                                <i class="${icon}"></i> ${badge}
+                            </p>
+                        </div>
+                    </div>
+
+                    ${(s.violations > 0 || s.lastViolation) ? `
+                        <div class="violation-badge">
+                            <i class="fas fa-exclamation-triangle text-lg"></i>
+                            <div>
+                                <div class="leading-none">Vi phạm: ${s.violations} lần</div>
+                                ${s.lastViolation ? `<div class="text-[10px] opacity-80 mt-1 font-normal truncate max-w-[150px]">${s.lastViolation}</div>` : ''}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <div class="mt-4">
+                        <div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1">
+                            <span>Tiến độ</span>
+                            <span>${s.progress || 0}/${s.totalQuestions || '?'}</span>
+                        </div>
+                        <div class="sc-progress"><div class="sc-bar" style="width: ${progress}%"></div></div>
+                    </div>
+
+                    ${(s.status === 'locked' || s.status === 'warning') ? `
+                        <div class="sc-actions">
+                            <button onclick="unlockStudent('${s.id}')" class="btn-action btn-unlock"><i class="fas fa-lock-open mr-1"></i> Mở Khóa</button>
+                            <button onclick="forceSubmit('${s.id}')" class="btn-action btn-force"><i class="fas fa-ban mr-1"></i> Thu Bài</button>
+                        </div>
+                    ` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        function getStatusScore(s) {
+            if (s.status === 'locked') return 100;
+            if (s.status === 'warning') return 90;
+            if (s.violations > 0) return 80;
+            if (s.status === 'online') return 50;
+            if (s.status === 'finished') return 10;
+            return 0; // offline
+        }
+
+        function updateStats() {
+            const ss = Array.from(studentSessions.values());
+            document.getElementById('count-online').innerText = ss.filter(s => s.status === 'online' || s.status === 'warning').length;
+            document.getElementById('count-finished').innerText = ss.filter(s => s.status === 'finished').length;
+            document.getElementById('count-violated').innerText = ss.filter(s => s.status === 'locked' || s.violations > 0).length;
+            document.getElementById('count-offline').innerText = ss.filter(s => s.status === 'offline').length;
+        }
+
+        // --- Actions ---
+        window.unlockStudent = async (sid) => {
+            if(confirm("Mở khóa cho học sinh này?")) {
+                await updateDoc(doc(db, "test_sessions", sid), { status: 'online', lastViolation: null }); // Optional: Reset warning
+                showToast("Đã mở khóa học sinh");
+            }
+        };
+
+        window.forceSubmit = async (sid) => {
+            if(confirm("Thu bài ngay lập tức?")) {
+                await updateDoc(doc(db, "test_sessions", sid), { status: 'force_submit' });
+                showToast("Đã gửi lệnh thu bài");
+            }
+        };
+
+        document.getElementById('logout-btn').onclick = () => signOut(auth);
+    </script>
+</body>
+</html>
