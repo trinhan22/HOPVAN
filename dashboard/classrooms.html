@@ -132,6 +132,27 @@
         ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
         ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
         ::-webkit-scrollbar-button { display: none; }
+
+        /* --- USER HEADER STYLE (Giống Dashboard) --- */
+        .user-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 30px; position: relative; z-index: 10;
+        }
+        .welcome-text h2 { 
+            font-size: 2rem; font-weight: 800; color: #2D3436; margin-bottom: 4px;
+        }
+        .user-avatar { 
+            width: 50px; height: 50px; 
+            background: linear-gradient(135deg, #FF8F50, #FF5E62); 
+            border-radius: 16px; 
+            display: flex; justify-content: center; align-items: center; 
+            color: white; font-weight: 800; font-size: 1.2rem; 
+            box-shadow: 0 8px 20px rgba(255, 143, 80, 0.25); 
+            transform: rotate(-5deg); transition: 0.3s; cursor: pointer; 
+            overflow: hidden;
+        }
+        .user-avatar:hover { transform: rotate(0deg) scale(1.05); }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -147,13 +168,18 @@
     <div id="menu-placeholder"></div>
 
     <main class="main-content">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-            <div>
-                <h1 class="text-3xl font-black text-gray-800">Lớp học của tôi</h1>
-                <p class="text-gray-500 mt-1">Danh sách các lớp bạn đang theo học.</p>
+        <div class="user-header">
+            <div class="welcome-text">
+                <h2 id="welcome-name">Xin chào,</h2>
+                <p style="color: var(--text-light); margin-top: 5px;">Hãy cùng bắt đầu học tập cùng với HopVan nhé!</p>
             </div>
-            
-            <button onclick="openJoinModal()" class="btn-add-class w-full md:w-auto justify-center">
+            <div class="user-avatar" id="avatar-initial" onclick="window.location.href='account.html'" title="Đi đến t  rang cá nhân">
+                </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-black text-gray-700 uppercase tracking-wide">Danh sách lớp</h3>
+            <button onclick="openJoinModal()" class="btn-add-class hover:shadow-lg transition-all transform hover:-translate-y-1">
                 <i data-feather="plus-circle"></i> Tham gia lớp mới
             </button>
         </div>
@@ -263,6 +289,29 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
+
+                // --- 1. HIỂN THỊ TÊN & AVATAR (MỚI THÊM) ---
+                const name = user.displayName || user.email.split('@')[0];
+                document.getElementById('welcome-name').textContent = `Xin chào, ${name}`;
+
+                // Lấy thông tin chi tiết từ Firestore để có Avatar chuẩn nhất
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                let avatarHTML = name.charAt(0).toUpperCase(); // Mặc định là chữ cái đầu
+
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    // Ưu tiên Avatar tùy chỉnh > Avatar Google > Chữ cái
+                    if (userData.customAvatar) {
+                        avatarHTML = `<img src="${userData.customAvatar}" alt="User">`;
+                        document.getElementById('avatar-initial').style.background = 'transparent'; // Xóa nền cam nếu có ảnh
+                    } else if (userData.photoURL || user.photoURL) {
+                        avatarHTML = `<img src="${userData.photoURL || user.photoURL}" alt="User">`;
+                        document.getElementById('avatar-initial').style.background = 'transparent';
+                    }
+                }
+                document.getElementById('avatar-initial').innerHTML = avatarHTML;
+
+                // --- 2. TẢI LỚP HỌC (GIỮ NGUYÊN) ---
                 loadClassrooms(user.uid);
             } else {
                 window.location.href = "../log.html";

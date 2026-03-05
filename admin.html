@@ -936,41 +936,52 @@
 </div>
 
             <div id="view-history" class="view-section hidden">
-                <div class="glass-panel rounded-3xl p-8">
+                <div class="glass-panel rounded-3xl p-8 min-h-[600px] flex flex-col">
                     
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                         <div>
-                            <h3 class="font-black text-2xl text-gray-800">Danh Sách Tài Khoản</h3>
-                            <p class="text-xs text-gray-400 font-bold mt-1 uppercase">Quản lý thông tin & tiến độ học tập</p>
+                            <h3 class="font-black text-2xl text-gray-800">Quản Lý Tài Khoản</h3>
+                            <p class="text-xs text-gray-400 font-bold mt-1 uppercase">Danh sách thành viên hệ thống</p>
                         </div>
                         
                         <div class="flex items-center gap-3 w-full md:w-auto">
                             <div class="relative group w-full md:w-auto">
                                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors"></i>
                                 <input type="text" id="user-search" onkeyup="filterUsers()" 
-                                       placeholder="Tìm theo tên, email, trường..." 
+                                       placeholder="Tìm kiếm..." 
                                        class="glass-input pl-11 pr-4 py-2.5 text-sm font-bold w-full md:w-64 focus:w-full md:focus:w-80 transition-all duration-300 border-transparent focus:border-orange-300 focus:ring-4 focus:ring-orange-100"
-                                       style="padding-left: 2.75rem;"> </div>
-
-                            <button onclick="loadUsers()" class="w-11 h-11 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-orange-50 hover:text-orange-500 hover:rotate-180 transition shadow-sm flex-shrink-0" title="Làm mới danh sách">
+                                       style="padding-left: 2.75rem;"> 
+                            </div>
+                            <button onclick="loadUsers(currentRoleFilter)" class="w-11 h-11 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-orange-50 hover:text-orange-500 hover:rotate-180 transition shadow-sm flex-shrink-0" title="Làm mới">
                                 <i class="fas fa-sync"></i>
                             </button>
                         </div>
                     </div>
                     
-                    <div class="overflow-x-auto no-scrollbar pb-4">
+                    <div class="flex gap-2 mb-6 p-1.5 bg-gray-100 rounded-xl w-fit border border-gray-200">
+                        <button onclick="switchUserTab('all', this)" class="user-tab-btn active px-4 py-2 rounded-lg text-xs font-bold text-white bg-gray-800 shadow-md transition-all flex items-center gap-2">
+                            <i class="fas fa-users"></i> TẤT CẢ
+                        </button>
+                        <button onclick="switchUserTab('student', this)" class="user-tab-btn px-4 py-2 rounded-lg text-xs font-bold text-gray-500 hover:bg-white hover:text-gray-800 hover:shadow-sm transition-all flex items-center gap-2">
+                            <i class="fas fa-user-graduate"></i> HỌC SINH
+                        </button>
+                        <button onclick="switchUserTab('teacher', this)" class="user-tab-btn px-4 py-2 rounded-lg text-xs font-bold text-gray-500 hover:bg-white hover:text-orange-600 hover:shadow-sm transition-all flex items-center gap-2">
+                            <i class="fas fa-chalkboard-teacher"></i> GIÁO VIÊN
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto no-scrollbar pb-4 flex-1">
                         <table class="w-full text-left table-custom">
-                            <thead class="bg-gray-50/50">
+                            <thead class="bg-gray-50/50 sticky top-0 z-10 backdrop-blur-sm">
                                 <tr>
-                                    <th class="pl-4 whitespace-nowrap">Email / Tài khoản</th>
-                                    <th class="whitespace-nowrap">Họ tên hiển thị</th>
-                                    <th class="whitespace-nowrap">Trường / Lớp</th>
-                                    <th class="whitespace-nowrap">Tài sản (Keys)</th>
-                                    <th class="text-right pr-4 whitespace-nowrap">Hành động</th>
+                                    <th class="pl-4 whitespace-nowrap rounded-l-xl">Tài khoản</th>
+                                    <th class="whitespace-nowrap">Vai trò</th>
+                                    <th class="whitespace-nowrap">Thông tin</th>
+                                    <th class="whitespace-nowrap">Hoạt động</th>
+                                    <th class="text-right pr-4 whitespace-nowrap rounded-r-xl">Tác vụ</th>
                                 </tr>
                             </thead>
-                            <tbody id="user-list-body">
-                                </tbody>
+                            <tbody id="user-list-body"></tbody>
                         </table>
                     </div>
                 </div>
@@ -1115,6 +1126,7 @@
     let editors = {};     // Quản lý Quill cho Kho đề thi
     let currentCollection = 'essay_bank';
     let currentNewsFilter = 'all';
+    let currentRoleFilter = 'all'; // Mặc định hiển thị tất cả
 
     // --- CODE MỚI: QUẢN LÝ VIEW 2 (DẠNG BẢNG) ---
     let tableRowCounter = 0;
@@ -1643,7 +1655,7 @@ const CAT_MAP = {
         }
         if(viewId === 'bank') loadBank(currentCollection);
         if(viewId === 'journal') loadLevelsList();
-        if(viewId === 'history') loadUsers();
+        if(viewId === 'history') loadUsers(currentRoleFilter);
         if(viewId === 'news') loadNews(currentNewsFilter);
         if(viewId === 'feedbacks') loadFeedbacks();
     };
@@ -2619,20 +2631,31 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
         }
     };
 
-// --- 7. QUẢN LÝ THÀNH VIÊN (USER MANAGER) ---
-    // --- 7. QUẢN LÝ THÀNH VIÊN (USER MANAGER) ---
-    window.loadUsers = async () => {
+    // --- 7. QUẢN LÝ THÀNH VIÊN (NÂNG CẤP) ---
+    window.loadUsers = async (roleFilter = 'all') => {
         const tbody = document.getElementById('user-list-body');
-        tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center"><i class="fas fa-circle-notch fa-spin text-orange-500 text-2xl"></i><p class="text-xs text-gray-400 mt-2 font-bold">Đang tải danh sách tài khoản...</p></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="p-12 text-center"><div class="flex flex-col items-center"><i class="fas fa-circle-notch fa-spin text-orange-500 text-3xl mb-3"></i><p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Đang tải dữ liệu...</p></div></td></tr>';
 
         try {
-            const q = query(collection(db, "users")); 
+            let q;
+            const usersRef = collection(db, "users");
+
+            // Logic lọc theo Role
+            if (roleFilter === 'all') {
+                // Mặc định lấy 50 user mới nhất
+                q = query(usersRef, orderBy("lastLoginDate", "desc"), limit(50)); 
+            } else {
+                // Lọc chính xác theo role (student/teacher)
+                q = query(usersRef, where("role", "==", roleFilter));
+            }
+
             const snap = await getDocs(q);
             
             tbody.innerHTML = "";
             
             if(snap.empty) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-gray-400 font-bold">Chưa có tài khoản nào.</td></tr>';
+                const emptyMsg = roleFilter === 'teacher' ? 'Chưa có giáo viên nào.' : 'Chưa có tài khoản nào.';
+                tbody.innerHTML = `<tr><td colspan="5" class="p-12 text-center text-gray-400 font-bold border-2 border-dashed border-gray-100 rounded-xl my-4 opacity-70">${emptyMsg}</td></tr>`;
                 return;
             }
 
@@ -2641,60 +2664,75 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
                 const uid = doc.id;
                 
                 const email = u.email || "No Email";
-                const initial = email.charAt(0).toUpperCase();
-                const name = u.name || '<span class="text-gray-300 italic text-xs">Chưa cập nhật tên</span>';
-                const school = u.school || '<span class="text-gray-300 italic text-xs">Chưa có trường</span>';
-                const grade = u.grade ? `<span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-[10px] font-bold">Khối ${u.grade}</span>` : '<span class="text-gray-300 text-xs">--</span>';
-                const keys = u.keys || 0;
-                
-                // --- XỬ LÝ AVATAR MỚI ---
-                let avatarHtml = initial; // Mặc định là chữ cái
-                if (u.customAvatar) {
-                    avatarHtml = `<img src="${u.customAvatar}" class="w-full h-full object-cover">`;
-                } else if (u.photoURL) {
-                    avatarHtml = `<img src="${u.photoURL}" class="w-full h-full object-cover">`;
-                }
-                
+                const name = u.name || '<span class="text-gray-300 italic">Chưa đặt tên</span>';
                 const isAdmin = email === 'admin@hopvan.com';
-                const rowClass = isAdmin ? "bg-orange-50/30 border-l-4 border-orange-500" : "hover:bg-gray-50";
-                const roleBadge = isAdmin ? '<i class="fas fa-crown text-yellow-500 ml-2" title="Quản trị viên"></i>' : '';
+                
+                // --- Xử lý Role Badge (Đẹp hơn) ---
+                let roleBadge = '<span class="bg-gray-100 text-gray-500 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider">Học sinh</span>';
+                
+                if (u.role === 'teacher') {
+                    roleBadge = `<span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center w-fit gap-1"><i class="fas fa-chalkboard-teacher"></i> Giáo viên</span>`;
+                }
+                if (isAdmin) {
+                    roleBadge = `<span class="bg-yellow-100 text-yellow-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center w-fit gap-1"><i class="fas fa-crown"></i> Admin</span>`;
+                }
+
+                // --- Thông tin phụ ---
+                let infoDetail = '';
+                if (u.role === 'teacher') {
+                    infoDetail = `<div class="text-xs text-gray-500 font-medium"><i class="fas fa-book mr-1 text-orange-300"></i> ${u.subject || 'Ngữ Văn'}</div>`;
+                } else {
+                    const grade = u.grade ? `K${u.grade}` : '--';
+                    const school = u.school ? u.school.substring(0, 15) + (u.school.length>15?'...':'') : 'No School';
+                    infoDetail = `<div class="text-xs text-gray-500 font-medium">${school} • <b class="text-gray-700">${grade}</b></div>`;
+                }
+
+                // Avatar
+                let avatarContent = name.charAt(0).toUpperCase();
+                if (u.customAvatar) avatarContent = `<img src="${u.customAvatar}" class="w-full h-full object-cover">`;
+                else if (u.photoURL) avatarContent = `<img src="${u.photoURL}" class="w-full h-full object-cover">`;
+
+                // Row Style
+                const rowClass = isAdmin ? "bg-orange-50/50 border-l-4 border-l-orange-400" : "hover:bg-gray-50 border-b border-gray-50";
 
                 const tr = document.createElement('tr');
-                tr.className = `transition border-b border-gray-50 ${rowClass}`;
+                tr.className = `transition-all duration-200 ${rowClass}`;
                 
-                // Gắn HTML, chú ý thêm "overflow-hidden" vào class của khung chứa Avatar để ảnh được bo tròn
                 tr.innerHTML = `
                     <td class="pl-4 py-4 whitespace-nowrap"> 
-                        <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center font-black text-gray-500 shadow-inner overflow-hidden">
-                                ${avatarHtml}
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center font-black text-gray-500 overflow-hidden shadow-sm">
+                                ${avatarContent}
                             </div>
                             <div class="flex flex-col">
-                                <span class="font-bold text-gray-700 text-sm flex items-center">${email.split('@')[0]} ${roleBadge}</span>
-                                <span class="text-[10px] text-gray-400 font-mono">${uid.slice(0,6)}...</span>
+                                <span class="font-bold text-gray-700 text-sm truncate max-w-[150px]">${name}</span>
+                                <span class="text-[10px] text-gray-400 font-mono truncate max-w-[150px]">${email}</span>
                             </div>
                         </div>
                     </td>
-                    <td class="text-sm font-medium text-gray-600 whitespace-nowrap">${name}</td> 
-                    <td class="text-sm whitespace-nowrap"> 
-                        <div class="flex flex-col">
-                            <span class="font-bold text-gray-700 text-xs">${school}</span>
-                            <span class="mt-1">${grade}</span>
+                    <td class="whitespace-nowrap align-middle">
+                        ${roleBadge}
+                    </td>
+                    <td class="whitespace-nowrap align-middle"> 
+                        ${infoDetail}
+                    </td>
+                    <td class="whitespace-nowrap align-middle">
+                        <div class="flex flex-col gap-1">
+                            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wide">Login: ${u.lastLoginDate || 'N/A'}</span>
+                            <div class="flex items-center gap-3 text-xs font-bold text-gray-600">
+                                <span title="Streak"><i class="fas fa-fire text-red-400"></i> ${u.streak||0}</span>
+                                <span title="Keys"><i class="fas fa-key text-yellow-400"></i> ${u.keys||0}</span>
+                            </div>
                         </div>
                     </td>
-                    <td>
-                        <div class="flex items-center gap-1 font-black text-orange-500">
-                            ${keys} <i class="fas fa-key text-[10px] text-orange-300"></i>
-                        </div>
-                    </td>
-                    <td class="text-right pr-4 whitespace-nowrap">
-                        <button onclick='openUserDetail(${JSON.stringify(u)})' class="bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 px-3 py-2 rounded-xl shadow-sm transition text-xs font-bold mr-2">
-                            <i class="fas fa-eye mr-1"></i> Xem
+                    <td class="text-right pr-4 whitespace-nowrap align-middle">
+                        <button onclick='openUserDetail(${JSON.stringify(u)})' class="bg-white border border-gray-200 text-gray-400 hover:text-blue-500 hover:border-blue-200 w-8 h-8 rounded-lg transition shadow-sm" title="Xem chi tiết">
+                            <i class="fas fa-eye text-xs"></i>
                         </button>
                         
                         ${!isAdmin ? `
-                        <button onclick="confirmDeleteUser('${uid}', '${email}')" class="bg-white border border-red-200 text-red-500 hover:bg-red-50 hover:border-red-400 px-3 py-2 rounded-xl shadow-sm transition text-xs font-bold" title="Xóa tài khoản này">
-                            <i class="fas fa-user-times"></i>
+                        <button onclick="confirmDeleteUser('${uid}', '${email}')" class="bg-white border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 w-8 h-8 rounded-lg transition shadow-sm ml-1" title="Xóa">
+                            <i class="fas fa-trash-alt text-xs"></i>
                         </button>` : ''}
                     </td>
                 `;
@@ -2703,7 +2741,7 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
 
         } catch (e) {
             console.error(e);
-            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-400 font-bold">Lỗi tải dữ liệu: ${e.message}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-red-400 font-bold bg-red-50 rounded-xl">Lỗi tải dữ liệu: ${e.message}</td></tr>`;
         }
     };
 
@@ -2899,6 +2937,21 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
         t.classList.remove('translate-x-60');
         setTimeout(() => t.classList.add('translate-x-60'), 3000);
     }
+
+    // --- USER TABS LOGIC ---
+    window.switchUserTab = (role, btn) => {
+        currentRoleFilter = role;
+        
+        // Update UI Tabs Styles
+        document.querySelectorAll('.user-tab-btn').forEach(b => {
+            b.classList.remove('active', 'bg-gray-800', 'text-white', 'shadow-md');
+            b.classList.add('text-gray-500', 'hover:bg-white', 'hover:shadow-sm');
+        });
+        btn.classList.remove('text-gray-500', 'hover:bg-white', 'hover:shadow-sm');
+        btn.classList.add('active', 'bg-gray-800', 'text-white', 'shadow-md');
+
+        loadUsers(role);
+    };
 </script>
 
 <script type="text/javascript">
