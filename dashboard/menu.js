@@ -114,23 +114,66 @@ const menuStyles = `
 const menuHTML = `
 <aside class="sidebar-comp" id="main-sidebar">
     <a href="../" class="sb-logo-link group">
-        <div class="logo-card-box shadow-lg"><img src="../LOGO.WEBP" alt="HopVan Logo" class="drop-shadow-md"></div>
+        <div class="logo-card-box shadow-lg">
+            <img src="../LOGO.WEBP" alt="HopVan Logo" class="drop-shadow-md">
+        </div>
         <div><h1 class="block">HOPVAN</h1></div>
     </a>
-    <nav class="sb-list">
-        <a href="../dashboard" class="sb-link" data-page="index"><i class="fas fa-home"></i> Tổng quan</a>
-        <a class="px-6 mt-2 mb-0 ml-[-7px] text-[10px] font-black text-gray-400 uppercase tracking-widest">Quản Lý Học Tập</>
-        <a href="classrooms.html" class="sb-link" data-page="classrooms"><i class="fas fa-chalkboard-teacher"></i> Lớp học của tôi</a>
-        <a href="phongluyende.html" class="sb-link" data-page="phongluyende"><i class="fas fa-pen-nib"></i> Phòng luyện đề</a>
-        <a href="bantinvanhoc.html" class="sb-link" data-page="bantinvanhoc"><i class="fas fa-newspaper"></i> Bản tin Văn học</a>
-        <a href="congdong.html" class="sb-link" data-page="congdong"><i class="fas fa-users"></i> Cộng đồng</a>
-        <a href="nhatkyhoctap.html" class="sb-link" data-page="nhatkyhoctap"><i class="fas fa-book-journal-whills"></i> Nhật ký học tập</a>
-        <a class="px-6 mt-2 mb-0 ml-[-7px] text-[10px] font-black text-gray-400 uppercase tracking-widest">Cá Nhân</>
-        <a href="account.html" class="sb-link" data-page="account"><i class="fas fa-user-cog"></i> Quản lý tài khoản</a>
+
+    <nav class="sb-list" style="padding: 0 12px; gap: 4px;">
+        <a href="../dashboard" class="sb-link" data-page="index" style="padding: 14px 18px;">
+            <i class="fas fa-home w-5 text-center"></i> Tổng quan
+        </a>
+
+        <div class="px-4 mt-3.5 mb-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest opacity-80">Quản Lý Học Tập</div>
+        <a href="classrooms.html" class="sb-link" data-page="classrooms" style="padding: 14px 18px;">
+            <i class="fas fa-chalkboard-teacher w-5 text-center"></i> Lớp học của tôi
+        </a>
+        <a href="phongluyende.html" class="sb-link" data-page="phongluyende" style="padding: 14px 18px;">
+            <i class="fas fa-pen-nib w-5 text-center"></i> Phòng luyện đề
+        </a>
+
+        <a href="nhatkyhoctap.html" class="sb-link" data-page="nhatkyhoctap" style="padding: 14px 18px;">
+            <i class="fas fa-book-journal-whills w-5 text-center"></i> Nhật ký học tập
+        </a>
+
+        <div class="px-4 mt-3.5 mb-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest opacity-80">Khám Phá</div>
+        <a href="bantinvanhoc.html" class="sb-link" data-page="bantinvanhoc" style="padding: 14px 18px;">
+            <i class="fas fa-newspaper w-5 text-center"></i> Bản tin Văn học
+        </a>
+
+        <a href="congdong.html" class="sb-link" data-page="congdong" style="padding: 14px 18px;">
+            <i class="fas fa-users w-5 text-center"></i> Cộng đồng
+        </a>        
+
+        <div class="px-4 mt-3.5 mb-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest opacity-80">Cá Nhân</div>
+        <a href="account.html" class="sb-link" data-page="account" style="padding: 14px 18px;">
+            <i class="fas fa-user-cog w-5 text-center"></i> Quản lý tài khoản
+        </a>
     </nav>
-    <div class="sb-footer">
-        <button id="menu-btn-feedback" class="menu-btn btn-feedback"><i class="far fa-comment-dots"></i> Gửi góp ý</button>
-        <button id="menu-btn-logout" class="menu-btn btn-logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+
+    <div class="sb-footer" style="padding: 15px; gap: 8px;">
+        <div class="grid grid-cols-2 gap-2">
+            <button id="menu-btn-feedback" class="menu-btn btn-feedback" style="padding: 9px; font-size: 0.8rem;">
+                <i class="far fa-comment-dots"></i> Góp ý
+            </button>
+            <button id="menu-btn-logout" class="menu-btn btn-logout" style="padding: 9px; font-size: 0.8rem;">
+                <i class="fas fa-sign-out-alt"></i> Thoát
+            </button>
+        </div>
+
+        <div style="margin-top: 8px; width: 100%; display: flex; justify-content: center;">
+            <div style="
+                display: inline-flex; align-items: center; gap: 8px; 
+                padding: 6px 16px; border-radius: 999px; 
+                background-color: rgba(249, 250, 251, 0.8); border: 1px solid #f3f4f6;
+                backdrop-filter: blur(4px); cursor: default;
+            " onmouseover="this.style.backgroundColor='#ffffff'" onmouseout="this.style.backgroundColor='rgba(249, 250, 251, 0.8)'">
+                <span style="font-size: 9px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1.2px;">HopVan Platform</span>
+                <span style="width: 5px; height: 5px; border-radius: 50%; background-color: #22c55e;"></span>
+                <span style="font-size: 10px; font-weight: 700; color: #f97316; font-family: monospace;">v1.1.0</span>
+            </div>
+        </div>
     </div>
 </aside>
 
