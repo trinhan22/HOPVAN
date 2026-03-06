@@ -532,6 +532,60 @@
         .btn-cancel { background: #f3f4f6; color: #4b5563; }
         .btn-confirm-danger { background: #dc2626; color: white; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3); }
         .btn-confirm-danger:hover { background: #b91c1c; }
+
+        /* --- FEEDBACK ADMIN NEW STYLE --- */
+        .fb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        
+        .fb-card { 
+            background: white; border-radius: 20px; padding: 24px; 
+            border: 1px solid #f1f5f9; box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
+            display: flex; flex-direction: column; transition: 0.2s; position: relative; overflow: hidden; 
+        }
+        .fb-card:hover { border-color: #fed7aa; box-shadow: 0 15px 40px rgba(255, 143, 80, 0.08); transform: translateY(-3px); }
+        
+        /* Đường kẻ trạng thái bên trái */
+        .fb-status-line { position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #e2e8f0; }
+        .fb-card.replied .fb-status-line { background: #22c55e; } /* Xanh: Đã trả lời */
+        .fb-card.new .fb-status-line { background: #ef4444; }    /* Đỏ: Mới */
+
+        .fb-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; padding-left: 12px; }
+        .fb-user-info h4 { font-weight: 800; color: #1e293b; font-size: 0.95rem; }
+        .fb-user-info p { font-size: 0.7rem; color: #94a3b8; font-weight: 600; margin-top: 2px; }
+        
+        .fb-content-box { 
+            background: #f8fafc; padding: 16px; border-radius: 14px; 
+            color: #334155; font-size: 0.9rem; line-height: 1.5; margin-bottom: 16px; 
+            border: 1px dashed #e2e8f0; margin-left: 12px; font-weight: 500;
+        }
+        
+        .fb-reply-section { margin-top: auto; padding-left: 12px; }
+        .fb-label { font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px; display: block; }
+        
+        .fb-input { 
+            width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; 
+            font-size: 0.85rem; transition: 0.2s; outline: none; background: white; resize: none; color: #334155;
+        }
+        .fb-input:focus { border-color: #f97316; box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1); }
+        
+        .fb-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+        .btn-fb-send { 
+            padding: 8px 16px; background: #1e293b; color: white; border-radius: 10px; 
+            font-size: 0.75rem; font-weight: 700; transition: 0.2s; display: flex; align-items: center; gap: 6px; 
+        }
+        .btn-fb-send:hover { background: #0f172a; transform: translateY(-1px); }
+        .btn-fb-del { 
+            width: 32px; height: 32px; border-radius: 10px; background: #fee2e2; color: #ef4444; 
+            display: flex; align-items: center; justify-content: center; transition: 0.2s; font-size: 0.8rem;
+        }
+        .btn-fb-del:hover { background: #ef4444; color: white; }
+
+        /* Feedback Filter Buttons */
+        .fb-filter-btn.active {
+            background: #1e293b; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .fb-filter-btn:not(.active):hover {
+            background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
     </style>
 </head>
 <body class="h-screen flex">
@@ -988,19 +1042,29 @@
             </div>
 
 <div id="view-feedbacks" class="view-section hidden">
-    <div class="glass-panel rounded-3xl p-8">
-        <div class="flex justify-between items-center mb-8">
-            <div>
-                <h3 class="font-black text-2xl text-gray-800">Hộp Thư Góp Ý</h3>
-                <p class="text-xs text-gray-400 font-bold mt-1 uppercase">Phản hồi từ người dùng</p>
+                <div class="glass-panel rounded-3xl p-8">
+                    
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                        <div>
+                            <h3 class="font-black text-2xl text-gray-800">Hộp Thư Góp Ý</h3>
+                            <p class="text-xs text-gray-400 font-bold mt-1 uppercase">Phản hồi từ người dùng</p>
+                        </div>
+
+                        <div class="flex bg-gray-100 p-1 rounded-xl">
+                            <button onclick="filterFeedbacks('all', this)" class="fb-filter-btn active px-4 py-2 rounded-lg text-xs font-bold text-white bg-gray-800 shadow-sm transition-all">Tất cả</button>
+                            <button onclick="filterFeedbacks('new', this)" class="fb-filter-btn px-4 py-2 rounded-lg text-xs font-bold text-gray-500 hover:text-red-500 transition-all">Chưa trả lời</button>
+                            <button onclick="filterFeedbacks('replied', this)" class="fb-filter-btn px-4 py-2 rounded-lg text-xs font-bold text-gray-500 hover:text-green-600 transition-all">Đã trả lời</button>
+                        </div>
+
+                        <button onclick="loadFeedbacks()" class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 hover:rotate-180 transition shadow-sm" title="Làm mới">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="feedback-list" class="fb-grid">
+                        </div>
+                </div>
             </div>
-            <button onclick="loadFeedbacks()" class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 hover:rotate-180 transition"><i class="fas fa-sync"></i></button>
-        </div>
-        
-        <div id="feedback-list" class="grid grid-cols-1 gap-4">
-            </div>
-    </div>
-</div>
 
         </main>
     </div>
@@ -1127,6 +1191,7 @@
     let currentCollection = 'essay_bank';
     let currentNewsFilter = 'all';
     let currentRoleFilter = 'all'; // Mặc định hiển thị tất cả
+    let currentFeedbackFilter = 'all';
 
     // --- CODE MỚI: QUẢN LÝ VIEW 2 (DẠNG BẢNG) ---
     let tableRowCounter = 0;
@@ -2865,56 +2930,105 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
         }
     };
 
-// --- 7. QUẢN LÝ GÓP Ý (FEEDBACK LOGIC) ---
+    // --- 7. QUẢN LÝ GÓP Ý & PHẢN HỒI (GIAO DIỆN MỚI) ---
+    // Hàm xử lý khi bấm nút lọc
+    window.filterFeedbacks = (status, btn) => {
+        currentFeedbackFilter = status;
+        
+        // Update UI nút bấm
+        document.querySelectorAll('.fb-filter-btn').forEach(b => {
+            b.classList.remove('active', 'bg-gray-800', 'text-white', 'shadow-sm');
+            b.classList.add('text-gray-500');
+        });
+        btn.classList.add('active', 'bg-gray-800', 'text-white', 'shadow-sm');
+        btn.classList.remove('text-gray-500');
+
+        // Gọi hàm load lại dữ liệu
+        loadFeedbacks();
+    };
+
     window.loadFeedbacks = async () => {
         const container = document.getElementById('feedback-list');
-        container.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-orange-500 text-2xl"></i></div>';
+        container.className = "fb-grid"; 
+        container.innerHTML = '<div class="col-span-full text-center py-12"><i class="fas fa-circle-notch fa-spin text-orange-500 text-3xl"></i></div>';
 
         try {
-            // Lấy dữ liệu từ collection 'feedbacks', sắp xếp mới nhất lên đầu
+            // Lấy toàn bộ trước, rồi lọc ở client (do Firestore query phức tạp với orderBy timestamp)
+            // Nếu dữ liệu lớn, cần đánh index composite để query where + orderBy
             const q = query(collection(db, "feedbacks"), orderBy("timestamp", "desc"));
             const snap = await getDocs(q);
             
             container.innerHTML = "";
-            if (snap.empty) {
-                container.innerHTML = '<div class="text-center py-10 text-gray-400 font-bold border-2 border-dashed border-gray-200 rounded-2xl">Chưa có góp ý nào.</div>';
-                return;
-            }
+            let hasData = false;
 
             snap.forEach(d => {
                 const data = d.data();
-                const timeStr = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString('vi-VN') : 'N/A';
                 
-                // Tạo thẻ hiển thị từng góp ý
+                // --- LOGIC LỌC CLIENT-SIDE ---
+                const hasReply = data.reply && data.reply.trim() !== "";
+                
+                // Nếu đang lọc 'new' mà tin này đã reply -> Bỏ qua
+                if (currentFeedbackFilter === 'new' && hasReply) return;
+                // Nếu đang lọc 'replied' mà tin này chưa reply -> Bỏ qua
+                if (currentFeedbackFilter === 'replied' && !hasReply) return;
+
+                hasData = true;
+                const timeStr = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString('vi-VN') : 'N/A';
+                const cardClass = hasReply ? "replied" : "new";
+                const statusBadge = hasReply 
+                    ? `<span class="bg-green-50 text-green-600 px-2 py-1 rounded text-[10px] font-black uppercase"><i class="fas fa-check-circle mr-1"></i>Đã trả lời</span>` 
+                    : `<span class="bg-red-50 text-red-500 px-2 py-1 rounded text-[10px] font-black uppercase animate-pulse"><i class="fas fa-exclamation-circle mr-1"></i>Mới</span>`;
+
                 const div = document.createElement('div');
-                div.className = "bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition relative group";
+                div.className = `fb-card ${cardClass}`;
                 div.innerHTML = `
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center font-bold text-sm">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-gray-800 text-sm">${data.email || 'Ẩn danh'}</h4>
-                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">${timeStr}</p>
-                            </div>
+                    <div class="fb-status-line"></div>
+                    
+                    <div class="fb-header">
+                        <div class="fb-user-info">
+                            <h4>${data.email || 'Ẩn danh'}</h4>
+                            <p>${timeStr} • ${data.page || 'Trang chủ'}</p>
                         </div>
-                        <button onclick="deleteFeedback('${d.id}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-400 hover:bg-red-500 hover:text-white flex items-center justify-center transition opacity-0 group-hover:opacity-100">
-                            <i class="fas fa-trash-alt text-xs"></i>
-                        </button>
+                        <div class="flex items-center gap-2">
+                            ${statusBadge}
+                        </div>
                     </div>
-                    <div class="bg-gray-50 p-4 rounded-xl text-gray-700 text-sm leading-relaxed font-medium">
+
+                    <div class="fb-content-box">
                         "${data.content}"
                     </div>
-                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-400 font-mono">
-                        <i class="fas fa-link"></i> Gửi từ trang: <span class="text-blue-400 truncate max-w-[200px]">${data.page || 'N/A'}</span>
+
+                    <div class="fb-reply-section">
+                        <label class="fb-label"><i class="fas fa-reply mr-1"></i> Phản hồi của Admin</label>
+                        <textarea id="reply-input-${d.id}" class="fb-input" rows="2" placeholder="Nhập câu trả lời...">${data.reply || ''}</textarea>
+                        
+                        <div class="fb-actions">
+                            <button onclick="deleteFeedback('${d.id}')" class="btn-fb-del" title="Xóa">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                            <button onclick="sendReply('${d.id}')" class="btn-fb-send">
+                                <i class="fas fa-paper-plane"></i> ${hasReply ? 'Cập nhật' : 'Gửi trả lời'}
+                            </button>
+                        </div>
                     </div>
                 `;
                 container.appendChild(div);
             });
+
+            if (!hasData) {
+                let msg = "Chưa có góp ý nào.";
+                if (currentFeedbackFilter === 'new') msg = "Tuyệt vời! Bạn đã trả lời hết các góp ý.";
+                if (currentFeedbackFilter === 'replied') msg = "Chưa có góp ý nào được trả lời.";
+                
+                container.innerHTML = `<div class="col-span-full text-center py-16 text-gray-400 font-bold border-2 border-dashed border-gray-100 rounded-3xl opacity-70 flex flex-col items-center justify-center gap-3">
+                    <i class="far fa-folder-open text-4xl text-gray-300"></i>
+                    ${msg}
+                </div>`;
+            }
+
         } catch (e) {
             console.error("Lỗi tải feedback:", e);
-            container.innerHTML = `<div class="text-center text-red-500 py-4">Lỗi: ${e.message}</div>`;
+            container.innerHTML = `<div class="col-span-full text-center text-red-500 py-4 font-bold">Lỗi tải dữ liệu: ${e.message}</div>`;
         }
     };
 
@@ -2928,6 +3042,36 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
             } catch (e) {
                 alert("Lỗi xóa: " + e.message);
             }
+        }
+    };
+
+// Hàm gửi phản hồi
+    window.sendReply = async (id) => {
+        const input = document.getElementById(`reply-input-${id}`);
+        const replyText = input.value.trim();
+        const btn = input.nextElementSibling.querySelector('.btn-fb-send');
+        
+        if (!replyText) { alert("Vui lòng nhập nội dung phản hồi!"); return; }
+
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Đang gửi...`;
+        btn.disabled = true;
+
+        try {
+            // Cập nhật field 'reply' trong document feedback
+            await updateDoc(doc(db, "feedbacks", id), {
+                reply: replyText,
+                repliedAt: serverTimestamp() // Lưu thêm thời gian trả lời nếu cần
+            });
+            
+            showToast("Đã gửi phản hồi thành công!");
+            // Load lại để cập nhật trạng thái màu sắc (Xanh/Đỏ)
+            loadFeedbacks(); 
+        } catch (e) {
+            console.error(e);
+            alert("Lỗi khi gửi: " + e.message);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         }
     };
 

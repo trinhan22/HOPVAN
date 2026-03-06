@@ -1,10 +1,12 @@
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { 
+    getFirestore, collection, addDoc, serverTimestamp, 
+    query, where, orderBy, getDocs // <--- Đã thêm các hàm còn thiếu này
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// --- PHẦN 1: CSS GIAO DIỆN (ĐẸP & XỊN) ---
+// --- PHẦN 1: CSS GIAO DIỆN ---
 const menuStyles = `
 <style>
-
     :root {
         --sb-w: 280px;
         --sb-primary: #FF8F50;
@@ -18,74 +20,32 @@ const menuStyles = `
         width: var(--sb-w); height: 100vh;
         background: var(--sb-glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
         border-right: var(--sb-border); box-shadow: var(--sb-shadow);
-        display: flex; flex-direction: column; padding: 0; /* Để logo-link tự quản lý padding */
+        display: flex; flex-direction: column; padding: 0;
         position: fixed; top: 0; left: 0; z-index: 9999;
         font-family: 'Plus Jakarta Sans', sans-serif;
         transition: transform 0.3s ease;
     }
 
-    /* --- LOGO CHUYỂN HÓA (ĐÃ FIX KÍCH THƯỚC & VỊ TRÍ) --- */
+    /* LOGO */
     .sb-logo-link {
-        padding: 35px 35px 30px; /* Vị trí logo thoáng đãng */
-        display: flex; 
-        align-items: center; 
-        gap: 10px; 
-        text-decoration: none;
-        transition: all 0.3s ease;
+        padding: 35px 35px 30px; display: flex; align-items: center; gap: 10px; text-decoration: none; transition: all 0.3s ease;
     }
-
-    /* Hộp trắng chứa icon */
     .logo-card-box {
-        width: 52px; 
-        height: 52px;
-        background: white;
-        border-radius: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 10px 25px rgba(255, 143, 80, 0.15);
-        border: 1px solid rgba(255, 143, 80, 0.1);
+        width: 52px; height: 52px; background: white; border-radius: 15px;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 10px 25px rgba(255, 143, 80, 0.15); border: 1px solid rgba(255, 143, 80, 0.1);
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-
-    .logo-card-box img {
-        width: 42px; 
-        height: 42px;
-        object-fit: contain;
-    }
-
-    /* Chữ HOPVAN mặc định là Gradient */
+    .logo-card-box img { width: 42px; height: 42px; object-fit: contain; }
     .sb-logo-link h1 {
-        font-size: 1.5rem;
-        font-weight: 900;
-        line-height: 1;
-        margin: 0;
-        background: var(--sb-gradient);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        transition: all 0.3s ease;
-        letter-spacing: -0.5px;
+        font-size: 1.5rem; font-weight: 900; line-height: 1; margin: 0;
+        background: var(--sb-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        transition: all 0.3s ease; letter-spacing: -0.5px;
     }
+    .sb-logo-link:hover h1 { background: none; -webkit-text-fill-color: #FF8F50; color: #FF8F50; }
+    .sb-logo-link:hover .logo-card-box { transform: scale(1.05); box-shadow: 0 15px 35px rgba(255, 143, 80, 0.25); }
 
-    /* KHI HOVER: Chữ đổi sang màu CAM chuẩn */
-    .sb-logo-link:hover h1 {
-        background: none; /* Tắt gradient */
-        -webkit-text-fill-color: #FF8F50; /* Hiện màu Cam chuẩn */
-        color: #FF8F50;
-        transition: all 0.3s ease;
-    }
-
-    .sb-logo-link:hover {
-        opacity: 0.9;
-    }
-
-    .sb-logo-link:hover .logo-card-box {
-        transform: scale(1.05); /* Phóng to nhẹ */
-        box-shadow: 0 15px 35px rgba(255, 143, 80, 0.25); /* Bóng đổ nổi bật hơn */
-        border-color: rgba(255, 143, 80, 0.3);
-    }
-
-    /* Các phần menu list giữ nguyên từ code trước của bạn... */
+    /* MENU LIST */
     .sb-list { list-style: none; padding: 0 15px; margin: 0; flex: 1; display: flex; flex-direction: column; gap: 8px; }
     .sb-link {
         display: flex; align-items: center; gap: 16px; padding: 14px 18px;
@@ -99,29 +59,49 @@ const menuStyles = `
     .menu-btn { width: 100%; padding: 12px; border-radius: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.9rem; transition: 0.2s; border: none; font-family: inherit; }
     .btn-feedback { background: white; border: 1.5px solid #fed7aa; color: #f97316; }
     .btn-logout { background: #fef2f2; color: #ef4444; }
-    
-    /* Modal Overlay */
+
+    /* MODAL OVERLAY */
     .menu-modal-overlay {
         position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px);
         z-index: 20000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;
     }
     .menu-modal-overlay.show { display: flex; opacity: 1; }
-
     .menu-card {
         background: white; width: 90%; max-width: 400px; padding: 30px;
         border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.15);
         transform: scale(0.95); transition: transform 0.2s; text-align: center;
     }
     .menu-modal-overlay.show .menu-card { transform: scale(1); }
-
     .menu-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 15px; }
     .menu-input { width: 100%; padding: 14px; border: 2px solid #f1f5f9; border-radius: 14px; margin-bottom: 20px; outline: none; resize: none; background: #f8fafc; }
     .menu-input:focus { border-color: var(--sb-primary); background: white; }
-
     .menu-actions { display: flex; gap: 10px; }
     .btn-m-cancel { flex: 1; padding: 12px; border-radius: 12px; font-weight: 700; background: #f1f5f9; color: #64748b; cursor: pointer; border: none; }
     .btn-m-confirm { flex: 1; padding: 12px; border-radius: 12px; font-weight: 700; background: var(--sb-gradient); color: white; cursor: pointer; border: none; box-shadow: 0 4px 15px rgba(255, 94, 98, 0.2); }
-    .btn-m-confirm:disabled { opacity: 0.7; cursor: wait; }
+
+    /* FEEDBACK TABS & LIST */
+    .fb-tabs { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 20px; }
+    .fb-tab { flex: 1; padding: 10px; text-align: center; font-size: 0.85rem; font-weight: 700; color: #64748b; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+    .fb-tab.active { background: white; color: var(--sb-primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+    .fb-list { max-height: 300px; overflow-y: auto; text-align: left; display: flex; flex-direction: column; gap: 12px; padding-right: 5px; }
+    .fb-list::-webkit-scrollbar { width: 5px; }
+    .fb-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+    .fb-item { background: #f8fafc; padding: 14px; border-radius: 16px; border: 1px solid #e2e8f0; position: relative; }
+    .fb-date { font-size: 0.7rem; color: #94a3b8; font-weight: 600; margin-bottom: 4px; display: block;}
+    .fb-content { font-size: 0.9rem; color: #334155; font-weight: 500; line-height: 1.5; }
+    .status-badge { position: absolute; top: 12px; right: 12px; font-size: 0.65rem; font-weight: 800; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; }
+    .st-sent { background: #e2e8f0; color: #64748b; }
+    .st-replied { background: #dcfce7; color: #16a34a; }
+
+    /* ADMIN REPLY */
+    .fb-reply-box { margin-top: 10px; padding: 12px; background: #fff7ed; border-left: 3px solid #f97316; border-radius: 8px; display: flex; gap: 8px; align-items: start; }
+    .fb-reply-icon { color: #f97316; font-size: 1rem; margin-top: 2px; }
+    .fb-reply-text { font-size: 0.85rem; color: #c2410c; }
+    .fb-reply-title { font-weight: 800; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 2px; display: block; }
+    .fb-empty { text-align: center; padding: 30px 0; color: #cbd5e1; }
+    .fb-empty i { font-size: 2rem; margin-bottom: 10px; display: block; }
 
     @media (max-width: 1024px) {
         .sidebar-comp { transform: translateX(-100%); }
@@ -132,17 +112,11 @@ const menuStyles = `
 
 // --- PHẦN 2: HTML GIAO DIỆN ---
 const menuHTML = `
-
 <aside class="sidebar-comp" id="main-sidebar">
     <a href="../" class="sb-logo-link group">
-        <div class="logo-card-box shadow-lg">
-            <img src="../LOGO.WEBP" alt="HopVan Logo" class="drop-shadow-md">
-        </div>
-        <div>
-            <h1 class="block">HOPVAN</h1>
-        </div>
+        <div class="logo-card-box shadow-lg"><img src="../LOGO.WEBP" alt="HopVan Logo" class="drop-shadow-md"></div>
+        <div><h1 class="block">HOPVAN</h1></div>
     </a>
-
     <nav class="sb-list">
         <a href="../dashboard" class="sb-link" data-page="index"><i class="fas fa-home"></i> Tổng quan</a>
         <a class="px-6 mt-2 mb-0 ml-[-7px] text-[10px] font-black text-gray-400 uppercase tracking-widest">Quản Lý Học Tập</>
@@ -161,14 +135,31 @@ const menuHTML = `
 </aside>
 
 <div id="modal-feedback" class="menu-modal-overlay">
-    <div class="menu-card">
+    <div class="menu-card" style="max-width: 480px;">
         <div class="menu-icon" style="background: #fff7ed; color: #f97316;"><i class="fas fa-paper-plane"></i></div>
-        <h3 class="text-xl font-bold text-gray-800 mb-2">Góp ý hệ thống</h3>
-        <p class="text-sm text-gray-500 mb-4">Chia sẻ để Hopvan tốt hơn nhé!</p>
-        <textarea id="fb-content" rows="4" class="menu-input" placeholder="Bạn muốn nhắn nhủ điều gì..."></textarea>
-        <div class="menu-actions">
-            <button class="btn-m-cancel" id="btn-cancel-fb">Đóng</button>
-            <button class="btn-m-confirm" id="btn-submit-fb">Gửi đi</button>
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Hộp thư Góp ý</h3>
+
+        <div class="fb-tabs">
+            <div id="tab-fb-new" class="fb-tab active">Gửi góp ý mới</div>
+            <div id="tab-fb-history" class="fb-tab">Lịch sử & Phản hồi</div>
+        </div>
+
+        <div id="view-fb-new">
+            <p class="text-sm text-gray-500 mb-4">Chia sẻ ý kiến để Hopvan tốt hơn nhé!</p>
+            <textarea id="fb-content" rows="4" class="menu-input" placeholder="Bạn muốn nhắn nhủ điều gì..."></textarea>
+            <div class="menu-actions">
+                <button class="btn-m-cancel" id="btn-cancel-fb">Đóng</button>
+                <button class="btn-m-confirm" id="btn-submit-fb">Gửi đi</button>
+            </div>
+        </div>
+
+        <div id="view-fb-history" style="display: none;">
+            <div id="fb-history-list" class="fb-list">
+                <div class="fb-empty"><i class="far fa-folder-open"></i> Chưa có góp ý nào</div>
+            </div>
+            <div class="menu-actions" style="margin-top: 20px;">
+                <button class="btn-m-cancel" style="width: 100%;" id="btn-close-history">Đóng</button>
+            </div>
         </div>
     </div>
 </div>
@@ -193,13 +184,10 @@ export function initMenu(app) {
     const container = document.getElementById('menu-placeholder');
 
     if (container) {
-        // Nạp HTML & CSS vào trang
         container.innerHTML = menuStyles + menuHTML;
-        
-        // Chạy Logic
         startMenuLogic(auth, db);
     } else {
-        console.error("Thiếu div id='menu-placeholder' trong file HTML");
+        console.error("Thiếu div id='menu-placeholder'");
     }
 }
 
@@ -218,28 +206,122 @@ function startMenuLogic(auth, db) {
     // 2. MODAL LOGIC
     const fbModal = document.getElementById('modal-feedback');
     const logoutModal = document.getElementById('modal-logout');
-
     const openModal = (m) => { m.style.display = 'flex'; setTimeout(()=>m.classList.add('show'), 10); };
     const closeModal = (m) => { m.classList.remove('show'); setTimeout(()=>m.style.display = 'none', 200); };
 
-    // Events mở modal
     document.getElementById('menu-btn-feedback').onclick = () => openModal(fbModal);
     document.getElementById('menu-btn-logout').onclick = () => openModal(logoutModal);
-
-    // Events đóng modal
     document.getElementById('btn-cancel-fb').onclick = () => closeModal(fbModal);
     document.getElementById('btn-cancel-logout').onclick = () => closeModal(logoutModal);
-    
-    // 3. GỬI GÓP Ý (FIREBASE)
+    document.getElementById('btn-close-history').onclick = () => closeModal(fbModal);
+
+    // --- LOGIC GÓP Ý NÂNG CAO ---
+    const tabNew = document.getElementById('tab-fb-new');
+    const tabHistory = document.getElementById('tab-fb-history');
+    const viewNew = document.getElementById('view-fb-new');
+    const viewHistory = document.getElementById('view-fb-history');
+    const listContainer = document.getElementById('fb-history-list');
+
+    const switchFbTab = (tab) => {
+        if (tab === 'new') {
+            tabNew.classList.add('active'); tabHistory.classList.remove('active');
+            viewNew.style.display = 'block'; viewHistory.style.display = 'none';
+        } else {
+            tabHistory.classList.add('active'); tabNew.classList.remove('active');
+            viewNew.style.display = 'none'; viewHistory.style.display = 'block';
+            loadFeedbackHistory();
+        }
+    };
+    tabNew.onclick = () => switchFbTab('new');
+    tabHistory.onclick = () => switchFbTab('history');
+
+    // 3. HÀM TẢI LỊCH SỬ GÓP Ý (ĐÃ SỬA LỖI INDEX)
+    async function loadFeedbackHistory() {
+        if (!auth.currentUser) return;
+        
+        const listContainer = document.getElementById('fb-history-list');
+        listContainer.innerHTML = '<div class="fb-empty"><i class="fas fa-circle-notch fa-spin"></i>Đang tải...</div>';
+
+        try {
+            // FIX LỖI: Chỉ dùng WHERE để lấy dữ liệu về trước
+            const q = query(
+                collection(db, "feedbacks"),
+                where("uid", "==", auth.currentUser.uid)
+            );
+            
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                listContainer.innerHTML = `
+                    <div class="fb-empty">
+                        <i class="far fa-comment-alt"></i>
+                        Bạn chưa gửi góp ý nào.
+                    </div>`;
+                return;
+            }
+
+            // Xử lý dữ liệu và Sắp xếp (Sort) ngay tại đây
+            let feedbacks = [];
+            querySnapshot.forEach((doc) => {
+                feedbacks.push({ id: doc.id, ...doc.data() });
+            });
+
+            // Sắp xếp: Mới nhất lên đầu (Dựa vào timestamp)
+            feedbacks.sort((a, b) => {
+                const timeA = a.timestamp ? a.timestamp.seconds : 0;
+                const timeB = b.timestamp ? b.timestamp.seconds : 0;
+                return timeB - timeA;
+            });
+
+            // Render ra giao diện
+            let html = '';
+            feedbacks.forEach((data) => {
+                const date = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString('vi-VN') : 'Vừa xong';
+                
+                // Kiểm tra xem Admin đã trả lời chưa
+                const hasReply = data.reply && data.reply.trim() !== "";
+                
+                const statusBadge = hasReply 
+                    ? `<span class="status-badge st-replied">Đã trả lời</span>` 
+                    : `<span class="status-badge st-sent">Đã gửi</span>`;
+
+                const replyBox = hasReply ? `
+                    <div class="fb-reply-box">
+                        <i class="fas fa-reply fb-reply-icon"></i>
+                        <div>
+                            <span class="fb-reply-title">Admin phản hồi:</span>
+                            <div class="fb-reply-text">${data.reply}</div>
+                        </div>
+                    </div>
+                ` : '';
+
+                html += `
+                    <div class="fb-item">
+                        ${statusBadge}
+                        <span class="fb-date">${date}</span>
+                        <div class="fb-content">${data.content}</div>
+                        ${replyBox}
+                    </div>
+                `;
+            });
+
+            listContainer.innerHTML = html;
+
+        } catch (e) {
+            console.error("Lỗi tải lịch sử:", e);
+            // Hiển thị lỗi cụ thể để dễ debug hơn
+            listContainer.innerHTML = `<div class="fb-empty" style="color:red; font-size: 0.8rem;">Lỗi: ${e.message}</div>`;
+        }
+    }
+
+    // 4. GỬI GÓP Ý
     document.getElementById('btn-submit-fb').onclick = async () => {
         const btn = document.getElementById('btn-submit-fb');
         const input = document.getElementById('fb-content');
         const content = input.value.trim();
 
         if (!content) { alert("Bạn chưa nhập nội dung!"); return; }
-
-        btn.innerText = "Đang gửi...";
-        btn.disabled = true;
+        btn.innerText = "Đang gửi..."; btn.disabled = true;
 
         try {
             await addDoc(collection(db, "feedbacks"), {
@@ -247,21 +329,20 @@ function startMenuLogic(auth, db) {
                 email: auth.currentUser ? auth.currentUser.email : "unknown",
                 content: content,
                 page: window.location.pathname,
-                timestamp: serverTimestamp()
+                timestamp: serverTimestamp(),
+                reply: ""
             });
-            alert("Gửi thành công! Cảm ơn bạn.");
             input.value = "";
-            closeModal(fbModal);
+            switchFbTab('history'); // Chuyển sang tab lịch sử để thấy kết quả
         } catch (e) {
             console.error(e);
             alert("Lỗi kết nối. Vui lòng thử lại.");
         } finally {
-            btn.innerText = "Gửi đi";
-            btn.disabled = false;
+            btn.innerText = "Gửi đi"; btn.disabled = false;
         }
     };
 
-    // 4. ĐĂNG XUẤT
+    // 5. ĐĂNG XUẤT
     document.getElementById('btn-confirm-logout').onclick = async () => {
         try {
             await signOut(auth);
@@ -269,7 +350,7 @@ function startMenuLogic(auth, db) {
         } catch (e) { console.error(e); }
     };
 
-    // 5. Mobile Toggle
+    // 6. Mobile Toggle
     window.toggleSidebarGlobal = () => {
         document.getElementById('main-sidebar').classList.toggle('open');
     };
