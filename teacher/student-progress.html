@@ -381,7 +381,7 @@
                         <div class="flex flex-col">
                             <span>${t.name}</span>
                             <span class="text-[10px] font-normal opacity-80 mt-1">
-                                ${t.questionIds?.length || 0} câu
+                                ${(t.questions && t.questions.length) || (t.questionIds && t.questionIds.length) || 0} câu
                             </span>
                         </div>
                     </th>`;

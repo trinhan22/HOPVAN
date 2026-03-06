@@ -254,17 +254,15 @@
                     document.getElementById('teacher-avatar').src = t.customAvatar || t.photoURL || `https://placehold.co/50x50/FF8F50/ffffff?text=${t.name.charAt(0)}`;
                 }
 
-                // 3. Fetch Students (Chỉ lấy 20 người đầu tiên để demo)
+                // 3. Fetch Students (Simple limit 20)
                 const studentIds = classData.students || [];
                 document.getElementById('student-count').innerText = studentIds.length;
                 
-                // Fetch student docs in chunks if needed, here simplified
                 const sList = document.getElementById('students-list');
                 sList.innerHTML = '';
                 
-                const visibleStudents = studentIds.slice(0, 20); // Limit query
+                const visibleStudents = studentIds.slice(0, 20); 
                 if (visibleStudents.length > 0) {
-                    // SỬA LỖI QUERY ID: Dùng documentId() thay vì __name__
                     const qStudents = query(collection(db, "users"), where(documentId(), "in", visibleStudents));
                     const sSnaps = await getDocs(qStudents);
                     
@@ -281,27 +279,27 @@
 
                 // 4. Fetch Assignments (Bài tập)
                 const aList = document.getElementById('assignments-list');
-                const assignments = classData.assignments || []; // Array of objects { testId, assignedAt }
+                const assignments = classData.assignments || []; 
                 
                 if (assignments.length === 0) {
                     aList.innerHTML = `<div class="text-center py-10 bg-white/50 rounded-2xl border-2 border-dashed border-gray-200"><p class="text-gray-400 font-bold">Chưa có bài tập nào.</p></div>`;
                     return;
                 }
 
-                // Lấy danh sách ID đề thi
                 const testIds = assignments.map(a => a.testId);
-                
-                // Fetch Tests Details (SỬA LỖI documentId)
-                // Firestore 'in' query supports max 10 items. Cần chia chunk nếu > 10.
                 const testsData = await fetchDocsInChunks(collection(db, "tests"), testIds);
 
-                // Fetch Submissions để xem đã làm chưa
+                // --- SỬA LỖI Ở ĐÂY: Lấy cả ID của document ---
                 const submissionsSnap = await getDocs(query(collection(db, "submissions"), where("studentId", "==", currentUser.uid), where("classId", "==", classId)));
-                const submissions = submissionsSnap.docs.map(d => d.data());
+                // Map thêm ID vào object data
+                const submissions = submissionsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
                 aList.innerHTML = testsData.map(t => {
                     const sub = submissions.find(s => s.testId === t.id);
                     const isDone = !!sub;
+                    
+                    // Kiểm tra ID bài làm (Ưu tiên sub.id thực từ Firestore)
+                    const resultLink = sub ? `result.html?submissionId=${sub.id}` : '#';
                     
                     return `
                     <div class="assignment-card group">
@@ -311,13 +309,13 @@
                                 <h3>${t.name}</h3>
                                 <div class="asg-meta">
                                     <span><i class="far fa-clock"></i> ${t.timeLimit} phút</span>
-                                    <span><i class="far fa-question-circle"></i> ${t.questions ? t.questions.length : 0} câu</span>
+                                    <span><i class="far fa-question-circle"></i> ${t.questions ? t.questions.length : (t.questionIds ? t.questionIds.length : 0)} câu</span>
                                 </div>
                             </div>
                         </div>
                         <div>
                             ${isDone 
-                                ? `<a href="result.html?submissionId=${sub.id}" class="btn-result">Xem Kết Quả</a>`
+                                ? `<a href="${resultLink}" class="btn-result">Xem Kết Quả</a>`
                                 : `<a href="do-test.html?testId=${t.id}&classId=${classId}" class="btn-start">Làm Bài Ngay <i class="fas fa-arrow-right ml-2"></i></a>`
                             }
                         </div>

@@ -42,6 +42,20 @@
         ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
         ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
         ::-webkit-scrollbar-button { display: none; }
+
+        /* Style riêng cho Confirm Modal để nó nằm trên cùng */
+        #confirm-role-modal { z-index: 9999; }
+        #confirm-role-modal .modal-content { transform: scale(0.95); opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        #confirm-role-modal.show .modal-content { transform: scale(1); opacity: 1; }
+
+        /* Style cho Alert Modal */
+        #alert-modal { z-index: 10000; }
+        .alert-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        
+        /* Màu sắc trạng thái */
+        .alert-error .alert-icon { background: #fee2e2; color: #ef4444; border: 4px solid #fef2f2; }
+        .alert-success .alert-icon { background: #dcfce7; color: #22c55e; border: 4px solid #f0fdf4; }
+        .alert-warning .alert-icon { background: #fef3c7; color: #f59e0b; border: 4px solid #fffbeb; }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4 sm:p-6">
@@ -118,49 +132,79 @@
                     <input type="hidden" id="reg-role" value="student">
                 </div>
 
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Tên hiển thị</label>
-                    <div class="relative"><i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="reg-name" class="input-field w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="Nguyễn Văn A" required></div>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Email</label>
-                    <div class="relative"><i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="email" id="reg-email" class="input-field w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="example@email.com" required></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Tên hiển thị</label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                            <input type="text" id="reg-name" class="input-field w-full pl-9 pr-2 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="Tên bạn" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Email</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                            <input type="email" id="reg-email" class="input-field w-full pl-9 pr-2 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="Email" required>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="student-fields" class="grid grid-cols-2 gap-3 transition-all duration-300">
-                    <div class="col-span-2">
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Trường học</label>
-                        <div class="relative"><i class="fas fa-school absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="reg-school-student" class="input-field w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="Tên trường..."></div>
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Trường</label>
+                        <div class="relative">
+                            <i class="fas fa-school absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                            <input type="text" id="reg-school-student" class="input-field w-full pl-9 pr-2 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="Tên trường">
+                        </div>
                     </div>
-                    <div class="col-span-2">
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Khối lớp</label>
-                        <div class="relative"><i class="fas fa-layer-group absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><select id="reg-grade" class="input-field w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm appearance-none cursor-pointer"><option value="10">Lớp 10</option><option value="11">Lớp 11</option><option value="12">Lớp 12</option></select><i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i></div>
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Khối</label>
+                        <div class="relative">
+                            <select id="reg-grade" class="input-field w-full pl-3 pr-8 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm appearance-none cursor-pointer">
+                                <option value="10">Lớp 10</option>
+                                <option value="11">Lớp 11</option>
+                                <option value="12">Lớp 12</option>
+                            </select>
+                            <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i>
+                        </div>
                     </div>
                 </div>
 
                 <div id="teacher-fields" class="grid grid-cols-2 gap-3 hidden transition-all duration-300">
-                    <div class="col-span-2">
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Đơn vị công tác</label>
-                        <div class="relative"><i class="fas fa-briefcase absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="reg-school-teacher" class="input-field w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="Tên trường / Trung tâm..."></div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Công tác</label>
+                        <div class="relative">
+                            <i class="fas fa-briefcase absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                            <input type="text" id="reg-school-teacher" class="input-field w-full pl-9 pr-2 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="Trường/TT">
+                        </div>
                     </div>
-                    <div class="col-span-2">
+                    <div>
                         <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Chuyên môn</label>
-                        <div class="relative"><i class="fas fa-book-open absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input type="text" id="reg-subject" class="input-field w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="VD: Ngữ Văn"></div>
+                        <div class="relative">
+                            <i class="fas fa-book-open absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                            <input type="text" id="reg-subject" class="input-field w-full pl-9 pr-2 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="Môn dạy">
+                        </div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Mật khẩu</label>
-                        <div class="relative"><input type="password" id="reg-pass" class="input-field w-full px-4 pr-8 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="••••••" required></div>
+                        <div class="relative">
+                            <input type="password" id="reg-pass" class="input-field w-full px-3 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="••••••" required>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 pl-1">Nhập lại</label>
-                        <div class="relative"><input type="password" id="reg-confirm" class="input-field w-full px-4 pr-8 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="••••••" required></div>
+                        <div class="relative">
+                            <input type="password" id="reg-confirm" class="input-field w-full px-3 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-semibold text-sm" placeholder="••••••" required>
+                        </div>
                     </div>
                 </div>
 
-                <button type="submit" id="reg-submit-btn" class="w-full py-3.5 rounded-xl text-white font-bold btn-gradient flex justify-center items-center gap-2 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/40 mt-2"><span>Tạo tài khoản</span></button>
+                <button type="submit" id="reg-submit-btn" class="w-full py-3.5 rounded-xl text-white font-bold btn-gradient flex justify-center items-center gap-2 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/40 mt-4">
+                    <span>Tạo tài khoản</span>
+                </button>
             </form>
 
             <div class="relative my-5 text-center">
@@ -202,6 +246,53 @@
         </div>
     </div>
 
+<div id="confirm-role-modal" class="modal-overlay">
+        <div class="modal-content text-left max-w-sm w-full p-0 overflow-hidden relative">
+            <div class="h-2 w-full bg-gradient-to-r from-orange-400 to-red-500"></div>
+            <button onclick="closeConfirmModal()" class="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition"><i class="fas fa-times"></i></button>
+            
+            <div class="p-8 pb-6">
+                <div class="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mb-5 mx-auto text-3xl text-orange-500 shadow-sm border border-orange-100">
+                    <i id="confirm-icon" class="fas fa-user-graduate"></i>
+                </div>
+                
+                <h3 class="text-xl font-black text-gray-800 text-center mb-2">Xác nhận vai trò?</h3>
+                <p class="text-sm text-gray-500 text-center leading-relaxed">
+                    Bạn đang đăng ký tài khoản với vai trò là <br>
+                    <span id="confirm-role-text" class="font-black text-orange-500 text-lg uppercase tracking-wide">HỌC SINH</span>
+                </p>
+                
+                <div class="mt-4 p-3 bg-blue-50 rounded-xl border border-blue-100 flex items-start gap-3">
+                    <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                    <p class="text-xs text-blue-600 font-medium text-justify">
+                        Vai trò này <b>không thể thay đổi</b> sau khi tạo. Hãy chắc chắn bạn đã chọn đúng!
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex border-t border-gray-100 bg-gray-50/50">
+                <button onclick="closeConfirmModal()" class="flex-1 py-4 text-gray-500 font-bold text-sm hover:bg-gray-100 transition">Quay lại</button>
+                <div class="w-px bg-gray-200"></div>
+                <button id="btn-confirm-register" class="flex-1 py-4 text-orange-600 font-black text-sm hover:bg-orange-50 transition">Đồng ý tạo</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="alert-modal" class="modal-overlay">
+        <div class="modal-content text-center max-w-sm w-full p-6 pt-8 pb-8 relative rounded-3xl">
+            <button onclick="closeAlertModal()" class="absolute top-4 right-4 text-gray-300 hover:text-gray-500 transition"><i class="fas fa-times"></i></button>
+            
+            <div id="alert-icon-container" class="alert-icon mb-4">
+                </div>
+            
+            <h3 id="alert-title" class="text-xl font-black text-gray-800 mb-2">Thông báo</h3>
+            <p id="alert-message" class="text-sm text-gray-500 font-medium leading-relaxed px-4 mb-6">
+                Nội dung thông báo...
+            </p>
+            
+            <button onclick="closeAlertModal()" class="w-full py-3 rounded-xl bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition text-sm">Đã hiểu</button>
+        </div>
+    </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -275,35 +366,130 @@
             document.getElementById('loading-overlay').classList.toggle('hidden', !isLoading);
         };
 
-        // --- 1. REGISTER LOGIC (FIXED) ---
-        registerForm.addEventListener("submit", async (e) => {
+        // --- LOGIC POPUP XÁC NHẬN ---
+        const confirmModal = document.getElementById('confirm-role-modal');
+        const confirmIcon = document.getElementById('confirm-icon');
+        const confirmText = document.getElementById('confirm-role-text');
+        let pendingRegisterData = null; // Biến tạm để lưu dữ liệu đăng ký
+
+        window.closeConfirmModal = () => {
+            confirmModal.classList.remove('show');
+            pendingRegisterData = null;
+        };
+
+        // --- CUSTOM ALERT LOGIC ---
+        const alertModal = document.getElementById('alert-modal');
+        const alertTitle = document.getElementById('alert-title');
+        const alertMessage = document.getElementById('alert-message');
+        const alertIconContainer = document.getElementById('alert-icon-container');
+        const alertContentBox = alertModal.querySelector('.modal-content');
+
+        window.closeAlertModal = () => alertModal.classList.remove('show');
+
+        window.showAlert = (message, type = 'error') => {
+            alertMessage.innerText = message;
+            
+            // Xóa các class màu cũ
+            alertContentBox.classList.remove('alert-error', 'alert-success', 'alert-warning');
+            
+            if (type === 'error') {
+                alertTitle.innerText = "Rất tiếc!";
+                alertIconContainer.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                alertContentBox.classList.add('alert-error');
+            } else if (type === 'success') {
+                alertTitle.innerText = "Thành công!";
+                alertIconContainer.innerHTML = '<i class="fas fa-check"></i>';
+                alertContentBox.classList.add('alert-success');
+            } else {
+                alertTitle.innerText = "Lưu ý";
+                alertIconContainer.innerHTML = '<i class="fas fa-info"></i>';
+                alertContentBox.classList.add('alert-warning');
+            }
+            
+            alertModal.classList.add('show');
+        };
+
+        // 1. KHI BẤM NÚT ĐĂNG KÝ -> KIỂM TRA DỮ LIỆU -> HIỆN POPUP
+        registerForm.addEventListener("submit", (e) => {
             e.preventDefault();
             
-            const role = roleInput.value; // Lấy role chính xác từ biến toàn cục
+            // 1. Lấy giá trị từ form
+            const role = roleInput.value;
             const name = document.getElementById("reg-name").value.trim();
             const email = document.getElementById("reg-email").value.trim();
             const pass = document.getElementById("reg-pass").value;
             const confirmPass = document.getElementById("reg-confirm").value;
 
-            // Debug Role
-            if (!confirm(`Xác nhận tạo tài khoản với vai trò: ${role === 'student' ? 'HỌC SINH' : 'GIÁO VIÊN'}?`)) return;
+            // 2. VALIDATE DỮ LIỆU (Kiểm tra lỗi trước)
+            
+            // Kiểm tra tên
+            if (name.length < 2) {
+                showAlert("Tên hiển thị quá ngắn! Vui lòng nhập đầy đủ họ tên.", "error");
+                return;
+            }
 
-            if (name.length < 2) return alert("Tên hiển thị quá ngắn!");
-            if (pass.length < 6) return alert("Mật khẩu phải từ 6 ký tự trở lên!");
-            if (pass !== confirmPass) return alert("Mật khẩu nhập lại không khớp!");
+            // Kiểm tra độ dài mật khẩu
+            if (pass.length < 6) {
+                showAlert("Mật khẩu phải có ít nhất 6 ký tự để đảm bảo an toàn.", "error");
+                return;
+            }
 
+            // Kiểm tra trùng khớp mật khẩu (QUAN TRỌNG)
+            if (pass !== confirmPass) {
+                showAlert("Mật khẩu nhập lại không khớp. Vui lòng kiểm tra lại!", "error");
+                return;
+            }
+
+            // Kiểm tra thông tin theo vai trò
             let school = "", grade = null, subject = null;
+            
             if (role === 'student') {
                 school = document.getElementById("reg-school-student").value.trim();
                 grade = parseInt(document.getElementById("reg-grade").value);
-                if (!school) return alert("Vui lòng nhập tên trường học!");
+                
+                if (!school) {
+                    showAlert("Vui lòng nhập tên trường học của bạn!", "error");
+                    return;
+                }
             } else {
                 school = document.getElementById("reg-school-teacher").value.trim();
                 subject = document.getElementById("reg-subject").value.trim();
-                if (!school || !subject) return alert("Vui lòng nhập đơn vị công tác và chuyên môn!");
+                
+                if (!school || !subject) {
+                    showAlert("Vui lòng nhập đầy đủ Đơn vị công tác và Chuyên môn!", "error");
+                    return;
+                }
             }
 
-            setLoading(true);
+            // 3. NẾU MỌI THỨ OK -> LƯU TẠM & HIỆN POPUP XÁC NHẬN
+            
+            // Lưu dữ liệu vào biến tạm để dùng sau khi bấm "Đồng ý"
+            pendingRegisterData = { role, name, email, pass, school, grade, subject };
+
+            // Cập nhật giao diện Popup theo vai trò
+            if (role === 'student') {
+                confirmIcon.className = "fas fa-user-graduate";
+                confirmText.innerText = "HỌC SINH";
+                confirmText.className = "font-black text-orange-500 text-lg uppercase tracking-wide";
+            } else {
+                confirmIcon.className = "fas fa-chalkboard-teacher";
+                confirmText.innerText = "GIÁO VIÊN";
+                confirmText.className = "font-black text-blue-500 text-lg uppercase tracking-wide";
+            }
+
+            // Hiện Popup
+            confirmModal.classList.add('show');
+        });
+
+        // 2. KHI BẤM "ĐỒNG Ý TẠO" TRONG POPUP -> GỌI FIREBASE
+        document.getElementById('btn-confirm-register').addEventListener('click', async () => {
+            if (!pendingRegisterData) return;
+            
+            closeConfirmModal(); // Đóng popup
+            setLoading(true);    // Hiện loading
+
+            const { role, name, email, pass, school, grade, subject } = pendingRegisterData;
+
             try {
                 const userCred = await createUserWithEmailAndPassword(auth, email, pass);
                 const user = userCred.user;
@@ -319,7 +505,7 @@
                 await setDoc(doc(db, "users", user.uid), userData);
                 await setDoc(doc(db, "users_progress", user.uid), { currentLevel: 1, paidLevel: 0 });
 
-                // Auth State Change sẽ lo phần redirect
+                // Thành công -> Auth listener sẽ tự chuyển trang
             } catch (err) {
                 setLoading(false);
                 alert(err.code === "auth/email-already-in-use" ? "Email này đã được sử dụng." : "Đăng ký thất bại: " + err.message);
@@ -335,7 +521,8 @@
                 await signInWithEmailAndPassword(auth, document.getElementById("login-email").value, document.getElementById("login-password").value);
             } catch (err) {
                 setLoading(false);
-                alert("Sai email hoặc mật khẩu.");
+                // SỬA Ở ĐÂY:
+                showAlert("Email hoặc mật khẩu không chính xác. Vui lòng thử lại!", "error");
             }
         });
 

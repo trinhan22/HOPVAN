@@ -430,7 +430,8 @@
                 const isPublished = t.status === 'published';
                 const statusClass = isPublished ? 'status-published' : 'status-draft';
                 const statusText = isPublished ? 'Đã xuất bản' : 'Bản nháp';
-                const qCount = t.questionIds?.length || 0;
+                // Kiểm tra cả 2 trường hợp: questions (nhúng trực tiếp) và questionIds (tham chiếu)
+                const qCount = (t.questions && t.questions.length) || (t.questionIds && t.questionIds.length) || 0;
                 
                 return `
                 <div class="test-card group">

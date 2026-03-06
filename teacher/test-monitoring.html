@@ -213,21 +213,44 @@
     </div>
     <div id="overlay" class="fixed inset-0 bg-black/20 z-40 hidden md:hidden backdrop-blur-sm" onclick="toggleSidebar()"></div>
 
-    <aside id="sidebar">
-        <div class="p-8 flex items-center gap-3">
-            <img src="../LOGO.WEBP" class="w-10 h-10 object-contain">
-            <div><h1 class="font-black text-gray-800 text-xl leading-none">TEACHER</h1><p class="text-[10px] font-bold text-orange-500 tracking-widest uppercase">Dashboard</p></div>
-        </div>
-        <nav class="flex-1 px-2 space-y-1">
-            <a href="index.html" class="nav-item"><i class="fas fa-th-large"></i> Tổng quan</a>
-            <div class="px-5 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase">Quản Lý</div>
-            <a href="classrooms.html" class="nav-item"><i class="fas fa-chalkboard-teacher"></i> Lớp học</a>
-            <a href="tests.html" class="nav-item active"><i class="fas fa-file-alt"></i> Đề thi</a>
-            <a href="question-bank.html" class="nav-item"><i class="fas fa-database"></i> Ngân hàng câu hỏi</a>
-            <div class="px-5 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase">Cá Nhân</div>
-            <a href="account.html" class="nav-item"><i class="fas fa-user-cog"></i> Tài khoản</a>
+    <aside id="sidebar" class="w-[280px] sidebar hidden md:flex flex-col z-50 h-full shadow-xl">
+        <a class='p-8 flex items-center gap-4 hover:opacity-80 transition-opacity cursor-pointer group' href='#'>
+            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20 border border-orange-50 overflow-hidden">
+                <img src="../LOGO.WEBP" alt="Logo" class="w-12 h-12 object-contain drop-shadow-md bg-white rounded-xl p-1 group-hover:scale-105 transition-transform">
+            </div>
+            <div>
+                <h1 class="block text-2xl font-black text-gray-800 tracking-tight leading-none group-hover:text-orange-500 transition-colors">TEACHER</h1>
+                <p class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">Dashboard</p>
+            </div>
+        </a>
+
+        <nav class="flex-1 py-4 overflow-y-auto">
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-th-large w-6"></i> Tổng quan
+            </a>
+            
+            <div class="px-6 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Quản Lý Giảng Dạy</div>
+            <a href="classrooms.html" class="nav-item">
+                <i class="fas fa-chalkboard-teacher w-6"></i> Lớp học của tôi
+            </a>
+            <a href="tests.html" class="nav-item active">
+                <i class="fas fa-file-alt w-6"></i> Quản lý đề thi
+            </a>
+            <a href="question-bank.html" class="nav-item">
+                <i class="fas fa-database w-6"></i> Ngân hàng câu hỏi
+            </a>
+
+            <div class="px-6 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Cá Nhân</div>
+            <a href="account.html" class="nav-item">
+                <i class="fas fa-user-cog w-6"></i> Thông tin tài khoản
+            </a>
         </nav>
-        <div class="p-6"><button id="logout-btn" class="w-full py-3 rounded-xl bg-red-50 text-red-500 font-bold text-sm hover:bg-red-500 hover:text-white transition flex items-center justify-center gap-2"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button></div>
+
+        <div class="p-6 border-t border-gray-100">
+            <button id="logout-btn" class="w-full py-4 rounded-2xl bg-red-50 text-red-500 font-bold text-sm hover:bg-red-500 hover:text-white transition flex items-center justify-center gap-2 group">
+                <i class="fas fa-sign-out-alt group-hover:-translate-x-1 transition"></i> Đăng xuất
+            </button>
+        </div>
     </aside>
 
     <div class="main-panel">
@@ -325,6 +348,9 @@
         let studentSessions = new Map();
         let currentFilter = 'all';
         let heartbeatInterval = null;
+        
+        // --- THÊM DÒNG NÀY ---
+        let totalTestQuestions = 0;
 
         // UI Helpers
         window.toggleSidebar = () => {
@@ -377,7 +403,17 @@
             ]);
             
             if(tSnap.exists() && cSnap.exists()) {
-                document.getElementById('test-info').innerText = `${tSnap.data().name} • ${cSnap.data().className}`;
+                const tData = tSnap.data();
+                document.getElementById('test-info').innerText = `${tData.name} • ${cSnap.data().className}`;
+
+                // --- SỬA: Lấy tổng số câu hỏi từ đề thi ---
+                if (tData.questions && Array.isArray(tData.questions)) {
+                    totalTestQuestions = tData.questions.length;
+                } else if (tData.questionIds && Array.isArray(tData.questionIds)) {
+                    totalTestQuestions = tData.questionIds.length;
+                }
+                // Cập nhật lại lưới ngay lập tức nếu dữ liệu phiên đã tải xong trước đó
+                if (studentSessions.size > 0) renderGrid();
             }
         }
 
@@ -449,7 +485,12 @@
                 else if(s.status === 'locked') { css = 'sc-locked'; badge = 'BỊ KHÓA'; icon = 'fas fa-lock'; }
                 else if(s.status === 'finished') { css = 'sc-finished'; badge = 'Đã Nộp'; icon = 'fas fa-check'; }
 
-                const progress = s.totalQuestions > 0 ? (s.progress / s.totalQuestions) * 100 : 0;
+                // --- SỬA: Tính toán tiến độ dựa trên biến toàn cục ---
+                const currentProgress = s.progress || 0;
+                // Ưu tiên lấy tổng câu từ session, nếu không có thì lấy từ đề thi gốc
+                const total = s.totalQuestions || totalTestQuestions || 0; 
+                const progressPercent = total > 0 ? (currentProgress / total) * 100 : 0;
+                const displayTotal = total > 0 ? total : '?';
                 
                 return `
                 <div class="student-card ${css}">
@@ -479,9 +520,9 @@
                     <div class="mt-4">
                         <div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1">
                             <span>Tiến độ</span>
-                            <span>${s.progress || 0}/${s.totalQuestions || '?'}</span>
+                            <span>${currentProgress}/${displayTotal}</span>
                         </div>
-                        <div class="sc-progress"><div class="sc-bar" style="width: ${progress}%"></div></div>
+                        <div class="sc-progress"><div class="sc-bar" style="width: ${progressPercent}%"></div></div>
                     </div>
 
                     ${(s.status === 'locked' || s.status === 'warning') ? `
