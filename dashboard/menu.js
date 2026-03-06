@@ -152,7 +152,7 @@ const menuHTML = `
         <a href="congdong.html" class="sb-link" data-page="congdong"><i class="fas fa-users"></i> Cộng đồng</a>
         <a href="nhatkyhoctap.html" class="sb-link" data-page="nhatkyhoctap"><i class="fas fa-book-journal-whills"></i> Nhật ký học tập</a>
         <a class="px-6 mt-2 mb-0 ml-[-7px] text-[10px] font-black text-gray-400 uppercase tracking-widest">Cá Nhân</>
-        <a href="account.html" class="sb-link" data-page="account"><i class="fas fa-user-cog"></i> Quản Lý tài khoản</a>
+        <a href="account.html" class="sb-link" data-page="account"><i class="fas fa-user-cog"></i> Quản lý tài khoản</a>
     </nav>
     <div class="sb-footer">
         <button id="menu-btn-feedback" class="menu-btn btn-feedback"><i class="far fa-comment-dots"></i> Gửi góp ý</button>

@@ -83,11 +83,12 @@
     <canvas id="confetti-canvas"></canvas>
 
     <div class="max-w-5xl mx-auto flex justify-between items-center mb-8 relative z-20">
-        <button onclick="history.back()" class="flex items-center gap-2 text-gray-500 font-bold hover:text-orange-600 transition bg-white/60 px-5 py-2.5 rounded-xl backdrop-blur-sm shadow-sm hover:shadow-md">
+        <button id="btn-back" class="flex items-center gap-2 text-gray-500 font-bold hover:text-orange-600 transition bg-white/60 px-5 py-2.5 rounded-xl backdrop-blur-sm shadow-sm hover:shadow-md">
             <i class="fas fa-arrow-left"></i> <span>Quay lại</span>
         </button>
+
         <div class="flex items-center gap-3 bg-white/80 p-2 pr-5 rounded-full shadow-sm backdrop-blur-sm border border-white">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-red-500 text-white flex items-center justify-center font-bold shadow-md" id="user-avatar">U</div>
+             <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-red-500 text-white flex items-center justify-center font-bold shadow-md" id="user-avatar">U</div>
             <div>
                 <p class="text-[10px] font-bold text-gray-400 uppercase" id="role-badge">Học sinh</p>
                 <p class="text-sm font-bold text-gray-800 leading-none truncate max-w-[150px]" id="user-name"></p>
@@ -115,9 +116,10 @@
         <div class="glass-panel p-8 mb-8 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-orange-400 to-red-500"></div>
             
-            <div class="text-center mb-10">
-                <span id="status-badge" class="st-badge st-wait mb-4 inline-block shadow-sm">Đang tải...</span>
-                <h1 class="text-3xl md:text-4xl font-black text-gray-800 mb-2 leading-tight" id="test-name"></h1>
+            <div class="text-center mb-12"> <span id="status-badge" class="st-badge st-wait mb-5 inline-block shadow-sm">Đang tải...</span>
+    
+                <h1 class="text-3xl md:text-4xl font-black text-gray-800 mt-3 mb-3 leading-tight px-4" id="test-name"></h1>
+                
                 <p class="text-gray-500 font-medium flex items-center justify-center gap-2">
                     <i class="far fa-clock"></i> <span id="submit-time">--:--</span>
                 </p>
@@ -222,7 +224,6 @@
             if(user) {
                 currentUser = user;
                 try {
-                    // Lấy Role
                     const uSnap = await getDoc(doc(db, "users", user.uid));
                     if(uSnap.exists()) {
                         const uData = uSnap.data();
@@ -231,7 +232,6 @@
                         document.getElementById('role-badge').innerText = currentRole === 'teacher' ? 'GIÁO VIÊN' : 'HỌC SINH';
                         document.getElementById('user-avatar').innerText = (uData.name || 'U').charAt(0).toUpperCase();
                     }
-                    // Bắt đầu tìm bài làm
                     await findAndLoadSubmission();
                 } catch (e) {
                     console.error(e);
@@ -240,108 +240,95 @@
             } else window.location.href = "../auth.html";
         });
 
-        // --- 2. THUẬT TOÁN TÌM BÀI LÀM (ĐÃ FIX LỖI INDEX) ---
+        // --- 2. TÌM BÀI LÀM ---
         async function findAndLoadSubmission() {
             const params = new URLSearchParams(window.location.search);
             let subId = params.get('submissionId');
-            const tId = params.get('testId'); 
+            let tId = params.get('testId'); 
 
-            // Vệ sinh dữ liệu
             if (subId === "undefined" || subId === "null") subId = null;
 
-            // CHIẾN LƯỢC 1: Lấy ID trực tiếp từ URL (Ưu tiên cao nhất)
             if (subId) {
-                console.log("🎯 Chiến thuật 1: Load theo ID trực tiếp:", subId);
                 await loadData(subId);
                 return;
             }
 
-            // CHIẾN LƯỢC 2: Tự động tìm bài làm cho đề thi (Fix lỗi Index ở đây)
-            if (tId && currentRole === 'student') {
-                console.log("🔍 Chiến thuật 2: Auto-find bài làm cho đề " + tId);
-                try {
-                    // Query ĐƠN GIẢN: Chỉ lấy theo testId và studentId (Không dùng orderBy để tránh lỗi Index)
-                    const q = query(
-                        collection(db, "submissions"), 
-                        where("testId", "==", tId),
-                        where("studentId", "==", currentUser.uid)
-                    );
-                    
-                    const snap = await getDocs(q);
-                    
-                    if (snap.empty) {
-                        showError("Hệ thống không tìm thấy bài làm nào của bạn cho đề thi này.");
-                        return;
-                    }
-
-                    // Sắp xếp bài làm ở phía Client (Mới nhất lên đầu)
-                    // Dữ liệu Firestore trả về là Timestamp object
-                    const submissions = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                    submissions.sort((a, b) => {
-                        const timeA = a.submittedAt ? a.submittedAt.seconds : 0;
-                        const timeB = b.submittedAt ? b.submittedAt.seconds : 0;
-                        return timeB - timeA; 
-                    });
-
-                    // Lấy bài mới nhất
-                    const latestSub = submissions[0];
-                    console.log("✅ Đã tìm thấy bài làm mới nhất:", latestSub.id);
-
-                    // Cập nhật URL để lần sau load nhanh hơn
-                    const newUrl = new URL(window.location);
-                    newUrl.searchParams.set('submissionId', latestSub.id);
-                    window.history.replaceState({}, '', newUrl);
-
-                    await loadData(latestSub.id);
-
-                } catch (e) {
-                    console.error("Auto-find error:", e);
-                    showError("Lỗi tìm kiếm dữ liệu: " + e.message);
-                }
-                return;
-            }
-
-            // CHIẾN LƯỢC 3: Lấy từ Session Storage (Cứu cánh cuối cùng)
             const sessionSubId = sessionStorage.getItem('latestResultId');
             if (sessionSubId && sessionSubId !== "undefined") {
-                console.log("📦 Chiến thuật 3: Load từ bộ nhớ tạm:", sessionSubId);
+                replaceUrlParam('submissionId', sessionSubId);
                 await loadData(sessionSubId);
                 return;
             }
 
-            showError("Không tìm thấy thông tin bài làm. Vui lòng kiểm tra lại đường dẫn.");
+            if (tId && currentRole === 'student') {
+                try {
+                    const q = query(collection(db, "submissions"), where("testId", "==", tId), where("studentId", "==", currentUser.uid));
+                    const snap = await getDocs(q);
+                    
+                    if (!snap.empty) {
+                        const list = snap.docs.map(d=>({id:d.id, ...d.data()}));
+                        list.sort((a,b) => (b.submittedAt?.seconds || 0) - (a.submittedAt?.seconds || 0));
+                        replaceUrlParam('submissionId', list[0].id);
+                        await loadData(list[0].id);
+                    } else {
+                        showError("Bạn chưa làm bài kiểm tra này.");
+                    }
+                } catch (e) {
+                    showError("Lỗi tìm kiếm: " + e.message);
+                }
+                return;
+            }
+            showError("Không tìm thấy thông tin bài làm.");
         }
 
-        // --- 3. TẢI DỮ LIỆU CHI TIẾT ---
+        function replaceUrlParam(key, value) {
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.set(key, value);
+            window.history.replaceState({}, '', newUrl);
+        }
+
+        // --- 3. TẢI DỮ LIỆU ---
         async function loadData(id) {
             submissionId = id;
             try {
                 const subRef = doc(db, "submissions", id);
                 const subSnap = await getDoc(subRef);
-                
-                if (!subSnap.exists()) throw new Error("Bài làm không tồn tại trên hệ thống.");
+                if (!subSnap.exists()) throw new Error("Bài làm không tồn tại.");
                 
                 submissionData = subSnap.data();
 
-                // Bảo mật: Học sinh không xem bài người khác
+                // === [CODE MỚI] XỬ LÝ NÚT QUAY LẠI ===
+                const btnBack = document.getElementById('btn-back');
+                if (currentRole === 'teacher') {
+                    // Nếu là Giáo viên: Ẩn nút
+                    btnBack.style.display = 'none';
+                } else {
+                    // Nếu là Học sinh: Quay về lớp học
+                    btnBack.onclick = () => {
+                        if (submissionData.classId) {
+                            window.location.href = `classroom-view.html?classId=${submissionData.classId}`;
+                        } else {
+                            // Fallback nếu không tìm thấy ID lớp
+                            window.location.href = 'classrooms.html';
+                        }
+                    };
+                }
+                // ======================================
+
                 if (currentRole === 'student' && submissionData.studentId !== currentUser.uid) {
-                    throw new Error("Bạn không có quyền truy cập bài làm này.");
+                    throw new Error("Bạn không có quyền truy cập.");
                 }
 
-                // Init Grading Data (Cho Giáo viên)
                 if (currentRole === 'teacher') {
                     gradingData.scores = submissionData.essayScores || {};
                     gradingData.comments = submissionData.questionComments || {};
                 }
 
-                // Tải câu hỏi
                 questions = await fetchQuestions(submissionData.testId);
                 
-                // Render UI
                 renderUI();
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('main-content').classList.remove('hidden');
-
             } catch(e) {
                 console.error(e);
                 showError(e.message);
@@ -369,70 +356,87 @@
             return qs;
         }
 
-        // --- 4. RENDER GIAO DIỆN ---
+        // --- 4. RENDER GIAO DIỆN (LOGIC CHÍNH ĐÃ SỬA) ---
         function renderUI() {
-            // Kiểm tra xem đề có Tự luận không?
             const hasEssay = questions.some(q => ['reading', 'essay', 'nlxh', 'nlvh'].includes(q.type));
             const isFullQuiz = !hasEssay && questions.length > 0;
-
+            
             const isTeacher = currentRole === 'teacher';
             const isPublished = submissionData.isPublished === true;
             
-            // Logic hiển thị: Nếu là GV, hoặc đã Public, hoặc là Full Trắc Nghiệm -> Xem full
-            const canViewFull = isTeacher || isPublished || isFullQuiz;
+            // --- CỜ ĐIỀU KHIỂN HIỂN THỊ (QUAN TRỌNG) ---
+            
+            // 1. Ai được xem ĐIỂM TỔNG KẾT?
+            // GV xem hết. HS xem khi Public HOẶC Đề Full Trắc nghiệm
+            const canShowScore = isTeacher || isPublished || isFullQuiz;
 
-            // Info
+            // 2. Ai được xem CHI TIẾT BÀI LÀM (Câu hỏi, đáp án, lời phê)?
+            // GV xem hết. HS CHỈ XEM KHI ĐÃ PUBLIC (Bất kể full quiz hay không)
+            const canShowDetails = isTeacher || isPublished;
+
+
+            // --- HEADER INFO ---
             document.getElementById('test-name').innerText = submissionData.testName || "Bài Kiểm Tra";
             document.getElementById('submit-time').innerText = "Nộp: " + (submissionData.submittedAt?.toDate().toLocaleString('vi-VN') || "N/A");
 
-            // Scores
+            // --- SCORE BOX ---
             const mcqScore = submissionData.quizScore || 0;
             const totalMcq = submissionData.totalQuiz || 0;
+            
+            // LUÔN HIỆN: Số câu trắc nghiệm đúng
             document.getElementById('mcq-score').innerText = mcqScore;
             document.getElementById('mcq-detail').innerText = `${mcqScore}/${totalMcq} câu đúng`;
 
-            // Tính điểm tổng
+            // Tính toán điểm tổng (để dùng nếu được hiện)
             let finalScore = submissionData.score || 0;
-
-            // Nếu Full Quiz mà chưa có điểm tổng -> Tính luôn
             if (isFullQuiz && finalScore === 0 && submissionData.totalQuestions > 0) {
                 finalScore = (mcqScore / submissionData.totalQuestions) * 10;
-            }
-            // Nếu là GV đang chấm -> Tính live
-            else if (isTeacher && finalScore === 0) {
+            } else if (isTeacher && finalScore === 0) {
                 const essayTotal = Object.values(gradingData.scores).reduce((a,b)=>a+b, 0);
                 finalScore = mcqScore + essayTotal; 
             }
 
-            if (canViewFull) {
+            // --- HIỂN THỊ VÒNG TRÒN ĐIỂM (SCORE CIRCLE) ---
+            if (canShowScore) {
                 document.getElementById('final-score').innerText = Number(finalScore).toFixed(1);
-                document.getElementById('essay-score').innerText = submissionData.essayScore || 0;
-                document.getElementById('essay-status').innerText = isPublished ? "Đã chấm xong" : "Đang chấm...";
                 
+                // Color Ring
                 const ring = document.getElementById('score-ring');
                 ring.classList.add('graded');
                 const color = finalScore >= 8 ? '#10B981' : (finalScore >= 5 ? '#F59E0B' : '#EF4444');
                 ring.style.background = `conic-gradient(${color} ${(finalScore/10)*100}%, #f1f5f9 0%)`;
 
-                const badge = document.getElementById('status-badge');
-                if(isFullQuiz) { badge.innerText="ĐÃ HOÀN THÀNH"; badge.className="st-badge st-done"; }
-                else if(isPublished) { badge.innerText="ĐÃ CÔNG BỐ"; badge.className="st-badge st-done"; }
-                else { badge.innerText="ĐANG CHẤM"; badge.className="st-badge st-wait"; }
-
-                if (isFullQuiz) {
-                     document.getElementById('essay-score').innerHTML = '<span class="text-gray-300 text-lg">N/A</span>';
-                     document.getElementById('essay-status').innerText = "Không có tự luận";
-                }
-
                 if(finalScore >= 8 && !isTeacher) launchConfetti();
             } else {
-                // Student Pending View
-                document.getElementById('status-badge').innerText = "CHỜ CHẤM ĐIỂM";
+                // Ẩn điểm tổng (Chờ chấm)
                 document.getElementById('final-score').innerHTML = '<i class="fas fa-hourglass-half opacity-20"></i>';
-                document.getElementById('essay-score').innerText = "--";
+                
+                // Gray Ring
+                document.getElementById('score-ring').classList.remove('graded');
+                document.getElementById('score-ring').style.background = '#e2e8f0';
             }
 
-            // Feedback Area
+            // --- BADGE TRẠNG THÁI & ESSAY STATUS ---
+            const badge = document.getElementById('status-badge');
+            
+            if (isPublished) {
+                badge.innerText = "ĐÃ CÔNG BỐ"; badge.className = "st-badge st-done";
+                document.getElementById('essay-score').innerText = submissionData.essayScore || 0;
+                document.getElementById('essay-status').innerText = "Đã chấm xong";
+            } 
+            else if (isFullQuiz) {
+                badge.innerText = "ĐÃ HOÀN THÀNH"; badge.className = "st-badge st-done";
+                document.getElementById('essay-score').innerHTML = '<span class="text-gray-300 text-lg">N/A</span>';
+                document.getElementById('essay-status').innerText = "Không có tự luận";
+            } 
+            else {
+                badge.innerText = "CHỜ CHẤM ĐIỂM"; badge.className = "st-badge st-wait";
+                document.getElementById('essay-score').innerText = "--";
+                document.getElementById('essay-status').innerText = "Giáo viên đang chấm...";
+            }
+
+
+            // --- FEEDBACK AREA ---
             const fbArea = document.getElementById('feedback-area');
             if(isTeacher) {
                 fbArea.innerHTML = `<textarea id="teacher-general-feedback" class="w-full p-4 border border-orange-200 rounded-2xl bg-white focus:border-orange-500 outline-none transition shadow-sm h-32 resize-none text-gray-700" placeholder="Nhập lời phê chung...">${submissionData.teacherComment || ''}</textarea>`;
@@ -440,17 +444,47 @@
                 document.getElementById('live-total-score').innerText = Number(finalScore).toFixed(1);
                 document.getElementById('publish-check').checked = isPublished || isFullQuiz;
             } else {
-                if(canViewFull && submissionData.teacherComment) {
+                // Học sinh chỉ thấy lời phê khi canShowDetails (Đã Public)
+                if(canShowDetails && submissionData.teacherComment) {
                     fbArea.innerHTML = `<div class="bg-orange-50 p-5 rounded-2xl border border-orange-100 italic text-gray-700 relative"><i class="fas fa-quote-left text-orange-200 absolute top-2 left-2 text-2xl"></i><span class="relative z-10 ml-4">${submissionData.teacherComment}</span></div>`;
+                } else if (!canShowDetails) {
+                    fbArea.innerHTML = `<div class="p-6 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-gray-400 font-medium"><i class="fas fa-lock mr-2"></i>Nhận xét sẽ hiển thị khi giáo viên trả bài.</div>`;
                 } else {
                     fbArea.innerHTML = `<p class="text-gray-400 italic text-sm text-center">Chưa có nhận xét.</p>`;
                 }
             }
 
-            // Render Questions List
+            // --- CHI TIẾT BÀI LÀM (QUESTIONS LIST) ---
             const listEl = document.getElementById('questions-list');
-            document.getElementById('view-mode').innerText = canViewFull ? "Chi tiết đầy đủ" : "Ẩn đáp án đúng";
             
+            // QUAN TRỌNG: Ẩn chi tiết nếu chưa được phép xem (kể cả full trắc nghiệm)
+            if (!canShowDetails) {
+                listEl.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-16 bg-white/50 rounded-3xl border-2 border-dashed border-gray-100">
+                        <div class="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center text-3xl text-orange-400 mb-4 shadow-sm">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h3 class="text-xl font-black text-gray-700">Chi tiết bài làm được ẩn</h3>
+                        <p class="text-gray-500 mt-2 max-w-md text-center text-sm">
+                            Giáo viên chưa công bố bài làm chi tiết. <br>Bạn vui lòng quay lại sau khi có thông báo trả bài.
+                        </p>
+                        <div class="mt-6 flex gap-3 text-sm font-bold text-gray-500 bg-gray-50 px-4 py-2 rounded-lg border border-gray-100">
+                            <span><i class="fas fa-check-circle text-green-500 mr-1"></i> Kết quả trắc nghiệm: <span class="text-gray-800">${mcqScore}/${totalMcq}</span></span>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('view-mode').innerText = "Chế độ riêng tư";
+                return; // Dừng, không render list câu hỏi
+            }
+
+            // Nếu được xem -> Render bình thường
+            document.getElementById('view-mode').innerText = "Chi tiết đầy đủ";
+            
+            if (questions.length === 0) {
+                listEl.innerHTML = `<p class="text-center text-gray-400">Không tải được nội dung đề thi.</p>`;
+                return;
+            }
+
             listEl.innerHTML = questions.map((q, idx) => {
                 const ans = submissionData.answers ? submissionData.answers[q.id] : null;
                 const num = idx + 1;
@@ -461,35 +495,55 @@
                         let cls = "ans-neutral";
                         let icon = "";
                         
-                        if (canViewFull) {
-                            if (String(i) === String(q.correct)) { cls = "ans-correct"; icon = '<i class="fas fa-check text-green-700"></i>'; }
-                            else if (String(i) === String(ans) && String(i) !== String(q.correct)) { cls = "ans-wrong"; icon = '<i class="fas fa-times text-red-700"></i>'; }
-                        } else {
-                            if (String(i) === String(ans)) { cls = "ans-selected"; icon = '<i class="fas fa-user text-blue-500"></i>'; }
-                        }
+                        if (String(i) === String(q.correct)) { cls = "ans-correct"; icon = '<i class="fas fa-check text-green-700"></i>'; }
+                        else if (String(i) === String(ans) && String(i) !== String(q.correct)) { cls = "ans-wrong"; icon = '<i class="fas fa-times text-red-700"></i>'; }
+                        
                         return `<div class="ans-box ${cls}"><span class="font-black w-6 text-gray-400">${char}.</span><span class="flex-1">${opt}</span>${icon}</div>`;
                     }).join('');
 
-                    return `<div class="q-card"><div class="flex justify-between mb-3 pl-1"><span class="font-black text-gray-400 text-sm">CÂU ${num}</span>${canViewFull ? (String(ans)===String(q.correct)?'<span class="text-green-600 font-bold text-xs bg-green-100 px-2 py-1 rounded">ĐÚNG</span>':'<span class="text-red-600 font-bold text-xs bg-red-100 px-2 py-1 rounded">SAI</span>') : '<span class="text-gray-400 font-bold text-xs bg-gray-100 px-2 py-1 rounded">ĐÃ LÀM</span>'}</div><div class="q-content font-bold text-gray-800">${q.question}</div><div class="space-y-1">${opts}</div>${(canViewFull && q.explanation) ? `<div class="mt-4 p-4 bg-blue-50 text-blue-800 text-sm rounded-xl border border-blue-100 leading-relaxed">💡 <b>Giải thích:</b> ${q.explanation}</div>` : ''}</div>`;
+                    return `
+                    <div class="q-card">
+                        <div class="flex justify-between mb-3 pl-1">
+                            <span class="font-black text-gray-400 text-sm">CÂU ${num}</span>
+                            ${(String(ans)===String(q.correct)?'<span class="text-green-600 font-bold text-xs bg-green-100 px-2 py-1 rounded">ĐÚNG</span>':'<span class="text-red-600 font-bold text-xs bg-red-100 px-2 py-1 rounded">SAI</span>')}
+                        </div>
+                        <div class="q-content font-bold text-gray-800">${q.question}</div>
+                        <div class="space-y-1">${opts}</div>
+                        ${q.explanation ? `<div class="mt-4 p-4 bg-blue-50 text-blue-800 text-sm rounded-xl border border-blue-100 leading-relaxed">💡 <b>Giải thích:</b> ${q.explanation}</div>` : ''}
+                    </div>`;
                 } 
                 else {
-                    // Essay
                     let teacherTools = '';
                     if (isTeacher) {
                         const curScore = gradingData.scores[q.id] || 0;
                         const curCmt = gradingData.comments[q.id] || '';
                         teacherTools = `<div class="grading-panel"><div class="grading-label">CHẤM ĐIỂM</div><div class="grid grid-cols-1 md:grid-cols-4 gap-4"><div><label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Điểm số</label><input type="number" class="grade-input grade-score-input" value="${curScore}" min="0" max="10" step="0.25" oninput="window.updateLiveScore('${q.id}', this.value)"></div><div class="md:col-span-3"><label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Nhận xét</label><input type="text" class="grade-input text-sm h-[54px]" value="${curCmt}" placeholder="Nhập nhận xét..." onchange="window.updateComment('${q.id}', this.value)"></div></div></div>`;
-                    } else if (canViewFull) {
+                    } else {
                         const s = submissionData.essayScores?.[q.id];
                         const c = submissionData.questionComments?.[q.id];
                         if (s !== undefined || c) {
-                            teacherTools = `<div class="grading-readonly"><div class="flex justify-between items-center mb-2"><span class="label">ĐÁNH GIÁ CỦA GIÁO VIÊN</span>${s !== undefined ? `<span class="bg-green-100 text-green-700 font-black px-3 py-1 rounded-full text-sm">+${s} điểm</span>` : ''}</div>${c ? `<p class="text-sm text-gray-800 bg-white p-3 rounded-lg border border-green-100">"${c}"</p>` : ''}</div>`;
+                            teacherTools = `<div class="grading-readonly"><div class="flex justify-between items-center mb-2"><span class="label">ĐÁNH GIÁ GV</span>${s!==undefined?`<span class="bg-green-100 text-green-700 font-black px-3 py-1 rounded-full text-sm">+${s}đ</span>`:''}</div>${c?`<p class="text-sm text-gray-800 bg-white p-3 rounded-lg border border-green-100">"${c}"</p>`:''}</div>`;
                         }
                     }
-                    return `<div class="q-card border-l-4 border-orange-400"><div class="flex justify-between mb-3 pl-1"><span class="font-black text-gray-400 text-sm">CÂU ${num} (Tự luận)</span><span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-xs font-bold border border-orange-200">${isTeacher || isPublished ? 'ĐÃ CHẤM' : 'CHỜ CHẤM'}</span></div><div class="q-content text-sm text-gray-600 bg-gray-50 p-4 rounded-xl mb-4 italic leading-relaxed border border-gray-100">${q.type === 'reading' ? `(Đọc hiểu) ${q.text.substring(0,100)}...` : q.topic}</div><div class="p-5 bg-white rounded-xl border-2 border-gray-100"><p class="text-xs font-bold text-gray-400 uppercase mb-2 flex items-center gap-1"><i class="fas fa-pen"></i> Bài làm của bạn:</p><p class="text-gray-800 font-serif whitespace-pre-wrap text-sm leading-7">${formatEssay(ans)}</p></div>${teacherTools}</div>`;
+
+                    return `
+                    <div class="q-card border-l-4 border-orange-400">
+                        <div class="flex justify-between mb-3 pl-1">
+                            <span class="font-black text-gray-400 text-sm">CÂU ${num} (Tự luận)</span>
+                            <span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-xs font-bold border border-orange-200">ĐÃ CHẤM</span>
+                        </div>
+                        <div class="q-content text-sm text-gray-600 bg-gray-50 p-4 rounded-xl mb-4 italic leading-relaxed border border-gray-100">
+                            ${q.type === 'reading' ? `(Đọc hiểu) ${q.text.substring(0,100)}...` : q.topic}
+                        </div>
+                        <div class="p-5 bg-white rounded-xl border-2 border-gray-100">
+                            <p class="text-xs font-bold text-gray-400 uppercase mb-2 flex items-center gap-1"><i class="fas fa-pen"></i> Bài làm:</p>
+                            <p class="text-gray-800 font-serif whitespace-pre-wrap text-sm leading-7">${formatEssay(ans)}</p>
+                        </div>
+                        ${teacherTools}
+                    </div>`;
                 }
             }).join('');
-            
+
             if(window.renderMathInElement) renderMathInElement(listEl);
         }
 
@@ -535,25 +589,23 @@
             }
         };
 
+        // --- UTILS ---
         function formatEssay(ans) {
             if(!ans) return "(Bỏ trống)";
             if(typeof ans === 'object') return Object.entries(ans).map(([k,v]) => `Ý ${parseInt(k)+1}: ${v}`).join('\n\n');
             return ans;
         }
-
         function showError(msg) {
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('error-screen').classList.remove('hidden');
             document.getElementById('error-msg').innerText = msg;
         }
-
         function showToast(msg) {
             const t = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
             t.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(()=>t.classList.add('translate-y-20', 'opacity-0'), 3000);
         }
-
         function launchConfetti() {
             const c = document.getElementById('confetti-canvas'); const ctx = c.getContext('2d');
             c.width=innerWidth; c.height=innerHeight;

@@ -513,7 +513,13 @@
                 // Thành công -> Auth listener sẽ tự chuyển trang
             } catch (err) {
                 setLoading(false);
-                alert(err.code === "auth/email-already-in-use" ? "Email này đã được sử dụng." : "Đăng ký thất bại: " + err.message);
+                
+                // --- PHẦN ĐÃ SỬA ---
+                if (err.code === "auth/email-already-in-use") {
+                    showAlert("Email này đã được sử dụng. Vui lòng dùng email khác hoặc đăng nhập.", "warning");
+                } else {
+                    showAlert("Đăng ký thất bại: " + err.message, "error");
+                }
             }
         });
 
@@ -531,28 +537,49 @@
             }
         });
 
-        // --- 3. GOOGLE LOGIN ---
+        // --- 3. GOOGLE LOGIN (Tự động set role Student) ---
         document.getElementById("google-login-btn").addEventListener("click", async () => {
             const provider = new GoogleAuthProvider();
             try {
+                // Đảm bảo đăng nhập được lưu phiên
                 await setPersistence(auth, browserLocalPersistence);
+                
+                // Mở popup đăng nhập Google
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
-                setLoading(true);
                 
+                setLoading(true); // Hiện màn hình chờ
+                
+                // Kiểm tra xem tài khoản đã tồn tại trong Database chưa
                 const userDoc = await getDoc(doc(db, "users", user.uid));
+                
                 if (!userDoc.exists()) {
-                    // Google Login mặc định là Student
+                    // === LOGIC MỚI: Tự động tạo tài khoản với role STUDENT ===
                     await setDoc(doc(db, "users", user.uid), {
-                        uid: user.uid, name: user.displayName, email: user.email, photoURL: user.photoURL,
-                        role: "student", grade: 10, school: "THPT (Chưa cập nhật)",
-                        keys: 0, streak: 0, createdAt: serverTimestamp()
+                        uid: user.uid, 
+                        name: user.displayName, 
+                        email: user.email, 
+                        photoURL: user.photoURL,
+                        role: "student",               // <--- Tự động gán quyền Học sinh
+                        grade: 10,                     // Mặc định khối 10 (có thể sửa sau)
+                        school: "THPT (Chưa cập nhật)", // Trường mặc định
+                        keys: 0, 
+                        streak: 0, 
+                        createdAt: serverTimestamp()
                     });
+                    
+                    // Khởi tạo tiến độ học tập
                     await setDoc(doc(db, "users_progress", user.uid), { currentLevel: 1, paidLevel: 0 });
                 }
+                
+                // (Phần chuyển hướng trang sẽ do onAuthStateChanged tự động xử lý)
+
             } catch (err) {
                 setLoading(false);
-                if (err.code !== 'auth/popup-closed-by-user') alert("Lỗi đăng nhập Google.");
+                // Bỏ qua lỗi nếu người dùng tự tắt popup
+                if (err.code !== 'auth/popup-closed-by-user') {
+                    showAlert("Lỗi đăng nhập Google: " + err.message, "error");
+                }
             }
         });
 
