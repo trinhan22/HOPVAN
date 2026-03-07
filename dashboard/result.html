@@ -577,8 +577,7 @@
                             <div class="grading-panel">
                                 <div class="flex justify-between items-start mb-3">
                                     <div class="grading-label">CHẤM ĐIỂM THỦ CÔNG</div>
-                                    <button onclick="window.triggerAI('${q.id}', \`${(ans || '').replace(/`/g, "'")}\`, \`${(q.topic || '').replace(/`/g, "'")}\`)" 
-                                            class="ai-btn" id="btn-ai-${q.id}">
+                                    <button onclick="window.triggerAI('${q.id}')" class="ai-btn" id="btn-ai-${q.id}">
                                         <i class="fas fa-magic"></i> <span>Gợi ý AI</span>
                                     </button>
                                 </div>
@@ -626,46 +625,74 @@
             if(window.renderMathInElement) renderMathInElement(listEl);
         }
 
-        // --- TÍNH NĂNG AI SUPPORT (GỌI API THẬT) ---
-        window.triggerAI = async (qId, studentAns, topic) => {
+        // --- TÍNH NĂNG AI SUPPORT (PHIÊN BẢN FIX LỖI) ---
+        window.triggerAI = async (qId) => {
             const btn = document.getElementById(`btn-ai-${qId}`);
             const scoreInput = document.getElementById(`score-${qId}`);
             const cmtInput = document.getElementById(`cmt-${qId}`);
             
-            // 1. Hiệu ứng Loading
+            // 1. Lấy dữ liệu an toàn từ biến toàn cục (Tránh lỗi HTML)
+            const questionData = questions.find(q => q.id === qId);
+            const studentAns = submissionData.answers ? submissionData.answers[qId] : "";
+            const topic = questionData ? questionData.topic : "";
+
+            if (!questionData) { alert("Lỗi: Không tìm thấy câu hỏi"); return; }
+
+            // 2. Hiệu ứng Loading
             const originalText = btn.innerHTML;
             btn.innerHTML = `<span class="ai-typing"></span> Đang suy nghĩ...`;
             btn.disabled = true;
 
-            // URL API (Dùng chung với file luyện đề)
+            // 3. Cấu hình API (Sửa thành link full để chạy được cả ở Localhost)
+            // Lưu ý: Khi deploy chính thức bạn có thể đổi lại thành relative path nếu muốn
             const API_URL = `/.netlify/functions/gemini-proxy`;
 
             try {
-                // 2. Chuẩn bị Prompt (Chuyên biệt cho chấm 1 câu)
+                // 2. Chuẩn bị Prompt (Chuyên gia chấm thi - Barem GDPT 2018)
                 const systemPrompt = `
-                VAI TRÒ: Bạn là Trợ lý chấm thi Ngữ Văn K12.
-                NHIỆM VỤ: Chấm điểm và đưa ra nhận xét ngắn gọn cho MỘT câu hỏi tự luận.
+                VAI TRÒ: Bạn là Giáo viên Ngữ văn lớp 12 (Chương trình GDPT 2018), chuyên chấm thi Tốt nghiệp THPT và Đánh giá năng lực.
                 
-                YÊU CẦU ĐẦU RA (BẮT BUỘC ĐỊNH DẠNG JSON):
+                PHONG CÁCH CHẤM:
+                - KHẮT KHE, TỈ MỈ: Soi kỹ từng lỗi diễn đạt, lỗi logic. Không chấm điểm "thoáng".
+                - HỌC THUẬT: Nhận xét phải dùng thuật ngữ chuyên môn (VD: "thao tác lập luận", "hình tượng nghệ thuật", "tính liên kết", "giọng điệu").
+                - TRỰC DIỆN: Chỉ rõ lỗi sai để học sinh sửa, không khen sáo rỗng.
+
+                BAREM ĐIỂM & QUY TẮC CHẤM (TỰ ĐỘNG NHẬN DIỆN):
+
+                A. NẾU LÀ CÂU HỎI ĐỌC HIỂU (Câu hỏi ngắn):
+                   - Câu 1, 2, 3 (Nhận biết): Tối đa 0.5 điểm. Yêu cầu: Trả lời đúng từ khóa, gãy gọn. Sai/thiếu ý -> 0 điểm.
+                   - Câu 4, 5 (Thông hiểu/Vận dụng): Tối đa 1.0 điểm. Yêu cầu: Giải thích sâu sắc, có quan điểm cá nhân thuyết phục. Hời hợt -> Trừ 50% điểm.
+
+                B. NẾU LÀ LÀM VĂN (NLXH hoặc NLVH):
+                   Hãy đọc đề bài để xác định hình thức là "ĐOẠN VĂN" hay "BÀI VĂN":
+
+                   * HÌNH THỨC 1: ĐOẠN VĂN (~200 chữ):
+                     - Thang điểm: Tối đa 2.0 điểm.
+                     - Yêu cầu: Viết liền mạch 1 đoạn, không xuống dòng. Có câu chủ đề và câu kết.
+                     - Trừ điểm nặng:
+                       + Viết thành bài văn (tách Mở/Thân/Kết) -> Trừ 0.5 điểm.
+                       + Thiếu dẫn chứng thực tế (với NLXH) -> Trừ 0.5 điểm.
+                       + Lan man, dài dòng quá 300 chữ -> Trừ 0.25 điểm.
+
+                   * HÌNH THỨC 2: BÀI VĂN (~600 chữ):
+                     - Thang điểm: Tối đa 4.0 - 6.0 điểm (tùy thang đề).
+                     - Yêu cầu: Bố cục 3 phần rõ ràng. Hệ thống luận điểm chặt chẽ.
+                     - Tiêu chí nâng cao (để đạt điểm Giỏi): Có so sánh mở rộng, phản đề, vận dụng Lý luận văn học, văn phong giàu hình ảnh.
+                     - Trừ điểm nặng: Diễn xuôi lại cốt truyện (NLVH) hoặc hô khẩu hiệu sáo rỗng (NLXH).
+
+                NHIỆM VỤ CỦA BẠN:
+                1. Đọc "ĐỀ BÀI" để xác định thể loại và hình thức.
+                2. Chấm điểm số thực tế (làm tròn 0.25). Lưu ý: Điểm tuyệt đối (max) rất khó đạt, chỉ dành cho bài xuất sắc.
+                3. Viết nhận xét súc tích (dưới 50 từ).
+
+                OUTPUT JSON FORMAT (BẮT BUỘC):
                 {
-                    "score": (số thực từ 0.0 đến 10.0, làm tròn đến 0.25),
-                    "comment": (chuỗi string, nhận xét súc tích dưới 40 từ, giọng văn giáo viên, lịch sự nhưng thẳng thắn)
+                    "score": (số thực, ví dụ: 0.25, 1.5, 3.75, 8.0),
+                    "comment": (chuỗi string, nhận xét tập trung vào lỗi sai hoặc điểm sáng tạo)
                 }
-
-                QUY TẮC CHẤM:
-                - Bài làm trống hoặc vô nghĩa: 0 điểm. Nhận xét: "Học sinh bỏ trống câu này."
-                - Bài quá ngắn (<20 từ): Dưới 3.0 điểm. Nhận xét nhắc nhở sơ sài.
-                - Đánh giá dựa trên: Đúng trọng tâm, diễn đạt mạch lạc, có dẫn chứng (nếu cần).
                 `;
 
-                const userMessage = `
-                ĐỀ BÀI: "${topic}"
-                BÀI LÀM CỦA HỌC SINH: "${studentAns}"
-                
-                Hãy chấm điểm ngay.
-                `;
-
-                // 3. Gọi API
+                // Gọi API
                 const res = await fetch(API_URL, { 
                     method: 'POST', 
                     headers: {'Content-Type': 'application/json'}, 
@@ -675,19 +702,15 @@
                     }) 
                 });
 
-                if (!res.ok) throw new Error("Lỗi kết nối Server AI");
+                if (!res.ok) throw new Error("Lỗi Server AI (404/500)");
 
                 const data = await res.json();
                 
-                if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                    throw new Error("AI không trả về kết quả");
-                }
+                if (!data.choices || !data.choices[0]) throw new Error("AI không trả lời");
 
-                // 4. Xử lý dữ liệu JSON trả về (Clean JSON)
+                // Xử lý JSON
                 let rawText = data.choices[0].message.content;
-                // Loại bỏ markdown ```json nếu có
                 rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
-                // Tìm ngoặc nhọn đầu cuối để tránh lỗi cú pháp
                 const firstBrace = rawText.indexOf('{');
                 const lastBrace = rawText.lastIndexOf('}');
                 if (firstBrace !== -1 && lastBrace !== -1) {
@@ -696,15 +719,16 @@
 
                 const result = JSON.parse(rawText);
 
-                // 5. Hiển thị kết quả lên giao diện
-                // Điền điểm số
+                // Hiển thị kết quả
                 let finalScore = parseFloat(result.score);
                 if (isNaN(finalScore)) finalScore = 0;
+                
+                // Cập nhật giao diện
                 scoreInput.value = finalScore;
-                window.updateLiveScore(qId, finalScore); // Cập nhật tổng điểm dự kiến
+                window.updateLiveScore(qId, finalScore);
 
-                // Điền lời phê (Hiệu ứng gõ chữ)
-                const aiComment = result.comment || "Đã có lỗi khi tạo nhận xét.";
+                // Hiệu ứng gõ chữ lời phê
+                const aiComment = result.comment || "Đã chấm xong.";
                 cmtInput.value = "";
                 let i = 0;
                 const typeWriter = setInterval(() => {
@@ -713,18 +737,21 @@
                         i++;
                     } else {
                         clearInterval(typeWriter);
-                        window.updateComment(qId, aiComment); // Lưu comment vào biến nhớ
+                        window.updateComment(qId, aiComment);
                     }
-                }, 15); // Tốc độ gõ
+                }, 15);
 
-                showToast("✨ AI đã đề xuất kết quả!");
+                showToast("✨ AI đã chấm xong!");
 
             } catch (e) {
                 console.error("AI Error:", e);
-                // Fallback nếu lỗi: Hiện thông báo để GV chấm tay
-                alert("AI đang bận hoặc gặp lỗi. Thầy/Cô vui lòng chấm thủ công câu này nhé!");
+                // Thông báo lỗi chi tiết hơn
+                if (e.message.includes("404")) {
+                    alert("Lỗi kết nối: Không tìm thấy Server AI. Hãy đảm bảo bạn đang chạy trên Netlify hoặc dùng đúng link API.");
+                } else {
+                    alert("AI đang bận, thầy/cô vui lòng chấm tay câu này nhé!");
+                }
             } finally {
-                // 6. Khôi phục nút bấm
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
