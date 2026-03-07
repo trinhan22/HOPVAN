@@ -625,92 +625,90 @@
             if(window.renderMathInElement) renderMathInElement(listEl);
         }
 
-        // --- TÍNH NĂNG AI SUPPORT (PHIÊN BẢN FIX LỖI) ---
+        // --- TÍNH NĂNG AI SUPPORT (Đã Fix: Khớp logic Groq/Proxy) ---
         window.triggerAI = async (qId) => {
             const btn = document.getElementById(`btn-ai-${qId}`);
             const scoreInput = document.getElementById(`score-${qId}`);
             const cmtInput = document.getElementById(`cmt-${qId}`);
             
-            // 1. Lấy dữ liệu an toàn từ biến toàn cục (Tránh lỗi HTML)
+            // 1. Lấy dữ liệu câu hỏi
             const questionData = questions.find(q => q.id === qId);
             const studentAns = submissionData.answers ? submissionData.answers[qId] : "";
-            const topic = questionData ? questionData.topic : "";
+            const topic = questionData ? (questionData.topic || questionData.question) : "Câu hỏi không xác định";
 
-            if (!questionData) { alert("Lỗi: Không tìm thấy câu hỏi"); return; }
+            if (!questionData) { alert("Lỗi: Không tìm thấy dữ liệu câu hỏi"); return; }
 
             // 2. Hiệu ứng Loading
             const originalText = btn.innerHTML;
-            btn.innerHTML = `<span class="ai-typing"></span> Đang suy nghĩ...`;
+            btn.innerHTML = `<span class="ai-typing"></span> Đang chấm...`;
             btn.disabled = true;
 
-            // 3. Cấu hình API (Sửa thành link full để chạy được cả ở Localhost)
-            // Lưu ý: Khi deploy chính thức bạn có thể đổi lại thành relative path nếu muốn
+            // URL API (Dùng chung với file luyện đề)
             const API_URL = `/.netlify/functions/gemini-proxy`;
 
             try {
-                // 2. Chuẩn bị Prompt (Chuyên gia chấm thi - Barem GDPT 2018)
+                // 3. Chuẩn bị Prompt (Khắt khe & Chi tiết theo Barem)
                 const systemPrompt = `
-                VAI TRÒ: Bạn là Giáo viên Ngữ văn lớp 12 (Chương trình GDPT 2018), chuyên chấm thi Tốt nghiệp THPT và Đánh giá năng lực.
+                VAI TRÒ: Bạn là Giáo viên Ngữ văn lớp 12 (Chatbot K12), chuyên chấm thi Tốt nghiệp THPT.
                 
-                PHONG CÁCH CHẤM:
-                - KHẮT KHE, TỈ MỈ: Soi kỹ từng lỗi diễn đạt, lỗi logic. Không chấm điểm "thoáng".
-                - HỌC THUẬT: Nhận xét phải dùng thuật ngữ chuyên môn (VD: "thao tác lập luận", "hình tượng nghệ thuật", "tính liên kết", "giọng điệu").
-                - TRỰC DIỆN: Chỉ rõ lỗi sai để học sinh sửa, không khen sáo rỗng.
+                THÁI ĐỘ:
+                - Nghiêm túc, tỉ mỉ, KHẮT KHE.
+                - Nhận xét mang tính học thuật, dùng thuật ngữ chuyên môn (không nói sáo rỗng).
 
-                BAREM ĐIỂM & QUY TẮC CHẤM (TỰ ĐỘNG NHẬN DIỆN):
+                BAREM ĐIỂM CHI TIẾT (Áp dụng cho câu đang chấm):
+                
+                1. NẾU LÀ CÂU ĐỌC HIỂU (Câu ngắn):
+                   - Câu hỏi Nhận biết (Hỏi thể thơ, PTBĐ, phong cách ngôn ngữ...): Tối đa 0.5 điểm. Sai là 0 điểm.
+                   - Câu hỏi Thông hiểu/Vận dụng (Hỏi "Hiểu thế nào", "Thông điệp", "Đồng tình không"...): Tối đa 1.0 điểm. Trả lời hời hợt trừ 50% điểm.
 
-                A. NẾU LÀ CÂU HỎI ĐỌC HIỂU (Câu hỏi ngắn):
-                   - Câu 1, 2, 3 (Nhận biết): Tối đa 0.5 điểm. Yêu cầu: Trả lời đúng từ khóa, gãy gọn. Sai/thiếu ý -> 0 điểm.
-                   - Câu 4, 5 (Thông hiểu/Vận dụng): Tối đa 1.0 điểm. Yêu cầu: Giải thích sâu sắc, có quan điểm cá nhân thuyết phục. Hời hợt -> Trừ 50% điểm.
-
-                B. NẾU LÀ LÀM VĂN (NLXH hoặc NLVH):
-                   Hãy đọc đề bài để xác định hình thức là "ĐOẠN VĂN" hay "BÀI VĂN":
-
-                   * HÌNH THỨC 1: ĐOẠN VĂN (~200 chữ):
-                     - Thang điểm: Tối đa 2.0 điểm.
-                     - Yêu cầu: Viết liền mạch 1 đoạn, không xuống dòng. Có câu chủ đề và câu kết.
-                     - Trừ điểm nặng:
-                       + Viết thành bài văn (tách Mở/Thân/Kết) -> Trừ 0.5 điểm.
-                       + Thiếu dẫn chứng thực tế (với NLXH) -> Trừ 0.5 điểm.
-                       + Lan man, dài dòng quá 300 chữ -> Trừ 0.25 điểm.
-
-                   * HÌNH THỨC 2: BÀI VĂN (~600 chữ):
-                     - Thang điểm: Tối đa 4.0 - 6.0 điểm (tùy thang đề).
-                     - Yêu cầu: Bố cục 3 phần rõ ràng. Hệ thống luận điểm chặt chẽ.
-                     - Tiêu chí nâng cao (để đạt điểm Giỏi): Có so sánh mở rộng, phản đề, vận dụng Lý luận văn học, văn phong giàu hình ảnh.
-                     - Trừ điểm nặng: Diễn xuôi lại cốt truyện (NLVH) hoặc hô khẩu hiệu sáo rỗng (NLXH).
-
-                NHIỆM VỤ CỦA BẠN:
-                1. Đọc "ĐỀ BÀI" để xác định thể loại và hình thức.
-                2. Chấm điểm số thực tế (làm tròn 0.25). Lưu ý: Điểm tuyệt đối (max) rất khó đạt, chỉ dành cho bài xuất sắc.
-                3. Viết nhận xét súc tích (dưới 50 từ).
+                2. NẾU LÀ LÀM VĂN (NLXH hoặc NLVH):
+                   Hãy tự xác định hình thức là "ĐOẠN VĂN" (khoảng 200 chữ) hay "BÀI VĂN".
+                   
+                   * NLXH (Nghị luận xã hội):
+                     - Yêu cầu: Phải có DẪN CHỨNG thực tế xác đáng. Thiếu dẫn chứng -> Trừ 0.5 điểm.
+                     - Tư duy phản biện sắc bén. Hô khẩu hiệu sáo rỗng -> Điểm trung bình.
+                   
+                   * NLVH (Nghị luận văn học):
+                     - Yêu cầu: Cảm thụ sâu sắc, phát hiện tín hiệu nghệ thuật.
+                     - Kị nhất: "Diễn xuôi" lại cốt truyện -> Trừ 50% số điểm.
 
                 OUTPUT JSON FORMAT (BẮT BUỘC):
                 {
-                    "score": (số thực, ví dụ: 0.25, 1.5, 3.75, 8.0),
-                    "comment": (chuỗi string, nhận xét tập trung vào lỗi sai hoặc điểm sáng tạo)
+                    "score": (số thực, làm tròn 0.25. Ví dụ: 0.5, 0.75, 1.5, 8.0),
+                    "comment": (chuỗi string, nhận xét súc tích dưới 50 từ, chỉ rõ lỗi sai hoặc điểm sáng tạo)
                 }
                 `;
 
-                // Gọi API
+                const userMessage = `
+                ĐỀ BÀI: "${topic}"
+                BÀI LÀM CỦA HỌC SINH: "${studentAns}"
+                
+                Hãy chấm điểm ngay theo barem trên.
+                `;
+
+                // 4. Gọi API (Logic giống hệt file fulltest.html)
                 const res = await fetch(API_URL, { 
                     method: 'POST', 
                     headers: {'Content-Type': 'application/json'}, 
                     body: JSON.stringify({ 
                         systemPrompt: systemPrompt, 
-                        messages: userMessage
+                        messages: userMessage // Groq proxy nhận key 'messages'
                     }) 
                 });
 
-                if (!res.ok) throw new Error("Lỗi Server AI (404/500)");
+                if (!res.ok) throw new Error(`Lỗi Server: ${res.status}`);
 
                 const data = await res.json();
                 
-                if (!data.choices || !data.choices[0]) throw new Error("AI không trả lời");
+                // KIỂM TRA ĐÚNG ĐỊNH DẠNG CỦA GROQ/OPENAI
+                if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+                    throw new Error("AI không trả về kết quả đúng định dạng");
+                }
 
-                // Xử lý JSON
+                // 5. Xử lý JSON (Làm sạch markdown)
                 let rawText = data.choices[0].message.content;
                 rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+                
                 const firstBrace = rawText.indexOf('{');
                 const lastBrace = rawText.lastIndexOf('}');
                 if (firstBrace !== -1 && lastBrace !== -1) {
@@ -719,25 +717,29 @@
 
                 const result = JSON.parse(rawText);
 
-                // Hiển thị kết quả
+                // 6. Hiển thị kết quả
                 let finalScore = parseFloat(result.score);
                 if (isNaN(finalScore)) finalScore = 0;
                 
-                // Cập nhật giao diện
+                // Điền điểm
                 scoreInput.value = finalScore;
                 window.updateLiveScore(qId, finalScore);
 
-                // Hiệu ứng gõ chữ lời phê
+                // Điền lời phê (Hiệu ứng gõ chữ)
                 const aiComment = result.comment || "Đã chấm xong.";
                 cmtInput.value = "";
+                
+                // Xóa interval cũ nếu có (tránh lỗi khi bấm liên tục)
+                if (window['typing_' + qId]) clearInterval(window['typing_' + qId]);
+
                 let i = 0;
-                const typeWriter = setInterval(() => {
+                window['typing_' + qId] = setInterval(() => {
                     if (i < aiComment.length) {
                         cmtInput.value += aiComment.charAt(i);
                         i++;
                     } else {
-                        clearInterval(typeWriter);
-                        window.updateComment(qId, aiComment);
+                        clearInterval(window['typing_' + qId]);
+                        window.updateComment(qId, aiComment); // Lưu comment vào biến nhớ
                     }
                 }, 15);
 
@@ -745,12 +747,7 @@
 
             } catch (e) {
                 console.error("AI Error:", e);
-                // Thông báo lỗi chi tiết hơn
-                if (e.message.includes("404")) {
-                    alert("Lỗi kết nối: Không tìm thấy Server AI. Hãy đảm bảo bạn đang chạy trên Netlify hoặc dùng đúng link API.");
-                } else {
-                    alert("AI đang bận, thầy/cô vui lòng chấm tay câu này nhé!");
-                }
+                alert("Hệ thống đang bận hoặc gặp lỗi kết nối. Thầy/Cô vui lòng chấm thủ công câu này nhé!");
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
