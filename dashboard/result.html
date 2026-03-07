@@ -75,6 +75,59 @@
         ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
         ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
         ::-webkit-scrollbar-button { display: none; }
+
+        /* --- AI ASSISTANT STYLES --- */
+        .ai-btn {
+            background: linear-gradient(135deg, #6366f1, #a855f7); /* Tím mộng mơ */
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Hiệu ứng lấp lánh */
+        .ai-btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-20deg);
+            animation: shine 3s infinite;
+        }
+        @keyframes shine { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+
+        .ai-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5);
+        }
+
+        .ai-btn:disabled {
+            background: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Hiệu ứng AI đang viết */
+        .ai-typing {
+            display: inline-block;
+            width: 12px; height: 12px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8 overflow-y-auto custom-scrollbar pb-40">
@@ -237,7 +290,7 @@
                     console.error(e);
                     showError("Lỗi xác thực người dùng.");
                 }
-            } else window.location.href = "../auth.html";
+            } else window.location.href = "../log.html";
         });
 
         // --- 2. TÌM BÀI LÀM ---
@@ -514,10 +567,36 @@
                 } 
                 else {
                     let teacherTools = '';
-                    if (isTeacher) {
-                        const curScore = gradingData.scores[q.id] || 0;
-                        const curCmt = gradingData.comments[q.id] || '';
-                        teacherTools = `<div class="grading-panel"><div class="grading-label">CHẤM ĐIỂM</div><div class="grid grid-cols-1 md:grid-cols-4 gap-4"><div><label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Điểm số</label><input type="number" class="grade-input grade-score-input" value="${curScore}" min="0" max="10" step="0.25" oninput="window.updateLiveScore('${q.id}', this.value)"></div><div class="md:col-span-3"><label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Nhận xét</label><input type="text" class="grade-input text-sm h-[54px]" value="${curCmt}" placeholder="Nhập nhận xét..." onchange="window.updateComment('${q.id}', this.value)"></div></div></div>`;
+                    // --- CODE MỚI: GIAO DIỆN CHẤM ĐIỂM CÓ AI ---
+                        if (isTeacher) {
+                            const curScore = gradingData.scores[q.id] || 0;
+                            const curCmt = gradingData.comments[q.id] || '';
+                            
+                            // Nút AI + Input điểm + Input nhận xét
+                            teacherTools = `
+                            <div class="grading-panel">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="grading-label">CHẤM ĐIỂM THỦ CÔNG</div>
+                                    <button onclick="window.triggerAI('${q.id}', \`${(ans || '').replace(/`/g, "'")}\`, \`${(q.topic || '').replace(/`/g, "'")}\`)" 
+                                            class="ai-btn" id="btn-ai-${q.id}">
+                                        <i class="fas fa-magic"></i> <span>Gợi ý AI</span>
+                                    </button>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Điểm số (0-10)</label>
+                                        <input type="number" id="score-${q.id}" class="grade-input grade-score-input" value="${curScore}" min="0" max="10" step="0.25" oninput="window.updateLiveScore('${q.id}', this.value)">
+                                    </div>
+                                    <div class="md:col-span-3">
+                                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Lời phê / Nhận xét</label>
+                                        <div class="relative">
+                                            <input type="text" id="cmt-${q.id}" class="grade-input text-sm h-[54px] pr-10" value="${curCmt}" placeholder="Nhập nhận xét..." onchange="window.updateComment('${q.id}', this.value)">
+                                            <i class="fas fa-pen absolute right-4 top-4 text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
                     } else {
                         const s = submissionData.essayScores?.[q.id];
                         const c = submissionData.questionComments?.[q.id];
@@ -546,6 +625,110 @@
 
             if(window.renderMathInElement) renderMathInElement(listEl);
         }
+
+        // --- TÍNH NĂNG AI SUPPORT (GỌI API THẬT) ---
+        window.triggerAI = async (qId, studentAns, topic) => {
+            const btn = document.getElementById(`btn-ai-${qId}`);
+            const scoreInput = document.getElementById(`score-${qId}`);
+            const cmtInput = document.getElementById(`cmt-${qId}`);
+            
+            // 1. Hiệu ứng Loading
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="ai-typing"></span> Đang suy nghĩ...`;
+            btn.disabled = true;
+
+            // URL API (Dùng chung với file luyện đề)
+            const API_URL = `/.netlify/functions/gemini-proxy`;
+
+            try {
+                // 2. Chuẩn bị Prompt (Chuyên biệt cho chấm 1 câu)
+                const systemPrompt = `
+                VAI TRÒ: Bạn là Trợ lý chấm thi Ngữ Văn K12.
+                NHIỆM VỤ: Chấm điểm và đưa ra nhận xét ngắn gọn cho MỘT câu hỏi tự luận.
+                
+                YÊU CẦU ĐẦU RA (BẮT BUỘC ĐỊNH DẠNG JSON):
+                {
+                    "score": (số thực từ 0.0 đến 10.0, làm tròn đến 0.25),
+                    "comment": (chuỗi string, nhận xét súc tích dưới 40 từ, giọng văn giáo viên, lịch sự nhưng thẳng thắn)
+                }
+
+                QUY TẮC CHẤM:
+                - Bài làm trống hoặc vô nghĩa: 0 điểm. Nhận xét: "Học sinh bỏ trống câu này."
+                - Bài quá ngắn (<20 từ): Dưới 3.0 điểm. Nhận xét nhắc nhở sơ sài.
+                - Đánh giá dựa trên: Đúng trọng tâm, diễn đạt mạch lạc, có dẫn chứng (nếu cần).
+                `;
+
+                const userMessage = `
+                ĐỀ BÀI: "${topic}"
+                BÀI LÀM CỦA HỌC SINH: "${studentAns}"
+                
+                Hãy chấm điểm ngay.
+                `;
+
+                // 3. Gọi API
+                const res = await fetch(API_URL, { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({ 
+                        systemPrompt: systemPrompt, 
+                        messages: userMessage
+                    }) 
+                });
+
+                if (!res.ok) throw new Error("Lỗi kết nối Server AI");
+
+                const data = await res.json();
+                
+                if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+                    throw new Error("AI không trả về kết quả");
+                }
+
+                // 4. Xử lý dữ liệu JSON trả về (Clean JSON)
+                let rawText = data.choices[0].message.content;
+                // Loại bỏ markdown ```json nếu có
+                rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+                // Tìm ngoặc nhọn đầu cuối để tránh lỗi cú pháp
+                const firstBrace = rawText.indexOf('{');
+                const lastBrace = rawText.lastIndexOf('}');
+                if (firstBrace !== -1 && lastBrace !== -1) {
+                    rawText = rawText.substring(firstBrace, lastBrace + 1);
+                }
+
+                const result = JSON.parse(rawText);
+
+                // 5. Hiển thị kết quả lên giao diện
+                // Điền điểm số
+                let finalScore = parseFloat(result.score);
+                if (isNaN(finalScore)) finalScore = 0;
+                scoreInput.value = finalScore;
+                window.updateLiveScore(qId, finalScore); // Cập nhật tổng điểm dự kiến
+
+                // Điền lời phê (Hiệu ứng gõ chữ)
+                const aiComment = result.comment || "Đã có lỗi khi tạo nhận xét.";
+                cmtInput.value = "";
+                let i = 0;
+                const typeWriter = setInterval(() => {
+                    if (i < aiComment.length) {
+                        cmtInput.value += aiComment.charAt(i);
+                        i++;
+                    } else {
+                        clearInterval(typeWriter);
+                        window.updateComment(qId, aiComment); // Lưu comment vào biến nhớ
+                    }
+                }, 15); // Tốc độ gõ
+
+                showToast("✨ AI đã đề xuất kết quả!");
+
+            } catch (e) {
+                console.error("AI Error:", e);
+                // Fallback nếu lỗi: Hiện thông báo để GV chấm tay
+                alert("AI đang bận hoặc gặp lỗi. Thầy/Cô vui lòng chấm thủ công câu này nhé!");
+            } finally {
+                // 6. Khôi phục nút bấm
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        };
 
         // --- GLOBAL ACTIONS ---
         window.updateLiveScore = (qId, val) => {

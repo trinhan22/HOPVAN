@@ -14,6 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 
     <style>
         :root {
@@ -363,6 +364,14 @@
                 const subSnap = await getDocs(subQ);
                 const submissions = subSnap.docs.map(d => ({id: d.id, ...d.data()}));
 
+                // --- CẬP NHẬT MỚI: Lưu dữ liệu vào Window để dùng cho Excel ---
+                window.excelDataCache = {
+                    className: classData.className || "Lop_Hoc",
+                    students: students,
+                    tests: tests,
+                    submissions: submissions
+                };
+
                 renderTable(students, tests, submissions);
 
             } catch (err) {
@@ -520,9 +529,101 @@
             window.open(`../dashboard/result.html?submissionId=${subId}`, '_blank');
         }
 
-        // Export Function (Mock)
+        // --- CHỨC NĂNG XUẤT EXCEL CHUYÊN NGHIỆP ---
         window.exportExcel = () => {
-            alert("Tính năng xuất Excel sẽ sớm được cập nhật trong phiên bản tới!");
+            // 1. Kiểm tra dữ liệu
+            if (!window.excelDataCache || !window.excelDataCache.students.length) {
+                alert("Chưa có dữ liệu để xuất!");
+                return;
+            }
+
+            const { className, students, tests, submissions } = window.excelDataCache;
+            const btn = document.querySelector('button[onclick="exportExcel()"]');
+            const originalText = btn.innerHTML;
+
+            // Hiệu ứng Loading cho nút
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Đang tạo file...`;
+            btn.disabled = true;
+
+            setTimeout(() => {
+                try {
+                    // 2. Chuẩn bị dữ liệu cho Excel (Mảng 2 chiều)
+                    const data = [];
+
+                    // --- DÒNG TIÊU ĐỀ ---
+                    const headers = ["STT", "Họ và Tên", "Email"];
+                    tests.forEach(t => headers.push(t.name)); // Thêm cột tên từng bài thi
+                    // headers.push("Điểm Trung Bình"); // (Tùy chọn: Bỏ comment nếu muốn thêm cột ĐTB)
+                    data.push(headers);
+
+                    // --- DÒNG DỮ LIỆU ---
+                    students.forEach((s, index) => {
+                        const row = [
+                            index + 1,
+                            s.name || "Không tên",
+                            s.email || ""
+                        ];
+
+                        // let totalScore = 0;
+                        // let count = 0;
+
+                        // Tìm điểm cho từng bài thi
+                        tests.forEach(t => {
+                            const sub = submissions.find(x => x.studentId === s.uid && x.testId === t.id);
+                            if (sub) {
+                                let score = parseFloat(sub.score);
+                                // Xử lý trường hợp chưa chấm tự luận (score = 0 nhưng có quizScore)
+                                if (score === 0 && sub.quizScore !== undefined) {
+                                    score = parseFloat(sub.quizScore);
+                                }
+                                row.push(score);
+                                // totalScore += score;
+                                // count++;
+                            } else {
+                                row.push(""); // Chưa làm bài thì để trống
+                            }
+                        });
+
+                        // Tính ĐTB (Tùy chọn)
+                        // const avg = count > 0 ? (totalScore / count).toFixed(2) : "";
+                        // row.push(avg);
+
+                        data.push(row);
+                    });
+
+                    // 3. Tạo Workbook & Worksheet
+                    const ws = XLSX.utils.aoa_to_sheet(data);
+
+                    // --- STYLE CƠ BẢN (Độ rộng cột) ---
+                    const wscols = [
+                        {wch: 5},  // STT
+                        {wch: 25}, // Tên
+                        {wch: 30}  // Email
+                    ];
+                    // Tự động thêm width cho các cột điểm
+                    tests.forEach(() => wscols.push({wch: 15}));
+                    ws['!cols'] = wscols;
+
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Sổ Điểm");
+
+                    // 4. Xuất file
+                    // Tên file: So_Diem_[TenLop]_[NgayThang].xlsx
+                    const dateStr = new Date().toISOString().slice(0,10);
+                    const safeClassName = className.replace(/[^a-zA-Z0-9]/g, "_");
+                    const fileName = `So_Diem_${safeClassName}_${dateStr}.xlsx`;
+
+                    XLSX.writeFile(wb, fileName);
+
+                } catch (e) {
+                    console.error("Lỗi xuất Excel:", e);
+                    alert("Có lỗi khi tạo file Excel. Vui lòng thử lại.");
+                } finally {
+                    // Khôi phục nút bấm
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            }, 500); // Delay nhẹ để thấy hiệu ứng loading
         };
 
         document.getElementById('logout-btn').onclick = () => signOut(auth);
