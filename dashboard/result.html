@@ -572,7 +572,7 @@
                             const curScore = gradingData.scores[q.id] || 0;
                             const curCmt = gradingData.comments[q.id] || '';
                             
-                            // Nút AI + Input điểm + Input nhận xét
+                            // Nút AI + Input điểm + Textarea nhận xét (Đã nâng cấp)
                             teacherTools = `
                             <div class="grading-panel">
                                 <div class="flex justify-between items-start mb-3">
@@ -587,11 +587,18 @@
                                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Điểm số (0-10)</label>
                                         <input type="number" id="score-${q.id}" class="grade-input grade-score-input" value="${curScore}" min="0" max="10" step="0.25" oninput="window.updateLiveScore('${q.id}', this.value)">
                                     </div>
+                                    
                                     <div class="md:col-span-3">
                                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Lời phê / Nhận xét</label>
                                         <div class="relative">
-                                            <input type="text" id="cmt-${q.id}" class="grade-input text-sm h-[54px] pr-10" value="${curCmt}" placeholder="Nhập nhận xét..." onchange="window.updateComment('${q.id}', this.value)">
-                                            <i class="fas fa-pen absolute right-4 top-4 text-gray-300"></i>
+                                            <textarea 
+                                                id="cmt-${q.id}" 
+                                                class="grade-input text-sm p-3 pr-10 w-full min-h-[80px] resize-y" 
+                                                placeholder="Nhập nhận xét chi tiết..." 
+                                                rows="3"
+                                                onchange="window.updateComment('${q.id}', this.value)"
+                                            >${curCmt}</textarea>
+                                            <i class="fas fa-pen absolute right-3 top-3 text-gray-300 pointer-events-none"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -613,9 +620,9 @@
                         <div class="q-content text-sm text-gray-600 bg-gray-50 p-4 rounded-xl mb-4 italic leading-relaxed border border-gray-100">
                             ${q.type === 'reading' ? `(Đọc hiểu) ${q.text.substring(0,100)}...` : q.topic}
                         </div>
-                        <div class="p-5 bg-white rounded-xl border-2 border-gray-100">
-                            <p class="text-xs font-bold text-gray-400 uppercase mb-2 flex items-center gap-1"><i class="fas fa-pen"></i> Bài làm:</p>
-                            <p class="text-gray-800 font-serif whitespace-pre-wrap text-sm leading-7">${formatEssay(ans)}</p>
+                        <p class="text-xs font-bold text-gray-400 uppercase mb-2 flex items-center gap-1"><i class="fas fa-pen"></i> Bài làm:</p>
+                        <div class="text-gray-800 whitespace-pre-wrap text-[15px] leading-8" style="font-family: 'Merriweather', serif;">
+                            ${formatEssay(ans)}
                         </div>
                         ${teacherTools}
                     </div>`;
