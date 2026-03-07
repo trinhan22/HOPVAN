@@ -663,28 +663,48 @@
         const btnCloseBanner = document.getElementById('btn-close-banner');
         const iosModal = document.getElementById('ios-modal');
 
+        // Hàm kiểm tra thiết bị
         const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+        const isAndroid = () => /android/i.test(window.navigator.userAgent.toLowerCase());
         const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
 
+        // 1. Hiển thị Banner
+        // Bắt sự kiện PWA (cho Android/Desktop) để hiện banner
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
+            // Chỉ hiện trên mobile
             if (window.innerWidth < 768) {
                 installBanner.style.display = 'flex';
             }
         });
 
+        // Với iOS (không có sự kiện beforeinstallprompt), tự check để hiện
         if (isIos() && !isInStandaloneMode() && window.innerWidth < 768) {
             setTimeout(() => {
                 installBanner.style.display = 'flex';
             }, 2000);
         }
 
+        // 2. Xử lý nút Cài đặt
         btnInstall.addEventListener('click', () => {
             if (isIos()) {
+                // --- TRƯỜNG HỢP IOS: Hiện hướng dẫn ---
                 installBanner.style.display = 'none';
                 iosModal.style.display = 'flex';
+            } else if (isAndroid()) {
+                // --- TRƯỜNG HỢP ANDROID: Tải file APK ---
+                const link = document.createElement('a');
+                link.href = 'hopvan.apk'; // Đảm bảo file hopvan.apk nằm ngang hàng file index.html
+                link.download = 'HopVan.apk';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Ẩn banner sau khi bấm tải
+                installBanner.style.display = 'none';
             } else if (deferredPrompt) {
+                // --- TRƯỜNG HỢP KHÁC (PC/Laptop): Dùng PWA mặc định ---
                 installBanner.style.display = 'none';
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
@@ -693,9 +713,13 @@
             }
         });
 
+        // Nút đóng banner
         btnCloseBanner.addEventListener('click', () => {
             installBanner.style.display = 'none';
         });
+        
+        // Đóng modal iOS khi bấm nút Đã hiểu
+        // (Code HTML của bạn đã có onclick inline, nhưng thêm ở đây cho chắc chắn nếu cần)
     </script>
 
 <script type="module">
