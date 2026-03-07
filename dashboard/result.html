@@ -632,114 +632,109 @@
             if(window.renderMathInElement) renderMathInElement(listEl);
         }
 
-        // --- TÍNH NĂNG AI SUPPORT (Đã Fix: Khớp logic Groq/Proxy) ---
+        // --- TÍNH NĂNG AI SUPPORT (THÔNG MINH: TỰ ĐỘNG CHỌN THANG ĐIỂM) ---
         window.triggerAI = async (qId) => {
             const btn = document.getElementById(`btn-ai-${qId}`);
             const scoreInput = document.getElementById(`score-${qId}`);
             const cmtInput = document.getElementById(`cmt-${qId}`);
             
-            // 1. Lấy dữ liệu câu hỏi
+            // 1. Lấy dữ liệu
             const questionData = questions.find(q => q.id === qId);
             const studentAns = submissionData.answers ? submissionData.answers[qId] : "";
             const topic = questionData ? (questionData.topic || questionData.question) : "Câu hỏi không xác định";
 
             if (!questionData) { alert("Lỗi: Không tìm thấy dữ liệu câu hỏi"); return; }
 
+            // --- LOGIC THÔNG MINH: XÁC ĐỊNH THANG ĐIỂM ---
+            // Nếu đề chỉ có 1 câu duy nhất -> Chấm thang 10 (bài luyện tập)
+            // Nếu đề có nhiều câu -> Chấm theo barem thành phần (để cộng lại ra 10)
+            const isSingleQuestion = questions.length === 1;
+            const gradingMode = isSingleQuestion ? "THANG_10" : "BAREM_THANH_PHAN";
+
             // 2. Hiệu ứng Loading
             const originalText = btn.innerHTML;
-            btn.innerHTML = `<span class="ai-typing"></span> Đang chấm...`;
+            btn.innerHTML = `<span class="ai-typing"></span> Đang chấm (${isSingleQuestion ? 'Thang 10' : 'Thành phần'})...`;
             btn.disabled = true;
 
-            // URL API (Dùng chung với file luyện đề)
             const API_URL = `/.netlify/functions/gemini-proxy`;
 
             try {
-                // 2. Chuẩn bị Prompt (Phiên bản Giáo viên Tâm huyết - Barem chi tiết)
+                // 3. Chuẩn bị Prompt (Động theo chế độ chấm)
                 const systemPrompt = `
-                VAI TRÒ: Bạn là Giáo viên Ngữ văn lớp 12 giàu kinh nghiệm, chấm thi rất kỹ tính và tâm huyết.
+                VAI TRÒ: Bạn là Giáo viên Ngữ văn lớp 12 (GDPT 2018) giàu kinh nghiệm, tâm huyết và chấm thi rất kỹ tính.
                 
-                NHIỆM VỤ: Chấm điểm 1 câu hỏi và đưa ra lời phê chi tiết (tối thiểu 40 từ).
+                NHIỆM VỤ: Chấm điểm bài làm của học sinh và đưa ra lời phê chi tiết (Tối thiểu 40 từ).
+                
+                CHẾ ĐỘ CHẤM HIỆN TẠI: ${gradingMode}
+                (Lưu ý: Nếu là ${gradingMode} == "THANG_10", hãy chấm bài làm này trên thang điểm 10. Nếu là "BAREM_THANH_PHAN", hãy chấm theo điểm nhỏ bên dưới).
 
-                BAREM ĐIỂM CỤ THỂ (QUAN TRỌNG - Cần xác định đúng loại câu):
+                BAREM KHI CHẤM "BAREM_THANH_PHAN" (Đề tổng hợp nhiều câu):
+                A. ĐỌC HIỂU (Câu hỏi ngắn):
+                   - Mức NHẬN BIẾT (Hỏi thể thơ, PTBĐ, từ ngữ...): Tối đa 0.5 điểm. Sai hoặc thiếu ý chính -> 0 điểm.
+                   - Mức VẬN DỤNG (Hỏi hiểu thế nào, thông điệp...): Tối đa 1.0 điểm. Trả lời hời hợt, chung chung -> Trừ 0.5 điểm.
+                B. LÀM VĂN:
+                   - ĐOẠN VĂN (~200 chữ): Tối đa 2.0 điểm.
+                   - BÀI VĂN (~600 chữ): Tối đa 4.0 - 6.0 điểm.
 
-                A. PHẦN ĐỌC HIỂU (Dựa vào nội dung câu hỏi để xác định mức độ):
-                   1. Mức NHẬN BIẾT (Thường là Câu 1, 2, 3 - Hỏi thể thơ, PTBĐ, chỉ ra từ ngữ/hình ảnh...):
-                      - Điểm tối đa: 0.5 điểm.
-                      - Yêu cầu: Trả lời chính xác, ngắn gọn. Sai hoặc thiếu ý chính -> 0 điểm.
-                   
-                   2. Mức VẬN DỤNG/THÔNG HIỂU (Thường là Câu 4, 5 - Hỏi "Hiểu thế nào", "Thông điệp", "Đồng tình không"...):
-                      - Điểm tối đa: 1.0 điểm.
-                      - Yêu cầu: Giải thích thấu đáo, lập luận thuyết phục. Trả lời hời hợt, chung chung -> Trừ 0.5 điểm.
+                BAREM KHI CHẤM "THANG_10" (Bài luyện tập 1 câu duy nhất):
+                   - Bất kể là câu hỏi gì (Đoạn văn hay Bài văn), hãy quy đổi chất lượng sang thang điểm 10.
+                   - Ví dụ: Một đoạn văn 200 chữ viết xuất sắc sẽ được 9.0 - 9.5 điểm (thay vì chỉ 2.0).
 
-                B. PHẦN LÀM VĂN (NLXH hoặc NLVH):
-                   - Nếu là ĐOẠN VĂN (~200 chữ): Max 2.0 điểm. (Trừ điểm nặng nếu tách đoạn hoặc thiếu dẫn chứng).
-                   - Nếu là BÀI VĂN (~600 chữ): Max 5.0 - 6.0 điểm. (Yêu cầu bố cục 3 phần, luận điểm sâu sắc).
+                YÊU CẦU LỜI PHÊ (BẮT BUỘC):
+                1. ĐỘ DÀI: Từ 40 đến 100 từ. (Tuyệt đối không nhận xét ngắnn cũn cỡn).
+                2. CẤU TRÚC 3 PHẦN:
+                   + Điểm sáng: Khen ngợi tư duy, cách diễn đạt, ý tưởng.
+                   + Hạn chế: Chỉ rõ lỗi lủng củng, thiếu dẫn chứng, sai kiến thức, diễn xuôi.
+                   + Lời khuyên: Gợi ý cách sửa cụ thể để đạt điểm cao hơn.
+                3. GIỌNG VĂN: Ân cần, sâu sắc nhưng nghiêm khắc về lỗi sai.
 
-                YÊU CẦU VỀ LỜI PHÊ (COMMENT):
-                - ĐỘ DÀI: Bắt buộc từ 40 đến 80 từ. Tuyệt đối không nhận xét sơ sài kiểu "Bài làm tốt".
-                - CẤU TRÚC 3 PHẦN:
-                  + Điểm sáng: Khen ngợi tư duy, cách dùng từ hoặc ý tưởng hay.
-                  + Điểm trừ: Chỉ rõ lỗi diễn đạt (lủng củng, sáo rỗng), lỗi kiến thức hoặc lỗi trình bày.
-                  + Lời khuyên: Gợi ý cụ thể cách sửa để nâng điểm số.
-
-                OUTPUT JSON FORMAT (BẮT BUỘC):
+                OUTPUT JSON FORMAT:
                 {
                     "score": (số thực, làm tròn 0.25),
-                    "comment": (chuỗi string, giọng văn giáo viên ân cần nhưng nghiêm khắc, phân tích kỹ ưu nhược điểm)
+                    "comment": (chuỗi string, lời phê tâm huyết, đầy đủ 3 phần Khen/Chê/Khuyên)
                 }
                 `;
 
                 const userMessage = `
                 ĐỀ BÀI: "${topic}"
-                BÀI LÀM CỦA HỌC SINH: "${studentAns}"
+                BÀI LÀM: "${studentAns}"
                 
-                Hãy chấm điểm ngay theo barem trên.
+                Hãy chấm ngay.
                 `;
 
-                // 4. Gọi API (Logic giống hệt file fulltest.html)
+                // 4. Gọi API
                 const res = await fetch(API_URL, { 
                     method: 'POST', 
                     headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({ 
-                        systemPrompt: systemPrompt, 
-                        messages: userMessage // Groq proxy nhận key 'messages'
-                    }) 
+                    body: JSON.stringify({ systemPrompt, messages: userMessage }) 
                 });
 
                 if (!res.ok) throw new Error(`Lỗi Server: ${res.status}`);
 
                 const data = await res.json();
-                
-                // KIỂM TRA ĐÚNG ĐỊNH DẠNG CỦA GROQ/OPENAI
-                if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                    throw new Error("AI không trả về kết quả đúng định dạng");
-                }
+                if (!data.choices || !data.choices[0]) throw new Error("AI không trả lời");
 
-                // 5. Xử lý JSON (Làm sạch markdown)
-                let rawText = data.choices[0].message.content;
-                rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+                // 5. Xử lý JSON
+                let rawText = data.choices[0].message.content.replace(/```json|```/g, "").trim();
+                const jsonStart = rawText.indexOf('{');
+                const jsonEnd = rawText.lastIndexOf('}');
+                if (jsonStart !== -1 && jsonEnd !== -1) rawText = rawText.substring(jsonStart, jsonEnd + 1);
                 
-                const firstBrace = rawText.indexOf('{');
-                const lastBrace = rawText.lastIndexOf('}');
-                if (firstBrace !== -1 && lastBrace !== -1) {
-                    rawText = rawText.substring(firstBrace, lastBrace + 1);
-                }
-
                 const result = JSON.parse(rawText);
 
-                // 6. Hiển thị kết quả
-                let finalScore = parseFloat(result.score);
-                if (isNaN(finalScore)) finalScore = 0;
+                // 6. Hiển thị
+                let finalScore = parseFloat(result.score) || 0;
                 
-                // Điền điểm
+                // An toàn: Nếu là thang 10 mà AI lỡ chấm lố > 10 thì chỉnh về 10
+                if (finalScore > 10) finalScore = 10;
+                // Nếu là điểm thành phần mà AI lỡ chấm > 5 (với câu đọc hiểu) thì cũng cần xem lại (nhưng tạm tin AI)
+                
                 scoreInput.value = finalScore;
                 window.updateLiveScore(qId, finalScore);
 
-                // Điền lời phê (Hiệu ứng gõ chữ)
-                const aiComment = result.comment || "Đã chấm xong.";
+                // Hiệu ứng gõ chữ lời phê
+                const aiComment = result.comment || "Bài làm tốt, cần phát huy.";
                 cmtInput.value = "";
-                
-                // Xóa interval cũ nếu có (tránh lỗi khi bấm liên tục)
                 if (window['typing_' + qId]) clearInterval(window['typing_' + qId]);
 
                 let i = 0;
@@ -747,17 +742,19 @@
                     if (i < aiComment.length) {
                         cmtInput.value += aiComment.charAt(i);
                         i++;
+                        // Tự động cuộn xuống nếu lời phê dài
+                        if(i % 50 === 0) cmtInput.scrollTop = cmtInput.scrollHeight;
                     } else {
                         clearInterval(window['typing_' + qId]);
-                        window.updateComment(qId, aiComment); // Lưu comment vào biến nhớ
+                        window.updateComment(qId, aiComment);
                     }
-                }, 15);
+                }, 10); // Gõ nhanh hơn xíu (10ms) vì lời phê dài
 
-                showToast("✨ AI đã chấm xong!");
+                showToast(`✨ Đã chấm xong (${isSingleQuestion ? 'Thang 10' : 'Điểm thành phần'})`);
 
             } catch (e) {
                 console.error("AI Error:", e);
-                alert("Hệ thống đang bận hoặc gặp lỗi kết nối. Thầy/Cô vui lòng chấm thủ công câu này nhé!");
+                alert("AI đang bận, thầy/cô vui lòng chấm tay câu này nhé!");
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
