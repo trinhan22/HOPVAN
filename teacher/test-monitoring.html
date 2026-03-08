@@ -265,7 +265,7 @@
             " onmouseover="this.style.backgroundColor='#ffffff'" onmouseout="this.style.backgroundColor='rgba(249, 250, 251, 0.8)'">
                 <span style="font-size: 9px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1.2px;">HopVan Platform</span>
                 <span style="width: 5px; height: 5px; border-radius: 50%; background-color: #22c55e;"></span>
-                <span style="font-size: 10px; font-weight: 700; color: #f97316; font-family: monospace;">v1.1.0</span>
+                <span style="font-size: 10px; font-weight: 700; color: #f97316; font-family: monospace;">v1.1.1</span>
             </div>
         </div>
     </aside>
@@ -473,16 +473,15 @@
             const grid = document.getElementById('student-grid');
             let sessions = Array.from(studentSessions.values());
 
-            // Filter Logic
-            if (currentFilter === 'violation') sessions = sessions.filter(s => s.violations > 0 || s.status === 'locked');
+            // --- LỌC DỮ LIỆU ---
+            if (currentFilter === 'violation') sessions = sessions.filter(s => s.status === 'locked' || s.violations > 0);
             else if (currentFilter === 'online') sessions = sessions.filter(s => s.status === 'online');
             else if (currentFilter === 'finished') sessions = sessions.filter(s => s.status === 'finished');
 
-            // Sort: Locked/Violation first, then Online, then Finished
+            // --- SẮP XẾP: Bị khóa lên đầu -> Đang làm -> Đã nộp ---
             sessions.sort((a, b) => {
-                const scoreA = getStatusScore(a);
-                const scoreB = getStatusScore(b);
-                return scoreB - scoreA;
+                const score = (s) => s.status === 'locked' ? 100 : (s.status === 'online' ? 50 : 0);
+                return score(b) - score(a);
             });
 
             if (sessions.length === 0) {
@@ -493,61 +492,76 @@
             document.getElementById('empty-state').classList.add('hidden');
 
             grid.innerHTML = sessions.map(s => {
-                let css = 'sc-offline';
-                let badge = 'Offline';
-                let icon = 'fas fa-user-slash';
-                
-                if(s.status === 'online') { css = 'sc-online'; badge = 'Online'; icon = 'fas fa-wifi'; }
-                else if(s.status === 'warning') { css = 'sc-locked'; badge = 'Cảnh Báo'; icon = 'fas fa-exclamation'; }
-                else if(s.status === 'locked') { css = 'sc-locked'; badge = 'BỊ KHÓA'; icon = 'fas fa-lock'; }
-                else if(s.status === 'finished') { css = 'sc-finished'; badge = 'Đã Nộp'; icon = 'fas fa-check'; }
+                let cardClass = 'sc-offline';
+                let statusBadge = '<span class="text-gray-400"><i class="fas fa-user-slash"></i> Mất kết nối</span>';
+                let isLocked = false;
 
-                // --- SỬA: Tính toán tiến độ dựa trên biến toàn cục ---
+                // --- XỬ LÝ TRẠNG THÁI HIỂN THỊ ---
+                if (s.status === 'locked') {
+                    cardClass = 'sc-locked';
+                    statusBadge = '<span class="text-red-600 font-black animate-pulse"><i class="fas fa-lock"></i> BỊ KHÓA BÀI</span>';
+                    isLocked = true;
+                } 
+                else if (s.status === 'finished') {
+                    cardClass = 'sc-finished';
+                    statusBadge = '<span class="text-blue-600 font-bold"><i class="fas fa-check-circle"></i> Đã nộp bài</span>';
+                } 
+                else if (s.status === 'online') {
+                    cardClass = 'sc-online';
+                    // Nếu chưa có tiến độ (progress = 0) => Đang ở màn hình nhập Pass
+                    if (!s.progress || s.progress === 0) {
+                        statusBadge = '<span class="text-orange-500 font-bold"><i class="fas fa-key"></i> Đang nhập Pass...</span>';
+                    } else {
+                        statusBadge = '<span class="text-green-600 font-bold"><i class="fas fa-pen-nib"></i> Đang làm bài</span>';
+                    }
+                }
+
+                // Tính toán thanh tiến độ
                 const currentProgress = s.progress || 0;
-                // Ưu tiên lấy tổng câu từ session, nếu không có thì lấy từ đề thi gốc
-                const total = s.totalQuestions || totalTestQuestions || 0; 
-                const progressPercent = total > 0 ? (currentProgress / total) * 100 : 0;
-                const displayTotal = total > 0 ? total : '?';
-                
+                const total = s.totalQuestions || totalTestQuestions || 1;
+                const percent = (currentProgress / total) * 100;
+
                 return `
-                <div class="student-card ${css}">
+                <div class="student-card ${cardClass}">
                     <div class="sc-header">
                         <div class="sc-avatar">
-                            ${(s.studentName||'U').charAt(0)}
+                            ${(s.studentName || 'U').charAt(0)}
                             <div class="status-dot"></div>
                         </div>
                         <div class="flex-1 min-w-0">
                             <h4 class="font-black text-gray-800 text-sm truncate">${s.studentName}</h4>
-                            <p class="text-xs text-gray-500 font-bold flex items-center gap-1">
-                                <i class="${icon}"></i> ${badge}
-                            </p>
+                            <div class="text-xs mt-1">${statusBadge}</div>
                         </div>
                     </div>
 
-                    ${(s.violations > 0 || s.lastViolation) ? `
+                    ${(s.violations > 0 || isLocked) ? `
                         <div class="violation-badge">
-                            <i class="fas fa-exclamation-triangle text-lg"></i>
+                            <i class="fas fa-exclamation-triangle"></i>
                             <div>
-                                <div class="leading-none">Vi phạm: ${s.violations} lần</div>
-                                ${s.lastViolation ? `<div class="text-[10px] opacity-80 mt-1 font-normal truncate max-w-[150px]">${s.lastViolation}</div>` : ''}
+                                <div>Vi phạm: <b>${s.violations}</b> lần</div>
+                                <div class="text-[10px] font-normal truncate max-w-[140px]">${s.lastViolation || 'Thoát màn hình'}</div>
                             </div>
                         </div>
                     ` : ''}
 
                     <div class="mt-4">
                         <div class="flex justify-between text-[10px] font-bold text-gray-400 mb-1">
-                            <span>Tiến độ</span>
-                            <span>${currentProgress}/${displayTotal}</span>
+                            <span>TIẾN ĐỘ</span>
+                            <span>${currentProgress}/${total} câu</span>
                         </div>
-                        <div class="sc-progress"><div class="sc-bar" style="width: ${progressPercent}%"></div></div>
+                        <div class="sc-progress"><div class="sc-bar" style="width: ${percent}%"></div></div>
                     </div>
 
-                    ${(s.status === 'locked' || s.status === 'warning') ? `
-                        <div class="sc-actions">
-                            <button onclick="unlockStudent('${s.id}')" class="btn-action btn-unlock"><i class="fas fa-lock-open mr-1"></i> Mở Khóa</button>
-                            <button onclick="forceSubmit('${s.id}')" class="btn-action btn-force"><i class="fas fa-ban mr-1"></i> Thu Bài</button>
-                        </div>
-                    ` : ''}
+                    <div class="sc-actions">
+                        ${isLocked ? 
+                            `<button onclick="unlockStudent('${s.id}')" class="btn-action btn-unlock shadow-lg shadow-green-200 hover:-translate-y-1"><i class="fas fa-unlock-alt"></i> MỞ KHÓA NGAY</button>` 
+                            : ''
+                        }
+                        ${s.status !== 'finished' ? 
+                            `<button onclick="forceSubmit('${s.id}')" class="btn-action btn-force hover:bg-red-600 hover:text-white"><i class="fas fa-stop-circle"></i> THU BÀI</button>` 
+                            : ''
+                        }
+                    </div>
                 </div>`;
             }).join('');
         }
@@ -571,16 +585,30 @@
 
         // --- Actions ---
         window.unlockStudent = async (sid) => {
-            if(confirm("Mở khóa cho học sinh này?")) {
-                await updateDoc(doc(db, "test_sessions", sid), { status: 'online', lastViolation: null }); // Optional: Reset warning
-                showToast("Đã mở khóa học sinh");
+            if(confirm("Xác nhận MỞ KHÓA cho học sinh này tiếp tục làm bài?")) {
+                try {
+                    await updateDoc(doc(db, "test_sessions", sid), { 
+                        status: 'online', // Chuyển về online để học sinh làm tiếp
+                        lastViolation: "Đã được giáo viên mở khóa lúc " + new Date().toLocaleTimeString()
+                    });
+                    showToast("Đã mở khóa thành công");
+                } catch (e) {
+                    alert("Lỗi: " + e.message);
+                }
             }
         };
 
         window.forceSubmit = async (sid) => {
-            if(confirm("Thu bài ngay lập tức?")) {
-                await updateDoc(doc(db, "test_sessions", sid), { status: 'force_submit' });
-                showToast("Đã gửi lệnh thu bài");
+            if(confirm("CẢNH BÁO: Bạn có chắc chắn muốn THU BÀI NGAY LẬP TỨC của học sinh này không?")) {
+                try {
+                    await updateDoc(doc(db, "test_sessions", sid), { 
+                        status: 'force_submit', // Gửi lệnh nộp bài cưỡng chế
+                        lastUpdated: serverTimestamp()
+                    });
+                    showToast("Đã gửi lệnh thu bài!");
+                } catch (e) {
+                    alert("Lỗi: " + e.message);
+                }
             }
         };
 

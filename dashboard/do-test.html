@@ -190,6 +190,24 @@
 </head>
 <body>
 
+    <div id="violation-modal" class="modal-overlay" style="z-index: 20000;">
+        <div class="bg-white p-8 rounded-3xl text-center shadow-2xl w-96 border-2 border-red-100 transform transition-all scale-100">
+            <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl animate-pulse">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="text-2xl font-black text-gray-800 mb-2">CẢNH BÁO VI PHẠM!</h3>
+            <p class="text-gray-500 font-medium mb-6">
+                Bạn vừa rời khỏi màn hình làm bài.<br>
+                <span class="text-xs font-bold text-red-500 mt-2 block" id="violation-reason">Lý do: ...</span>
+            </p>
+
+            <button onclick="resolveViolation()" class="w-full py-4 rounded-xl bg-red-500 text-white font-bold text-lg shadow-lg shadow-red-200 hover:bg-red-600 hover:-translate-y-1 transition active:scale-95">
+                QUAY LẠI LÀM BÀI NGAY
+            </button>
+            <p class="text-[10px] text-gray-400 mt-4 font-bold">Vi phạm <span id="popup-count">0</span>/3 lần</p>
+        </div>
+    </div>
+
     <div id="start-modal" class="modal-overlay active">
         <div class="modal-card">
             <div class="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl text-orange-500 shadow-inner border border-orange-100">
@@ -199,18 +217,17 @@
             <p class="text-gray-500 font-medium mb-6 text-sm">Hệ thống giám sát tự động HopVan AI</p>
 
             <div class="bg-gray-50 rounded-2xl p-5 text-left space-y-3 mb-6 border border-gray-100">
-                <div class="flex items-start gap-3">
-                    <i class="fas fa-expand text-green-500 mt-1"></i>
-                    <p class="text-sm text-gray-600">Tự động bật <b>Toàn màn hình</b>.</p>
+                <div class="flex items-start gap-3"><i class="fas fa-expand text-green-500 mt-1"></i><p class="text-sm text-gray-600">Tự động bật <b>Toàn màn hình</b>.</p></div>
+                <div class="flex items-start gap-3"><i class="fas fa-eye text-blue-500 mt-1"></i><p class="text-sm text-gray-600">Giáo viên giám sát trực tiếp.</p></div>
+                <div class="flex items-start gap-3"><i class="fas fa-ban text-red-500 mt-1"></i><p class="text-sm text-gray-600 font-bold">Vi phạm 3 lần = Tự động nộp bài.</p></div>
+            </div>
+
+            <div id="password-section" class="mb-6 hidden text-left">
+                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Mật mã kíp thi</label>
+                <div class="relative">
+                    <input type="text" id="input-test-password" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-transparent focus:border-orange-500 focus:bg-white outline-none font-bold text-center tracking-widest transition-all text-lg" placeholder="Nhập mã kíp thi...">
                 </div>
-                <div class="flex items-start gap-3">
-                    <i class="fas fa-eye text-blue-500 mt-1"></i>
-                    <p class="text-sm text-gray-600">Giáo viên giám sát trực tiếp tiến độ.</p>
-                </div>
-                <div class="flex items-start gap-3">
-                    <i class="fas fa-ban text-red-500 mt-1"></i>
-                    <p class="text-sm text-gray-600 font-bold">Thoát màn hình quá 3 lần = Nộp bài.</p>
-                </div>
+                <p id="password-error" class="text-xs text-red-500 font-bold mt-2 hidden flex items-center justify-center gap-1"><i class="fas fa-times-circle"></i> Mật mã không chính xác!</p>
             </div>
 
             <button onclick="startExam()" class="btn-start-hero">
@@ -293,377 +310,256 @@
 
     <div id="toast"><i class="fas fa-info-circle"></i> <span id="toast-msg">Thông báo</span></div>
 
-    <script type="module">
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, addDoc, setDoc, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, addDoc, setDoc, serverTimestamp, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- STATE VARIABLES ---
-        let currentUser = null;
-        let testId = new URLSearchParams(window.location.search).get('testId');
-        let classId = new URLSearchParams(window.location.search).get('classId');
-        let sessionId = null;
-        
-        let questions = [];
-        let answers = {};
-        
-        let timerInterval, syncInterval;
-        let timeLeft = 0;
-        let isExamMode = false;
-        let violationCount = 0;
-        let isDevMode = false; // Secret toggle
+        // State
+        let currentUser = null, testId = new URLSearchParams(window.location.search).get('testId'), classId = new URLSearchParams(window.location.search).get('classId'), sessionId = null;
+        let questions = [], answers = {}, timerInterval, syncInterval, timeLeft = 0, isExamMode = false, violationCount = 0, isDevMode = false;
+        let testPassword = ""; // Mật khẩu đề thi
+        let isProcessingViolation = false; // Cờ chặn lặp lỗi
 
-        // --- INIT ---
+        const setText = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+
+        // 1. KHỞI TẠO: ONLINE NGAY LẬP TỨC
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                document.getElementById('student-name').innerText = user.displayName || user.email;
-                if (!testId) { alert("Lỗi: Thiếu ID đề thi!"); return; }
+                setText('student-name', user.displayName || user.email);
+                if (!testId) return alert("Thiếu ID đề thi!");
                 sessionId = `${testId}_${user.uid}`;
-                await fetchTestData();
-            } else {
-                window.location.href = "../log.html";
-            }
+                
+                await fetchTestData(); // Tải đề & Pass
+
+                // Báo danh Online ngay (Status: online, Progress: 0)
+                await setDoc(doc(db, "test_sessions", sessionId), {
+                    studentId: user.uid,
+                    studentName: user.displayName || user.email,
+                    testId: testId,
+                    classId: classId || "",
+                    status: 'online', 
+                    lastUpdated: serverTimestamp(),
+                    progress: 0,
+                    violations: 0
+                }, { merge: true });
+
+                listenToTeacherActions();
+            } else window.location.href = "../log.html";
         });
 
-        // --- 1. FETCH DATA ---
+        // 2. TẢI ĐỀ THI & CHECK PASS
         async function fetchTestData() {
             try {
-                const testRef = doc(db, "tests", testId);
-                const testSnap = await getDoc(testRef);
-                if (!testSnap.exists()) throw new Error("Đề thi không tồn tại.");
-                const data = testSnap.data();
-
-                // Set Info
-                document.getElementById('test-title').innerText = data.name;
+                const snap = await getDoc(doc(db, "tests", testId));
+                if (!snap.exists()) throw new Error("Đề không tồn tại.");
+                const data = snap.data();
+                
+                setText('test-title', data.name);
                 timeLeft = (data.timeLimit || 45) * 60;
                 updateTimerDisplay();
 
-                // Get Questions
-                if (data.questions && data.questions.length > 0) {
-                    questions = data.questions.map((q, i) => ({...q, id: q.id || `q_${i}`}));
-                } else if (data.questionIds && data.questionIds.length > 0) {
-                    const promises = data.questionIds.map(qid => getDoc(doc(db, "questions", qid)));
-                    const snaps = await Promise.all(promises);
-                    questions = snaps.filter(s => s.exists()).map(s => ({id: s.id, ...s.data()}));
+                // Xử lý Mật khẩu
+                testPassword = (data.password || "").trim();
+                if(testPassword !== "") {
+                    // Nếu đề có pass => Hiện ô nhập
+                    document.getElementById('password-section').classList.remove('hidden');
+                } else {
+                    // Nếu đề cũ ko có pass => Ẩn ô nhập
+                    document.getElementById('password-section').classList.add('hidden');
                 }
 
-                if (questions.length === 0) {
-                    document.getElementById('questions-render').innerHTML = `<div class="text-center py-20 text-gray-400">Đề thi trống.</div>`;
-                    return;
-                }
-
+                if (data.questions) questions = data.questions.map((q, i) => ({...q, id: q.id || `q_${i}`}));
                 renderQuestions();
-
-            } catch (err) {
-                console.error(err);
-                alert("Lỗi: " + err.message);
-            }
+                setText('total-q', questions.length);
+            } catch (err) { alert(err.message); }
         }
 
-        // --- 2. RENDER UI ---
-        function renderQuestions() {
-            const container = document.getElementById('questions-render');
-            const sheetQuiz = document.getElementById('sheet-quiz-grid');
-            const sheetEssay = document.getElementById('sheet-essay-list');
-            
-            container.innerHTML = '';
-            sheetQuiz.innerHTML = '';
-            sheetEssay.innerHTML = '';
-            
-            document.getElementById('total-q').innerText = questions.length;
-
-            let hasQuiz = false;
-            let hasEssay = false;
-
-            questions.forEach((q, idx) => {
-                const num = idx + 1;
-                let html = '';
-
-                // A. Reading
-                if (q.type === 'reading') {
-                    html = `
-                        <div class="question-block" id="q-${q.id}">
-                            <div class="q-label bg-blue-tag"><i class="fas fa-book-open"></i> Đọc Hiểu</div>
-                            <div class="reading-text">${q.text}</div>
-                            <div class="space-y-6">
-                                ${(q.subQuestions || []).map((sq, i) => `
-                                    <div>
-                                        <p class="q-title">Câu ${num}.${i+1}: ${sq}</p>
-                                        <textarea class="essay-field" placeholder="Nhập câu trả lời..." oninput="handleAnswer('${q.id}_${i}', this.value)"></textarea>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>`;
-                } 
-                // B. Quiz (Multiple Choice)
-                else if (q.type === 'quiz') {
-                    hasQuiz = true;
-                    html = `
-                        <div class="question-block" id="q-${q.id}">
-                            <div class="q-label bg-purple-tag"><i class="fas fa-check-square"></i> Trắc Nghiệm</div>
-                            <p class="q-title text-lg">Câu ${num}: ${q.question}</p>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                ${(q.options || []).map((opt, i) => `
-                                    <div class="option-item group" onclick="handleQuizSelect('${q.id}', ${i})">
-                                        <div class="opt-letter">${String.fromCharCode(65+i)}</div>
-                                        <span class="text-sm font-medium text-gray-700">${opt}</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>`;
-                    
-                    // Add Bubble
-                    sheetQuiz.innerHTML += `<button id="bubble-${q.id}" class="bubble-btn" onclick="scrollToQ('${q.id}')">${num}</button>`;
-                } 
-                // C. Essay
-                else {
-                    hasEssay = true;
-                    html = `
-                        <div class="question-block" id="q-${q.id}">
-                            <div class="q-label bg-orange-tag"><i class="fas fa-pen-nib"></i> Làm Văn</div>
-                            <p class="q-title text-lg">Đề bài: ${q.topic}</p>
-                            ${q.hint ? `<p class="text-sm text-gray-500 italic mb-4 bg-white p-3 rounded-lg border border-orange-100 flex items-center gap-2"><i class="fas fa-lightbulb text-yellow-500"></i>Gợi ý: ${q.hint.join('; ')}</p>` : ''}
-                            <textarea class="essay-field h-64" placeholder="Nhập bài làm..." oninput="handleAnswer('${q.id}', this.value)"></textarea>
-                        </div>`;
-                    
-                    // Add Map Item
-                    sheetEssay.innerHTML += `
-                        <div class="flex items-center justify-between p-2 rounded hover:bg-gray-50 cursor-pointer" onclick="scrollToQ('${q.id}')">
-                            <span class="text-xs font-bold text-gray-500">Câu ${num}</span>
-                            <span id="status-${q.id}" class="w-3 h-3 rounded-full bg-gray-200"></span>
-                        </div>`;
+        // 3. BẮT ĐẦU LÀM BÀI
+        window.startExam = () => {
+            // Nếu đề có pass thì bắt buộc phải nhập đúng
+            if (testPassword !== "") {
+                const input = document.getElementById('input-test-password').value.trim();
+                if (input !== testPassword) {
+                    document.getElementById('password-error').classList.remove('hidden');
+                    return; // Dừng lại, không cho vào
                 }
-                
-                container.innerHTML += html;
-            });
-
-            if (hasQuiz) document.getElementById('sheet-quiz-container').classList.remove('hidden');
-            if (hasEssay) document.getElementById('sheet-essay-container').classList.remove('hidden');
-        }
-
-        // --- 3. INTERACTIONS ---
-        window.handleAnswer = (key, val) => {
-            answers[key] = val;
-            updateProgress();
-            
-            // Update Essay Status Dot
-            if(key.includes('_')) return; // Ignore sub-questions for map simplification
-            const statusDot = document.getElementById(`status-${key}`);
-            if(statusDot) {
-                if(val.trim()) statusDot.classList.replace('bg-gray-200', 'bg-green-500');
-                else statusDot.classList.replace('bg-green-500', 'bg-gray-200');
-            }
-        };
-
-        window.handleQuizSelect = (qId, idx) => {
-            answers[qId] = idx;
-            
-            // UI Paper
-            const qBlock = document.getElementById(`q-${qId}`);
-            qBlock.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
-            qBlock.querySelectorAll('.option-item')[idx].classList.add('selected');
-
-            // UI Sheet
-            const bubble = document.getElementById(`bubble-${qId}`);
-            if(bubble) {
-                bubble.classList.add('filled');
-                bubble.innerText = String.fromCharCode(65 + idx);
             }
 
-            updateProgress();
-            triggerSync(); 
-        };
-
-        function updateProgress() {
-            const count = Object.keys(answers).length;
-            const total = questions.length; 
-            const percent = Math.min((count / total) * 100, 100);
-            
-            document.getElementById('progress-text').innerText = count;
-            document.getElementById('progress-fill').style.width = `${percent}%`;
-        }
-
-        window.scrollToQ = (id) => {
-            document.getElementById(`q-${id}`).scrollIntoView({behavior: 'smooth', block: 'center'});
-        };
-
-        // --- 4. START EXAM & ANTI-CHEAT ---
-        window.startExam = async () => {
+            // Pass đúng hoặc không cần pass
             document.getElementById('start-modal').classList.remove('active');
             document.getElementById('app-ui').classList.remove('blur-sm');
+            
+            // Vào toàn màn hình
+            const el = document.documentElement;
+            if(el.requestFullscreen) el.requestFullscreen().catch(()=>{});
 
-            if(!isDevMode) requestFullscreen();
-            isExamMode = true;
+            // Delay 2s rồi mới bật giám sát (để tránh bị tính lỗi khi vừa vào)
+            setTimeout(() => {
+                isExamMode = true;
+                triggerSync();
+                showToast("Bắt đầu giám sát!");
+            }, 2000);
 
-            // Timer
             timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay();
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    alert("Hết giờ làm bài!");
-                    submitTest(true);
-                }
+                timeLeft--; updateTimerDisplay();
+                if (timeLeft <= 0) { clearInterval(timerInterval); window.submitTest(true); }
             }, 1000);
-
-            // Create Session
-            setDoc(doc(db, "test_sessions", sessionId), {
-                studentId: currentUser.uid,
-                studentName: currentUser.displayName || currentUser.email,
-                testId: testId,
-                classId: classId,
-                status: 'online',
-                progress: 0,
-                violations: 0,
-                lastUpdated: serverTimestamp()
-            }).catch(e => console.warn("Session init warning:", e));
-
-            // Sync Interval
             syncInterval = setInterval(triggerSync, 5000);
         };
 
-        async function triggerSync() {
-            if (!isExamMode) return;
-            try {
-                await setDoc(doc(db, "test_sessions", sessionId), {
-                    progress: Object.keys(answers).length,
-                    violations: violationCount,
-                    lastUpdated: serverTimestamp()
-                }, { merge: true });
-            } catch(e) {}
-        }
+        // --- 4. LOGIC VI PHẠM & DEV MODE ---
 
-        function updateTimerDisplay() {
-            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-            const s = (timeLeft % 60).toString().padStart(2, '0');
-            document.getElementById('timer-text').innerText = `${m}:${s}`;
-            const box = document.getElementById('timer-box');
-            if (timeLeft < 300) box.classList.add('danger');
-        }
+        // Hàm xử lý khi vi phạm
+        const handleViolation = (reason) => {
+            // Nếu chưa thi, đang Dev Mode, hoặc đang xử lý lỗi trước -> Bỏ qua
+            if (!isExamMode || isDevMode || isProcessingViolation) return;
 
-        // --- DEV MODE & VIOLATION ---
-        function requestFullscreen() {
+            isProcessingViolation = true; // Khóa chặn lặp
+            violationCount++;
+            setText('violation-count', violationCount);
+
+            // Gửi báo cáo ngầm
+            triggerSync(reason);
+
+            if (violationCount >= 3) {
+                isExamMode = false;
+                alert("BẠN ĐÃ VI PHẠM 3 LẦN!\nHệ thống tự động thu bài.");
+                submitTest(true);
+            } else {
+                // HIỆN POPUP CẢNH BÁO ĐẸP
+                document.getElementById('violation-reason').innerText = `Lý do: ${reason}`;
+                document.getElementById('popup-count').innerText = violationCount;
+                document.getElementById('violation-modal').classList.add('active');
+            }
+        };
+
+        // Hàm nút "QUAY LẠI LÀM BÀI NGAY"
+        window.resolveViolation = () => {
             const el = document.documentElement;
-            if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
-        }
+            // Ép Fullscreen lại ngay lập tức (F11)
+            if (el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen().catch(()=>{});
 
-        // Toggle Dev Mode (Ctrl + B)
+            // Ẩn Popup
+            document.getElementById('violation-modal').classList.remove('active');
+            
+            // Mở khóa chặn sau 1s (để sự kiện resize/focus ổn định)
+            setTimeout(() => { isProcessingViolation = false; }, 1000);
+        };
+
+        // --- GẮN SỰ KIỆN GIÁM SÁT ---
+        document.addEventListener('fullscreenchange', () => { 
+            if (!document.fullscreenElement && isExamMode) handleViolation("Thoát toàn màn hình"); 
+        });
+        window.addEventListener('blur', () => { 
+            if (isExamMode) handleViolation("Rời khỏi tab thi"); 
+        });
+
+        // --- PHÍM TẮT DEV MODE (Ctrl + B) ---
         document.addEventListener('keydown', (e) => {
+            // Ctrl + B để bật/tắt Dev Mode
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
                 e.preventDefault();
                 isDevMode = !isDevMode;
-                
                 const badge = document.getElementById('dev-badge');
+                
                 if (isDevMode) {
                     badge.classList.remove('hidden');
-                    showToast("👨‍💻 Dev Mode: ON (Anti-cheat OFF)");
-                    if (document.fullscreenElement) document.exitFullscreen();
+                    showToast("Dev Mode: ON (Tắt giám sát)");
+                    // Nếu đang Fullscreen thì thoát ra cho dễ debug
+                    if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
                 } else {
                     badge.classList.add('hidden');
-                    showToast("🛡️ Anti-Cheat: ON");
-                    requestFullscreen();
+                    showToast("Dev Mode: OFF (Bật giám sát)");
+                    // Bắt buộc Fullscreen lại
+                    document.documentElement.requestFullscreen().catch(()=>{});
                 }
             }
         });
 
-        // Detect Violation
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement && isExamMode && !isDevMode) handleViolation("Thoát toàn màn hình");
-        });
-        window.addEventListener('blur', () => {
-            if (isExamMode && !isDevMode) handleViolation("Rời khỏi tab thi");
-        });
-
-        function handleViolation(reason) {
-            violationCount++;
-            document.getElementById('violation-count').innerText = violationCount;
-            
-            // Sync immediately
-            setDoc(doc(db, "test_sessions", sessionId), { 
-                status: violationCount >= 3 ? 'locked' : 'warning', 
+        // 6. CÁC HÀM HỖ TRỢ KHÁC
+        async function triggerSync(violationReason = null) {
+            if (!sessionId) return;
+            const payload = {
+                progress: Object.keys(answers).length,
                 violations: violationCount,
-                lastViolation: reason 
-            }, { merge: true });
-
-            if (violationCount >= 3) {
-                alert(`VI PHẠM QUÁ 3 LẦN (${reason}). HỆ THỐNG SẼ TỰ ĐỘNG NỘP BÀI!`);
-                submitTest(true);
-            } else {
-                alert(`CẢNH BÁO VI PHẠM (${violationCount}/3): ${reason}\nVui lòng quay lại làm bài ngay!`);
-                requestFullscreen();
-            }
+                status: 'online',
+                lastUpdated: serverTimestamp()
+            };
+            if(violationReason) payload.lastViolation = violationReason + " (" + new Date().toLocaleTimeString() + ")";
+            
+            try { await setDoc(doc(db, "test_sessions", sessionId), payload, { merge: true }); } catch(e){}
         }
 
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
+        function listenToTeacherActions() {
+            onSnapshot(doc(db, "test_sessions", sessionId), (s) => {
+                if(s.exists() && s.data().status === 'force_submit') window.submitTest(true);
+            });
         }
 
-        // Prevent Copy/Paste
-        document.addEventListener('contextmenu', e => !isDevMode && e.preventDefault());
-        document.addEventListener('copy', e => !isDevMode && e.preventDefault());
-        document.addEventListener('paste', e => !isDevMode && e.preventDefault());
-
-        // --- 6. SUBMIT LOGIC ---
-        window.submitTest = async (force = false) => {
-            if (!force && !confirm("Bạn chắc chắn muốn nộp bài?")) return;
-
-            isExamMode = false;
-            clearInterval(timerInterval);
-            clearInterval(syncInterval);
-            document.getElementById('loading-overlay').classList.add('active');
-
-            try {
-                // Calc Quiz Score
-                let quizScore = 0;
-                let totalQuiz = 0;
-                questions.forEach(q => {
-                    if (q.type === 'quiz') {
-                        totalQuiz++;
-                        if(answers[q.id] == q.correct) quizScore++;
-                    }
-                });
-
-                const submissionData = {
-                    studentId: currentUser.uid,
-                    studentName: currentUser.displayName || currentUser.email,
-                    testId: testId,
-                    classId: classId,
-                    answers: answers,
-                    score: 0, // Pending teacher grading
-                    quizScore: quizScore,
-                    totalQuiz: totalQuiz,
-                    submittedAt: serverTimestamp(),
-                    violations: violationCount
-                };
-
-                // Save Submission
-                const subRef = await addDoc(collection(db, "submissions"), submissionData);
-
-                // Cleanup Session
-                try {
-                    await setDoc(doc(db, "test_sessions", sessionId), { status: 'finished' }, { merge: true });
-                    await deleteDoc(doc(db, "test_sessions", sessionId));
-                } catch(e) {}
-
-                window.location.href = `result.html?submissionId=${subRef.id}`;
-
-            } catch (err) {
-                console.error(err);
-                document.getElementById('loading-overlay').classList.remove('active');
-                alert("Lỗi nộp bài: " + err.message);
-                isExamMode = true; // Fallback
-            }
+        // Render & Helpers
+        function renderQuestions() {
+            const container = document.getElementById('questions-render');
+            if(!container) return;
+            container.innerHTML = questions.map((q, idx) => {
+                const num = idx + 1;
+                if (q.type === 'quiz') {
+                    return `<div class="question-block" id="q-${q.id}"><div class="q-label bg-purple-tag">Câu ${num}</div><p class="q-title text-lg mb-4 font-bold">${q.question}</p><div class="grid grid-cols-1 md:grid-cols-2 gap-3">${(q.options || []).map((opt, i) => `<div class="option-item group" onclick="window.handleQuizSelect('${q.id}', ${i})"><div class="opt-letter">${String.fromCharCode(65+i)}</div><span class="text-sm font-medium text-gray-700">${opt}</span></div>`).join('')}</div></div>`;
+                } else {
+                    return `<div class="question-block" id="q-${q.id}"><div class="q-label bg-orange-tag">Câu ${num}</div><p class="q-title text-lg mb-4 font-bold">${q.topic || 'Bài làm văn'}</p>${q.hint ? `<p class="text-sm text-gray-500 italic mb-2 bg-gray-50 p-2 rounded border">💡 ${q.hint.join('; ')}</p>`:''}<textarea class="essay-field" placeholder="Nhập bài làm..." oninput="window.handleAnswer('${q.id}', this.value)"></textarea></div>`;
+                }
+            }).join('');
+        }
+        
+        window.handleAnswer = (id, val) => { answers[id] = val; updateProgress(); };
+        window.handleQuizSelect = (id, idx) => {
+            answers[id] = idx;
+            const block = document.getElementById(`q-${id}`);
+            block.querySelectorAll('.option-item').forEach(e => e.classList.remove('selected'));
+            block.querySelectorAll('.option-item')[idx].classList.add('selected');
+            updateProgress(); 
+            triggerSync();
         };
 
+        function updateTimerDisplay() { setText('timer-text', `${Math.floor(timeLeft/60).toString().padStart(2,'0')}:${(timeLeft%60).toString().padStart(2,'0')}`); }
+        function updateProgress() { 
+            const count = Object.keys(answers).length; 
+            setText('progress-text', count); 
+            if(document.getElementById('progress-fill')) document.getElementById('progress-fill').style.width = `${(count/questions.length)*100}%`; 
+        }
+        function showToast(msg) { 
+            const t = document.getElementById('toast'); 
+            if(t) { document.getElementById('toast-msg').innerText = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); } 
+        }
+
+        window.submitTest = async (force = false) => {
+            if (!force && !confirm("Bạn chắc chắn muốn nộp bài?")) return;
+            isExamMode = false;
+            clearInterval(timerInterval); clearInterval(syncInterval);
+            document.getElementById('loading-overlay').classList.add('active');
+            try {
+                const subRef = await addDoc(collection(db, "submissions"), { 
+                    studentId: currentUser.uid, 
+                    studentName: currentUser.displayName || currentUser.email, 
+                    testId, 
+                    answers, 
+                    score: 0, // Chấm sau
+                    submittedAt: serverTimestamp(), 
+                    violations: violationCount 
+                });
+                await deleteDoc(doc(db, "test_sessions", sessionId));
+                window.location.href = `result.html?submissionId=${subRef.id}`;
+            } catch (err) { alert(err.message); }
+        };
+
+        document.addEventListener('contextmenu', e => !isDevMode && e.preventDefault());
     </script>
 
 <script type="text/javascript">

@@ -198,7 +198,7 @@
             " onmouseover="this.style.backgroundColor='#ffffff'" onmouseout="this.style.backgroundColor='rgba(249, 250, 251, 0.8)'">
                 <span style="font-size: 9px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1.2px;">HopVan Platform</span>
                 <span style="width: 5px; height: 5px; border-radius: 50%; background-color: #22c55e;"></span>
-                <span style="font-size: 10px; font-weight: 700; color: #f97316; font-family: monospace;">v1.1.0</span>
+                <span style="font-size: 10px; font-weight: 700; color: #f97316; font-family: monospace;">v1.1.1</span>
             </div>
         </div>
     </aside>
@@ -238,6 +238,16 @@
                                     <input type="number" id="time-limit" class="glass-input pr-12" value="45" min="5">
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xs">PHÚT</span>
                                 </div>
+                            </div>
+                            <div>
+                                <label class="label-custom">Mật mã kíp thi (Tùy chọn)</label>
+                                <div class="relative">
+                                    <input type="text" id="test-password" class="glass-input pr-12" placeholder="Ví dụ: LOP10A-123" maxlength="20">
+                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                        <i class="fas fa-key"></i>
+                                    </span>
+                                </div>
+                                <p class="text-[10px] text-gray-400 mt-1 font-bold italic">* Nếu để trống, học sinh sẽ vào thi trực tiếp.</p>
                             </div>
                         </div>
 
@@ -475,11 +485,13 @@
             try {
                 const snap = await getDoc(doc(db, "tests", id));
                 if(snap.exists()) {
-                    const data = snap.data();
-                    // Fill Step 1
-                    document.getElementById('test-name').value = data.name;
-                    document.getElementById('test-grade').value = data.grade || "10";
-                    document.getElementById('time-limit').value = data.timeLimit || 45;
+                const data = snap.data();
+                document.getElementById('test-name').value = data.name;
+                document.getElementById('test-grade').value = data.grade || "10";
+                document.getElementById('time-limit').value = data.timeLimit || 45;
+                
+                // --- [MỚI] THÊM DÒNG NÀY ĐỂ HIỆN LẠI PASS CŨ ---
+                document.getElementById('test-password').value = data.password || "";
                     
                     // Fill Content
                     questions = data.questions || [];
@@ -738,10 +750,15 @@
             const grade = document.getElementById('test-grade').value;
             const timeLimit = parseInt(document.getElementById('time-limit').value);
             const source = document.getElementById('selected-source').value;
+            
+            // --- [MỚI] THÊM DÒNG NÀY ĐỂ LẤY PASSWORD ---
+            const password = document.getElementById('test-password').value.trim(); 
+
             const classIds = Array.from(document.querySelectorAll('input[name="classroom"]:checked')).map(cb => cb.value);
 
             const testData = {
                 name, grade, timeLimit, source,
+                password, // --- [MỚI] ĐƯA PASSWORD VÀO OBJECT GỬI ĐI ---
                 authorId: currentUser.uid,
                 status: status,
                 questions: questions,
