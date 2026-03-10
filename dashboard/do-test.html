@@ -566,19 +566,40 @@
             isExamMode = false;
             clearInterval(timerInterval); clearInterval(syncInterval);
             document.getElementById('loading-overlay').classList.add('active');
+            
             try {
+                // Tính điểm trắc nghiệm (nếu có)
+                let quizScore = 0;
+                questions.forEach(q => {
+                    if (q.type === 'quiz' && answers[q.id] == q.correct) quizScore++;
+                });
+
                 const subRef = await addDoc(collection(db, "submissions"), { 
                     studentId: currentUser.uid, 
                     studentName: currentUser.displayName || currentUser.email, 
                     testId, 
+                    // CHÚ Ý: Bổ sung thêm classId vào đây để trang Sổ Điểm hoạt động đúng
+                    classId: classId || "", 
                     answers, 
                     score: 0, // Chấm sau
+                    quizScore: quizScore,
                     submittedAt: serverTimestamp(), 
                     violations: violationCount 
                 });
-                await deleteDoc(doc(db, "test_sessions", sessionId));
+                
+                // CẬP NHẬT TRẠNG THÁI LÀ FINISHED ĐỂ GIÁO VIÊN THẤY
+                await setDoc(doc(db, "test_sessions", sessionId), { 
+                    status: 'finished',
+                    lastUpdated: serverTimestamp()
+                }, { merge: true });
+                
+                // KHÔNG GỌI lệnh deleteDoc ở đây nữa!
+
                 window.location.href = `result.html?submissionId=${subRef.id}`;
-            } catch (err) { alert(err.message); }
+            } catch (err) { 
+                document.getElementById('loading-overlay').classList.remove('active');
+                alert("Lỗi nộp bài: " + err.message); 
+            }
         };
 
         document.addEventListener('contextmenu', e => !isDevMode && e.preventDefault());

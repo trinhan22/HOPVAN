@@ -445,41 +445,91 @@
                 document.getElementById('loading-area').classList.add('hidden');
                 
                 snapshot.docChanges().forEach((change) => {
-                    if (change.type === "removed") studentSessions.delete(change.doc.id);
-                    else studentSessions.set(change.doc.id, { id: change.doc.id, ...change.doc.data() });
+                    const data = change.doc.data();
+                    const docId = change.doc.id;
+
+                    if (change.type === "removed") {
+                        studentSessions.delete(docId);
+                    } else {
+                        // Lấy session cũ nếu có
+                        const existingSession = studentSessions.get(docId);
+                        
+                        // Cập nhật session, giữ lại _localStatus nếu đang offline, nhưng ưu tiên status từ server nếu server báo 'locked', 'force_submit', 'finished'
+                        let newLocalStatus = data.status;
+                        
+                        if (existingSession) {
+                            if (data.status === 'online' || data.status === 'warning') {
+                                // Nếu server báo online, giữ localStatus hiện tại (để xử lý offline cục bộ)
+                                newLocalStatus = existingSession._localStatus;
+                                // Nhưng nếu server vừa cập nhật mới nhất, ta set lại thành online
+                                if (data.lastUpdated && existingSession.lastUpdated && 
+                                    data.lastUpdated.toMillis() > existingSession.lastUpdated.toMillis()) {
+                                    newLocalStatus = 'online';
+                                }
+                            }
+                        }
+
+                        studentSessions.set(docId, { 
+                            id: docId, 
+                            ...data,
+                            _localStatus: newLocalStatus 
+                        });
+                    }
                 });
                 
                 renderGrid();
                 updateStats();
             });
 
-            // Heartbeat check every 5s
+            // Heartbeat check (Chỉ thay đổi trạng thái hiển thị (Local))
+            if(heartbeatInterval) clearInterval(heartbeatInterval);
             heartbeatInterval = setInterval(() => {
                 const now = Date.now();
                 let hasChanges = false;
+                
                 studentSessions.forEach((s) => {
-                    const last = s.lastUpdated?.toDate().getTime() || 0;
-                    // If silent for > 15s, mark offline
-                    if (now - last > 15000 && (s.status === 'online' || s.status === 'warning')) {
-                        s.status = 'offline';
+                    // Nếu đã nộp hoặc bị khóa thì bỏ qua check offline
+                    if (s.status === 'finished' || s.status === 'locked' || s.status === 'force_submit') {
+                        if (s._localStatus !== s.status) {
+                            s._localStatus = s.status;
+                            hasChanges = true;
+                        }
+                        return;
+                    }
+
+                    const last = s.lastUpdated ? s.lastUpdated.toMillis() : 0;
+                    
+                    // Nếu im lặng > 15s -> Gán trạng thái Local là Offline
+                    if (now - last > 15000 && (s._localStatus === 'online' || s._localStatus === 'warning')) {
+                        s._localStatus = 'offline';
+                        hasChanges = true;
+                    } 
+                    // Nếu thời gian vừa cập nhật lại gần đây -> Gán lại Local là Online
+                    else if (now - last <= 15000 && s._localStatus === 'offline') {
+                        s._localStatus = 'online';
+                        hasChanges = true;
                     }
                 });
-                if(hasChanges) { renderGrid(); updateStats(); }
-            }, 5000);
+                
+                if(hasChanges) { 
+                    renderGrid(); 
+                    updateStats(); 
+                }
+            }, 3000); 
         }
 
         function renderGrid() {
             const grid = document.getElementById('student-grid');
             let sessions = Array.from(studentSessions.values());
 
-            // --- LỌC DỮ LIỆU ---
-            if (currentFilter === 'violation') sessions = sessions.filter(s => s.status === 'locked' || s.violations > 0);
-            else if (currentFilter === 'online') sessions = sessions.filter(s => s.status === 'online');
-            else if (currentFilter === 'finished') sessions = sessions.filter(s => s.status === 'finished');
+            // --- LỌC DỮ LIỆU BẰNG _localStatus ---
+            if (currentFilter === 'violation') sessions = sessions.filter(s => s._localStatus === 'locked' || s.violations > 0);
+            else if (currentFilter === 'online') sessions = sessions.filter(s => s._localStatus === 'online');
+            else if (currentFilter === 'finished') sessions = sessions.filter(s => s._localStatus === 'finished');
 
-            // --- SẮP XẾP: Bị khóa lên đầu -> Đang làm -> Đã nộp ---
+            // --- SẮP XẾP ---
             sessions.sort((a, b) => {
-                const score = (s) => s.status === 'locked' ? 100 : (s.status === 'online' ? 50 : 0);
+                const score = (s) => s._localStatus === 'locked' ? 100 : (s._localStatus === 'online' ? 50 : 0);
                 return score(b) - score(a);
             });
 
@@ -491,23 +541,22 @@
             document.getElementById('empty-state').classList.add('hidden');
 
             grid.innerHTML = sessions.map(s => {
+                // SỬ DỤNG _localStatus thay cho status gốc
                 let cardClass = 'sc-offline';
                 let statusBadge = '<span class="text-gray-400"><i class="fas fa-user-slash"></i> Mất kết nối</span>';
                 let isLocked = false;
 
-                // --- XỬ LÝ TRẠNG THÁI HIỂN THỊ ---
-                if (s.status === 'locked') {
+                if (s._localStatus === 'locked') {
                     cardClass = 'sc-locked';
                     statusBadge = '<span class="text-red-600 font-black animate-pulse"><i class="fas fa-lock"></i> BỊ KHÓA BÀI</span>';
                     isLocked = true;
                 } 
-                else if (s.status === 'finished') {
+                else if (s._localStatus === 'finished') {
                     cardClass = 'sc-finished';
                     statusBadge = '<span class="text-blue-600 font-bold"><i class="fas fa-check-circle"></i> Đã nộp bài</span>';
                 } 
-                else if (s.status === 'online') {
+                else if (s._localStatus === 'online') {
                     cardClass = 'sc-online';
-                    // Nếu chưa có tiến độ (progress = 0) => Đang ở màn hình nhập Pass
                     if (!s.progress || s.progress === 0) {
                         statusBadge = '<span class="text-orange-500 font-bold"><i class="fas fa-key"></i> Đang nhập Pass...</span>';
                     } else {
@@ -515,7 +564,6 @@
                     }
                 }
 
-                // Tính toán thanh tiến độ
                 const currentProgress = s.progress || 0;
                 const total = s.totalQuestions || totalTestQuestions || 1;
                 const percent = (currentProgress / total) * 100;
@@ -524,7 +572,7 @@
                 <div class="student-card ${cardClass}">
                     <div class="sc-header">
                         <div class="sc-avatar">
-                            ${(s.studentName || 'U').charAt(0)}
+                            ${(s.studentName || 'U').charAt(0).toUpperCase()}
                             <div class="status-dot"></div>
                         </div>
                         <div class="flex-1 min-w-0">
@@ -556,13 +604,22 @@
                             `<button onclick="unlockStudent('${s.id}')" class="btn-action btn-unlock shadow-lg shadow-green-200 hover:-translate-y-1"><i class="fas fa-unlock-alt"></i> MỞ KHÓA NGAY</button>` 
                             : ''
                         }
-                        ${s.status !== 'finished' ? 
+                        ${s._localStatus !== 'finished' ? 
                             `<button onclick="forceSubmit('${s.id}')" class="btn-action btn-force hover:bg-red-600 hover:text-white"><i class="fas fa-stop-circle"></i> THU BÀI</button>` 
                             : ''
                         }
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        function updateStats() {
+            const ss = Array.from(studentSessions.values());
+            // Đếm dựa trên _localStatus
+            document.getElementById('count-online').innerText = ss.filter(s => s._localStatus === 'online' || s._localStatus === 'warning').length;
+            document.getElementById('count-finished').innerText = ss.filter(s => s._localStatus === 'finished').length;
+            document.getElementById('count-violated').innerText = ss.filter(s => s._localStatus === 'locked' || s.violations > 0).length;
+            document.getElementById('count-offline').innerText = ss.filter(s => s._localStatus === 'offline').length;
         }
 
         function getStatusScore(s) {
@@ -572,14 +629,6 @@
             if (s.status === 'online') return 50;
             if (s.status === 'finished') return 10;
             return 0; // offline
-        }
-
-        function updateStats() {
-            const ss = Array.from(studentSessions.values());
-            document.getElementById('count-online').innerText = ss.filter(s => s.status === 'online' || s.status === 'warning').length;
-            document.getElementById('count-finished').innerText = ss.filter(s => s.status === 'finished').length;
-            document.getElementById('count-violated').innerText = ss.filter(s => s.status === 'locked' || s.violations > 0).length;
-            document.getElementById('count-offline').innerText = ss.filter(s => s.status === 'offline').length;
         }
 
         // --- Actions ---
