@@ -303,10 +303,23 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", 
+            authDomain: "hopvan-9a648.firebaseapp.com", 
+            projectId: "hopvan-9a648", 
+            storageBucket: "hopvan-9a648.appspot.com", 
+            messagingSenderId: "429347196227", 
+            appId: "1:429347196227:web:917b8d019f0efd0f7833f6", 
+            measurementId: "G-1BG8PSRG0R" 
+        };
+        
+        // Đã đổi tên biến app thành firebaseApp để tránh xung đột với module import
+        const firebaseApp = initializeApp(firebaseConfig); 
+        const auth = getAuth(firebaseApp);
+        const db = getFirestore(firebaseApp);
+
+        // Biến cờ ngăn chặn onAuthStateChanged chạy khi đang xử lý đăng ký
+        let isRegistering = false;
 
         // --- ROLE SWITCH LOGIC ---
         const btnStudent = document.getElementById('btn-role-student');
@@ -375,7 +388,7 @@
         const confirmModal = document.getElementById('confirm-role-modal');
         const confirmIcon = document.getElementById('confirm-icon');
         const confirmText = document.getElementById('confirm-role-text');
-        let pendingRegisterData = null; // Biến tạm để lưu dữ liệu đăng ký
+        let pendingRegisterData = null;
 
         window.closeConfirmModal = () => {
             confirmModal.classList.remove('show');
@@ -393,8 +406,6 @@
 
         window.showAlert = (message, type = 'error') => {
             alertMessage.innerText = message;
-            
-            // Xóa các class màu cũ
             alertContentBox.classList.remove('alert-error', 'alert-success', 'alert-warning');
             
             if (type === 'error') {
@@ -410,68 +421,37 @@
                 alertIconContainer.innerHTML = '<i class="fas fa-info"></i>';
                 alertContentBox.classList.add('alert-warning');
             }
-            
             alertModal.classList.add('show');
         };
 
         // 1. KHI BẤM NÚT ĐĂNG KÝ -> KIỂM TRA DỮ LIỆU -> HIỆN POPUP
         registerForm.addEventListener("submit", (e) => {
-            e.preventDefault();
+            e.preventDefault(); 
             
-            // 1. Lấy giá trị từ form
             const role = roleInput.value;
             const name = document.getElementById("reg-name").value.trim();
             const email = document.getElementById("reg-email").value.trim();
             const pass = document.getElementById("reg-pass").value;
             const confirmPass = document.getElementById("reg-confirm").value;
 
-            // 2. VALIDATE DỮ LIỆU (Kiểm tra lỗi trước)
-            
-            // Kiểm tra tên
-            if (name.length < 2) {
-                showAlert("Tên hiển thị quá ngắn! Vui lòng nhập đầy đủ họ tên.", "error");
-                return;
-            }
+            if (name.length < 2) return showAlert("Tên hiển thị quá ngắn! Vui lòng nhập đầy đủ họ tên.", "error");
+            if (pass.length < 6) return showAlert("Mật khẩu phải có ít nhất 6 ký tự để đảm bảo an toàn.", "error");
+            if (pass !== confirmPass) return showAlert("Mật khẩu nhập lại không khớp. Vui lòng kiểm tra lại!", "error");
 
-            // Kiểm tra độ dài mật khẩu
-            if (pass.length < 6) {
-                showAlert("Mật khẩu phải có ít nhất 6 ký tự để đảm bảo an toàn.", "error");
-                return;
-            }
-
-            // Kiểm tra trùng khớp mật khẩu (QUAN TRỌNG)
-            if (pass !== confirmPass) {
-                showAlert("Mật khẩu nhập lại không khớp. Vui lòng kiểm tra lại!", "error");
-                return;
-            }
-
-            // Kiểm tra thông tin theo vai trò
             let school = "", grade = null, subject = null;
             
             if (role === 'student') {
                 school = document.getElementById("reg-school-student").value.trim();
                 grade = parseInt(document.getElementById("reg-grade").value);
-                
-                if (!school) {
-                    showAlert("Vui lòng nhập tên trường học của bạn!", "error");
-                    return;
-                }
+                if (!school) return showAlert("Vui lòng nhập tên trường học của bạn!", "error");
             } else {
                 school = document.getElementById("reg-school-teacher").value.trim();
                 subject = document.getElementById("reg-subject").value.trim();
-                
-                if (!school || !subject) {
-                    showAlert("Vui lòng nhập đầy đủ Đơn vị công tác và Chuyên môn!", "error");
-                    return;
-                }
+                if (!school || !subject) return showAlert("Vui lòng nhập đầy đủ Đơn vị công tác và Chuyên môn!", "error");
             }
 
-            // 3. NẾU MỌI THỨ OK -> LƯU TẠM & HIỆN POPUP XÁC NHẬN
-            
-            // Lưu dữ liệu vào biến tạm để dùng sau khi bấm "Đồng ý"
             pendingRegisterData = { role, name, email, pass, school, grade, subject };
 
-            // Cập nhật giao diện Popup theo vai trò
             if (role === 'student') {
                 confirmIcon.className = "fas fa-user-graduate";
                 confirmText.innerText = "HỌC SINH";
@@ -482,7 +462,6 @@
                 confirmText.className = "font-black text-blue-500 text-lg uppercase tracking-wide";
             }
 
-            // Hiện Popup
             confirmModal.classList.add('show');
         });
 
@@ -490,20 +469,23 @@
         document.getElementById('btn-confirm-register').addEventListener('click', async () => {
             if (!pendingRegisterData) return;
             
-            closeConfirmModal(); // Đóng popup
-            setLoading(true);    // Hiện loading
-
+            // LẤY DỮ LIỆU RA TRƯỚC KHI ĐÓNG POPUP (QUAN TRỌNG NHẤT !!!)
             const { role, name, email, pass, school, grade, subject } = pendingRegisterData;
 
+            // RỒI MỚI ĐÓNG POPUP VÀ HIỆN LOADING
+            closeConfirmModal(); 
+            setLoading(true);    
+            isRegistering = true; // Bật cờ chặn onAuthStateChanged
+
             try {
-                // 1. Tạo tài khoản Firebase Auth
+                // 1. Tạo Auth
                 const userCred = await createUserWithEmailAndPassword(auth, email, pass);
                 const user = userCred.user;
                 
-                // 2. Cập nhật Profile (Tên hiển thị)
+                // 2. Update Profile
                 await updateProfile(user, { displayName: name });
 
-                // 3. Chuẩn bị dữ liệu để lưu vào Firestore
+                // 3. Data cho Firestore
                 const userData = {
                     uid: user.uid, 
                     name: name, 
@@ -521,120 +503,123 @@
                     userData.subject = subject;
                 }
 
-                // 4. Lưu thông tin user vào collection 'users'
+                // 4. Ghi Firestore: users
                 await setDoc(doc(db, "users", user.uid), userData);
 
-                // 5. CHỈ lưu progress nếu là Học sinh (Nguyên nhân gây lỗi treo thường ở đây)
+                // 5. Ghi Firestore: users_progress (chỉ cho học sinh)
                 if (role === 'student') {
                     try {
                         await setDoc(doc(db, "users_progress", user.uid), { currentLevel: 1, paidLevel: 0 });
                     } catch (progressErr) {
-                        console.warn("Không thể khởi tạo progress, nhưng account đã tạo thành công:", progressErr);
-                        // Không ném lỗi ra ngoài để tránh treo đăng ký
+                        console.warn("Lỗi tạo progress (có thể bỏ qua):", progressErr);
                     }
                 }
 
-                // TẠO THÀNH CÔNG: Hàm onAuthStateChanged sẽ tự động bắt sự kiện và chuyển trang.
-                // Lưu ý: Không cần gọi setLoading(false) ở đây vì trang sẽ bị chuyển đi.
+                // 6. Điều hướng ngay lập tức
+                if (role === 'teacher') {
+                    window.location.replace("teacher/index.html");
+                } else {
+                    window.location.replace("loading.html"); 
+                }
 
             } catch (err) {
-                // NẾU CÓ LỖI, BẮT BUỘC PHẢI TẮT LOADING
+                // Có lỗi xảy ra, gỡ cờ và tắt loading
+                isRegistering = false; 
                 setLoading(false);
-                
                 console.error("Lỗi đăng ký:", err);
 
-                // Hiển thị thông báo lỗi chi tiết
                 if (err.code === "auth/email-already-in-use") {
                     showAlert("Email này đã được sử dụng. Vui lòng dùng email khác hoặc đăng nhập.", "warning");
                 } else if (err.code === "auth/weak-password") {
                     showAlert("Mật khẩu quá yếu. Vui lòng chọn mật khẩu mạnh hơn.", "warning");
                 } else if (err.code === "auth/invalid-email") {
                     showAlert("Địa chỉ email không hợp lệ.", "error");
-                } else if (err.code === "permission-denied") {
-                     showAlert("Lỗi quyền truy cập cơ sở dữ liệu. Vui lòng liên hệ Admin.", "error");
                 } else {
                     showAlert("Đăng ký thất bại: " + err.message, "error");
                 }
             }
         });
 
-        // --- 2. LOGIN LOGIC ---
-        loginForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            setLoading(true);
-            try {
-                await setPersistence(auth, document.getElementById("remember-me").checked ? browserLocalPersistence : browserSessionPersistence);
-                await signInWithEmailAndPassword(auth, document.getElementById("login-email").value, document.getElementById("login-password").value);
-            } catch (err) {
-                setLoading(false);
-                // SỬA Ở ĐÂY:
-                showAlert("Email hoặc mật khẩu không chính xác. Vui lòng thử lại!", "error");
-            }
-        });
-
-        // --- 3. GOOGLE LOGIN (Tự động set role Student) ---
+        // --- 3. GOOGLE LOGIN ---
         document.getElementById("google-login-btn").addEventListener("click", async () => {
             const provider = new GoogleAuthProvider();
             try {
-                // Đảm bảo đăng nhập được lưu phiên
                 await setPersistence(auth, browserLocalPersistence);
-                
-                // Mở popup đăng nhập Google
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
                 
-                setLoading(true); // Hiện màn hình chờ
+                isRegistering = true; // Chặn onAuthStateChanged để xử lý logic cấp quyền trước
+                setLoading(true); 
                 
-                // Kiểm tra xem tài khoản đã tồn tại trong Database chưa
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 
                 if (!userDoc.exists()) {
-                    // === LOGIC MỚI: Tự động tạo tài khoản với role STUDENT ===
                     await setDoc(doc(db, "users", user.uid), {
                         uid: user.uid, 
                         name: user.displayName, 
                         email: user.email, 
                         photoURL: user.photoURL,
-                        role: "student",               // <--- Tự động gán quyền Học sinh
-                        grade: 10,                     // Mặc định khối 10 (có thể sửa sau)
-                        school: "THPT (Chưa cập nhật)", // Trường mặc định
+                        role: "student",               
+                        grade: 10,                     
+                        school: "THPT (Chưa cập nhật)", 
                         keys: 0, 
                         streak: 0, 
                         createdAt: serverTimestamp()
                     });
-                    
-                    // Khởi tạo tiến độ học tập
                     await setDoc(doc(db, "users_progress", user.uid), { currentLevel: 1, paidLevel: 0 });
                 }
                 
-                // (Phần chuyển hướng trang sẽ do onAuthStateChanged tự động xử lý)
+                window.location.replace("loading.html");
 
             } catch (err) {
+                isRegistering = false;
                 setLoading(false);
-                // Bỏ qua lỗi nếu người dùng tự tắt popup
                 if (err.code !== 'auth/popup-closed-by-user') {
                     showAlert("Lỗi đăng nhập Google: " + err.message, "error");
                 }
             }
         });
 
-        // --- 4. REDIRECT LOGIC ---
+        // --- 4. LOGIN LOGIC ---
+        loginForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            setLoading(true);
+            try {
+                await setPersistence(auth, document.getElementById("remember-me").checked ? browserLocalPersistence : browserSessionPersistence);
+                await signInWithEmailAndPassword(auth, document.getElementById("login-email").value, document.getElementById("login-password").value);
+                // Sau khi đăng nhập thành công, onAuthStateChanged sẽ tự động xử lý chuyển hướng.
+            } catch (err) {
+                setLoading(false);
+                showAlert("Email hoặc mật khẩu không chính xác. Vui lòng thử lại!", "error");
+            }
+        });
+
+        // --- 5. REDIRECT LOGIC (Khi đăng nhập bình thường hoặc F5) ---
         onAuthStateChanged(auth, async (user) => {
+            // Nếu đang trong tiến trình Đăng ký hoặc Đăng nhập Google thì không can thiệp
+            if (isRegistering) return; 
+
             if (user) {
+                // setLoading(true) ở đây để màn hình không chớp tắt nếu user đã lưu session
+                setLoading(true);
                 try {
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     if (userDoc.exists()) {
                         const role = userDoc.data().role;
-                        if (role === 'teacher') window.location.href = "teacher/index.html";
-                        else if (role === 'admin') window.location.href = "admin/index.html";
-                        else window.location.href = "loading.html";
+                        if (role === 'teacher') window.location.replace("teacher/index.html");
+                        else if (role === 'admin') window.location.replace("admin/index.html");
+                        else window.location.replace("loading.html");
                     } else {
-                        window.location.href = "loading.html";
+                        console.warn("Không tìm thấy user document.");
+                        setLoading(false);
                     }
                 } catch (e) {
                     console.error(e);
-                    window.location.href = "loading.html";
+                    setLoading(false);
+                    showAlert("Lỗi khi kiểm tra thông tin tài khoản.", "error");
                 }
+            } else {
+                 setLoading(false);
             }
         });
 
@@ -660,52 +645,11 @@
                 const s = document.getElementById('forgot-success-section');
                 s.classList.remove('hidden'); s.classList.add('flex');
             } catch (err) {
-                alert(err.code === 'auth/user-not-found' ? "Email chưa đăng ký." : "Lỗi gửi email.");
+                showAlert(err.code === 'auth/user-not-found' ? "Email chưa đăng ký." : "Lỗi gửi email.", "error");
             } finally {
                 btn.innerHTML = 'Gửi liên kết xác nhận'; btn.disabled = false;
             }
         });
-
-    </script>
-
-<script type="text/javascript">
-    // 1. Chặn Chuột phải (Để ẩn menu "Inspect/Kiểm tra" và "View Source/Xem nguồn")
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        // Không hiện thông báo gì cả để trải nghiệm mượt mà hơn
-    });
-
-    // 2. Chặn các phím tắt Developer Tools
-    document.addEventListener('keydown', function(e) {
-        // Chặn F12
-        if (e.key === 'F12' || e.keyCode === 123) {
-            e.preventDefault();
-            return false;
-        }
-
-        // Chặn các tổ hợp phím Ctrl + ...
-        if (e.ctrlKey) {
-            switch (e.key.toLowerCase()) {
-                case 'u': // Chặn Ctrl + U (Xem source code)
-                case 's': // Chặn Ctrl + S (Lưu trang web)
-                case 'p': // Chặn Ctrl + P (In trang web - thường hiện code)
-                // Lưu ý: KHÔNG chặn 'c' (Copy) và 'a' (Select All)
-                    e.preventDefault();
-                    return false;
-            }
-
-            // Chặn Ctrl + Shift + ... (Các phím mở DevTools)
-            if (e.shiftKey) {
-                switch (e.key.toLowerCase()) {
-                    case 'i': // Inspect Element
-                    case 'j': // Console
-                    case 'c': // Element Inspector
-                        e.preventDefault();
-                        return false;
-                }
-            }
-        }
-    });
 </script>
 </body>
 </html>
