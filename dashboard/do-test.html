@@ -458,32 +458,51 @@
         };
 
         // --- GẮN SỰ KIỆN GIÁM SÁT ---
+
+        // Hàm kiểm tra xem người dùng có đang gõ phím không
+        const isTyping = () => {
+            const activeElement = document.activeElement;
+            return activeElement && (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT');
+        };
+
+        // Hàm kiểm tra thiết bị di động (Mobile/Tablet)
+        const isMobileDevice = () => {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        };
+
         document.addEventListener('fullscreenchange', () => { 
-            if (!document.fullscreenElement && isExamMode) handleViolation("Thoát toàn màn hình"); 
-        });
-        window.addEventListener('blur', () => { 
-            if (isExamMode) handleViolation("Rời khỏi tab thi"); 
+            // Nếu đang Dev Mode hoặc không ở chế độ thi -> bỏ qua
+            if (!isExamMode || isDevMode) return;
+
+            // Trên Mobile/iPad, việc hiện bàn phím ảo có thể làm văng Fullscreen. 
+            // Nếu phát hiện đang gõ phím, TẠM THỜI BỎ QUA lỗi này.
+            if (!document.fullscreenElement) {
+                if (isMobileDevice() && isTyping()) {
+                    console.log("Bỏ qua lỗi thoát Fullscreen do đang dùng bàn phím ảo trên Mobile.");
+                    return;
+                }
+                handleViolation("Thoát toàn màn hình"); 
+            }
         });
 
-        // --- PHÍM TẮT DEV MODE (Ctrl + B) ---
-        document.addEventListener('keydown', (e) => {
-            // Ctrl + B để bật/tắt Dev Mode
-            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
-                e.preventDefault();
-                isDevMode = !isDevMode;
-                const badge = document.getElementById('dev-badge');
-                
-                if (isDevMode) {
-                    badge.classList.remove('hidden');
-                    showToast("Dev Mode: ON (Tắt giám sát)");
-                    // Nếu đang Fullscreen thì thoát ra cho dễ debug
-                    if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
-                } else {
-                    badge.classList.add('hidden');
-                    showToast("Dev Mode: OFF (Bật giám sát)");
-                    // Bắt buộc Fullscreen lại
-                    document.documentElement.requestFullscreen().catch(()=>{});
-                }
+        window.addEventListener('blur', () => { 
+            if (!isExamMode || isDevMode) return;
+
+            // Khi click vào ô Textarea, một số trình duyệt mobile kích hoạt sự kiện Blur đối với Window.
+            // Tránh phạt oan nếu focus vẫn nằm trong ô nhập liệu.
+            if (isTyping()) {
+                console.log("Bỏ qua lỗi Blur do đang gõ phím.");
+                return;
+            }
+
+            handleViolation("Rời khỏi tab thi hoặc chuyển ứng dụng"); 
+        });
+
+        // Bắt thêm sự kiện hiển thị/ẩn trang (Mạnh hơn Blur để chống gian lận)
+        document.addEventListener("visibilitychange", () => {
+            if (!isExamMode || isDevMode) return;
+            if (document.hidden) {
+                handleViolation("Chuyển sang tab/ứng dụng khác");
             }
         });
 
