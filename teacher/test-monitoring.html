@@ -462,7 +462,6 @@
                     // If silent for > 15s, mark offline
                     if (now - last > 15000 && (s.status === 'online' || s.status === 'warning')) {
                         s.status = 'offline';
-                        hasChanges = true;
                     }
                 });
                 if(hasChanges) { renderGrid(); updateStats(); }

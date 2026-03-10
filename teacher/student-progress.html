@@ -319,18 +319,16 @@
                     return;
                 }
 
-                // 2. Tải thông tin Học sinh (SỬA LỖI QUERY TẠI ĐÂY)
+                // 2. Tải thông tin Học sinh
                 const students = [];
                 const chunkSize = 10; // Firestore giới hạn 'in' là 10-30
                 
                 for (let i = 0; i < studentIds.length; i += chunkSize) {
                     const chunk = studentIds.slice(i, i + chunkSize);
                     if(chunk.length > 0) {
-                        // SỬA LỖI: Dùng documentId() thay vì "uid"
                         const q = query(collection(db, "users"), where(documentId(), "in", chunk));
                         const snap = await getDocs(q);
                         snap.forEach(d => {
-                            // Map dữ liệu và gán luôn uid chính xác từ d.id
                             students.push({ uid: d.id, ...d.data() });
                         });
                     }
@@ -341,7 +339,6 @@
                 const testIds = assignments.map(a => a.testId);
                 
                 if (testIds.length > 0) {
-                    // Loại bỏ ID trùng lặp nếu có
                     const uniqueTestIds = [...new Set(testIds)];
                     
                     for (let i = 0; i < uniqueTestIds.length; i += chunkSize) {
@@ -354,15 +351,30 @@
                     }
                 }
                 
-                // Sắp xếp đề thi theo thời gian giao (từ cũ đến mới)
-                // Cần map lại thứ tự dựa trên mảng assignments gốc nếu muốn
-                // Ở đây ta hiển thị theo thứ tự lấy về hoặc sort theo tên
                 tests.sort((a,b) => a.name.localeCompare(b.name));
 
-                // 4. Tải kết quả bài làm (Submissions)
-                const subQ = query(collection(db, "submissions"), where("classId", "==", classId));
-                const subSnap = await getDocs(subQ);
-                const submissions = subSnap.docs.map(d => ({id: d.id, ...d.data()}));
+                // 4. Tải kết quả bài làm (SỬA LẠI LOGIC QUERY Ở ĐÂY)
+                // Vì submissions cũ có thể không có classId, ta query theo testIds đã giao cho lớp này.
+                // Nếu testIds quá dài, ta chia chunk để query cho an toàn.
+                let submissions = [];
+                if (testIds.length > 0) {
+                    const uniqueTestIds = [...new Set(testIds)];
+                    for (let i = 0; i < uniqueTestIds.length; i += chunkSize) {
+                        const chunk = uniqueTestIds.slice(i, i + chunkSize);
+                        if(chunk.length > 0) {
+                            // Lấy tất cả bài nộp của những đề thi này
+                            const subQ = query(collection(db, "submissions"), where("testId", "in", chunk));
+                            const subSnap = await getDocs(subQ);
+                            subSnap.forEach(d => {
+                                const data = d.data();
+                                // Lọc lại: Chỉ lấy bài nộp của các học sinh thuộc lớp này
+                                if (studentIds.includes(data.studentId)) {
+                                    submissions.push({id: d.id, ...data});
+                                }
+                            });
+                        }
+                    }
+                }
 
                 // --- CẬP NHẬT MỚI: Lưu dữ liệu vào Window để dùng cho Excel ---
                 window.excelDataCache = {
