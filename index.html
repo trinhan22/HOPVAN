@@ -159,11 +159,11 @@
             border-radius: 40px; 
             padding: 18px; 
             box-shadow: 0 30px 60px rgba(0,0,0,0.08); 
-            transform: rotate(-2deg); 
+            transform: rotate(0.36deg); 
             border: 6px solid rgba(255,255,255,0.5); 
             transition: transform 0.5s; 
         }
-        .main-card:hover { transform: rotate(0deg) scale(1.01); }
+        .main-card:hover { transform: rotate(0deg) scale(1.02); }
         
         /* --- SỬA ĐỔI: Dùng thẻ IMG thay cho VIDEO --- */
         .main-card img { 
@@ -233,7 +233,7 @@
 
         /* --- ABOUT US --- */
         .about-wrap { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 60px; align-items: center; }
-        .about-img { width: 100%; border-radius: 30px; transform: rotate(2deg); border: 8px solid white; box-shadow: 0 20px 40px rgba(0,0,0,0.1); transition: 0.3s; }
+        .about-img { width: 100%; border-radius: 30px; transform: rotate(0.36deg); border: 8px solid white; box-shadow: 0 20px 40px rgba(0,0,0,0.1); transition: 0.3s; }
         .about-img:hover { transform: rotate(0deg) scale(1.02); }
         .check-list { list-style: none; margin-top: 25px; }
         .check-list li { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-size: 1.1rem; color: var(--text-main); }
@@ -472,6 +472,76 @@
 ::-webkit-scrollbar-button {
     display: none;
 }
+
+            .roadmap-section { padding: 80px 0; background: transparent; position: relative; z-index: 5; }
+            .roadmap-header { text-align: center; margin-bottom: 60px; }
+            .roadmap-header h2 { font-size: 2.5rem; margin-bottom: 10px; font-weight: 800; color: var(--text-main); }
+            .roadmap-header p { font-size: 1.05rem; color: var(--text-light); max-width: 650px; margin: 0 auto; line-height: 1.6; }
+
+            .roadmap-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 30px; /* Khoảng cách đều nhau */
+                max-width: 1100px;
+                margin: 0 auto;
+                align-items: stretch; /* Ép các thẻ cao bằng nhau */
+            }
+
+            .rm-card { background: rgba(255,255,255,0.7); border-radius: 25px; padding: 35px; border: 1px solid white; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.03); }
+            .rm-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); background: white; }
+
+            .rm-grade-pill {
+                display: inline-flex;
+                background: #fff5ec;
+                color: var(--primary);
+                font-size: 0.85rem;
+                font-weight: 800;
+                padding: 6px 14px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                width: fit-content;
+                border: 1px solid rgba(255, 143, 80, 0.2);
+            }
+
+            .rm-title {
+                font-size: 1.25rem;
+                font-weight: 800;
+                color: var(--text-main);
+                margin-bottom: 25px;
+                line-height: 1.4;
+            }
+
+            .rm-list { list-style: none; flex-grow: 1; padding: 0; margin: 0; }
+            .rm-list li {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+                margin-bottom: 16px;
+                color: var(--text-light);
+                font-size: 0.95rem;
+                line-height: 1.5;
+                font-weight: 500;
+            }
+            .rm-list li:last-child { margin-bottom: 0; }
+
+            /* Icon tick xanh có nền tròn */
+            .rm-list li .tick-icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 22px;
+                height: 22px;
+                background: #dcfce7; 
+                color: #22c55e;      
+                border-radius: 50%;
+                font-size: 0.7rem;
+                flex-shrink: 0;
+                margin-top: 2px;
+            }
+
+            @media (max-width: 992px) {
+                .roadmap-grid { grid-template-columns: 1fr; gap: 30px; padding: 0 20px; }
+            }
     </style>
 </head>
 <body>
@@ -607,6 +677,86 @@
             </div>
         </section>
 
+        <section class="roadmap-section">
+            <div class="container">
+                <div class="roadmap-header">
+                    <h2>Lộ Trình Học Tập Chuẩn GDPT 2018</h2>
+                    <p>Hệ thống kiến thức được phân mảnh chi tiết, kết hợp lý thuyết nền tảng và bài tập thực hành chuẩn xác theo khung chương trình 3 khối lớp THPT.</p>
+                </div>
+
+                <div class="roadmap-grid">
+                    <div class="rm-card">
+                        <div class="rm-grade-pill">NGỮ VĂN 10</div>
+                        <h3 class="rm-title">Củng Cố Nền Tảng & Đa Dạng Thể Loại</h3>
+                        <ul class="rm-list">
+                            <li>
+                                <div class="tick-icon"><i class="fas fa-check"></i></div>
+                                <span>Đọc hiểu Thần thoại, Sử thi, Thơ Đường luật & Truyện ngắn.</span>
+                            </li>
+                            <li>
+                                <div class="tick-icon"><i class="fas fa-check"></i></div>
+                                <span>Khám phá nghệ thuật sân khấu Kịch bản Chèo, Tuồng.</span>
+                            </li>
+                            <li>
+                                <div class="tick-icon"><i class="fas fa-check"></i></div>
+                                <span>Rèn kĩ năng viết văn bản Nghị luận xã hội & văn học.</span>
+                            </li>
+                            <li>
+                                <div class="tick-icon"><i class="fas fa-check"></i></div>
+                                <span>Thực hành nghiên cứu và viết báo cáo học tập chuyên sâu.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="rm-card">
+                        <div class="rm-grade-pill">NGỮ VĂN 11</div>
+                        <h3 class="rm-title">Khám Phá Chiều Sâu & Nghị Luận Đa Chiều</h3>
+                        <ul class="rm-list">
+                            <li>
+                                <div class="tick-icon"><i class="fas fa-check"></i></div>
+                                <span>Phân tích Truyện truyền kì, Thơ trữ tình & Bi kịch.</span>
+                            </li>
+                            <li>
+                                <div class="tick-icon"><i class="fas fa-check"></i></div>
+                                <span>Cảm thụ Tuỳ bút, Tản văn và Truyện kí hiện đại.</span>
+                            </li>
+                            <li>
+                                <div class="tick-icon"><i class="fas fa-check"></i></div>
+                                <span>Viết bài thuyết minh lồng ghép đa yếu tố biểu đạt.</span>
+                            </li>
+                            <li>
+                                <div class="tick-icon"><i class="fas fa-check"></i></div>
+                                <span>Thực hành tranh biện, đánh giá và so sánh tác phẩm.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="rm-card">
+                        <div class="rm-grade-pill">NGỮ VĂN 12</div>
+                        <h3 class="rm-title">Tổng Ôn Toàn Diện & Định Hình Tư Duy</h3>
+                        <ul class="rm-list">
+                            <li>
+                                <div class="tick-icon"><i class="fas fa-check"></i></div>
+                                <span>Tiếp cận Tiểu thuyết hiện đại, Hài kịch, Phóng sự.</span>
+                            </li>
+                            <li>
+                                <div class="tick-icon"><i class="fas fa-check"></i></div>
+                                <span>Nhận diện phong cách sáng tác của các tác giả lớn.</span>
+                            </li>
+                            <li>
+                                <div class="tick-icon"><i class="fas fa-check"></i></div>
+                                <span>Viết văn bản nghị luận so sánh, đánh giá chuyên sâu.</span>
+                            </li>
+                            <li>
+                                <div class="tick-icon"><i class="fas fa-check"></i></div>
+                                <span>Vận dụng chuyển thể tác phẩm sang điện ảnh, sân khấu.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="about" class="section-padding">
             <div class="about-wrap">
                 <div>
@@ -668,7 +818,7 @@
                     <li><a href="huongdansudung.html">Câu hỏi thường gặp</a></li>
                     <li><a href="huongdansudung.html">Điều khoản dịch vụ</a></li>
                     <li><a href="huongdansudung.html">Chính sách bảo mật</a></li>
-                    <li><a href="huongdansudung.html">Liên hệ HopTeam</a></li>
+                    <li><a href="https://www.facebook.com/hopvanapp">Liên hệ HopTeam</a></li>
                 </ul>
             </div>
 
@@ -710,7 +860,7 @@
             ">
                 <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px;">HopVan Platform</span>
                 <span style="width: 4px; height: 4px; border-radius: 50%; background-color: #22c55e;"></span>
-                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.1.4</span>
+                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.1.5</span>
             </div>
         </div>
     </footer>
