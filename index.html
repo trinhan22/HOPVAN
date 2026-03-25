@@ -191,7 +191,16 @@
         }
 
         .floating-badge i { font-size: 0.85rem; }
-        .floating-badge > div:first-child { padding: 8px !important; } 
+        /* ĐÃ FIX: Chống bóp méo icon và ép thành hình tròn hoàn hảo */
+        .floating-badge > div:first-child { 
+            padding: 0 !important; /* Bỏ padding cũ để dùng width/height cố định */
+            width: 38px; 
+            height: 38px; 
+            flex-shrink: 0; /* Thuộc tính chốt hạ: Cấm flexbox bóp méo */
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
         .floating-badge div div:first-child { font-weight: 700; font-size: 0.8rem !important; }
         .floating-badge div div:last-child { font-size: 0.7rem !important; color: #666; }
 
