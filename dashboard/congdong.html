@@ -15,23 +15,43 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+
     <style>
-        /* --- CORE STYLES --- */
+        /* --- CORE STYLES & VARIABLES --- */
         :root {
             --primary: #FF8F50;
             --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
-            --text-main: #2D3436;
-            --text-light: #636E72;
-            --glass-bg: rgba(255, 255, 255, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.8);
-            --blur: 25px;
-            --sidebar-width: 260px;
             --discord-color: #5865F2;
             --discord-gradient: linear-gradient(135deg, #5865F2, #4752C4);
+            
+            /* BỘ MÀU LIGHT MODE */
+            --bg-body: #FFF5EC;
+            --bg-glass: rgba(255, 255, 255, 0.6);
+            --bg-panel: rgba(255, 255, 255, 0.85);
+            --bg-panel-hover: white;
+            --border-panel: white;
+            --text-heading: #2D3436; 
+            --text-sub: #636E72;     
+            --blur: 25px;
+            --sidebar-width: 260px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: #FFF5EC; height: 100vh; overflow: hidden; display: flex; }
+        /* BỘ MÀU DARK MODE */
+        html.dark {
+            --bg-body: #0f172a;       /* slate-900 */
+            --bg-glass: rgba(15, 23, 42, 0.7);
+            --bg-panel: rgba(30, 41, 59, 0.85); /* slate-800 */
+            --bg-panel-hover: #1e293b;
+            --border-panel: #334155;  /* slate-700 */
+            --text-heading: #f8fafc;  /* slate-50 */
+            --text-sub: #94a3b8;      /* slate-400 */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease; }
+        body { background-color: var(--bg-body); height: 100vh; overflow: hidden; display: flex; color: var(--text-heading); }
 
         /* --- BACKGROUND --- */
         .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
@@ -39,19 +59,21 @@
         .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
         .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
         .blob-3 { width: 300px; height: 300px; background: #FFD1D1; top: 40%; left: 40%; animation-delay: -2s; }
+        html.dark .blob { opacity: 0.2; }
         @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
 
-        /* --- MOBILE HEADER & OVERLAY (MỚI THÊM TỪ TRANG MẪU) --- */
+        /* --- MOBILE HEADER & OVERLAY --- */
         .mobile-header {
             display: none; position: fixed; top: 0; left: 0; right: 0;
-            height: 60px; background: white; z-index: 100;
-            align-items: center; padding: 0 20px; border-bottom: 1px solid #eee;
+            height: 60px; background: var(--bg-panel); z-index: 100;
+            align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border-panel);
         }
         #sidebar-overlay {
             display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
-            z-index: 998;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            z-index: 998; transition: 0.3s; opacity: 0;
         }
+        #sidebar-overlay.active { display: block; opacity: 1; }
 
         .dashboard-container { width: 100%; height: 100%; position: relative; }
 
@@ -59,60 +81,117 @@
             margin-left: var(--sidebar-width);
             width: calc(100% - var(--sidebar-width));
             height: 100%;
-            background: var(--glass-bg); backdrop-filter: blur(var(--blur));
-            border-left: 1px solid var(--glass-border); padding: 40px 50px;
+            background: var(--bg-glass); backdrop-filter: blur(var(--blur));
+            border-left: 1px solid var(--border-panel); padding: 40px 50px;
             overflow-y: auto; display: flex; flex-direction: column; position: relative;
-            -webkit-overflow-scrolling: touch; /* Mượt hơn trên iOS */
+            -webkit-overflow-scrolling: touch;
         }
+
+        /* --- ĐỒNG BỘ DARK MODE CHO MENU.JS --- */
+        #menu-placeholder aside {
+            background-color: var(--bg-panel) !important;
+            border-color: var(--border-panel) !important;
+        }
+
+        /* 1. ÉP TRONG SUỐT mọi thẻ div bọc ngoài có nền sáng (xám/trắng) để lộ nền tối của Sidebar */
+        #menu-placeholder aside div[class*="bg-gray-"],
+        #menu-placeholder aside div[class*="bg-slate-"],
+        #menu-placeholder aside div[class*="bg-white"] {
+            background-color: transparent !important;
+        }
+
+        /* --- ĐỒNG BỘ DARK MODE CHO MENU.JS --- */
+        /* Lấy chuẩn 100% logic từ Bản Tin Văn Học, đổi biến cho khớp với Cộng Đồng */
+        
+        html.dark #menu-placeholder aside, 
+        html.dark #menu-placeholder .sidebar {
+            background-color: var(--bg-panel) !important;
+            border-color: var(--border-panel) !important;
+        }
+
+        /* 1. Ép trong suốt mọi thẻ div bọc ngoài có nền sáng để lộ nền tối của Sidebar */
+        html.dark #menu-placeholder aside > div,
+        html.dark #menu-placeholder .sidebar > div {
+            background-color: transparent !important;
+            border-color: var(--border-panel) !important;
+        }
+
+        /* 2. Ép màu nền tối cho các Nút (Góp ý, Thoát,...) ở đáy menu */
+        html.dark #menu-placeholder button {
+            background-color: var(--bg-body) !important; 
+            border: 1px solid var(--border-panel) !important;
+            color: var(--text-sub) !important;
+            box-shadow: none !important;
+        }
+        html.dark #menu-placeholder button:hover {
+            background-color: var(--bg-panel-hover) !important;
+            border-color: var(--primary) !important;
+            color: var(--primary) !important;
+        }
+
+        /* 3. Nút đang Active */
+        html.dark #menu-placeholder .nav-item.active { 
+            background: var(--primary-gradient) !important; 
+            color: white !important; 
+            border-color: transparent !important; 
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4) !important;
+        }
+
+        /* 4. Ép màu cục Version (HopVan Platform) đang dùng style inline */
+        html.dark #menu-placeholder div[style*="background-color"] {
+            background-color: var(--bg-body) !important;
+            border-color: var(--border-panel) !important;
+        }
+
+        /* 5. Xử lý Viền và Chữ */
+        html.dark #menu-placeholder [class*="border-"] { border-color: var(--border-panel) !important; }
+        html.dark #menu-placeholder .text-gray-800, 
+        html.dark #menu-placeholder h1 { color: var(--text-heading) !important; }
+        html.dark #menu-placeholder .text-gray-500, 
+        html.dark #menu-placeholder .text-gray-400 { color: var(--text-sub) !important; }
+        
+        /* 6. Hiệu ứng hover của Nav Item */
+        html.dark #menu-placeholder .nav-item { color: var(--text-sub) !important; transition: 0.3s; }
+        html.dark #menu-placeholder .nav-item:hover { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
 
         /* --- HEADER --- */
         .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; position: relative; z-index: 10;}
-        .welcome-text h2 { font-size: 2.2rem; font-weight: 800; color: var(--text-main); }
-        .user-avatar { width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.3rem; box-shadow: 0 10px 25px rgba(255, 143, 80, 0.3); transform: rotate(-5deg); transition: 0.3s; cursor: pointer; }
+        .welcome-text h2 { font-size: 2.2rem; font-weight: 800; color: var(--text-heading); }
+        .welcome-text p { color: var(--text-sub); }
+        .user-avatar { width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.3rem; box-shadow: 0 10px 25px rgba(255, 143, 80, 0.3); transform: rotate(-5deg); transition: 0.3s; cursor: pointer; overflow: hidden; border: 2px solid var(--border-panel);}
         .user-avatar:hover { transform: rotate(0deg) scale(1.1); }
 
-        /* --- DISCORD CARD (Balanced Size) --- */
+        /* --- DISCORD CARD --- */
         .community-center { 
             flex: 1; display: flex; justify-content: center; align-items: center; padding-bottom: 30px;
         }
 
         .discord-card-pro {
             width: 100%; max-width: 900px;
-            background: rgba(255, 255, 255, 0.85);
+            background: var(--bg-panel);
             backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 1);
+            border: 1px solid var(--border-panel);
             border-radius: 40px;
             padding: 50px 60px;
             display: flex; align-items: center; gap: 50px;
             box-shadow: 0 20px 60px rgba(88, 101, 242, 0.12);
             position: relative; overflow: hidden;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, background 0.4s ease;
         }
+        html.dark .discord-card-pro { box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
 
         .discord-card-pro:hover {
             transform: translateY(-5px);
             box-shadow: 0 30px 70px rgba(88, 101, 242, 0.2);
-            background: white;
+            background: var(--bg-panel-hover);
         }
+        html.dark .discord-card-pro:hover { box-shadow: 0 30px 70px rgba(88, 101, 242, 0.15); }
 
         /* Ánh sáng mờ ảo bên trong Card */
         .dc-glow { position: absolute; border-radius: 50%; filter: blur(60px); z-index: 0; pointer-events: none; }
         .blob-top { width: 300px; height: 300px; background: rgba(88, 101, 242, 0.15); top: -100px; left: -100px; animation: pulseGlow 6s infinite alternate; }
         .blob-bottom { width: 400px; height: 400px; background: rgba(255, 143, 80, 0.1); bottom: -150px; right: -150px; animation: pulseGlow 8s infinite alternate-reverse; }
-        
         @keyframes pulseGlow { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(1.2); opacity: 1; } }
-        
-        .discord-card-compact:hover {
-            transform: translateY(-10px) rotateX(3deg) rotateY(-3deg);
-            box-shadow: 0 45px 100px rgba(88, 101, 242, 0.18);
-        }
-
-        .discord-card-compact::before {
-            content: ''; position: absolute; top: 0; left: -150%; width: 50%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
-            transform: skewX(-25deg); transition: 0.8s; z-index: 1; pointer-events: none;
-        }
-        .discord-card-compact:hover::before { left: 150%; }
 
         .dc-logo-side {
             width: 120px; height: 120px; background: var(--discord-gradient);
@@ -122,7 +201,6 @@
             animation: breathe 3s ease-in-out infinite;
             position: relative; z-index: 2; transform: translateZ(40px);
         }
-
         @keyframes breathe { 0%, 100% { transform: scale(1) translateZ(40px); } 50% { transform: scale(1.05) translateZ(40px); } }
 
         .dc-watermark {
@@ -130,45 +208,43 @@
             color: #5865F2; opacity: 0.03; z-index: 0; transform: rotate(-15deg);
             pointer-events: none; transition: 0.5s ease;
         }
-
+        html.dark .dc-watermark { opacity: 0.05; }
         .discord-card-pro:hover .dc-watermark { transform: rotate(0) scale(1.05); opacity: 0.05; }
+        html.dark .discord-card-pro:hover .dc-watermark { opacity: 0.08; }
         
         .dc-left { position: relative; z-index: 2; flex-shrink: 0; }
         .dc-icon-wrapper {
             width: 150px; height: 150px;
-            background: linear-gradient(135deg, #5865F2, #4752C4);
+            background: var(--discord-gradient);
             border-radius: 40px;
             display: flex; justify-content: center; align-items: center;
             font-size: 6rem; color: white;
             box-shadow: 0 20px 40px rgba(88, 101, 242, 0.4), inset 0 5px 15px rgba(255,255,255,0.3);
             animation: floatLogo 4s ease-in-out infinite;
-            border: 4px solid rgba(255,255,255,0.6);
+            border: 4px solid var(--bg-glass);
         }
-
         @keyframes floatLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
         /* Nội dung bên phải */
         .dc-right { position: relative; z-index: 2; flex: 1; }
 
         .dc-badge {
-            display: inline-block; padding: 6px 16px; background: #EEF0FF; color: #5865F2;
+            display: inline-flex; padding: 6px 16px; background: rgba(88, 101, 242, 0.1); color: var(--discord-color);
             font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
-            border-radius: 20px; margin-bottom: 15px; border: 1px solid #D4D8FF;
+            border-radius: 20px; margin-bottom: 15px; border: 1px solid rgba(88, 101, 242, 0.2);
+            align-items: center; gap: 6px;
         }
 
-        .dc-title { font-size: 2.2rem; font-weight: 900; color: #2D3436; margin-bottom: 12px; letter-spacing: -1px; line-height: 1.2; }
+        .dc-title { font-size: 2.2rem; font-weight: 900; color: var(--text-heading); margin-bottom: 12px; letter-spacing: -1px; line-height: 1.2; }
 
         .dc-features { list-style: none; margin-bottom: 30px; display: flex; flex-direction: column; gap: 10px; }
-        .dc-features li { display: flex; align-items: center; gap: 12px; font-weight: 700; color: #475569; font-size: 0.95rem; }
-        .dc-features i { color: #5865F2; font-size: 1.2rem; }
+        .dc-features li { display: flex; align-items: center; gap: 12px; font-weight: 700; color: var(--text-sub); font-size: 0.95rem; }
+        .dc-features i { color: var(--discord-color); font-size: 1.2rem; }
 
-        .dc-content-side { flex: 1; text-align: left; position: relative; z-index: 2; transform: translateZ(25px); }
-        .dc-title { font-size: 2.2rem; font-weight: 900; color: var(--text-main); margin-bottom: 12px; letter-spacing: -1px; line-height: 1.1; }
-        .dc-desc { font-size: 1.05rem; color: var(--text-light); line-height: 1.6; margin-bottom: 20px; }
-        .dc-desc strong { color: var(--discord-color); font-weight: 800; }
+        .dc-desc { font-size: 1.05rem; color: var(--text-sub); line-height: 1.6; margin-bottom: 20px; font-weight: 500; }
 
         .btn-join-discord-pro {
-            background: #5865F2; color: white; padding: 16px 35px;
+            background: var(--discord-color); color: white; padding: 16px 35px;
             border-radius: 20px; font-weight: 800; font-size: 1.1rem;
             display: inline-flex; align-items: center; gap: 12px; border: none; cursor: pointer;
             box-shadow: 0 10px 25px rgba(88, 101, 242, 0.4); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -183,32 +259,18 @@
         .btn-join-discord-pro:hover { transform: translateY(-3px) scale(1.02); background: #4752C4; box-shadow: 0 15px 35px rgba(88, 101, 242, 0.5); }
         .btn-join-discord-pro:hover::before { left: 200%; transition: 0.6s ease; }
 
-        .dc-float { position: absolute; font-size: 2.5rem; opacity: 0.08; animation: floatIcon 6s infinite ease-in-out; pointer-events: none; z-index: 0; color: var(--discord-color); }
-        .df-1 { top: 10%; right: 10%; } 
-        .df-2 { bottom: 15%; right: 25%; font-size: 4rem; color: var(--primary); animation-delay: -2s; } 
-
-        @keyframes floatIcon { 
-            0%, 100% { transform: translateY(0) rotate(0deg); } 
-            50% { transform: translateY(-20px) rotate(10deg); } 
-        }
-
-        /* --- MOBILE OPTIMIZATION (CẬP NHẬT MỚI) --- */
-        .menu-toggle { display: none; }
-
+        /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 768px) {
             .mobile-header { display: flex; z-index: 1000; }
-            #sidebar-overlay.active { display: block; }
-
-            aside {
+            #menu-placeholder aside {
                 position: fixed !important; left: 0 !important; top: 0 !important; bottom: 0 !important;
                 transform: translateX(-100%); z-index: 9999 !important; width: 280px !important; 
-                background: white !important; transition: transform 0.3s ease-in-out !important;
+                transition: transform 0.3s ease-in-out !important;
             }
-            aside.open { transform: translateX(0) !important; box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important; }
+            #menu-placeholder aside.open { transform: translateX(0) !important; box-shadow: 10px 0 50px rgba(0,0,0,0.5) !important; }
 
             .main-content { margin-left: 0 !important; width: 100% !important; padding: 80px 20px 30px !important; }
             
-            /* Sửa lại cho Card Discord Mobile */
             .discord-card-pro { flex-direction: column; padding: 40px 25px; text-align: center; gap: 30px; }
             .dc-icon-wrapper { width: 110px; height: 110px; font-size: 4.5rem; margin: 0 auto; animation: none; transform: translateY(-10px);}
             .dc-title { font-size: 1.7rem; }
@@ -221,44 +283,21 @@
             .welcome-text h2 { font-size: 1.8rem; }
         }
 
-/* --- GLOBAL SCROLLBAR STYLE --- */
-
-/* 1. Thiết lập độ rộng/cao của thanh trượt */
-::-webkit-scrollbar {
-    width: 10px;  /* Độ rộng cho thanh dọc */
-    height: 10px; /* Độ cao cho thanh ngang */
-}
-
-/* 2. Thiết lập rãnh trượt (Track) - Nền chìm */
-::-webkit-scrollbar-track {
-    background: rgba(255, 143, 80, 0.05); /* Màu cam cực nhạt, gần như trong suốt */
-    border-radius: 10px;
-}
-
-/* 3. Thiết lập tay nắm (Thumb) - Phần di chuyển */
-::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 143, 80, 0.3); /* Mặc định là cam nhạt */
-    border-radius: 10px; /* Bo tròn mềm mại */
-    
-    /* Mẹo: Tạo viền trong suốt để thanh trượt trông nhỏ hơn và "lơ lửng" */
-    border: 2px solid transparent;
-    background-clip: content-box;
-    transition: background-color 0.3s ease;
-}
-
-/* 4. Hiệu ứng khi di chuột vào (Hover) */
-::-webkit-scrollbar-thumb:hover {
-    background-color: #FF8F50; /* Đổi sang màu cam chính thương hiệu */
-    border: 1px solid transparent; /* Làm thanh trượt to ra một chút khi hover */
-}
-
-/* 5. (Tùy chọn) Ẩn nút mũi tên 2 đầu (nếu trình duyệt hiển thị) */
-::-webkit-scrollbar-button {
-    display: none;
-}
+        /* --- GLOBAL SCROLLBAR STYLE --- */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
+        ::-webkit-scrollbar-button { display: none; }
     </style>
 </head>
 <body>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 
     <div class="background-blobs">
         <div class="blob blob-1"></div>
@@ -285,7 +324,7 @@
             <div class="user-header">
                 <div class="welcome-text">
                     <h2 id="welcome-name">Xin chào,</h2>
-                    <p>Hãy cùng bắt đầu học tập cùng với HopVan nhé!</p>
+                    <p>Cùng giao lưu và chia sẻ kiến thức nhé!</p>
                 </div>
                 <div class="user-avatar" id="avatar-initial"></div>
             </div>
@@ -303,7 +342,7 @@
                     </div>
 
                     <div class="dc-right">
-                        <div class="dc-badge"><i class="fas fa-fire" style="color: #5865F2"></i> Cộng đồng #1</div>
+                        <div class="dc-badge"><i class="fas fa-fire"></i> Cộng đồng #1</div>
                         <h1 class="dc-title">Gia nhập Server HopVan</h1>
                         <p class="dc-desc">Nơi hội tụ của các sĩ tử HopVan, cùng nhau bứt phá điểm số môn Ngữ Văn với vô vàn đặc quyền:</p>
                         
@@ -322,21 +361,16 @@
         </main>
     </div>
 
-<script type="module" src="gam.js"></script>
-<script src="../chatbot.js"></script>
-
     <script>
-        // --- LOGIC SIDEBAR TOGGLE (MỚI) ---
+        // --- LOGIC SIDEBAR TOGGLE ---
         window.toggleSidebar = () => {
-            // Lấy sidebar (vì sidebar được load động từ menu.html nên dùng querySelector 'aside')
-            const sidebar = document.querySelector('aside');
+            const sidebar = document.querySelector('#menu-placeholder aside');
             const overlay = document.getElementById('sidebar-overlay');
             
             if (sidebar && overlay) {
                 sidebar.classList.toggle('open');
                 overlay.classList.toggle('active');
                 
-                // Khóa cuộn body khi mở menu
                 if (sidebar.classList.contains('open')) {
                     document.body.style.overflow = 'hidden';
                 } else {
@@ -346,11 +380,11 @@
         };
     </script>
 
-<script type="module">
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        // Bổ sung doc, getDoc để truy vấn avatar
         import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initMenu } from "./menu.js";
 
         // 1. CẤU HÌNH FIREBASE
         const firebaseConfig = { 
@@ -367,6 +401,9 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // Khởi tạo Menu (Active tab: community)
+        initMenu(app, 'community');
+
         // 3. KIỂM TRA ĐĂNG NHẬP VÀ XỬ LÝ AVATAR
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -374,26 +411,26 @@
                 document.getElementById('welcome-name').textContent = `Xin chào, ${name}`;
                 
                 const avatarEl = document.getElementById('avatar-initial');
-                
-                // MỚI: Thêm sự kiện click để nhảy sang trang account
                 avatarEl.onclick = () => { window.location.href = 'account.html'; };
                 avatarEl.title = "Đi đến trang cá nhân";
 
                 try {
-                    // Lấy thông tin user từ Firestore
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     let hasAvatar = false;
 
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
                         
+                        // ĐỒNG BỘ DARK MODE TỪ FIREBASE XUỐNG CÁC TRANG (KẾT HỢP VỚI LOCALSTORAGE LÚC TRƯỚC ĐÓ)
+                        if (userData.theme && userData.theme === 'dark') {
+                            document.documentElement.classList.add('dark');
+                        }
+                        
                         if (userData.customAvatar) {
-                            // 1. Ảnh tải lên
                             avatarEl.innerHTML = `<img src="${userData.customAvatar}" alt="User" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
                             avatarEl.style.background = 'transparent';
                             hasAvatar = true;
                         } else if (userData.photoURL || user.photoURL) {
-                            // 2. Ảnh Google
                             avatarEl.innerHTML = `<img src="${userData.photoURL || user.photoURL}" alt="User" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
                             avatarEl.style.background = 'transparent';
                             hasAvatar = true;
@@ -401,7 +438,6 @@
                     }
 
                     if (!hasAvatar) {
-                        // 3. Nếu không có ảnh -> Chữ cái đầu
                         avatarEl.innerHTML = "";
                         avatarEl.innerText = name.charAt(0).toUpperCase();
                         avatarEl.style.background = 'linear-gradient(135deg, #FF8F50, #FF5E62)';
@@ -409,7 +445,6 @@
 
                 } catch (error) {
                     console.error("Lỗi tải avatar:", error);
-                    // Lỗi mạng thì hiện chữ cái đầu
                     avatarEl.innerText = name.charAt(0).toUpperCase();
                 }
             } else {
@@ -421,7 +456,6 @@
         window.addEventListener('trigger-firebase-signout', async () => {
             try {
                 await signOut(auth);
-                console.log("Đã ngắt kết nối tài khoản.");
                 window.location.href = "../index.html"; 
             } catch (error) {
                 alert("Lỗi khi thoát: " + error.message);
@@ -445,12 +479,9 @@
                 window.open("https://discord.gg/EhsQyEAk2k", "_blank");
             });
         }
+    </script>
 
-    import { initMenu } from "./menu.js";
-    initMenu(app);
-</script>
-
-<script type="text/javascript">
+    <script type="text/javascript">
     // 1. Chặn Chuột phải (Để ẩn menu "Inspect/Kiểm tra" và "View Source/Xem nguồn")
     document.addEventListener('contextmenu', function(e) {
         e.preventDefault();

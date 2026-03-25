@@ -15,90 +15,135 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+
     <style>
         :root {
             --primary: #FF8F50;
             --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
-            --bg-glass: rgba(255, 255, 255, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.8);
-            --blur: 25px;
             --sidebar-width: 260px;
+
+            /* BỘ MÀU SÁNG */
+            --bg-body: #FFF5EC;
+            --bg-glass: rgba(255, 255, 255, 0.6);
+            --bg-panel: white;
+            --bg-panel-hover: #FFF5EC;
+            --border-panel: rgba(0,0,0,0.05);
+            --border-ui: #f1f5f9;
+            --text-heading: #2D3436;
+            --text-sub: #636E72;
+            --shadow-card: 0 10px 30px rgba(0,0,0,0.03);
+            --shadow-hover: 0 10px 30px rgba(255, 143, 80, 0.1);
         }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #FFF5EC; height: 100vh; overflow: hidden; display: flex; }
+        /* BỘ MÀU TỐI */
+        html.dark {
+            --bg-body: #0f172a;       /* slate-900 */
+            --bg-glass: rgba(15, 23, 42, 0.7);
+            --bg-panel: rgba(30, 41, 59, 0.85); /* slate-800 */
+            --bg-panel-hover: #1e293b;
+            --border-panel: #334155;  /* slate-700 */
+            --border-ui: #334155;
+            --text-heading: #f8fafc;
+            --text-sub: #94a3b8;
+            --shadow-card: 0 10px 30px rgba(0,0,0,0.3);
+            --shadow-hover: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-sub); height: 100vh; overflow: hidden; display: flex; transition: all 0.3s ease; }
 
         /* --- BACKGROUND --- */
         .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatBlob 10s infinite alternate; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatBlob 10s infinite alternate; transition: 0.5s;}
+        html.dark .blob { opacity: 0.15; }
         .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
         .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
         @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
 
+        /* --- ĐỒNG BỘ DARK MODE CHO MENU.JS --- */
+        html.dark #menu-placeholder aside { background-color: var(--bg-panel) !important; border-color: var(--border-panel) !important; }
+        html.dark #menu-placeholder aside > div { background-color: transparent !important; border-color: var(--border-panel) !important; }
+        html.dark #menu-placeholder button { background-color: var(--bg-body) !important; border: 1px solid var(--border-panel) !important; color: var(--text-sub) !important; box-shadow: none !important; }
+        html.dark #menu-placeholder button:hover { background-color: var(--bg-panel-hover) !important; border-color: var(--primary) !important; color: var(--primary) !important; }
+        html.dark #menu-placeholder .nav-item.active { background: var(--primary-gradient) !important; color: white !important; border-color: transparent !important; box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4) !important; }
+        html.dark #menu-placeholder div[style*="background-color"] { background-color: var(--bg-body) !important; border-color: var(--border-panel) !important; }
+        html.dark #menu-placeholder [class*="border-"] { border-color: var(--border-panel) !important; }
+        html.dark #menu-placeholder .text-gray-800, html.dark #menu-placeholder h1 { color: var(--text-heading) !important; }
+        html.dark #menu-placeholder .text-gray-500, html.dark #menu-placeholder .text-gray-400 { color: var(--text-sub) !important; }
+        html.dark #menu-placeholder .nav-item { color: var(--text-sub) !important; transition: 0.3s; }
+        html.dark #menu-placeholder .nav-item:hover { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
+
+        /* Ghi đè text cứng Tailwind trên HTML */
+        .text-gray-800 { color: var(--text-heading) !important; }
+        .text-gray-400 { color: var(--text-sub) !important; }
+
         /* --- LAYOUT --- */
-        .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 60px; background: white; z-index: 100; align-items: center; padding: 0 20px; border-bottom: 1px solid #eee; }
-        #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); z-index: 998; }
+        .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 60px; background: var(--bg-panel); z-index: 100; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border-panel); }
+        #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 998; }
 
         .main-content {
             margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); height: 100%;
-            background: var(--bg-glass); backdrop-filter: blur(var(--blur)); border-left: 1px solid var(--glass-border);
+            background: var(--bg-glass); backdrop-filter: blur(var(--blur)); border-left: 1px solid var(--border-panel);
             padding: 40px; overflow-y: auto; position: relative;
         }
 
         /* --- CLASS INFO HEADER --- */
         .class-header {
-            background: white; border-radius: 24px; padding: 30px; margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid white;
+            background: var(--bg-panel); border-radius: 24px; padding: 30px; margin-bottom: 30px;
+            box-shadow: var(--shadow-card); border: 1px solid var(--border-panel);
             display: flex; justify-content: space-between; align-items: center;
-            position: relative; overflow: hidden;
+            position: relative; overflow: hidden; transition: 0.3s;
         }
-        .class-title h1 { font-size: 1.8rem; font-weight: 900; color: #2D3436; margin-bottom: 5px; }
-        .class-subtitle { color: #636E72; font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .class-title h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-heading); margin-bottom: 5px; }
+        .class-subtitle { color: var(--text-sub); font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        html.dark .class-subtitle .bg-gray-300 { background-color: var(--border-ui); }
         
-        .class-watermark {
-            position: absolute; right: -20px; bottom: -30px; font-size: 8rem; color: #FF8F50;
-            opacity: 0.1; transform: rotate(-15deg); pointer-events: none;
-        }
+        .class-watermark { position: absolute; right: -20px; bottom: -30px; font-size: 8rem; color: var(--primary); opacity: 0.1; transform: rotate(-15deg); pointer-events: none; }
+        html.dark .class-watermark { opacity: 0.05; }
 
         /* --- ASSIGNMENT CARD --- */
         .assignment-card {
-            background: rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 24px; margin-bottom: 20px;
-            border: 1px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            background: var(--bg-panel); border-radius: 20px; padding: 24px; margin-bottom: 20px;
+            border: 1px solid var(--border-panel); box-shadow: var(--shadow-card);
             transition: all 0.3s; display: flex; justify-content: space-between; align-items: center;
         }
-        .assignment-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255, 143, 80, 0.1); border-color: #ffedd5; background: white; }
+        .assignment-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--primary); background: var(--bg-panel-hover); }
 
         .asg-icon {
-            width: 50px; height: 50px; border-radius: 14px; background: #fff7ed; color: #FF8F50;
+            width: 50px; height: 50px; border-radius: 14px; background: rgba(255, 143, 80, 0.1); color: var(--primary);
             display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;
         }
-        .asg-info h3 { font-weight: 800; color: #2D3436; font-size: 1.1rem; margin-bottom: 4px; }
-        .asg-meta { font-size: 0.85rem; color: #636E72; display: flex; gap: 15px; }
+        .asg-info h3 { font-weight: 800; color: var(--text-heading); font-size: 1.1rem; margin-bottom: 4px; transition: 0.3s;}
+        .assignment-card:hover .asg-info h3 { color: var(--primary); }
+        .asg-meta { font-size: 0.85rem; color: var(--text-sub); display: flex; gap: 15px; }
         
         .btn-start {
             background: var(--primary-gradient); color: white; padding: 10px 24px; border-radius: 12px;
             font-weight: 700; text-decoration: none; box-shadow: 0 5px 15px rgba(255, 94, 98, 0.25);
-            transition: 0.2s; white-space: nowrap; display: inline-flex; align-items: center;
+            transition: 0.2s; white-space: nowrap; display: inline-flex; align-items: center; border: none;
         }
-        .btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 94, 98, 0.35); }
+        .btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 94, 98, 0.35); color: white;}
 
         .btn-result {
-            background: white; color: #2D3436; border: 2px solid #e5e7eb; padding: 10px 24px; border-radius: 12px;
+            background: var(--bg-body); color: var(--text-heading); border: 2px solid var(--border-ui); padding: 10px 24px; border-radius: 12px;
             font-weight: 700; text-decoration: none; transition: 0.2s; white-space: nowrap; display: inline-flex; align-items: center;
         }
-        .btn-result:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-result:hover { border-color: var(--primary); color: var(--primary); background: var(--bg-panel-hover);}
 
         /* --- SIDEBAR WIDGET --- */
-        .widget-box { background: white; border-radius: 20px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid white; }
-        .widget-title { font-weight: 800; color: #2D3436; margin-bottom: 20px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+        .widget-box { background: var(--bg-panel); border-radius: 20px; padding: 24px; box-shadow: var(--shadow-card); border: 1px solid var(--border-panel); transition: 0.3s;}
+        .widget-title { font-weight: 800; color: var(--text-heading); margin-bottom: 20px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
         
-        .member-item { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #f1f5f9; }
+        .member-item { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-ui); }
         .member-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-        .member-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #eee; }
-        .member-info h4 { font-weight: 700; font-size: 0.9rem; color: #2D3436; }
-        .member-info p { font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
+        .member-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: var(--border-ui); border: 2px solid var(--bg-body); }
+        .member-info h4 { font-weight: 700; font-size: 0.9rem; color: var(--text-heading); }
+        .member-info p { font-size: 0.75rem; color: var(--text-sub); font-weight: 600; }
 
         /* --- TOAST --- */
-        #toast { position: fixed; top: 30px; right: 30px; background: white; padding: 15px 25px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 10000; transform: translateX(200%); transition: 0.5s; }
+        #toast { position: fixed; top: 30px; right: 30px; background: var(--bg-panel); color: var(--text-heading); padding: 15px 25px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; z-index: 10000; transform: translateX(200%); transition: 0.5s; border: 1px solid var(--border-panel);}
         #toast.show { transform: translateX(0); }
 
         /* Mobile */
@@ -120,6 +165,12 @@
     </style>
 </head>
 <body>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 
     <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
 
@@ -230,11 +281,23 @@
             t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
         }
 
-        // Auth
+        // --- Auth ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
                 if(!classId) { window.location.href = 'classrooms.html'; return; }
+                
+                // MỚI: Đồng bộ Dark Mode từ Cloud xuống
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists() && userDoc.data().theme) {
+                        const theme = userDoc.data().theme;
+                        localStorage.setItem('theme', theme);
+                        if (theme === 'dark') document.documentElement.classList.add('dark');
+                        else document.documentElement.classList.remove('dark');
+                    }
+                } catch(e) {}
+
                 loadClassData();
             } else window.location.href = "../log.html";
         });
@@ -287,7 +350,8 @@
                 const assignments = classData.assignments || []; 
                 
                 if (assignments.length === 0) {
-                    aList.innerHTML = `<div class="text-center py-10 bg-white/50 rounded-2xl border-2 border-dashed border-gray-200"><p class="text-gray-400 font-bold">Chưa có bài tập nào.</p></div>`;
+                    // ĐÃ FIX: Dùng class-header để box có màu tự động đổi theo theme
+                    aList.innerHTML = `<div class="class-header justify-center text-center py-10"><p class="text-gray-400 font-bold">Chưa có bài tập nào được giao.</p></div>`;
                     return;
                 }
 

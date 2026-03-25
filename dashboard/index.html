@@ -331,9 +331,119 @@
         .btn-pm-skip:hover { background: #e2e8f0; }
         .btn-pm-update { padding: 14px; border-radius: 14px; font-weight: 700; cursor: pointer; background: linear-gradient(135deg, #FF8F50, #FF5E62); color: white; border: none; box-shadow: 0 5px 15px rgba(255, 109, 111, 0.25); transition: 0.2s; }
         .btn-pm-update:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 109, 111, 0.25); }
+
+        /* =========================================
+           TÍCH HỢP DARK MODE CHUẨN DEEP DARK CHO DASHBOARD
+           ========================================= */
+        html.dark {
+            --bg-body: #0B1120;       /* Nền tổng tối đen sâu thẳm */
+            --bg-panel: #111827;      /* Nền các thẻ Card/Modal nổi lên */
+            --bg-panel-hover: #1F2937;
+            --border-ui: #1F2937;     /* Viền tối, mờ ảo */
+            --text-main: #F8FAFC;
+            --text-light: #94A3B8;
+        }
+
+        /* 1. XỬ LÝ NỀN BỊ ĐỤC -> CHUYỂN THÀNH ĐEN NHÁM SANG TRỌNG */
+        html.dark body { background-color: var(--bg-body) !important; }
+        html.dark .main-content {
+            background-color: var(--bg-body) !important; 
+            backdrop-filter: none !important; /* Tắt kính mờ để không bị đục */
+            border-left: 1px solid var(--border-ui) !important;
+        }
+        /* Làm mờ các đốm sáng background blob cho đỡ chói */
+        html.dark .blob { opacity: 0.1 !important; }
+
+        /* 2. ĐỒNG BỘ 2 NÚT "GÓP Ý" & "THOÁT" Y HỆT ẢNH GỬI */
+        html.dark #menu-placeholder aside { background-color: var(--bg-panel) !important; border-color: var(--border-ui) !important; }
+        html.dark #menu-placeholder aside > div { background-color: transparent !important; }
+        /* Nút Góp ý (Viền cam, chữ cam, nền chìm) */
+        html.dark #menu-placeholder button.bg-white:nth-child(1) {
+            background-color: transparent !important; 
+            border: 1px solid var(--primary) !important;
+            color: var(--primary) !important;
+            box-shadow: none !important;
+        }
+        html.dark #menu-placeholder button.bg-white:nth-child(1):hover { background-color: rgba(255, 143, 80, 0.1) !important; }
+        /* Nút Thoát (Viền xám, chữ xám) */
+        html.dark #menu-placeholder button.bg-white:nth-child(2) {
+            background-color: transparent !important; 
+            border: 1px solid var(--border-ui) !important;
+            color: var(--text-light) !important;
+            box-shadow: none !important;
+        }
+        html.dark #menu-placeholder button.bg-white:nth-child(2):hover { background-color: var(--bg-panel-hover) !important; color: white !important;}
+        
+        /* Cục Version & Menu Active */
+        html.dark #menu-placeholder div[style*="background-color"] { background-color: var(--bg-body) !important; border: 1px solid var(--border-ui) !important;}
+        html.dark #menu-placeholder .nav-item.active { background: var(--primary-gradient) !important; color: white !important; border-color: transparent !important; box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3) !important; }
+        html.dark #menu-placeholder .nav-item { color: var(--text-light) !important; }
+        html.dark #menu-placeholder .nav-item:hover:not(.active) { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
+
+        /* 3. LÀM ĐẸP CÁC CARD NGOÀI DASHBOARD */
+        html.dark .stat-card, html.dark .activity-box, html.dark .chart-box, 
+        html.dark .leaderboard-box, html.dark .tip-card {
+            background-color: var(--bg-panel) !important;
+            border: 1px solid var(--border-ui) !important;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4) !important;
+        }
+        html.dark .stat-card:hover, html.dark .activity-box:hover, html.dark .chart-box:hover, html.dark .tip-card:hover {
+            background-color: var(--bg-panel-hover) !important;
+            border-color: var(--primary) !important;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6) !important;
+        }
+        html.dark .stat-watermark { opacity: 0.03 !important; }
+        html.dark .stat-card:hover .stat-watermark { opacity: 0.08 !important; }
+        
+        /* Cứu màu chữ bị đen */
+        html.dark .text-gray-800, html.dark .text-gray-700, html.dark h2, html.dark h3, html.dark h4, html.dark .section-h3 { color: var(--text-main) !important; }
+        html.dark .text-gray-500, html.dark .text-gray-400, html.dark p, html.dark .unit { color: var(--text-light) !important; }
+
+        /* 4. FIX TOÀN BỘ MODAL (POPUP) BỊ TRẮNG */
+        html.dark .modal-content, html.dark .pm-content {
+            background-color: var(--bg-panel) !important;
+            border: 1px solid var(--border-ui) !important;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8) !important;
+        }
+        html.dark .modal-table-container { background-color: transparent !important; }
+        
+        /* Xử lý bảng BXH trong Modal */
+        html.dark .bg-white.sticky { background-color: var(--bg-panel) !important; border-bottom: 1px solid var(--border-ui) !important; }
+        html.dark tr[style*="background: #fafafa"], html.dark .bg-gray-50 { 
+            background-color: var(--bg-body) !important; 
+            border-color: var(--border-ui) !important;
+        }
+        /* Hàng của bản thân trong BXH nổi bật hơn */
+        html.dark tr.bg-orange-50 { 
+            background-color: rgba(255, 143, 80, 0.05) !important; 
+            border: 1px solid var(--primary) !important; 
+        } 
+        
+        /* Xử lý Modal Thống Kê 3 ô */
+        html.dark .modal-stat-box { background-color: var(--bg-body) !important; border: 1px solid var(--border-ui) !important; }
+        html.dark .ms-val { color: var(--text-main) !important; }
+        html.dark .ms-label { color: var(--text-light) !important; }
+        
+        /* Xử lý Modal Hoàn tất Hồ sơ */
+        html.dark .pm-icon { background-color: var(--bg-body) !important; box-shadow: 0 10px 20px rgba(0,0,0,0.5) !important; }
+        html.dark .pm-icon::after { border-color: var(--bg-panel) !important; }
+        html.dark .btn-pm-skip { background-color: var(--bg-body) !important; color: var(--text-light) !important; border: 1px solid var(--border-ui) !important; }
+        html.dark .btn-pm-skip:hover { background-color: var(--bg-panel-hover) !important; color: var(--text-main) !important; }
+
+        /* Đổi màu text trong table Nhật ký */
+        html.dark #full-activity-body td[style*="color: #636e72"], 
+        html.dark #full-activity-body td[style*="color: var(--text-main)"] {
+            color: var(--text-main) !important;
+        }
     </style>
 </head>
 <body>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 
     <div class="background-blobs">
         <div class="blob blob-1"></div>
@@ -555,6 +665,21 @@
             const name = user.displayName || user.email.split('@')[0];
             document.getElementById('welcome-name').textContent = `Xin chào, ${name}`;
             
+            // --- BẮT ĐẦU: ĐỒNG BỘ DARK MODE TỪ FIREBASE ---
+            try {
+                // Nhớ import getDoc và doc ở trên cùng thẻ script nhé
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists() && userDoc.data().theme) {
+                    const theme = userDoc.data().theme;
+                    localStorage.setItem('theme', theme);
+                    if (theme === 'dark') document.documentElement.classList.add('dark');
+                    else document.documentElement.classList.remove('dark');
+                }
+            } catch(e) {
+                console.log("Lỗi tải theme: ", e);
+            }
+            // --- KẾT THÚC: ĐỒNG BỘ DARK MODE ---
+
             // Chuyển toàn bộ logic xử lý Avatar xuống hàm updateUserStreak để lấy dữ liệu từ Database
             updateUserStreak(user);
             setupRealtimeStats(user);

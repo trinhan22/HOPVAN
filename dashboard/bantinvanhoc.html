@@ -19,23 +19,99 @@
         :root {
             --primary: #FF8F50;
             --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
-            --text-heading: #2D3436;
-            --bg-body: #FFF5EC;
             --sidebar-width: 280px;
+
+            /* BỘ MÀU SÁNG (Bắt buộc phải có để không bị lỗi lúc tắt Dark Mode) */
+            --bg-body: #FFF5EC;
+            --bg-glass: rgba(255, 255, 255, 0.4);
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --bg-search: white;
+            --bg-nav: rgba(255, 255, 255, 0.6);
+            --border-card: rgba(255, 255, 255, 0.8);
+            --text-heading: #2D3436;
+            --text-body: #444;
+            --text-muted: #94A3B8;
+            --shadow-card: 0 15px 35px rgba(0,0,0,0.04);
+        }
+
+        /* BỘ MÀU TỐI (Khi có class .dark) */
+        html.dark {
+            --bg-body: #0f172a;       /* slate-900 */
+            --bg-glass: rgba(15, 23, 42, 0.6);
+            --bg-card: rgba(30, 41, 59, 0.85); /* slate-800 */
+            --bg-search: #1e293b;
+            --bg-nav: rgba(30, 41, 59, 0.6);
+            --border-card: #334155;    /* slate-700 */
+            --text-heading: #f8fafc;
+            --text-body: #cbd5e1;
+            --text-muted: #94a3b8;
+            --shadow-card: 0 15px 35px rgba(0,0,0,0.3);
         }
 
         /* --- BASE --- */
-        body { background-color: var(--bg-body); font-family: 'Plus Jakarta Sans', sans-serif; color: #444; overflow-x: hidden; }
+        body { background-color: var(--bg-body); font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-body); overflow-x: hidden; transition: background-color 0.3s ease; }
 
         /* --- LAYOUT FIX --- */
         #menu-placeholder { position: fixed; top: 0; left: 0; height: 100vh; z-index: 900; }
+
+        /* --- ĐỒNG BỘ DARK MODE CHO MENU.JS --- */
+        /* Chỉ áp dụng các CSS này khi HTML có class "dark" */
         
+        html.dark #menu-placeholder aside, 
+        html.dark #menu-placeholder .sidebar {
+            background-color: var(--bg-card) !important;
+            border-color: var(--border-card) !important;
+        }
+
+        html.dark #menu-placeholder aside > div,
+        html.dark #menu-placeholder .sidebar > div {
+            background-color: transparent !important;
+            border-color: var(--border-card) !important;
+        }
+
+        html.dark #menu-placeholder button {
+            background-color: var(--bg-body) !important; 
+            border: 1px solid var(--border-card) !important;
+            color: var(--text-muted) !important;
+            box-shadow: none !important;
+        }
+        html.dark #menu-placeholder button:hover {
+            background-color: var(--bg-search) !important;
+            border-color: var(--primary) !important;
+            color: var(--primary) !important;
+        }
+
+        html.dark #menu-placeholder .nav-item.active { 
+            background: var(--primary-gradient) !important; 
+            color: white !important; 
+            border-color: transparent !important; 
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4) !important;
+        }
+
+        html.dark #menu-placeholder div[style*="background-color"] {
+            background-color: var(--bg-body) !important;
+            border-color: var(--border-card) !important;
+        }
+
+        html.dark #menu-placeholder [class*="border-"] { border-color: var(--border-card) !important; }
+        html.dark #menu-placeholder .text-gray-800, 
+        html.dark #menu-placeholder h1 { color: var(--text-heading) !important; }
+        html.dark #menu-placeholder .text-gray-500, 
+        html.dark #menu-placeholder .text-gray-400 { color: var(--text-muted) !important; }
+        
+        html.dark #menu-placeholder .nav-item { color: var(--text-muted) !important; transition: 0.3s; }
+        html.dark #menu-placeholder .nav-item:hover { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
+
         .main-content {
             margin-left: var(--sidebar-width);
             width: calc(100% - var(--sidebar-width));
             min-height: 100vh;
             padding: 40px 60px;
-            background: rgba(255, 255, 255, 0.4); 
+            
+            /* SỬA LẠI 2 DÒNG NÀY ĐỂ ĐỒNG BỘ BIẾN DARK MODE */
+            background: var(--bg-glass); 
+            border-left: 1px solid var(--border-card);
+            
             backdrop-filter: blur(20px);
         }
 
@@ -381,6 +457,12 @@
 </head>
 <body>
 
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+
     <div class="background-blobs">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
@@ -444,12 +526,12 @@
     <script type="module" src="gam.js"></script>    
     <script src="../chatbot.js"></script>
 
-    <script type="module">
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Import Menu (Đã thêm lại)
+        // Import Menu
         import { initMenu } from "./menu.js";
 
         const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
@@ -457,106 +539,13 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-// ------------------------------------------------------------------
-    //  LOGIC DANH SÁCH YÊU THÍCH (Dán vào trong script type="module")
-    // ------------------------------------------------------------------
-    
-    // 1. Import thêm hàm đọc document (nếu trên đầu file chưa có)
-    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    let isFavMode = false; // Biến theo dõi trạng thái (Đang xem / Không xem)
-
-    window.toggleFavorites = async () => {
-        const btn = document.getElementById('btn-love-mode');
-        const container = document.getElementById('content-area');
-        const navBtns = document.querySelectorAll('.nav-btn'); // Các nút danh mục
-
-        // TRƯỜNG HỢP 1: ĐANG BẬT -> TẮT (Quay về xem tất cả)
-        if (isFavMode) {
-            isFavMode = false;
-            btn.classList.remove('active');
-            btn.innerHTML = '<i class="fas fa-heart"></i>'; // Trả lại icon tim
-            
-            // Kích hoạt lại nút "Tất cả" và tải lại danh sách gốc
-            const btnAll = document.querySelector('.nav-btn:first-child');
-            if(btnAll) btnAll.click(); 
-            return;
-        }
-
-        // TRƯỜNG HỢP 2: ĐANG TẮT -> BẬT (Xem danh sách yêu thích)
-        isFavMode = true;
-        
-        // Cập nhật giao diện nút
-        btn.classList.add('active');
-        btn.innerHTML = '<i class="fas fa-times"></i>'; // Đổi thành dấu X để đóng
-        
-        // Tắt active của các nút danh mục kia cho đỡ rối
-        navBtns.forEach(b => b.classList.remove('active')); 
-
-        // Hiển thị loading đẹp
-        container.innerHTML = `
-            <div class="loading-state" style="padding: 60px 0;">
-                <i class="fas fa-spinner fa-spin text-3xl mb-3 text-orange-300"></i>
-                <br>Đang tìm trong bộ sưu tập của bạn...
-            </div>`;
-
-        try {
-            const user = auth.currentUser;
-            if (!user) {
-                alert("Vui lòng đăng nhập để xem bộ sưu tập!");
-                btn.click(); // Tự động tắt chế độ này
-                return;
-            }
-
-            // Gọi lên Firebase lấy danh sách ID đã lưu
-            const favSnap = await getDoc(doc(db, "favorites", user.uid));
-            
-            // Nếu chưa lưu bài nào
-            if (!favSnap.exists() || !favSnap.data().list || favSnap.data().list.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-10">
-                        <i class="far fa-folder-open text-6xl text-gray-200 mb-4"></i>
-                        <h3 class="text-xl font-bold text-gray-400">Chưa có bài viết nào</h3>
-                        <p class="text-sm text-gray-400 mt-2">Hãy thả tim <i class="fas fa-heart text-red-400"></i> các bài viết hay để lưu vào đây nhé!</p>
-                        <button onclick="toggleFavorites()" class="mt-6 px-6 py-2 bg-orange-100 text-orange-500 rounded-full font-bold hover:bg-orange-200 transition">Quay lại Bản tin</button>
-                    </div>`;
-                return;
-            }
-
-            const favIds = favSnap.data().list; // Mảng chứa các ID [id1, id2...]
-
-            // Lọc ra các bài viết trùng khớp từ danh sách allArticles đã tải sẵn
-            // (Cách này nhanh hơn là query lại database)
-            const favArticles = allArticles.filter(item => favIds.includes(item.id));
-
-            if (favArticles.length === 0) {
-                container.innerHTML = '<div class="loading-state">Các bài viết bạn lưu có thể đã bị xóa khỏi hệ thống.</div>';
-            } else {
-                // Hiển thị danh sách kèm tiêu đề
-                renderLayout(favArticles);
-                
-                // Chèn thêm header nhỏ báo số lượng
-                container.insertAdjacentHTML('afterbegin', `
-                    <div class="col-span-full mb-6 pb-4 border-b border-gray-100 flex items-center gap-3 animate-fade-in">
-                        <div class="w-8 h-8 rounded-full bg-red-100 text-red-500 flex items-center justify-center font-bold"><i class="fas fa-heart"></i></div>
-                        <span class="font-bold text-gray-600">Bạn đã lưu ${favArticles.length} bài viết</span>
-                    </div>
-                `);
-            }
-
-        } catch (e) {
-            console.error(e);
-            container.innerHTML = '<div class="loading-state text-red-400">Lỗi tải dữ liệu yêu thích.</div>';
-        }
-    };
-
-        // Khởi tạo Menu bên trái
-        initMenu(app);
+        initMenu(app, 'news');
 
         let allArticles = [];
+        let favIdsCache = [];
         let currentFilter = 'all';
+        let isFavMode = false;
 
-        // 8 Danh mục mới (để hiển thị badge)
         const CAT_CONFIG = {
             'dauchan':  { name: 'Dấu chân thời đại' },
             'chandung': { name: 'Chân dung bút lực' },
@@ -570,39 +559,56 @@
 
         const getCatInfo = (code) => CAT_CONFIG[code] || { name: 'Bài viết' };
 
-        // --- FETCH DATA ---
+        // 1. Kiểm tra Theme & Gọi Load Data
+        onAuthStateChanged(auth, async (user) => { 
+            if(!user) window.location.href="../log.html"; 
+            else {
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists() && userDoc.data().theme === 'dark') {
+                        document.documentElement.classList.add('dark');
+                    }
+                } catch(e) {}
+                loadData(); 
+            }
+        });
+
+        // 2. Tải dữ liệu từ Firebase
         async function loadData() {
             try {
                 const q = query(collection(db, "literary_news"), orderBy("createdAt", "desc"));
                 const snapshot = await getDocs(q);
                 
-                allArticles = [];
-                snapshot.forEach(doc => {
+                allArticles = snapshot.docs.map(doc => {
                     const data = doc.data();
-                    allArticles.push({
+                    return {
                         id: doc.id,
-                        slug: data.slug || null, // <--- THÊM DÒNG NÀY (Lấy slug)
+                        slug: data.slug || null,
                         title: data.title || "Chưa có tiêu đề",
                         category: data.type || "diahat", 
-                        summary: data.summary || data.intro?.replace(/<[^>]*>?/gm, '').slice(0, 150) + "..." || "",
+                        summary: data.summary || (data.intro ? data.intro.replace(/<[^>]*>?/gm, '').slice(0, 150) + "..." : ""),
                         img: data.img || "../panel.webp", 
                         date: data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('vi-VN') : 'Mới cập nhật'
-                    });
+                    };
                 });
 
                 renderLayout(allArticles);
             } catch (e) {
                 console.error(e);
-                document.getElementById('content-area').innerHTML = `<div class="loading-state text-red-400">Không thể kết nối máy chủ.</div>`;
+                document.getElementById('content-area').innerHTML = `<div class="loading-state text-red-400">Lỗi tải dữ liệu. Hãy tải lại trang.</div>`;
             }
         }
 
-        // --- RENDER CARD GIAO DIỆN MỚI (ĐÃ TỐI ƯU SEO VỚI THẺ A) ---
+        // 3. Hiển thị Giao diện
         function renderLayout(articles) {
             const container = document.getElementById('content-area');
-            container.innerHTML = '';
+            if (isFavMode && articles.length > 0) {
+                // Đã được xử lý header riêng ở toggleFavorites
+            } else {
+                container.innerHTML = '';
+            }
 
-            if (articles.length === 0) {
+            if (articles.length === 0 && !isFavMode) {
                 container.innerHTML = '<div class="loading-state">Chưa có bài viết nào.</div>';
                 return;
             }
@@ -610,31 +616,27 @@
             let featured = null;
             let list = [...articles];
 
-            // Nếu đang xem "Tất cả", tách bài mới nhất làm Featured
-            if (currentFilter === 'all' && list.length > 0) {
+            if (currentFilter === 'all' && !isFavMode && list.length > 0) {
                 featured = list.shift(); 
             }
 
             let html = '';
-
-            // Danh sách các danh mục dùng View 2 (Dạng bảng) để chia link
             const view2Categories = ['maicau', 'cuango', 'khoinguon'];
 
-            // 1. Featured Card (Bài nổi bật to đùng)
             if (featured) {
                 const cat = getCatInfo(featured.category);
                 const targetView = view2Categories.includes(featured.category) ? 'view2.html' : 'view.html';
                 const link = `../bantinvanhoc/${targetView}?${featured.slug ? `slug=${featured.slug}` : `id=${featured.id}`}`;
 
                 html += `
-                    <a href="${link}" class="featured-card card" style="display: grid; text-decoration: none;">  
+                    <a href="${link}" class="featured-card card">  
                         <div class="c-img-box f-img-wrap">
                             <img src="${featured.img}" class="c-img f-img" loading="lazy">
                             <div class="c-badge" style="background:var(--primary); color:white; border:none;">MỚI NHẤT</div>
                         </div>
                         <div class="c-body f-content">
                             <div class="c-badge" style="position:static; width:fit-content; margin-bottom:10px; background:rgba(255,143,80,0.1); color:#FF8F50;">${cat.name}</div>
-                            <h2 class="c-title f-title" style="font-size:2rem;">${featured.title}</h2>
+                            <h2 class="c-title f-title">${featured.title}</h2>
                             <p class="c-desc f-desc">${featured.summary}</p>
                             <div class="c-footer">
                                 <span>${featured.date}</span>
@@ -644,7 +646,6 @@
                     </a>`;
             }
 
-            // 2. Grid Cards (Các bài còn lại)
             html += '<div class="news-grid">';
             list.forEach(item => {
                 const cat = getCatInfo(item.category);
@@ -652,7 +653,7 @@
                 const link = `../bantinvanhoc/${targetView}?${item.slug ? `slug=${item.slug}` : `id=${item.id}`}`;
 
                 html += `
-                <a href="${link}" class="card" style="text-decoration: none;">
+                <a href="${link}" class="card">
                     <div class="c-img-box">
                         <img src="${item.img}" class="c-img" loading="lazy">
                         <div class="c-badge">${cat.name}</div>
@@ -669,68 +670,86 @@
             });
             html += '</div>';
 
-            container.innerHTML = html;
+            if(isFavMode) {
+                container.insertAdjacentHTML('beforeend', html);
+            } else {
+                container.innerHTML = html;
+            }
         }
 
-        // --- FILTER LOGIC ---
+        // 4. Lọc và Yêu Thích
         window.filterData = (cat, el) => {
             currentFilter = cat;
+            isFavMode = false;
+            document.getElementById('btn-love-mode').classList.remove('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            if(el) {
-                el.classList.add('active');
-                el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            }
+            if(el) el.classList.add('active');
             const filtered = cat === 'all' ? allArticles : allArticles.filter(i => i.category === cat);
             renderLayout(filtered);
         };
 
-        // --- SEARCH ---
+        window.toggleFavorites = async () => {
+            if (!auth.currentUser) return alert("Vui lòng đăng nhập!");
+            isFavMode = !isFavMode;
+            const btn = document.getElementById('btn-love-mode');
+            const container = document.getElementById('content-area');
+            
+            btn.classList.toggle('active', isFavMode);
+
+            if (isFavMode) {
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); 
+                container.innerHTML = `<div class="loading-state"><i class="fas fa-spinner fa-spin text-3xl mb-3 text-orange-400"></i><br>Đang tìm trong bộ sưu tập...</div>`;
+                
+                try {
+                    const favSnap = await getDoc(doc(db, "favorites", auth.currentUser.uid));
+                    if (!favSnap.exists() || !favSnap.data().list || favSnap.data().list.length === 0) {
+                        container.innerHTML = `
+                            <div class="text-center py-10">
+                                <i class="far fa-folder-open text-6xl text-gray-300 dark:text-slate-600 mb-4"></i>
+                                <h3 class="text-xl font-bold text-gray-500 dark:text-slate-400">Chưa có bài viết nào</h3>
+                                <p class="text-sm text-gray-400 dark:text-slate-500 mt-2">Hãy thả tim các bài viết hay để lưu vào đây nhé!</p>
+                            </div>`;
+                        return;
+                    }
+
+                    favIdsCache = favSnap.data().list;
+                    const favArticles = allArticles.filter(a => favIdsCache.includes(a.id));
+                    
+                    container.innerHTML = `
+                        <div class="col-span-full mb-6 pb-4 border-b border-gray-200 dark:border-slate-700 flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-500 flex items-center justify-center font-bold"><i class="fas fa-heart"></i></div>
+                            <span class="font-bold text-gray-600 dark:text-slate-300">Bạn đã lưu ${favArticles.length} bài viết</span>
+                        </div>`;
+                    
+                    renderLayout(favArticles);
+                } catch (e) {
+                    console.error(e);
+                    container.innerHTML = '<div class="loading-state text-red-400">Lỗi tải dữ liệu.</div>';
+                }
+            } else {
+                const btnAll = document.querySelector('.nav-btn:first-child');
+                if(btnAll) btnAll.click(); 
+            }
+        };
+
+        // 5. Tính năng phụ
         document.getElementById('search-input').addEventListener('input', (e) => {
             const key = e.target.value.toLowerCase();
-            const filtered = allArticles.filter(i => i.title.toLowerCase().includes(key));
+            const sourceList = isFavMode ? allArticles.filter(a => favIdsCache.includes(a.id)) : allArticles;
+            const filtered = sourceList.filter(i => i.title.toLowerCase().includes(key));
             renderLayout(filtered);
         });
 
-        window.scrollNav = (direction) => {
-            const container = document.getElementById('nav-scroll-container');
-            container.scrollBy({ left: 300 * direction, behavior: 'smooth' });
-        };
-
-        // --- ĐÃ CẬP NHẬT: LOGIC ĐIỀU HƯỚNG VIEW 1 & VIEW 2 ---
-        window.goToDetail = (val, type, category) => {
-            // Danh sách các danh mục dùng View 2 (Dạng bảng)
-            const view2Categories = ['maicau', 'cuango', 'khoinguon'];
-            
-            // Kiểm tra xem bài viết có thuộc 3 danh mục đặc biệt không
-            const targetView = view2Categories.includes(category) ? 'view2.html' : 'view.html';
-
-            if (type === 'slug') {
-                window.location.href = `../bantinvanhoc/${targetView}?slug=${val}`;
-            } else {
-                window.location.href = `../bantinvanhoc/${targetView}?id=${val}`;
-            }
-        };
-
-        window.toggleSidebar = () => {
-            // Tìm thẻ aside HOẶC thẻ có class .sidebar (ưu tiên cái nào tìm thấy trước)
-            const sidebar = document.querySelector('aside') || document.querySelector('.sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            
-            if(sidebar && overlay) {
-                sidebar.classList.toggle('open');
-                overlay.classList.toggle('active');
-            } else {
-                console.log("Chưa load xong Menu hoặc Overlay");
-            }
-        };
-
-        onAuthStateChanged(auth, (u) => { 
-            if(!u) window.location.href="../log.html"; 
-            else loadData(); 
-        });
+        window.scrollNav = (dir) => { document.getElementById('nav-scroll-container').scrollBy({ left: 300 * dir, behavior: 'smooth' }); };
         
-        window.addEventListener('trigger-firebase-signout', async () => { await signOut(auth); window.location.href = "../index.html"; });
+        window.toggleSidebar = () => {
+            const sidebar = document.querySelector('aside');
+            const overlay = document.getElementById('sidebar-overlay');
+            if(sidebar) sidebar.classList.toggle('open');
+            if(overlay) overlay.classList.toggle('hidden');
+        };
 
+        window.addEventListener('trigger-firebase-signout', async () => { await signOut(auth); window.location.href = "../index.html"; });
     </script>
 
 <script type="text/javascript">

@@ -20,31 +20,70 @@
         :root {
             --primary: #FF8F50;
             --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
-            --text-main: #2D3436;
-            --text-light: #636E72;
-            --glass-bg: rgba(255, 255, 255, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.8);
-            --blur: 25px;
             --sidebar-width: 260px;
+
+            /* MÀU SÁNG */
+            --bg-body: #FFF5EC;
+            --bg-glass: rgba(255, 255, 255, 0.6);
+            --bg-panel: rgba(255, 255, 255, 0.9);
+            --bg-panel-hover: white;
+            --bg-input: #f8fafc;
+            --border-panel: rgba(255, 255, 255, 0.8);
+            --border-input: #e2e8f0;
+            --text-heading: #2D3436;
+            --text-sub: #636E72;
+            --shadow-card: 0 10px 30px rgba(0,0,0,0.03);
+            --shadow-hover: 0 20px 40px rgba(255, 143, 80, 0.15);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.3s ease; }
-        body { background-color: #FFF5EC; height: 100vh; overflow: hidden; display: flex; }
+        /* MÀU TỐI */
+        html.dark {
+            --bg-body: #0f172a;       /* slate-900 */
+            --bg-glass: rgba(15, 23, 42, 0.7);
+            --bg-panel: rgba(30, 41, 59, 0.85); /* slate-800 */
+            --bg-panel-hover: #1e293b;
+            --bg-input: #0f172a;
+            --border-panel: #334155;  /* slate-700 */
+            --border-input: #475569;  /* slate-600 */
+            --text-heading: #f8fafc;
+            --text-sub: #94a3b8;
+            --shadow-card: 0 10px 30px rgba(0,0,0,0.3);
+            --shadow-hover: 0 20px 40px rgba(0,0,0,0.5);
+        }
 
-        /* --- BACKGROUND --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease; }
+        body { background-color: var(--bg-body); height: 100vh; overflow: hidden; display: flex; color: var(--text-sub); }
+
+        /* --- BACKGROUND BLOBS --- */
         .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatBlob 10s infinite alternate; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatBlob 10s infinite alternate; transition: opacity 0.5s; }
         .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
         .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
+        html.dark .blob { opacity: 0.15; }
         @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
 
-        /* --- LAYOUT --- */
-        .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 60px; background: white; z-index: 100; align-items: center; padding: 0 20px; border-bottom: 1px solid #eee; }
-        #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); z-index: 998; }
+        /* --- ĐỒNG BỘ DARK MODE CHO MENU.JS --- */
+        html.dark #menu-placeholder aside, 
+        html.dark #menu-placeholder .sidebar { background-color: var(--bg-panel) !important; border-color: var(--border-panel) !important; }
+        html.dark #menu-placeholder aside > div,
+        html.dark #menu-placeholder .sidebar > div { background-color: transparent !important; border-color: var(--border-panel) !important; }
+        html.dark #menu-placeholder button { background-color: var(--bg-body) !important; border: 1px solid var(--border-panel) !important; color: var(--text-sub) !important; box-shadow: none !important; }
+        html.dark #menu-placeholder button:hover { background-color: var(--bg-panel-hover) !important; border-color: var(--primary) !important; color: var(--primary) !important; }
+        html.dark #menu-placeholder .nav-item.active { background: var(--primary-gradient) !important; color: white !important; border-color: transparent !important; box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4) !important; }
+        html.dark #menu-placeholder div[style*="background-color"] { background-color: var(--bg-body) !important; border-color: var(--border-panel) !important; }
+        html.dark #menu-placeholder [class*="border-"] { border-color: var(--border-panel) !important; }
+        html.dark #menu-placeholder .text-gray-800, html.dark #menu-placeholder h1 { color: var(--text-heading) !important; }
+        html.dark #menu-placeholder .text-gray-500, html.dark #menu-placeholder .text-gray-400 { color: var(--text-sub) !important; }
+        html.dark #menu-placeholder .nav-item { color: var(--text-sub) !important; transition: 0.3s; }
+        html.dark #menu-placeholder .nav-item:hover { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
+
+        /* --- LAYOUT CHÍNH --- */
+        .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 60px; background: var(--bg-panel); z-index: 100; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border-panel); }
+        #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 998; }
 
         .main-content {
             margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); height: 100%;
-            background: var(--glass-bg); backdrop-filter: blur(var(--blur)); border-left: 1px solid var(--glass-border);
+            background: var(--bg-glass); backdrop-filter: blur(var(--blur)); border-left: 1px solid var(--border-panel);
             padding: 30px 40px; overflow-y: auto; position: relative;
         }
 
@@ -52,15 +91,16 @@
         .class-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; margin-top: 30px; }
         
         .class-card {
-            background: rgba(255, 255, 255, 0.9); border-radius: 24px; padding: 24px;
-            border: 1px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            background: var(--bg-panel); border-radius: 24px; padding: 24px;
+            border: 1px solid var(--border-panel); box-shadow: var(--shadow-card);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; flex-direction: column; position: relative; overflow: hidden;
         }
-        .class-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(255, 143, 80, 0.15); border-color: var(--primary); }
+        .class-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); border-color: var(--primary); background: var(--bg-panel-hover); }
 
-        .class-badge { display: inline-block; padding: 6px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; background: #fff7ed; color: var(--primary); width: fit-content; margin-bottom: 12px; }
-        .class-title { font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px; line-height: 1.4; }
-        .class-teacher { font-size: 0.9rem; color: var(--text-light); display: flex; align-items: center; gap: 6px; margin-bottom: 20px; }
+        .class-badge { display: inline-block; padding: 6px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; background: rgba(255, 143, 80, 0.1); color: var(--primary); width: fit-content; margin-bottom: 12px; }
+        .class-title { font-size: 1.25rem; font-weight: 800; color: var(--text-heading); margin-bottom: 4px; line-height: 1.4; }
+        .class-teacher { font-size: 0.9rem; color: var(--text-sub); display: flex; align-items: center; gap: 6px; margin-bottom: 20px; }
+        html.dark .class-card i.fa-book-open { opacity: 0.05; }
 
         .btn-enter {
             margin-top: auto; background: var(--primary-gradient); color: white; padding: 12px; border-radius: 14px;
@@ -69,45 +109,48 @@
         .btn-enter:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 94, 98, 0.35); }
 
         .btn-add-class {
-            background: white; color: var(--primary); border: 2px solid var(--primary); padding: 10px 20px;
+            background: transparent; color: var(--primary); border: 2px solid var(--primary); padding: 10px 20px;
             border-radius: 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;
         }
         .btn-add-class:hover { background: var(--primary); color: white; }
 
         /* --- MODAL (POPUP) --- */
         .modal-overlay {
-            position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);
+            position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
             display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s;
         }
         .modal-overlay.open { display: flex; opacity: 1; }
         
         .modal-content {
-            background: white; width: 90%; max-width: 480px; padding: 40px; border-radius: 32px;
+            background: var(--bg-panel); width: 90%; max-width: 480px; padding: 40px; border-radius: 32px; border: 1px solid var(--border-panel);
             text-align: center; position: relative; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
         .modal-overlay.open .modal-content { transform: scale(1); }
+        .modal-content h2 { color: var(--text-heading); }
+        .modal-content p { color: var(--text-sub); }
 
         .close-btn {
             position: absolute; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%;
-            background: #f3f4f6; color: #6b7280; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.2s;
+            background: var(--bg-input); color: var(--text-sub); border: 1px solid var(--border-input);
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
         }
-        .close-btn:hover { background: #fee2e2; color: #ef4444; transform: rotate(90deg); }
+        .close-btn:hover { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: transparent; transform: rotate(90deg); }
 
         .code-input {
             width: 100%; padding: 18px; font-size: 1.8rem; text-align: center; letter-spacing: 0.3em;
-            font-weight: 900; color: #2D3436; background: #f8fafc; border: 2px solid #e2e8f0;
+            font-weight: 900; color: var(--text-heading); background: var(--bg-input); border: 2px solid var(--border-input);
             border-radius: 20px; outline: none; transition: all 0.3s; text-transform: uppercase; margin-top: 20px;
         }
-        .code-input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 5px rgba(255, 143, 80, 0.1); transform: scale(1.02); }
+        .code-input:focus { border-color: var(--primary); background: var(--bg-panel); box-shadow: 0 0 0 5px rgba(255, 143, 80, 0.1); transform: scale(1.02); }
 
         .preview-box {
-            margin-top: 20px; padding: 15px; background: #fff7ed; border-radius: 16px; border: 2px dashed #ffedd5;
+            margin-top: 20px; padding: 15px; background: rgba(255, 143, 80, 0.05); border-radius: 16px; border: 2px dashed rgba(255, 143, 80, 0.2);
             display: none; align-items: center; gap: 15px; text-align: left; animation: slideDown 0.3s;
         }
         .preview-box.active { display: flex; }
-        .preview-avatar { width: 45px; height: 45px; border-radius: 12px; object-fit: cover; border: 2px solid white; }
+        .preview-box h4 { color: var(--text-heading); }
+        .preview-avatar { width: 45px; height: 45px; border-radius: 12px; object-fit: cover; border: 2px solid var(--border-panel); }
 
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -143,9 +186,24 @@
             display: flex; justify-content: space-between; align-items: center; 
             margin-bottom: 30px; position: relative; z-index: 10;
         }
+        
+        /* ĐÃ FIX: Chữ "Xin chào" sáng lên ở Dark Mode */
         .welcome-text h2 { 
-            font-size: 2rem; font-weight: 800; color: #2D3436; margin-bottom: 4px;
+            font-size: 2rem; font-weight: 800; 
+            color: var(--text-heading); /* Thay mã màu đen cứng bằng biến tự động */
+            margin-bottom: 4px;
         }
+        
+        /* ĐÃ FIX: Lời chúc phụ sáng mờ tinh tế */
+        .welcome-text p {
+            color: var(--text-sub) !important;
+        }
+
+        /* ĐÃ FIX: Chữ "DANH SÁCH LỚP" thoát khỏi class text-gray-700 của Tailwind */
+        html.dark .text-gray-700 {
+            color: var(--text-heading) !important;
+        }
+
         .user-avatar { 
             width: 50px; height: 50px; 
             background: linear-gradient(135deg, #FF8F50, #FF5E62); 
@@ -155,12 +213,19 @@
             box-shadow: 0 8px 20px rgba(255, 143, 80, 0.25); 
             transform: rotate(-5deg); transition: 0.3s; cursor: pointer; 
             overflow: hidden;
+            border: 2px solid var(--border-panel); /* Thêm viền avatar cho đẹp */
         }
         .user-avatar:hover { transform: rotate(0deg) scale(1.05); }
         .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 
     <div class="background-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
 
@@ -296,16 +361,22 @@
             if (user) {
                 currentUser = user;
 
-                // --- 1. HIỂN THỊ TÊN & AVATAR (MỚI THÊM) ---
                 const name = user.displayName || user.email.split('@')[0];
                 document.getElementById('welcome-name').textContent = `Xin chào, ${name}`;
 
-                // Lấy thông tin chi tiết từ Firestore để có Avatar chuẩn nhất
                 const userDoc = await getDoc(doc(db, "users", user.uid));
-                let avatarHTML = name.charAt(0).toUpperCase(); // Mặc định là chữ cái đầu
+                let avatarHTML = name.charAt(0).toUpperCase(); 
 
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
+                    
+                    // --- THÊM 6 DÒNG ĐỒNG BỘ DARK MODE ---
+                    if (userData.theme) {
+                        localStorage.setItem('theme', userData.theme);
+                        if (userData.theme === 'dark') document.documentElement.classList.add('dark');
+                        else document.documentElement.classList.remove('dark');
+                    }
+
                     // Ưu tiên Avatar tùy chỉnh > Avatar Google > Chữ cái
                     if (userData.customAvatar) {
                         avatarHTML = `<img src="${userData.customAvatar}" alt="User">`;

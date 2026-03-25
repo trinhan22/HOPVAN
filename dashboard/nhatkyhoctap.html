@@ -15,24 +15,59 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <style>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+
+<style>
         :root {
             --primary: #FF8F50;
             --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
-            --text-main: #2D3436;
-            --text-light: #636E72;
-            --glass-bg: rgba(255, 255, 255, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.8);
-            --blur: 25px;
-            --sidebar-width: 260px;
-            --color-reading: #3b82f6; /* Xanh dương */
-            --color-nlxh: #10b981;    /* Xanh lá */
-            --color-nlvh: #f59e0b;    /* Vàng cam */
-            --color-lang: #8b5cf6;    /* Tím */
+            --sidebar-width: 280px;
+
+            /* MÀU ĐẶC TRƯNG MÔN HỌC */
+            --color-reading: #3b82f6; 
+            --color-nlxh: #10b981;    
+            --color-nlvh: #f59e0b;    
+            --color-lang: #8b5cf6;    
+
+            /* BỘ MÀU SÁNG (MẶC ĐỊNH) */
+            --bg-body: #FFF5EC;
+            --bg-glass: rgba(255, 255, 255, 0.4);
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --bg-card-hover: white;
+            --bg-map-node: white;
+            --bg-map-active: #fffaf6;
+            --bg-map-completed: #f0fdf4;
+            --border-ui: white;
+            --border-map: #f1f5f9;
+            --text-heading: #2D3436;
+            --text-body: #444;
+            --text-muted: #94A3B8;
+            --shadow-card: 0 10px 30px rgba(0,0,0,0.02);
+            --shadow-hover: 0 20px 40px rgba(255, 143, 80, 0.15);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.3s ease; }
-        body { background-color: #FFF5EC; height: 100vh; overflow: hidden; display: flex; }
+        /* BỘ MÀU TỐI (DARK MODE) */
+        html.dark {
+            --bg-body: #0f172a;       /* slate-900 */
+            --bg-glass: rgba(15, 23, 42, 0.6);
+            --bg-card: rgba(30, 41, 59, 0.85); /* slate-800 */
+            --bg-card-hover: #1e293b;
+            --bg-map-node: #1e293b;
+            --bg-map-active: #2d3748;
+            --bg-map-completed: rgba(34, 197, 94, 0.1);
+            --border-ui: #334155;    /* slate-700 */
+            --border-map: #334155;
+            --text-heading: #f8fafc; /* slate-50 */
+            --text-body: #cbd5e1;    /* slate-300 */
+            --text-muted: #64748b;   /* slate-500 */
+            --shadow-card: 0 10px 30px rgba(0,0,0,0.3);
+            --shadow-hover: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease; }
+        body { background-color: var(--bg-body); height: 100vh; overflow: hidden; display: flex; color: var(--text-body); }
 
         /* --- BACKGROUND --- */
         .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
@@ -40,6 +75,7 @@
         .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
         .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
         .blob-3 { width: 300px; height: 300px; background: #FFD1D1; top: 40%; left: 40%; animation-delay: -2s; }
+        html.dark .blob { opacity: 0.15; }
         @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
 
         /* --- SCROLLBAR --- */
@@ -49,119 +85,137 @@
         ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
         ::-webkit-scrollbar-button { display: none; }
 
+        /* --- ĐỒNG BỘ DARK MODE CHO MENU.JS --- */
+        #menu-placeholder { width: var(--sidebar-width); flex-shrink: 0; transition: 0.3s; position: relative; z-index: 1000; }
+        
+        html.dark #menu-placeholder aside, 
+        html.dark #menu-placeholder .sidebar { background-color: var(--bg-card) !important; border-color: var(--border-ui) !important; }
+        
+        html.dark #menu-placeholder aside > div,
+        html.dark #menu-placeholder .sidebar > div { background-color: transparent !important; border-color: var(--border-ui) !important; }
+
+        html.dark #menu-placeholder button { background-color: var(--bg-body) !important; border: 1px solid var(--border-ui) !important; color: var(--text-muted) !important; box-shadow: none !important; }
+        html.dark #menu-placeholder button:hover { background-color: var(--bg-card-hover) !important; border-color: var(--primary) !important; color: var(--primary) !important; }
+
+        html.dark #menu-placeholder .nav-item.active { background: var(--primary-gradient) !important; color: white !important; border-color: transparent !important; box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4) !important; }
+        
+        html.dark #menu-placeholder div[style*="background-color"] { background-color: var(--bg-body) !important; border-color: var(--border-ui) !important; }
+        
+        html.dark #menu-placeholder [class*="border-"] { border-color: var(--border-ui) !important; }
+        html.dark #menu-placeholder .text-gray-800, html.dark #menu-placeholder h1 { color: var(--text-heading) !important; }
+        html.dark #menu-placeholder .text-gray-500, html.dark #menu-placeholder .text-gray-400 { color: var(--text-muted) !important; }
+        
+        html.dark #menu-placeholder .nav-item { color: var(--text-muted) !important; transition: 0.3s; }
+        html.dark #menu-placeholder .nav-item:hover { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
+
         /* --- LAYOUT --- */
-        .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 60px; background: white; z-index: 100; align-items: center; padding: 0 20px; border-bottom: 1px solid #eee; }
-        #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); z-index: 998; }
-        #menu-placeholder { width: var(--sidebar-width); flex-shrink: 0; transition: 0.3s; }
+        .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 60px; background: var(--bg-card); z-index: 100; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border-ui); }
+        #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 998; }
 
         .main-content {
             flex-grow: 1; width: calc(100% - var(--sidebar-width)); height: 100%;
-            background: var(--glass-bg); backdrop-filter: blur(var(--blur));
-            border-left: 1px solid var(--glass-border);
+            background: var(--bg-glass); backdrop-filter: blur(var(--blur));
+            border-left: 1px solid var(--border-ui);
             padding: 30px 40px; overflow-y: auto; position: relative;
         }
 
+        /* --- HEADER & STATS --- */
         .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-        .welcome-text h2 { font-size: 2.2rem; font-weight: 800; color: var(--text-main); }
-        .user-avatar { width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.3rem; box-shadow: 0 10px 25px rgba(255, 143, 80, 0.3); transform: rotate(-5deg); transition: 0.3s; cursor: pointer; }
+        .welcome-text h2 { font-size: 2.2rem; font-weight: 800; color: var(--text-heading); }
+        .user-avatar { width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.3rem; box-shadow: 0 10px 25px rgba(255, 143, 80, 0.3); transform: rotate(-5deg); transition: 0.3s; cursor: pointer; border: 2px solid var(--border-ui);}
         .user-avatar:hover { transform: rotate(0deg) scale(1.1); }
 
-        /* Stats Grid */
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
         .stat-card {
-            background: rgba(255, 255, 255, 0.85); padding: 25px; border-radius: 28px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.02); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid rgba(255, 255, 255, 1); display: flex; flex-direction: column; justify-content: space-between;
+            background: var(--bg-card); padding: 25px; border-radius: 28px;
+            box-shadow: var(--shadow-card); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid var(--border-ui); display: flex; flex-direction: column; justify-content: space-between;
             position: relative; overflow: hidden; z-index: 1;
         }
         .stat-card:hover { 
             transform: translateY(-8px) scale(1.02); 
-            background: white;
-            box-shadow: 0 20px 40px rgba(255, 143, 80, 0.15); 
-            border-color: var(--primary); 
-            z-index: 10;
+            background: var(--bg-card-hover);
+            box-shadow: var(--shadow-hover); border-color: var(--primary); z-index: 10;
         }
-        .stat-card h3 { font-size: 0.95rem; color: var(--text-light); margin-bottom: 5px; display: flex; gap: 8px; align-items: center; position: relative; z-index: 2; }
-        .stat-card .value { font-size: 2.5rem; font-weight: 900; color: var(--text-main); line-height: 1; position: relative; z-index: 2; }
+        .stat-card h3 { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 5px; display: flex; gap: 8px; align-items: center; position: relative; z-index: 2; }
+        .stat-card .value { font-size: 2.5rem; font-weight: 900; color: var(--text-heading); line-height: 1; position: relative; z-index: 2; }
         .stat-card .unit { font-size: 0.85rem; color: var(--primary); font-weight: 700; margin-top: 8px; position: relative; z-index: 2; }
 
-        .stat-watermark {
-            position: absolute; right: -15px; bottom: -20px; font-size: 6rem;
-            opacity: 0.05; transform: rotate(-15deg); transition: all 0.5s ease; z-index: 0;
-        }
+        .stat-watermark { position: absolute; right: -15px; bottom: -20px; font-size: 6rem; opacity: 0.05; transform: rotate(-15deg); transition: all 0.5s ease; z-index: 0; }
+        html.dark .stat-watermark { opacity: 0.02; }
         .stat-card:hover .stat-watermark { transform: rotate(0deg) scale(1.2) translate(-5px, -5px); opacity: 0.1; }
 
-        .section-title { font-size: 1.5rem; font-weight: 900; color: var(--text-main); margin-bottom: 25px; display: flex; align-items: center; gap: 12px; }
+        .section-title { font-size: 1.5rem; font-weight: 900; color: var(--text-heading); margin-bottom: 25px; display: flex; align-items: center; gap: 12px; }
 
-        /* SKILL TREE CARDS (CHECKLIST STYLE) */
+        /* --- SKILL TREE CARDS --- */
         .skill-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 50px; }
         .skill-card {
-            background: rgba(255, 255, 255, 0.9); border-radius: 28px; padding: 25px 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid white;
+            background: var(--bg-card); border-radius: 28px; padding: 25px 20px;
+            box-shadow: var(--shadow-card); border: 1px solid var(--border-ui);
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow: hidden; cursor: pointer; z-index: 1;
         }
-        .skill-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(255, 143, 80, 0.15); border-color: #FF8F50; }
+        .skill-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); border-color: var(--primary); background: var(--bg-card-hover); }
         .skill-icon { 
             width: 65px; height: 65px; border-radius: 20px; position: relative; z-index: 2;
             display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 20px;
             box-shadow: 0 8px 16px rgba(0,0,0,0.05); transition: transform 0.3s;
         }
+        html.dark .skill-icon { box-shadow: 0 8px 16px rgba(0,0,0,0.3); }
 
-        .skill-bg-icon {
-            position: absolute; right: -20px; top: 10px; font-size: 8rem; opacity: 0.05;
-            transform: rotate(0deg); transition: 0.5s; z-index: 0;
-        }
+        .skill-bg-icon { position: absolute; right: -20px; top: 10px; font-size: 8rem; opacity: 0.05; transform: rotate(0deg); transition: 0.5s; z-index: 0; }
+        html.dark .skill-bg-icon { opacity: 0.02; }
         .skill-card:hover .skill-bg-icon { transform: rotate(-10deg) scale(1.1) translate(-5px, -5px); opacity: 0.1; }
         .skill-card:hover .skill-icon { transform: scale(1.1) rotate(-5deg); }
 
         /* Style màu riêng cho từng môn */
         .skill-reading:hover { border-color: var(--color-reading); box-shadow: 0 15px 40px rgba(59, 130, 246, 0.2); transform: translateY(-5px); }
-        .skill-reading .skill-icon { color: var(--color-reading); background: #eff6ff; }
+        .skill-reading .skill-icon { color: var(--color-reading); background: rgba(59, 130, 246, 0.1); }
         .skill-reading .skill-progress-bar { background: linear-gradient(90deg, #60a5fa, var(--color-reading)); }
         
         .skill-nlxh:hover { border-color: var(--color-nlxh); box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2); transform: translateY(-5px); }
-        .skill-nlxh .skill-icon { color: var(--color-nlxh); background: #ecfdf5; }
+        .skill-nlxh .skill-icon { color: var(--color-nlxh); background: rgba(16, 185, 129, 0.1); }
         .skill-nlxh .skill-progress-bar { background: linear-gradient(90deg, #34d399, var(--color-nlxh)); }
 
         .skill-nlvh:hover { border-color: var(--color-nlvh); box-shadow: 0 15px 40px rgba(245, 158, 11, 0.2); transform: translateY(-5px); }
-        .skill-nlvh .skill-icon { color: var(--color-nlvh); background: #fffbeb; }
+        .skill-nlvh .skill-icon { color: var(--color-nlvh); background: rgba(245, 158, 11, 0.1); }
         .skill-nlvh .skill-progress-bar { background: linear-gradient(90deg, #fbbf24, var(--color-nlvh)); }
 
         .skill-lang:hover { border-color: var(--color-lang); box-shadow: 0 15px 40px rgba(139, 92, 246, 0.2); transform: translateY(-5px); }
-        .skill-lang .skill-icon { color: var(--color-lang); background: #f5f3ff; }
+        .skill-lang .skill-icon { color: var(--color-lang); background: rgba(139, 92, 246, 0.1); }
         .skill-lang .skill-progress-bar { background: linear-gradient(90deg, #a78bfa, var(--color-lang)); }
 
-        .skill-title { font-size: 1.15rem; font-weight: 800; color: #2d3436; margin-bottom: 5px; position: relative; z-index: 2; }
-        .skill-info { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 800; color: #94a3b8; margin-bottom: 12px; position: relative; z-index: 2; }
-        .skill-progress-bg { height: 10px; background: #f1f5f9; border-radius: 10px; overflow: hidden; margin-bottom: 15px; position: relative; z-index: 2; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+        .skill-title { font-size: 1.15rem; font-weight: 800; color: var(--text-heading); margin-bottom: 5px; position: relative; z-index: 2; }
+        .skill-info { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 800; color: var(--text-muted); margin-bottom: 12px; position: relative; z-index: 2; }
+        .skill-progress-bg { height: 10px; background: var(--bg-body); border-radius: 10px; overflow: hidden; margin-bottom: 15px; position: relative; z-index: 2; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
         .skill-progress-bar { height: 100%; width: 0%; border-radius: 10px; transition: width 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        
         .skill-list { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; position: relative; z-index: 2; }
-        .skill-card.active .skill-list { max-height: 600px; transition: max-height 0.5s ease-in; border-top: 1px dashed #e2e8f0; margin-top: 15px; padding-top: 15px; }
+        .skill-card.active .skill-list { max-height: 600px; transition: max-height 0.5s ease-in; border-top: 1px dashed var(--border-ui); margin-top: 15px; padding-top: 15px; }
         .skill-item { 
             display: flex; align-items: center; gap: 12px; padding: 12px 10px; 
-            font-size: 0.9rem; font-weight: 600; color: #94a3b8; border-radius: 12px; transition: 0.2s;
+            font-size: 0.9rem; font-weight: 600; color: var(--text-muted); border-radius: 12px; transition: 0.2s;
         }
-        .skill-item:hover { background: #f8fafc; color: #475569; }
-        .skill-item.completed { color: #334155; font-weight: 800; }
+        .skill-item:hover { background: var(--bg-body); color: var(--text-heading); }
+        .skill-item.completed { color: var(--text-heading); font-weight: 800; }
         .skill-item.completed i { color: #22c55e; filter: drop-shadow(0 2px 4px rgba(34, 197, 94, 0.3)); font-size: 1rem; }
-        .skill-item i { font-size: 0.8rem; color: #cbd5e1; width: 16px; transition: 0.3s; }
-        .toggle-icon { position: absolute; top: 30px; right: 25px; color: #cbd5e1; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 2; font-size: 1.2rem; }
+        .skill-item i { font-size: 0.8rem; color: var(--border-ui); width: 16px; transition: 0.3s; }
+        .toggle-icon { position: absolute; top: 30px; right: 25px; color: var(--text-muted); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 2; font-size: 1.2rem; }
         .skill-card.active .toggle-icon { transform: rotate(180deg); color: var(--primary); }
 
-        
-
-        /* --- HORIZONTAL MAP (SÁNG VÀ NEON HƠN) --- */
+        /* --- HORIZONTAL MAP --- */
         .map-container {
-            background: rgba(255,255,255,0.8); border-radius: 40px; padding: 40px 0;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.03); position: relative; overflow: hidden; border: 1px solid white;
+            background: var(--bg-card); border-radius: 40px; padding: 40px 0;
+            box-shadow: var(--shadow-card); position: relative; overflow: hidden; border: 1px solid var(--border-ui);
         }
         .map-scroll-area {
             display: flex; align-items: center; gap: 40px; padding: 20px 50px;
             overflow-x: auto; scroll-behavior: smooth; position: relative; z-index: 10;
         }
+        .map-scroll-area::-webkit-scrollbar { display: none; }
+
         .map-line {
-            position: absolute; top: 50%; left: 0; right: 0; height: 12px; background: #f1f5f9; 
-            transform: translateY(-50%); z-index: 1; border-radius: 10px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            position: absolute; top: 50%; left: 0; right: 0; height: 12px; background: var(--border-map); 
+            transform: translateY(-50%); z-index: 1; border-radius: 10px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
         .map-line-progress {
             position: absolute; top: 50%; left: 0; height: 12px; 
@@ -169,29 +223,31 @@
             transform: translateY(-50%); z-index: 1; border-radius: 10px; width: 0%; transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 0 0 15px rgba(255, 94, 98, 0.5);
         }
+        
         .map-node {
-            flex-shrink: 0; width: 150px; height: 170px; background: white; border-radius: 28px;
-            border: 4px solid #f1f5f9; position: relative; z-index: 2;
+            flex-shrink: 0; width: 150px; height: 170px; background: var(--bg-map-node); border-radius: 28px;
+            border: 4px solid var(--border-map); position: relative; z-index: 2;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
-        .map-node:hover { transform: translateY(-15px) scale(1.05); }
+        .map-node:hover { transform: translateY(-15px) scale(1.05); border-color: var(--primary); }
         
         .map-node.active { 
             border-color: #FF8F50; 
             box-shadow: 0 20px 40px rgba(255, 143, 80, 0.3), inset 0 0 20px rgba(255, 143, 80, 0.1); 
             animation: nodePulse 2s infinite; 
-            background: #fffaf6;
+            background: var(--bg-map-active);
         }
-        .map-node.completed { border-color: #22c55e; background: #f0fdf4; }
+        .map-node.completed { border-color: #22c55e; background: var(--bg-map-completed); }
         
-        .node-icon { font-size: 3rem; margin-bottom: 12px; color: #cbd5e1; transition: 0.3s; }
-        .map-node:hover .node-icon { transform: scale(1.1); }
+        .node-icon { font-size: 3rem; margin-bottom: 12px; color: var(--text-muted); transition: 0.3s; }
+        .map-node:hover .node-icon { transform: scale(1.1); color: var(--primary);}
         .map-node.active .node-icon { color: #FF8F50; filter: drop-shadow(0 5px 10px rgba(255, 143, 80, 0.4)); }
         .map-node.completed .node-icon { color: #22c55e; }
         
-        .node-title { font-size: 0.85rem; font-weight: 800; color: #64748b; text-align: center; padding: 0 10px; line-height: 1.4; }
+        .node-title { font-size: 0.85rem; font-weight: 800; color: var(--text-muted); text-align: center; padding: 0 10px; line-height: 1.4; }
         .map-node.active .node-title { color: #ea580c; }
+        .map-node.completed .node-title { color: var(--text-heading); }
         
         @keyframes nodePulse { 
             0% { box-shadow: 0 0 0 0 rgba(255, 143, 80, 0.4), 0 20px 40px rgba(255, 143, 80, 0.3); } 
@@ -199,64 +255,57 @@
             100% { box-shadow: 0 0 0 0 rgba(255, 143, 80, 0), 0 20px 40px rgba(255, 143, 80, 0.3); } 
         }
 
-        /* MODALS */
+        /* --- MODALS --- */
         .hv-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 9999; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
         .hv-modal.show { display: flex; opacity: 1; }
-        .hv-modal-box { background: white; padding: 40px; border-radius: 32px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.25); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .hv-modal-box { background: var(--bg-card); padding: 40px; border-radius: 32px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.5); border: 1px solid var(--border-ui); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .hv-modal.show .hv-modal-box { transform: scale(1); }
+        
+        .hv-modal-box h3 { color: var(--text-heading); }
+        .hv-modal-box p { color: var(--text-muted); }
+
         .hv-btn { width: 100%; padding: 15px; border-radius: 16px; font-weight: 800; font-size: 1rem; border: none; margin-top: 15px; cursor: pointer; transition: 0.2s; }
         .hv-btn-primary { background: var(--primary-gradient); color: white; box-shadow: 0 10px 20px rgba(255, 94, 98, 0.3); }
         .hv-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 15px 25px rgba(255, 94, 98, 0.4); }
-        .hv-btn-gray { background: #f1f5f9; color: #64748b; }
-        .hv-btn-gray:hover { background: #e2e8f0; color: #334155; }
+        .hv-btn-gray { background: var(--bg-body); color: var(--text-muted); border: 1px solid var(--border-ui); }
+        .hv-btn-gray:hover { background: var(--bg-card-hover); color: var(--text-heading); }
 
-        /* --- MOBILE RESPONSIVE (NHẬT KÝ HỌC TẬP - ĐÃ SỬA STATS THÀNH 2 CỘT) --- */
+        /* --- MOBILE RESPONSIVE --- */
         @media (max-width: 768px) {
-            .mobile-header { display: flex; }
-            #sidebar-overlay.active { display: block; }
-            #menu-placeholder { width: 0; }
+            .mobile-header { display: flex; z-index: 1000; }
+            #sidebar-overlay.active { display: block; opacity: 1; }
+            
+            #menu-placeholder { width: 0; position: absolute; }
+            #menu-placeholder aside {
+                position: fixed !important; left: 0 !important; top: 0 !important; bottom: 0 !important;
+                transform: translateX(-100%); z-index: 9999 !important; width: 280px !important; 
+                transition: transform 0.3s ease-in-out !important;
+            }
+            #menu-placeholder aside.open { transform: translateX(0) !important; box-shadow: 10px 0 50px rgba(0,0,0,0.5) !important; }
+
             .main-content { margin-left: 0; width: 100%; padding: 80px 20px 40px; }
             
-            aside { 
-                position: fixed !important; transform: translateX(-100%); 
-                z-index: 10002; width: 280px !important; 
-            }
-            aside.open { transform: translateX(0) !important; }
-
-            /* --- PHẦN SỬA ĐỔI: STATS GRID THÀNH 2 CỘT (GIỐNG DASHBOARD) --- */
             .stats-grid { 
-                display: grid !important; /* Dùng Grid */
-                grid-template-columns: repeat(2, 1fr); /* Chia 2 cột đều */
-                gap: 15px; 
-                margin-bottom: 30px;
-                overflow-x: visible; /* Tắt cuộn ngang */
-                padding-bottom: 0;
-                margin-right: 0;
+                display: grid !important; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px;
+                overflow-x: visible; padding-bottom: 0; margin-right: 0;
             }
-            
-            /* Tắt thanh cuộn (dư thừa nhưng cứ để cho chắc) */
             .stats-grid::-webkit-scrollbar { display: none; }
-            
-            .stat-card {
-                min-width: 0; /* Bỏ chiều rộng cố định để co giãn theo cột */
-                width: auto; 
-                padding: 15px; /* Thu nhỏ padding xíu cho gọn */
-            }
-
-            /* Chỉnh lại cỡ chữ cho vừa vặn trong ô nhỏ */
+            .stat-card { min-width: 0; width: auto; padding: 15px; }
             .stat-card .value { font-size: 1.6rem; } 
             .stat-card h3 { font-size: 0.75rem; }
-            /* ------------------------------------------------------------- */
 
-            /* Các phần khác giữ nguyên của Nhật Ký */
             .skill-grid { grid-template-columns: 1fr; }
             .map-node { width: 120px; height: 140px; }
         }
-
-        
     </style>
 </head>
 <body>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 
     <div class="background-blobs">
         <div class="blob blob-1"></div>
@@ -461,10 +510,18 @@
             document.getElementById('welcome-name').innerText = `Xin chào, ${name}`;
             const avatarEl = document.getElementById('avatar-initial');
 
-            // 1. Đồng bộ thông tin Keys & Avatar ngay lập tức
+            // 1. Đồng bộ thông tin Keys, Avatar và THEME ngay lập tức
             onSnapshot(doc(db, "users", user.uid), (userSnap) => {
                 if (userSnap.exists()) {
                     const d = userSnap.data();
+                    
+                    // --- ĐỒNG BỘ DARK MODE TỪ FIREBASE ---
+                    if (d.theme) {
+                        localStorage.setItem('theme', d.theme);
+                        if (d.theme === 'dark') document.documentElement.classList.add('dark');
+                        else document.documentElement.classList.remove('dark');
+                    }
+                    
                     userKeys = d.keys || 0;
                     document.getElementById('keys-val').innerText = userKeys;
                     document.getElementById('streak-val').innerText = d.streak || 0;
@@ -494,7 +551,6 @@
             onSnapshot(doc(db, "users_progress", user.uid), (progSnap) => {
                 if (progSnap.exists()) {
                     const d = progSnap.data();
-                    // ĐÃ FIX LỖI: Ép kiểu dữ liệu về Số (Number) để hàm click nhận diện đúng
                     currentLevel = Number(d.currentLevel) || 1; 
                     paidLevel = Number(d.paidLevel) || 0;
                 } else {
@@ -502,8 +558,6 @@
                     currentLevel = 1;
                     paidLevel = 0;
                 }
-                
-                // Mỗi khi có thay đổi level (vừa thi xong), nó tự vẽ lại Map mà không cần reload
                 renderMap(); 
             });
 
