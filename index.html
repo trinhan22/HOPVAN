@@ -245,17 +245,92 @@
         .cta-btn-white { background: white; color: var(--primary); padding: 18px 45px; border-radius: 50px; font-weight: 800; font-size: 1.1rem; text-decoration: none; display: inline-block; margin-top: 30px; position: relative; z-index: 2; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
         .cta-btn-white:hover { transform: scale(1.05); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
 
-        /* --- FOOTER --- */
-        footer { background: rgba(255,255,255,0.8); border-top: 1px solid rgba(255,255,255,0.5); padding: 80px 0 30px; margin-top: 80px; }
-        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px; margin-bottom: 40px; }
-        .footer-brand span { font-size: 1.8rem; font-weight: 900; background: linear-gradient(45deg, var(--primary), #FF5E62); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .footer-brand p { margin-top: 20px; color: var(--text-light); line-height: 1.7; max-width: 350px; font-size: 1rem; }
-        .footer-col h4 { font-size: 1.2rem; margin-bottom: 25px; color: var(--text-main); font-weight: 800; }
+        footer {
+            background: #ffffff;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding: 80px 0 40px;
+            margin-top: 60px;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .footer-brand p { margin: 20px 0; color: #636E72; line-height: 1.8; font-size: 0.95rem; max-width: 320px; }
+        .footer-col h4 {
+            font-size: 0.85rem; font-weight: 800; text-transform: uppercase; margin-bottom: 30px;
+            color: #2D3436; letter-spacing: 1.5px; position: relative;
+        }
+        .footer-col h4::after {
+            content: ''; position: absolute; bottom: -10px; left: 0;
+            width: 30px; height: 2px; background: var(--primary); border-radius: 2px;
+        }
+
         .footer-col ul { list-style: none; }
         .footer-col li { margin-bottom: 15px; }
-        .footer-col a { text-decoration: none; color: var(--text-light); transition: 0.3s; font-size: 1rem; }
+        .footer-col a { text-decoration: none; color: #636E72; font-size: 0.95rem; transition: 0.3s; font-weight: 500; }
         .footer-col a:hover { color: var(--primary); padding-left: 5px; }
-        .footer-bottom { text-align: center; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 30px; font-size: 0.95rem; color: #888; }
+
+        /* Social Icons */
+        .social-links { display: flex; gap: 12px; margin-top: 25px; }
+        .social-item {
+            width: 40px; height: 40px; background: #f8fafc; color: #64748b; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; transition: 0.3s;
+            text-decoration: none; border: 1px solid #f1f5f9;
+        }
+        .social-item:hover { background: var(--primary); color: white; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 143, 80, 0.2); }
+
+        /* NÚT DOWNLOAD: CHỮ TRẮNG & HOVER CHỈ TRANSLATE Y */
+        .download-container { display: flex; flex-direction: column; gap: 12px; }
+        .btn-app {
+            display: flex; align-items: center; gap: 12px;
+            background: #1e293b; /* Nền xanh đen slate */
+            padding: 12px 22px; border-radius: 16px;
+            text-decoration: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255,255,255,0.1);
+            width: fit-content; min-width: 190px;
+        }
+        
+        .btn-app:hover {
+            background: #0f172a;
+            transform: translateY(-8px); /* Cả card bay lên */
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Chữ và Icon bên trong chỉ bay lên theo card, không lệch trái */
+        .btn-app i { font-size: 1.7rem; color: #ffffff; transition: 0.4s; }
+        .btn-app:hover i { transform: translateY(-2px); }
+
+        .btn-app .app-text { text-align: left; line-height: 1.3; transition: 0.4s; }
+        .btn-app:hover .app-text { transform: translateY(-2px); }
+        
+        .btn-app .app-sub { font-size: 0.65rem; color: rgba(255,255,255,0.75); display: block; font-weight: 500; }
+        .btn-app .app-title { font-size: 1rem; color: #ffffff; font-weight: 800; display: block; }
+
+        /* TOAST THÔNG BÁO */
+        #toast-app {
+            position: fixed; bottom: 30px; right: 30px;
+            background: #2D3436; color: white; padding: 16px 25px;
+            border-radius: 16px; border-left: 5px solid var(--primary);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            z-index: 10001; display: flex; align-items: center; gap: 15px;
+            transform: translateX(120%); transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            opacity: 0; pointer-events: none;
+        }
+        #toast-app.show { transform: translateX(0); opacity: 1; }
+
+        @media (max-width: 768px) {
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
+            .footer-brand, .footer-col { display: flex; flex-direction: column; align-items: center; }
+            .footer-col h4::after { left: 50%; transform: translateX(-50%); }
+            .btn-app { margin: 0 auto; }
+            #toast-app { left: 20px; right: 20px; bottom: 20px; transform: translateY(150%); }
+            #toast-app.show { transform: translateY(0); }
+        }
 
         /* --- PWA INSTALL BANNER --- */
         .install-banner {
@@ -569,15 +644,16 @@
                     <span>HOPVAN</span>
                 </a>
                 <p>Nền tảng học tập Ngữ Văn tích hợp AI tiên phong. Đồng hành cùng bạn trên con đường chinh phục tri thức.</p>
-                <div style="margin-top: 25px; display: flex; gap: 20px;">
-                    <a href="https://www.facebook.com/hopvanapp" style="color: var(--primary); font-size: 1.4rem;"><i class="fab fa-facebook"></i></a>
-                    <a href="https://www.facebook.com/hopvanapp" style="color: var(--primary); font-size: 1.4rem;"><i class="fab fa-tiktok"></i></a>
-                    <a href="https://www.facebook.com/hopvanapp" style="color: var(--primary); font-size: 1.4rem;"><i class="fab fa-youtube"></i></a>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/hopvanapp" class="social-item"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.facebook.com/hopvanapp" class="social-item"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://www.facebook.com/hopvanapp" class="social-item"><i class="fab fa-youtube"></i></a>
+                    <a href="https://discord.com/invite/EhsQyEAk2k" class="social-item"><i class="fab fa-discord"></i></a>
                 </div>
             </div>
             
             <div class="footer-col">
-                <h4>Liên kết nhanh</h4>
+                <h4>Khám phá</h4>
                 <ul>
                     <li><a href="dashboard/bantinvanhoc.html">Bản tin Văn học</a></li>
                     <li><a href="dashboard/nhatkyhoctap.html">Nhật ký học tập</a></li>
@@ -590,16 +666,52 @@
                 <h4>Hỗ trợ</h4>
                 <ul>
                     <li><a href="huongdansudung.html">Câu hỏi thường gặp</a></li>
-                    <li><a href="huongdansudung.html">Điều khoản sử dụng</a></li>
+                    <li><a href="huongdansudung.html">Điều khoản dịch vụ</a></li>
                     <li><a href="huongdansudung.html">Chính sách bảo mật</a></li>
-                    <li><a href="huongdansudung.html">Liên hệ</a></li>
+                    <li><a href="huongdansudung.html">Liên hệ HopTeam</a></li>
                 </ul>
             </div>
+
+            <div class="footer-col">
+                <h4>Tải ứng dụng</h4>
+                <div class="download-container">
+                    <a href="hopvan.apk" download="HopVan.apk" class="btn-app">
+                        <i class="fab fa-android" style="color: #3DDC84;"></i>
+                        <div class="app-text">
+                            <span class="app-sub">Tải bản cài đặt</span>
+                            <span class="app-title">APK Android</span>
+                        </div>
+                    </a>
+
+                    <a href="javascript:void(0)" onclick="showToastApp()" class="btn-app">
+                        <i class="fab fa-apple"></i>
+                        <div class="app-text">
+                            <span class="app-sub">Sắp ra mắt trên</span>
+                            <span class="app-title">App Store</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 HopVan. All Rights Reserved By HopTeam.</p>
+
+    <div class="footer-bottom" style="margin-top: 60px; padding-top: 30px; border-top: 1px solid rgba(0,0,0,0.05); width: 100%;">
+        <div class="container" style="text-align: center;">
+            <p style="color: #94a3b8; font-size: 0.9rem; margin: 0;">
+                &copy; 2026 HopVan. All Rights Reserved By HopTeam.
+            </p>
         </div>
+    </div>
     </footer>
+
+    <div id="toast-app">
+        <div style="background: rgba(255, 143, 80, 0.2); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); flex-shrink: 0;">
+            <i class="fas fa-info-circle"></i>
+        </div>
+        <div style="text-align: left;">
+            <div style="font-weight: 800; font-size: 0.9rem;">Thông báo</div>
+            <div style="font-size: 0.8rem; opacity: 0.8;">Bản iOS đang được phát triển, sẽ sớm ra mắt!</div>
+        </div>
+    </div>
 
     <div id="logout-modal" class="logout-modal">
         <div class="logout-box">
@@ -866,6 +978,16 @@
                     navLinks.classList.remove('active');
                 }
             });
+        }
+    </script>
+    
+    <script>
+        function showToastApp() {
+            const toast = document.getElementById('toast-app');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
         }
     </script>
 
