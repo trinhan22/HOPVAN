@@ -150,7 +150,7 @@
             padding: 14px 35px !important;
             font-size: 1rem !important;
         }
-        
+                
 /* CSS cho Video Card (Giữ nguyên) */
         .hero-card-wrapper { position: relative; width: 100%; }
         
@@ -204,7 +204,7 @@
         .floating-badge div div:first-child { font-weight: 700; font-size: 0.8rem !important; }
         .floating-badge div div:last-child { font-size: 0.7rem !important; color: #666; }
 
-        .badge-1 { top: -30px; right: -40px; animation-delay: 0s; }
+        .badge-1 { top: -20px; right: -50px; animation-delay: 0s; }
         .badge-2 { bottom: 20px; left: -50px; animation-delay: 2s; }
         
         @keyframes floatBadge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
@@ -614,6 +614,109 @@
         .contact-icon { width: 50px; height: 50px; border-radius: 14px; background: rgba(255,143,80,0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;}
         .contact-info h4 { font-size: 1rem; color: var(--text-main); margin: 0 0 5px; font-weight: 800;}
         .contact-info p { color: var(--text-light); margin: 0; font-size: 0.9rem;}
+
+        /* =========================================
+           THIẾT KẾ THANH GẠT DARK MODE (PILL TOGGLE)
+           Đã fix lỗi che Icon & Đồng bộ màu sắc
+           ========================================= */
+        .theme-switch {
+            position: relative; display: inline-block;
+            width: 64px; height: 32px; margin: 0;
+        }
+        .theme-switch input { opacity: 0; width: 0; height: 0; }
+        
+        .slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #e2e8f0; 
+            transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 34px; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        /* Cục gạt (Thumb) */
+        .slider:before {
+            position: absolute; content: "";
+            height: 24px; width: 24px; left: 4px; bottom: 4px;
+            background-color: #ffffff; 
+            transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+            z-index: 1; /* Cho cục gạt nằm DƯỚI icon */
+        }
+
+        /* Định dạng 2 Icon để nằm chính giữa cục gạt */
+        .icon-sun, .icon-moon {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            font-size: 13px; 
+            z-index: 2; /* Ép Icon nổi lên TRÊN cục gạt */
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; align-items: center; justify-content: center;
+            width: 24px; height: 24px; pointer-events: none;
+        }
+        
+        /* Màu sắc mặc định (Light Mode) */
+        .icon-sun { left: 4px; color: #f59e0b; } /* Mặt trời vàng rực trên cục gạt trắng */
+        .icon-moon { right: 4px; color: #94a3b8; } /* Mặt trăng xám chìm */
+
+        /* =====================================
+           TRẠNG THÁI BẬT (DARK MODE) 
+           ===================================== */
+        input:checked + .slider { 
+            background-color: #1e293b; /* Nền xanh đen */
+            border: 1px solid rgba(255,255,255,0.05); 
+        }
+        input:checked + .slider:before {
+            transform: translateX(32px); /* Trượt sang phải */
+            background-color: #0f172a; /* Cục gạt đổi sang đen sâu */
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1), 0 2px 5px rgba(0,0,0,0.5);
+        }
+        /* Đổi màu Icon khi sang Dark Mode */
+        input:checked + .slider .icon-sun { color: #64748b; } /* Mặt trời xám tối đi */
+        input:checked + .slider .icon-moon { color: #fbbf24; } /* Mặt trăng vàng rực lên trên cục gạt đen */
+
+        /* =========================================
+           BỘ MÀU DARK MODE ĐỒNG BỘ TOÀN TRANG & FOOTER
+           ========================================= */
+        html.dark {
+            --text-main: #F8FAFC;
+            --text-light: #94A3B8;
+            --glass-bg: rgba(15, 23, 42, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+        html.dark body { background-color: #0B1120; }
+        html.dark .blob { opacity: 0.03; }
+        html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark .rm-title { color: #F8FAFC; }
+        
+        /* Fix màu các Card trên trang chủ */
+        html.dark .main-card, html.dark .floating-badge, html.dark .bento-item, 
+        html.dark .review-card, html.dark .rm-card, html.dark .about-img {
+            background-color: #1E293B; border-color: #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        html.dark .bento-item { background: rgba(30, 41, 59, 0.6); }
+        html.dark .bento-item:hover { background: rgba(30, 41, 59, 0.95); border-color: var(--primary); }
+        html.dark .rm-card:hover { border-color: var(--primary); background-color: #0F172A; }
+        html.dark .bento-icon, html.dark .tick-icon { background-color: #0F172A !important; }
+        html.dark .rm-grade-pill { background-color: rgba(255, 143, 80, 0.1); }
+        html.dark .nav-links { background-color: #1E293B; border-color: #334155; }
+        
+        /* ----- FIX ĐỒNG BỘ FOOTER ----- */
+        html.dark footer { background-color: #0F172A; border-top: 1px solid #1E293B; }
+        html.dark .footer-brand p, html.dark .footer-col a { color: #94A3B8; }
+        html.dark .footer-col h4 { color: #F8FAFC; }
+        html.dark .footer-bottom { border-top-color: #1E293B; color: #64748B; }
+        html.dark .social-item { background-color: #1E293B; border-color: #334155; color: #94A3B8; }
+        html.dark .social-item:hover { background-color: var(--primary); color: white; border-color: transparent; }
+
+        /* ----- FIX ĐỒNG BỘ POPUP HỖ TRỢ ----- */
+        html.dark .sm-box { background: #1E293B; border-color: #334155; }
+        html.dark .sm-header { background: #0F172A; border-bottom-color: #334155; }
+        html.dark .btn-sm-close { background: #0F172A; border-color: #334155; color: #94A3B8; }
+        html.dark .faq-item { background: #0F172A; border-color: #334155; }
+        html.dark .faq-a { background: #1E293B; }
+        html.dark .faq-item.active .faq-a-content { border-top-color: #334155; }
+        html.dark .contact-card { background: #0F172A; border-color: #334155; }
+        html.dark .contact-card:hover { background: #1E293B; border-color: var(--primary); }
     </style>
 </head>
 <body>
@@ -663,6 +766,14 @@
                 <span class="user-name">Chào, <span id="display-name">Bạn</span></span>
                 <button id="logout-btn" class="btn-logout" title="Đăng xuất"><i class="fas fa-sign-out-alt"></i></button>
             </div>
+
+            <label class="theme-switch" for="checkbox-theme" title="Bật/Tắt giao diện tối">
+                <input type="checkbox" id="checkbox-theme" />
+                <div class="slider">
+                    <i class="fas fa-sun icon-sun"></i>
+                    <i class="fas fa-moon icon-moon"></i>
+                </div>
+            </label>
         </div>
     </header>
 
@@ -932,7 +1043,7 @@
             ">
                 <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px;">HopVan Platform</span>
                 <span style="width: 4px; height: 4px; border-radius: 50%; background-color: #22c55e;"></span>
-                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.1.5</span>
+                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.1.6</span>
             </div>
         </div>
     </footer>
@@ -1336,6 +1447,29 @@
                 } else {
                     navLinks.style.display = 'none';
                     navLinks.classList.remove('active');
+                }
+            });
+        }
+
+        const themeCheckbox = document.getElementById('checkbox-theme');
+        const htmlElement = document.documentElement;
+
+        // 1. Kiểm tra trạng thái lưu trong localStorage khi tải trang
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'dark') {
+            htmlElement.classList.add('dark');
+            if (themeCheckbox) themeCheckbox.checked = true;
+        }
+
+        // 2. Xử lý sự kiện khi gạt công tắc
+        if (themeCheckbox) {
+            themeCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    htmlElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    htmlElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
                 }
             });
         }
