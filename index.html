@@ -66,9 +66,20 @@
 
         /* --- HEADER --- */
         header { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 1200px; padding: 12px 30px; border-radius: 100px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; transition: top 0.3s; }
-        .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .logo img { height: 40px; width: auto; }
-        .logo span { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        /* --- ĐÃ FIX: LOGO KHỐI VUÔNG TRẮNG BO GÓC --- */
+        .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; transition: 0.3s; }
+        .logo:hover { opacity: 0.8; }
+        .logo img { 
+            height: 42px; 
+            width: 42px; /* Ép thành hình vuông */
+            object-fit: contain;
+            background-color: #ffffff; /* Khối nền trắng */
+            border-radius: 12px; /* Bo góc mượt mà */
+            padding: 4px; /* Tạo viền trắng xung quanh logo */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Đổ bóng nổi bật */
+        }
+        .logo span { font-size: 1.5rem; font-weight: 900; color: var(--primary); letter-spacing: -0.5px; }
+        html.dark .logo img { background-color: #ffffff; } /* Đảm bảo Dark Mode logo vẫn nền trắng nổi bật */
         
         .nav-links { display: flex; gap: 30px; }
         .nav-links a { text-decoration: none; color: var(--text-main); font-weight: 600; font-size: 0.95rem; transition: 0.3s; }
@@ -727,12 +738,12 @@
         <div class="blob blob-3"></div>
     </div>
 
-    <header class="glass">
+    <header class="glass" style="padding: 10px 30px;">
         <div class="mobile-menu-btn">
             <i class="fas fa-bars"></i>
         </div>
 
-        <a href="#" class="logo">
+        <a href="index.html" class="logo">
             <img src="LOGO.WEBP" alt="Logo"> 
             <span>HOPVAN</span>
         </a>
@@ -754,18 +765,12 @@
             </div>
             <a href="#features">Tính năng</a>
             <a href="#reviews">Đánh giá</a>
-            <a href="khungchuongtrinh.html">Chương trình GDPT 2018</a>
+            <a href="khungchuongtrinh.html">Chương trình GDPT</a>
             <a href="huongdansudung.html">Hướng dẫn sử dụng</a>
             <a href="#about">Về chúng tôi</a>
         </nav>
 
         <div style="display: flex; gap: 15px; align-items: center;">
-            <a id="btn-hoc-ngay" href="log.html" class="btn-primary">Học ngay</a>
-            
-            <div id="user-profile" class="user-profile">
-                <span class="user-name">Chào, <span id="display-name">Bạn</span></span>
-                <button id="logout-btn" class="btn-logout" title="Đăng xuất"><i class="fas fa-sign-out-alt"></i></button>
-            </div>
 
             <label class="theme-switch" for="checkbox-theme" title="Bật/Tắt giao diện tối">
                 <input type="checkbox" id="checkbox-theme" />
@@ -774,6 +779,13 @@
                     <i class="fas fa-moon icon-moon"></i>
                 </div>
             </label>
+
+            <div id="user-profile" class="user-profile">
+                <span class="user-name">Chào, <span id="display-name">Bạn</span></span>
+                <button id="logout-btn" class="btn-logout" title="Đăng xuất"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+
+            <a id="btn-hoc-ngay" href="log.html" class="btn-primary" style="padding: 12px 24px; font-size: 0.95rem;">Học ngay</a>
         </div>
     </header>
 
@@ -972,7 +984,7 @@
     <footer>
         <div class="container footer-grid">
             <div class="footer-brand">
-                <a href="#" class="logo">
+                <a href="" class="logo">
                     <img src="LOGO.WEBP" alt="Logo"> 
                     <span>HOPVAN</span>
                 </a>
@@ -1008,7 +1020,7 @@
             <div class="footer-col">
                 <h4>Tải ứng dụng</h4>
                 <div class="download-container">
-                    <a href="hopvan.apk" download="HopVan.apk" class="btn-app">
+                    <a href="apk.html" class="btn-app">
                         <i class="fab fa-android" style="color: #3DDC84;"></i>
                         <div class="app-text">
                             <span class="app-sub">Tải file cài đặt</span>
@@ -1043,7 +1055,7 @@
             ">
                 <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px;">HopVan Platform</span>
                 <span style="width: 4px; height: 4px; border-radius: 50%; background-color: #22c55e;"></span>
-                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.1.6</span>
+                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.1.7</span>
             </div>
         </div>
     </footer>
@@ -1278,30 +1290,25 @@
             }, 2000);
         }
 
-        // 2. Xử lý nút Cài đặt
+        // 2. Xử lý nút Cài đặt trên Banner
         btnInstall.addEventListener('click', () => {
             if (isIos()) {
-                // --- TRƯỜNG HỢP IOS: Hiện hướng dẫn ---
+                // --- TRƯỜNG HỢP IOS: Hiện hướng dẫn thêm vào màn hình chính ---
                 installBanner.style.display = 'none';
                 iosModal.style.display = 'flex';
             } else if (isAndroid()) {
-                // --- TRƯỜNG HỢP ANDROID: Tải file APK ---
-                const link = document.createElement('a');
-                link.href = 'hopvan.apk'; // Đảm bảo file hopvan.apk nằm ngang hàng file index.html
-                link.download = 'HopVan.apk';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                // Ẩn banner sau khi bấm tải
-                installBanner.style.display = 'none';
+                // --- TRƯỜNG HỢP ANDROID: Chuyển hướng sang trang tải APK chuyên dụng ---
+                window.location.href = 'apk.html';
             } else if (deferredPrompt) {
-                // --- TRƯỜNG HỢP KHÁC (PC/Laptop): Dùng PWA mặc định ---
+                // --- TRƯỜNG HỢP KHÁC (PC/Laptop): Dùng PWA mặc định của trình duyệt ---
                 installBanner.style.display = 'none';
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     deferredPrompt = null;
                 });
+            } else {
+                // Phỏng phòng trường hợp không có PWA prompt, vẫn đưa về trang APK
+                window.location.href = 'apk.html';
             }
         });
 

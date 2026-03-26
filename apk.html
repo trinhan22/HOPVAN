@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HopVan - Download APK Android</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF8F50">
+    <link rel="apple-touch-icon" href="LOGO.WEBP">
+    <link rel="icon" type="image/webp" href="LOGO.WEBP" />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF8F50',
+                        'primary-dark': '#FF5E62',
+                        body: '#FFF5EC',
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --primary-dark: #FF5E62;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --bg-color: #FFF5EC;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --card-bg: rgba(255, 255, 255, 0.6);
+        }
+        
+        html.dark {
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --bg-color: #0B1120;
+            --glass-bg: rgba(15, 23, 42, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --card-bg: rgba(30, 41, 59, 0.6);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+
+        /* --- GLOBAL SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; }
+
+        /* --- BACKGROUND BLOBS --- */
+        .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: floatBlob 10s infinite alternate; }
+        html.dark .blob { opacity: 0.05; }
+        .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
+        .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
+        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
+
+        /* --- SECTION CARD TỪ HDSD --- */
+        .section-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px; 
+            padding: 40px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            position: relative;
+            overflow: hidden;
+        }
+        .section-card:hover { transform: translateY(-8px); box-shadow: 0 15px 40px rgba(255, 143, 80, 0.1); border-color: rgba(255, 143, 80, 0.3); }
+        html.dark .section-card:hover { background: rgba(30, 41, 59, 0.9); }
+
+        .h2-number {
+            font-size: 5rem; font-weight: 900; opacity: 0.05; line-height: 1;
+            position: absolute; right: 20px; top: 10px; color: var(--primary);
+            pointer-events: none; transition: 0.3s;
+        }
+        .section-card:hover .h2-number { opacity: 0.15; transform: scale(1.1) rotate(5deg); }
+
+        /* --- ANIMATION REVEAL --- */
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+       /* =========================================
+           THIẾT KẾ THANH GẠT DARK MODE (PILL TOGGLE)
+           Đã fix lỗi che Icon & Đồng bộ màu sắc
+           ========================================= */
+        .theme-switch {
+            position: relative; display: inline-block;
+            width: 58px; height: 32px; margin: 0;
+        }
+        .theme-switch input { opacity: 0; width: 0; height: 0; }
+        
+        .slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #e2e8f0; 
+            transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 34px; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        /* Cục gạt (Thumb) */
+        .slider:before {
+            position: absolute; content: "";
+            height: 24px; width: 24px; left: 4px; bottom: 4px;
+            background-color: #ffffff; 
+            transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+            z-index: 1; /* Cho cục gạt nằm DƯỚI icon */
+        }
+
+        /* Định dạng 2 Icon để nằm chính giữa cục gạt */
+        .icon-sun, .icon-moon {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            font-size: 13px; 
+            z-index: 2; /* Ép Icon nổi lên TRÊN cục gạt */
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; align-items: center; justify-content: center;
+            width: 24px; height: 24px; pointer-events: none;
+        }
+        
+        /* Màu sắc mặc định (Light Mode) */
+        .icon-sun { left: 4px; color: #f59e0b; } /* Mặt trời vàng rực trên cục gạt trắng */
+        .icon-moon { right: 4px; color: #94a3b8; } /* Mặt trăng xám chìm */
+
+        /* =====================================
+           TRẠNG THÁI BẬT (DARK MODE) 
+           ===================================== */
+        input:checked + .slider { 
+            background-color: #1e293b; /* Nền xanh đen */
+            border: 1px solid rgba(255,255,255,0.05); 
+        }
+        input:checked + .slider:before {
+            transform: translateX(25px); /* Trượt sang phải */
+            background-color: #0f172a; /* Cục gạt đổi sang đen sâu */
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1), 0 2px 5px rgba(0,0,0,0.5);
+        }
+        /* Đổi màu Icon khi sang Dark Mode */
+        input:checked + .slider .icon-sun { color: #64748b; } /* Mặt trời xám tối đi */
+        input:checked + .slider .icon-moon { color: #fbbf24; } /* Mặt trăng vàng rực lên trên cục gạt đen */
+
+        /* --- FLOATING MOCKUP --- */
+        @keyframes floatMockup { 0% { transform: translateY(0); } 100% { transform: translateY(-20px); } }
+        @keyframes floatBadge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .animate-mockup { animation: floatMockup 5s ease-in-out infinite alternate; }
+        .animate-badge-1 { animation: floatBadge 4s infinite ease-in-out; }
+        .animate-badge-2 { animation: floatBadge 5s infinite ease-in-out 1s; }
+
+        /* --- FAQ ACCORDION --- */
+        .faq-item { transition: all 0.3s ease; }
+        .faq-item.active { border-color: var(--primary); box-shadow: 0 10px 25px rgba(255, 143, 80, 0.1); }
+        .faq-icon { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .faq-item.active .faq-icon { transform: rotate(180deg); color: var(--primary); }
+        .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <header class="fixed top-5 left-1/2 -translate-x-1/2 w-[90%] max-w-6xl px-6 py-3 rounded-full flex justify-between items-center z-50 transition-all duration-300 shadow-sm" style="background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border);">
+        <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition">
+            <img src="LOGO.WEBP" alt="Logo" class="h-10 w-auto bg-white rounded-xl p-1 shadow-sm">
+            <span class="text-2xl font-black text-primary tracking-tight">HOPVAN</span>
+        </a>
+
+        <nav class="hidden lg:flex gap-8 items-center">
+            <a href="index.html" class="text-[var(--text-main)] font-semibold text-sm hover:text-primary transition">Trang chủ</a>
+            <a href="index.html#features" class="text-[var(--text-main)] font-semibold text-sm hover:text-primary transition">Tính năng</a>
+            <a href="index.html#reviews" class="text-[var(--text-main)] font-semibold text-sm hover:text-primary transition">Đánh giá</a>
+            <a href="khungchuongtrinh.html" class="text-[var(--text-main)] font-semibold text-sm hover:text-primary transition">Chương trình GDPT 2018</a>
+            <a href="huongdansudung.html" class="text-[var(--text-main)] font-semibold text-sm hover:text-primary transition">Hướng dẫn sử dụng</a>
+            <a href="index.html#about" class="text-[var(--text-main)] font-semibold text-sm hover:text-primary transition">Về chúng tôi</a>
+        </nav>
+        
+        <div class="flex gap-4 items-center">
+            <label class="theme-switch" for="checkbox-theme" title="Bật/Tắt giao diện tối">
+                <input type="checkbox" id="checkbox-theme" />
+                <div class="slider"><i class="fas fa-sun icon-sun"></i><i class="fas fa-moon icon-moon"></i></div>
+            </label>
+        </div>
+    </header>
+
+    <main class="w-full max-w-6xl mx-auto px-6 pt-28 pb-24">
+        
+        <section class="reveal relative flex flex-col md:flex-row items-center justify-between gap-12 mb-24 section-card !p-8 md:!p-12">
+            <div class="absolute inset-0 bg-gradient-to-br from-white/40 to-orange-50/40 dark:from-slate-800/40 dark:to-slate-900/40 z-0"></div>
+            
+            <div class="flex-1 space-y-6 z-10 relative">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-sm font-bold border border-green-200 dark:border-green-800 shadow-sm">
+                    <i class="fas fa-shield-check"></i> An toàn 100% & Không chứa mã độc
+                </div>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-[var(--text-main)] leading-[1.1] tracking-tight">
+                    Học Văn Dễ Dàng <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">Trên Android</span>
+                </h1>
+                <p class="text-lg text-[var(--text-sub)] max-w-lg leading-relaxed font-medium">
+                    Tải file APK chính thức để trải nghiệm HopVan ngay trên điện thoại/tablet Android của bạn.
+                </p>
+                <div class="pt-4">
+                    <a href="hopvan.apk" download="HopVan_v1.1.7.apk" class="relative inline-flex items-center gap-5 bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-orange-500/30 hover:-translate-y-1 hover:shadow-orange-500/50 transition-all duration-300 group z-10">
+                        <div class="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 blur-xl opacity-40 group-hover:opacity-70 transition-opacity -z-10 rounded-2xl"></div>
+                        
+                        <i class="fab fa-android text-4xl group-hover:scale-110 transition-transform"></i>
+                        <div class="text-left">
+                            <span class="block text-[0.7rem] uppercase tracking-wider font-bold opacity-90">Tải miễn phí</span>
+                            <span class="block text-xl font-black">Download APK</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="flex items-center gap-6 text-sm font-bold text-[var(--text-sub)] pt-4">
+                    <span class="flex items-center gap-2"><i class="fas fa-code-branch text-primary"></i> Phiên bản v1.1.7</span>
+                    <span class="flex items-center gap-2"><i class="fas fa-hdd text-primary"></i> 7 MB</span>
+                </div>
+            </div>
+
+            <div class="flex-1 flex justify-center relative z-10 w-full hidden md:flex mt-10 md:mt-0">
+                <div class="relative w-64 h-[500px] bg-slate-900 rounded-[3rem] border-[8px] border-slate-800 shadow-2xl flex flex-col items-center overflow-hidden animate-mockup">
+                    <div class="absolute top-0 w-32 h-6 bg-slate-800 rounded-b-2xl z-20"></div>
+                    <div class="absolute inset-0 bg-orange-50 flex flex-col items-center pt-20 px-5 text-center">
+                        <div class="w-20 h-20 bg-white rounded-3xl shadow-sm p-3 mb-4 flex items-center justify-center">
+                            <img src="LOGO.WEBP" alt="HopVan" class="w-full h-full object-contain">
+                        </div>
+                        <h3 class="font-black text-2xl text-gray-800 tracking-tight">HOPVAN</h3>
+                        <p class="text-xs text-gray-500 font-bold mt-1 uppercase tracking-widest">Mobile App</p>
+                        
+                        <div class="mt-10 w-full space-y-3">
+                            <div class="w-full h-12 bg-white rounded-2xl shadow-sm flex items-center px-4 gap-3">
+                                <div class="w-6 h-6 bg-orange-100 rounded-full"></div>
+                                <div class="w-24 h-2 bg-gray-200 rounded-full"></div>
+                            </div>
+                            <div class="w-full h-12 bg-white rounded-2xl shadow-sm flex items-center px-4 gap-3">
+                                <div class="w-6 h-6 bg-blue-100 rounded-full"></div>
+                                <div class="w-16 h-2 bg-gray-200 rounded-full"></div>
+                            </div>
+                            <div class="w-full h-24 bg-gradient-to-br from-orange-400 to-red-400 rounded-2xl shadow-md mt-4 flex items-end p-4">
+                                <div class="w-1/2 h-2 bg-white/50 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="absolute top-[11%] -left-[11px] bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-3 px-5 rounded-2xl shadow-xl border border-white/50 dark:border-slate-700 flex items-center gap-3 animate-badge-1">
+                    <i class="fas fa-check-circle text-2xl text-green-500"></i>
+                    <div class="text-left">
+                        <div class="text-[0.65rem] font-bold text-[var(--text-sub)] uppercase">Không mã độc</div>
+                        <div class="text-sm font-black text-[var(--text-main)]">An toàn 100%</div>
+                    </div>
+                </div>
+
+                <div class="absolute bottom-[20%] -right-[20px] bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-3 px-5 rounded-2xl shadow-xl border border-white/50 dark:border-slate-700 flex items-center gap-3 animate-badge-2">
+                    <i class="fas fa-star text-2xl text-yellow-500"></i>
+                    <div class="text-left">
+                        <div class="text-[0.65rem] font-bold text-[var(--text-sub)] uppercase">Đánh giá</div>
+                        <div class="text-sm font-black text-[var(--text-main)]">4.6/5 (2k+ Tải)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="reveal mb-24">
+            <div class="text-center mb-16">
+                <span class="text-orange-500 font-bold uppercase tracking-widest text-xs mb-2 block">Dễ dàng & Nhanh chóng</span>
+                <h2 class="text-3xl md:text-4xl font-black text-[var(--text-main)] mb-4 tracking-tight">Hướng Dẫn Cài Đặt</h2>
+                <p class="text-[var(--text-sub)] text-lg">Chỉ mất 3 bước để đưa HopVan lên điện thoại của bạn.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="section-card !p-8 group text-left">
+                    <span class="h2-number">01</span>
+                    <div class="w-14 h-14 bg-orange-100 dark:bg-orange-500/20 text-orange-500 rounded-2xl flex items-center justify-center text-2xl mb-6 transition-transform group-hover:-translate-y-2 group-hover:rotate-6">
+                        <i class="fas fa-cloud-download-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-[var(--text-main)] mb-3">Tải File APK</h3>
+                    <p class="text-[var(--text-sub)] text-sm leading-relaxed font-medium">Nhấn vào nút <strong>Download APK</strong> ở trên để tải file cài đặt <code class="bg-gray-100 dark:bg-slate-700 px-1 py-0.5 rounded text-orange-500">HopVan.apk</code> về bộ nhớ thiết bị.</p>
+                </div>
+                
+                <div class="section-card !p-8 group text-left">
+                    <span class="h2-number">02</span>
+                    <div class="w-14 h-14 bg-blue-100 dark:bg-blue-500/20 text-blue-500 rounded-2xl flex items-center justify-center text-2xl mb-6 transition-transform group-hover:-translate-y-2 group-hover:rotate-6">
+                        <i class="fas fa-unlock-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-[var(--text-main)] mb-3">Cấp Quyền</h3>
+                    <p class="text-[var(--text-sub)] text-sm leading-relaxed font-medium">Mở file vừa tải. Nếu có cảnh báo, vào <strong>Cài đặt > Bảo mật</strong> và bật tính năng <i>Cho phép cài đặt từ nguồn không xác định</i>.</p>
+                </div>
+                
+                <div class="section-card !p-8 group text-left">
+                    <span class="h2-number">03</span>
+                    <div class="w-14 h-14 bg-green-100 dark:bg-green-500/20 text-green-500 rounded-2xl flex items-center justify-center text-2xl mb-6 transition-transform group-hover:-translate-y-2 group-hover:rotate-6">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-[var(--text-main)] mb-3">Hoàn Tất</h3>
+                    <p class="text-[var(--text-sub)] text-sm leading-relaxed font-medium">Nhấn <strong>Cài đặt</strong> và chờ hệ thống xử lý vài giây. Sau đó bấm <strong>Mở</strong> để bắt đầu học tập cùng HopVan.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="reveal section-card !p-8 md:!p-12 max-w-4xl mx-auto">
+            <h2 class="text-3xl font-black text-[var(--text-main)] mb-8 text-center flex items-center justify-center gap-3 tracking-tight">
+                <i class="fas fa-question-circle text-orange-500 bg-orange-100 dark:bg-orange-500/20 p-2 rounded-xl"></i> Câu Hỏi Thường Gặp
+            </h2>
+            <div class="space-y-4">
+                
+                <div class="faq-item bg-white/80 dark:bg-slate-800/80 border border-gray-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
+                    <div class="p-6 flex justify-between items-center cursor-pointer font-bold text-[var(--text-main)] select-none" onclick="toggleAPKFAQ(this)">
+                        <span class="flex items-center gap-3 text-base md:text-lg"><i class="fas fa-shield-alt text-[var(--text-sub)]"></i> 1. File APK của HopVan có an toàn không?</span>
+                        <i class="fas fa-chevron-down faq-icon text-[var(--text-sub)]"></i>
+                    </div>
+                    <div class="faq-a">
+                        <div class="px-5 py-4 text-[var(--text-sub)] text-[0.95rem] font-medium leading-relaxed border-t border-gray-100 dark:border-slate-700/50">
+                            Hoàn toàn an toàn! File cài đặt được phát triển nội bộ bởi đội ngũ HopTeam và đã vượt qua các bài kiểm tra bảo mật nghiêm ngặt. Cam kết không chứa mã độc, không theo dõi dữ liệu ngầm và không kèm quảng cáo rác.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white/80 dark:bg-slate-800/80 border border-gray-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
+                    <div class="p-6 flex justify-between items-center cursor-pointer font-bold text-[var(--text-main)] select-none" onclick="toggleAPKFAQ(this)">
+                        <span class="flex items-center gap-3 text-base md:text-lg"><i class="fab fa-google-play text-[var(--text-sub)]"></i> 2. Tại sao không tải trực tiếp từ CH Play?</span>
+                        <i class="fas fa-chevron-down faq-icon text-[var(--text-sub)]"></i>
+                    </div>
+                    <div class="faq-a">
+                        <div class="px-5 py-4 text-[var(--text-sub)] text-[0.95rem] font-medium leading-relaxed border-t border-gray-100 dark:border-slate-700/50">
+                            HopVan hiện đang tích hợp các mô hình AI ngôn ngữ mới nhất nên cần thời gian để Google xét duyệt trên hệ thống CH Play. Trong lúc chờ đợi, tải file APK là cách giúp bạn trải nghiệm sớm các tính năng mới nhất mà không bị gián đoạn.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white/80 dark:bg-slate-800/80 border border-gray-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
+                    <div class="p-6 flex justify-between items-center cursor-pointer font-bold text-[var(--text-main)] select-none" onclick="toggleAPKFAQ(this)">
+                        <span class="flex items-center gap-3 text-base md:text-lg"><i class="fas fa-sync text-[var(--text-sub)]"></i> 3. Tôi có phải tải lại khi có bản cập nhật mới?</span>
+                        <i class="fas fa-chevron-down faq-icon text-[var(--text-sub)]"></i>
+                    </div>
+                    <div class="faq-a">
+                        <div class="px-5 py-4 text-[var(--text-sub)] text-[0.95rem] font-medium leading-relaxed border-t border-gray-100 dark:border-slate-700/50">
+                            Đúng vậy, nhưng cực kỳ đơn giản! Khi có phiên bản mới, App sẽ thông báo. Bạn chỉ cần tải file APK mới nhất và cài đè lên ứng dụng cũ (<b>KHÔNG</b> cần xóa app cũ). Mọi lịch sử học tập, tài khoản đều được giữ nguyên.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- SCROLL REVEAL ANIMATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+        });
+
+        // --- DARK MODE TOGGLE ---
+        const themeCheckbox = document.getElementById('checkbox-theme');
+        const htmlElement = document.documentElement;
+
+        if (localStorage.getItem('theme') === 'dark') {
+            htmlElement.classList.add('dark');
+            if (themeCheckbox) themeCheckbox.checked = true;
+        }
+
+        if (themeCheckbox) {
+            themeCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    htmlElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    htmlElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        }
+
+        // --- FAQ ACCORDION ---
+        function toggleAPKFAQ(element) {
+            const item = element.parentElement;
+            const content = element.nextElementSibling;
+            const icon = element.querySelector('.faq-icon');
+            
+            const allItems = document.querySelectorAll('.faq-item');
+            allItems.forEach(el => {
+                if(el !== item && el.classList.contains('active')) {
+                    el.classList.remove('active', 'border-orange-500');
+                    el.querySelector('.faq-a').style.maxHeight = null;
+                }
+            });
+
+            item.classList.toggle('active');
+            if (item.classList.contains('active')) {
+                item.classList.add('border-orange-500');
+                content.style.maxHeight = content.scrollHeight + "px";
+            } else {
+                item.classList.remove('border-orange-500');
+                content.style.maxHeight = null;
+            }
+        }
+    </script>
+</body>
+</html>
