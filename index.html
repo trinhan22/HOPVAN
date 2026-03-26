@@ -542,6 +542,78 @@
             @media (max-width: 992px) {
                 .roadmap-grid { grid-template-columns: 1fr; gap: 30px; padding: 0 20px; }
             }
+
+            /* ==========================================
+           CSS CHO CÁC POPUP HỖ TRỢ (FAQ, TERMS, CONTACT)
+           ========================================== */
+        .support-modal {
+            display: none; position: fixed; inset: 0; z-index: 100000;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(6px);
+            justify-content: center; align-items: center; padding: 20px;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .support-modal.show { display: flex; opacity: 1; }
+        
+        .sm-box {
+            background: white; width: 100%; max-width: 650px; max-height: 85vh;
+            border-radius: 30px; display: flex; flex-direction: column; overflow: hidden;
+            transform: scale(0.95) translateY(20px); 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+        .support-modal.show .sm-box { transform: scale(1) translateY(0); }
+
+        .sm-header {
+            padding: 25px 30px; border-bottom: 1px solid #f1f5f9;
+            display: flex; justify-content: space-between; align-items: center;
+            background: #fffcf9;
+        }
+        .sm-header h3 { font-size: 1.4rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        .sm-header h3 i { color: var(--primary); font-size: 1.6rem; }
+        
+        .btn-sm-close {
+            width: 36px; height: 36px; border-radius: 50%; background: white;
+            border: 1px solid #e2e8f0; color: #94a3b8; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.2s; font-size: 1.1rem;
+        }
+        .btn-sm-close:hover { background: #fee2e2; color: #ef4444; border-color: transparent; transform: rotate(90deg); }
+
+        .sm-body {
+            padding: 30px; overflow-y: auto; color: var(--text-light); line-height: 1.7; font-size: 0.95rem;
+        }
+        /* Custom Scrollbar cho Modal */
+        .sm-body::-webkit-scrollbar { width: 6px; }
+        .sm-body::-webkit-scrollbar-track { background: #f1f5f9; }
+        .sm-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .sm-body::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* Typography trong Modal Docs (Terms, Privacy) */
+        .sm-body h4 { font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin: 25px 0 10px; }
+        .sm-body h4:first-child { margin-top: 0; }
+        .sm-body p { margin-bottom: 15px; }
+        .sm-body ul.doc-list { list-style: none; padding-left: 5px; margin-bottom: 15px; }
+        .sm-body ul.doc-list li { position: relative; padding-left: 20px; margin-bottom: 8px; }
+        .sm-body ul.doc-list li::before { content: "•"; color: var(--primary); font-weight: bold; position: absolute; left: 0; font-size: 1.2rem; line-height: 1; top: 2px;}
+
+        /* FAQ Accordion */
+        .faq-item { border: 1px solid #f1f5f9; border-radius: 16px; margin-bottom: 15px; overflow: hidden; transition: 0.3s; background: white;}
+        .faq-item.active { border-color: rgba(255, 143, 80, 0.3); box-shadow: 0 5px 15px rgba(255, 143, 80, 0.05); }
+        .faq-q { padding: 18px 20px; font-weight: 700; color: var(--text-main); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; user-select: none;}
+        .faq-item.active .faq-q { color: var(--primary); }
+        .faq-icon { font-size: 0.9rem; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); color: #cbd5e1; }
+        .faq-item.active .faq-icon { transform: rotate(180deg); color: var(--primary); }
+        .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0, 1, 0, 1); background: #fdfdfd; }
+        .faq-a-content { padding: 0 20px 20px; font-size: 0.95rem; border-top: 1px dashed transparent; }
+        .faq-item.active .faq-a-content { border-top-color: #f1f5f9; padding-top: 15px; }
+
+        /* Contact Cards */
+        .contact-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .contact-card { display: flex; align-items: center; gap: 20px; padding: 20px; background: #f8fafc; border-radius: 20px; border: 1px solid #f1f5f9; transition: 0.3s; text-decoration: none;}
+        .contact-card:hover { transform: translateY(-3px); background: white; border-color: var(--primary); box-shadow: 0 10px 25px rgba(255,143,80,0.1); }
+        .contact-icon { width: 50px; height: 50px; border-radius: 14px; background: rgba(255,143,80,0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;}
+        .contact-info h4 { font-size: 1rem; color: var(--text-main); margin: 0 0 5px; font-weight: 800;}
+        .contact-info p { color: var(--text-light); margin: 0; font-size: 0.9rem;}
     </style>
 </head>
 <body>
@@ -815,10 +887,10 @@
             <div class="footer-col">
                 <h4>Hỗ trợ</h4>
                 <ul>
-                    <li><a href="huongdansudung.html">Câu hỏi thường gặp</a></li>
-                    <li><a href="huongdansudung.html">Điều khoản dịch vụ</a></li>
-                    <li><a href="huongdansudung.html">Chính sách bảo mật</a></li>
-                    <li><a href="https://www.facebook.com/hopvanapp">Liên hệ HopTeam</a></li>
+                    <li><a href="javascript:void(0)" onclick="openSupportModal('faq-modal')">Câu hỏi thường gặp</a></li>
+                    <li><a href="javascript:void(0)" onclick="openSupportModal('terms-modal')">Điều khoản dịch vụ</a></li>
+                    <li><a href="javascript:void(0)" onclick="openSupportModal('privacy-modal')">Chính sách bảo mật</a></li>
+                    <li><a href="javascript:void(0)" onclick="openSupportModal('contact-modal')">Liên hệ HopTeam</a></li>
                 </ul>
             </div>
 
@@ -847,7 +919,7 @@
     <div class="footer-bottom" style="margin-top: 60px; padding-top: 30px; border-top: 1px solid rgba(0,0,0,0.05); width: 100%;">
         <div class="container" style="text-align: center;">
             <p style="color: #94a3b8; font-size: 0.9rem; margin: 0;">
-                &copy; 2026 HopVan. All Rights Reserved By HopTeam.
+                &copy; 2026 HopVan. All Rights Reserved.
             </p>
         </div>
     </div>
@@ -864,6 +936,132 @@
             </div>
         </div>
     </footer>
+
+    <div id="faq-modal" class="support-modal">
+        <div class="sm-box">
+            <div class="sm-header">
+                <h3><i class="fas fa-question-circle"></i> Câu hỏi thường gặp</h3>
+                <button class="btn-sm-close" onclick="closeSupportModal('faq-modal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="sm-body">
+                <p style="margin-bottom: 25px;">Khám phá các tính năng và cách HopVan hỗ trợ bạn đạt điểm cao môn Ngữ Văn.</p>
+                
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFAQ(this)">HopVan AI chấm bài như thế nào?<i class="fas fa-chevron-down faq-icon"></i></div>
+                    <div class="faq-a"><div class="faq-a-content">
+                        Hệ thống AI của HopVan được huấn luyện trên hàng vạn bài văn mẫu điểm cao. AI sẽ phân tích bài làm của bạn theo các tiêu chí: Lỗi chính tả, Lỗi diễn đạt, Cấu trúc lập luận và Tính sáng tạo, từ đó đưa ra điểm số dự kiến và lời khuyên sửa lỗi chi tiết.
+                    </div></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFAQ(this)">"Keys" dùng để làm gì?<i class="fas fa-chevron-down faq-icon"></i></div>
+                    <div class="faq-a"><div class="faq-a-content">
+                        Keys là đơn vị "tiền tệ" trong HopVan. Bạn dùng Keys để mở khóa các tính năng nâng cao, vào phòng luyện đề VIP hoặc xem đáp án chi tiết. Bạn có thể kiếm Keys miễn phí thông qua việc đăng nhập điểm danh hàng ngày hoặc hoàn thành chuỗi bài tập.
+                    </div></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFAQ(this)">Nội dung có sát chương trình mới không?<i class="fas fa-chevron-down faq-icon"></i></div>
+                    <div class="faq-a"><div class="faq-a-content">
+                        Hoàn toàn bám sát! Mọi bài giảng, đề thi và lộ trình tại HopVan đều được xây dựng theo chuẩn <b>Chương trình GDPT 2018</b> mới nhất của Bộ Giáo dục, tập trung vào phát triển năng lực Đọc - Hiểu và Tư duy thay vì học vẹt.
+                    </div></div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFAQ(this)">Tôi có thể sử dụng HopVan trên điện thoại không?<i class="fas fa-chevron-down faq-icon"></i></div>
+                    <div class="faq-a"><div class="faq-a-content">
+                        Có. Nền tảng được tối ưu hóa hiển thị cực tốt trên trình duyệt di động. Ngoài ra, bạn có thể tải app định dạng APK cho Android hoặc thêm vào màn hình chính (Add to Home Screen) trên iOS để sử dụng mượt mà như một ứng dụng thực thụ.
+                    </div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="terms-modal" class="support-modal">
+        <div class="sm-box">
+            <div class="sm-header">
+                <h3><i class="fas fa-file-contract"></i> Điều khoản dịch vụ</h3>
+                <button class="btn-sm-close" onclick="closeSupportModal('terms-modal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="sm-body">
+                <h4>1. Chấp nhận điều khoản</h4>
+                <p>Bằng việc truy cập và sử dụng nền tảng HopVan, bạn đồng ý tuân thủ các điều khoản và quy định của chúng tôi. Nếu không đồng ý, vui lòng ngừng sử dụng dịch vụ.</p>
+                
+                <h4>2. Tài khoản người dùng</h4>
+                <ul class="doc-list">
+                    <li>Bạn chịu trách nhiệm bảo mật thông tin đăng nhập của mình.</li>
+                    <li>Nghiêm cấm hành vi chia sẻ tài khoản cho nhiều người sử dụng cùng lúc nhằm mục đích trục lợi.</li>
+                </ul>
+
+                <h4>3. Bản quyền nội dung</h4>
+                <p>Toàn bộ tài liệu, bài giảng, và thuật toán AI trên HopVan thuộc sở hữu trí tuệ của HopTeam. Bất kỳ hành vi sao chép, phát tán nội dung mà không có sự cho phép đều vi phạm pháp luật.</p>
+
+                <h4>4. Chính sách Keys và Thanh toán</h4>
+                <p>Keys kiếm được qua hoạt động học tập không có giá trị quy đổi thành tiền mặt. Mọi giao dịch nạp Keys (nếu có) đều tuân theo chính sách hoàn tiền trong vòng 3 ngày nếu có lỗi hệ thống.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="privacy-modal" class="support-modal">
+        <div class="sm-box">
+            <div class="sm-header">
+                <h3><i class="fas fa-user-shield"></i> Chính sách bảo mật</h3>
+                <button class="btn-sm-close" onclick="closeSupportModal('privacy-modal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="sm-body">
+                <h4>1. Thu thập thông tin</h4>
+                <p>Chúng tôi chỉ thu thập các thông tin cơ bản: Email, Tên hiển thị, Trường học/Khối lớp và lịch sử làm bài để cá nhân hóa lộ trình học tập của bạn.</p>
+
+                <h4>2. Sử dụng dữ liệu bài làm</h4>
+                <ul class="doc-list">
+                    <li>Bài luận bạn nộp trên hệ thống sẽ được phân tích ẩn danh bởi AI.</li>
+                    <li>Chúng tôi <b>KHÔNG</b> chia sẻ, rò rỉ hay bán nội dung bài làm cá nhân của bạn cho bất kỳ bên thứ ba nào.</li>
+                </ul>
+
+                <h4>3. Bảo vệ dữ liệu</h4>
+                <p>HopVan áp dụng các công nghệ mã hóa tiêu chuẩn quốc tế để bảo vệ dữ liệu tài khoản và mật khẩu của bạn trên máy chủ.</p>
+                <p>Bạn hoàn toàn có quyền yêu cầu xóa vĩnh viễn tài khoản và toàn bộ dữ liệu học tập bất cứ lúc nào trong mục "Quản lý tài khoản".</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="contact-modal" class="support-modal">
+        <div class="sm-box">
+            <div class="sm-header">
+                <h3><i class="fas fa-headset"></i> Liên hệ HopTeam</h3>
+                <button class="btn-sm-close" onclick="closeSupportModal('contact-modal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="sm-body">
+                <p style="margin-bottom: 25px;">Đội ngũ HopTeam luôn sẵn sàng hỗ trợ bạn. Hãy liên hệ với chúng tôi qua các kênh dưới đây:</p>
+                
+                <div class="contact-grid">
+                    <a href="mailto:nhanntfct30802@gmail.com" class="contact-card">
+                        <div class="contact-icon"><i class="fas fa-envelope-open-text"></i></div>
+                        <div class="contact-info">
+                            <h4>Email Hỗ Trợ</h4>
+                            <p>nhanntfct30802@gmail.com</p>
+                        </div>
+                    </a>
+
+                    <a href="https://www.facebook.com/hopvanapp" target="_blank" class="contact-card">
+                        <div class="contact-icon" style="color: #1877F2; background: rgba(24, 119, 242, 0.1);"><i class="fab fa-facebook-messenger"></i></div>
+                        <div class="contact-info">
+                            <h4>Fanpage Facebook</h4>
+                            <p>HopVan - Nền Tảng Học & Luyện Thi Ngữ Văn</p>
+                        </div>
+                    </a>
+
+                    <div class="contact-card" style="cursor: default; text-decoration: none;">
+                        <div class="contact-icon" style="color: #10b981; background: rgba(16, 185, 129, 0.1);"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="contact-info">
+                            <h4>Địa chỉ</h4>
+                            <p>600 Nguyen Van Cu, An Binh, Can Tho, Vietnam</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="toast-app">
         <div style="background: rgba(255, 143, 80, 0.2); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); flex-shrink: 0;">
@@ -1152,6 +1350,57 @@
             }, 4000);
         }
     </script>
+
+    <script>
+        // Mở Modal
+        function openSupportModal(id) {
+            const modal = document.getElementById(id);
+            if(modal) {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden'; // Khóa cuộn trang nền
+            }
+        }
+
+        // Đóng Modal
+        function closeSupportModal(id) {
+            const modal = document.getElementById(id);
+            if(modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Đóng khi click ra ngoài vùng xám (overlay)
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('support-modal')) {
+                e.target.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Xử lý hiệu ứng xổ xuống của FAQ (Accordion)
+        function toggleFAQ(element) {
+            const item = element.parentElement;
+            const content = element.nextElementSibling;
+            
+            // Đóng các thẻ đang mở khác (Tùy chọn, nếu muốn mở 1 cái 1 lúc)
+            const allItems = item.parentElement.querySelectorAll('.faq-item');
+            allItems.forEach(el => {
+                if(el !== item && el.classList.contains('active')) {
+                    el.classList.remove('active');
+                    el.querySelector('.faq-a').style.maxHeight = null;
+                }
+            });
+
+            // Bật tắt thẻ hiện tại
+            item.classList.toggle('active');
+            if (item.classList.contains('active')) {
+                content.style.maxHeight = content.scrollHeight + "px";
+            } else {
+                content.style.maxHeight = null;
+            }
+        }
+    </script>   
 
 <script type="text/javascript">
     // 1. Chặn Chuột phải (Để ẩn menu "Inspect/Kiểm tra" và "View Source/Xem nguồn")
