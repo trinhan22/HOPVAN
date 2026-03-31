@@ -485,75 +485,92 @@
     display: none;
 }
 
-            .roadmap-section { padding: 80px 0; background: transparent; position: relative; z-index: 5; }
-            .roadmap-header { text-align: center; margin-bottom: 60px; }
-            .roadmap-header h2 { font-size: 2.5rem; margin-bottom: 10px; font-weight: 800; color: var(--text-main); }
-            .roadmap-header p { font-size: 1.05rem; color: var(--text-light); max-width: 650px; margin: 0 auto; line-height: 1.6; }
+            /* =========================================
+           ROADMAP SECTION (Đồng bộ chuẩn với Review Card)
+           ========================================= */
+        .roadmap-section { padding: 100px 0; position: relative; z-index: 5; } /* Đồng bộ padding với các section khác */
+        .roadmap-header { text-align: center; margin-bottom: 60px; }
+        .roadmap-header h2 { font-size: 2.5rem; margin-bottom: 10px; font-weight: 800; color: var(--text-main); }
+        .roadmap-header p { font-size: 1.05rem; color: var(--text-light); max-width: 650px; margin: 0 auto; line-height: 1.6; }
 
-            .roadmap-grid {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 30px; /* Khoảng cách đều nhau */
-                max-width: 1100px;
-                margin: 0 auto;
-                align-items: stretch; /* Ép các thẻ cao bằng nhau */
-            }
+        .roadmap-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px; /* Đồng bộ khoảng cách chuẩn 24px giống khối Tính năng */
+            align-items: stretch; 
+        }
 
-            .rm-card { background: rgba(255,255,255,0.7); border-radius: 25px; padding: 35px; border: 1px solid white; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.03); }
-            .rm-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); background: white; }
+        .rm-card { 
+            background: rgba(255,255,255,0.6); 
+            border-radius: 30px; /* Bo góc to 30px */
+            padding: 40px; /* Padding rộng rãi 40px */
+            border: 1px solid white; 
+            transition: 0.3s; 
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); 
+            display: flex; 
+            flex-direction: column; 
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
 
-            .rm-grade-pill {
-                display: inline-flex;
-                background: #fff5ec;
-                color: var(--primary);
-                font-size: 0.85rem;
-                font-weight: 800;
-                padding: 6px 14px;
-                border-radius: 8px;
-                margin-bottom: 20px;
-                width: fit-content;
-                border: 1px solid rgba(255, 143, 80, 0.2);
-            }
+        .rm-card:hover { 
+            transform: translateY(-5px); 
+            background: rgba(255,255,255,0.95); 
+            box-shadow: 0 20px 40px -10px rgba(255, 143, 80, 0.15); /* Đổ bóng ánh cam rực rỡ như thẻ Tính năng */
+        }
 
-            .rm-title {
-                font-size: 1.25rem;
-                font-weight: 800;
-                color: var(--text-main);
-                margin-bottom: 25px;
-                line-height: 1.4;
-            }
+        .rm-grade-pill {
+            display: inline-flex;
+            background: #fff5ec;
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 800;
+            padding: 6px 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            width: fit-content;
+            border: 1px solid rgba(255, 143, 80, 0.2);
+        }
 
-            .rm-list { list-style: none; flex-grow: 1; padding: 0; margin: 0; }
-            .rm-list li {
-                display: flex;
-                align-items: flex-start;
-                gap: 12px;
-                margin-bottom: 16px;
-                color: var(--text-light);
-                font-size: 0.95rem;
-                line-height: 1.5;
-                font-weight: 500;
-            }
-            .rm-list li:last-child { margin-bottom: 0; }
+        .rm-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
 
-            /* Icon tick xanh có nền tròn */
-            .rm-list li .tick-icon {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 22px;
-                height: 22px;
-                background: #dcfce7; 
-                color: #22c55e;      
-                border-radius: 50%;
-                font-size: 0.7rem;
-                flex-shrink: 0;
-                margin-top: 2px;
-            }
+        .rm-list { list-style: none; flex-grow: 1; padding: 0; margin: 0; }
+        .rm-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+        .rm-list li:last-child { margin-bottom: 0; }
 
-            @media (max-width: 992px) {
-                .roadmap-grid { grid-template-columns: 1fr; gap: 30px; padding: 0 20px; }
-            }
+        .rm-list li .tick-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            background: #dcfce7; 
+            color: #22c55e;      
+            border-radius: 50%;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        @media (max-width: 992px) {
+            .roadmap-grid { grid-template-columns: 1fr; gap: 20px; } /* Đồng bộ khoảng cách mobile với các khối khác */
+        }
 
             /* ==========================================
            CSS CHO CÁC POPUP HỖ TRỢ (FAQ, TERMS, CONTACT)
