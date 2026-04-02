@@ -208,6 +208,61 @@
 ::-webkit-scrollbar-button {
     display: none;
 }
+
+
+/* =========================================
+           THÊM CARD MỚI: ĐỀ CỦA TÔI & LỊCH SỬ (TÔNG CAM/ĐỎ)
+           ========================================= */
+        .practice-grid-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1000px; margin-top: 25px; }
+        
+        /* Gradient cam vàng rực rỡ */
+        .card-gold { background: var(--primary-gradient); color: white; }
+        .card-gold .card-btn { background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(10px); }
+        
+        /* Gradient cam đỏ đậm */
+        .card-rose { background: var(--purple-gradient); color: white; }
+        .card-rose .card-btn { background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(10px); }
+
+        @media (max-width: 768px) {
+            .practice-grid-bottom { grid-template-columns: 1fr; }
+        }
+
+        /* =========================================
+           MODAL LỊCH SỬ LÀM BÀI (3x3 Grid - Tông Cam)
+           ========================================= */
+        .history-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-height: 500px; overflow-y: auto; padding-right: 5px; }
+        
+        .history-card { 
+            background: var(--bg-body); border: 1px solid var(--border-ui); 
+            border-radius: 20px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); 
+            transition: all 0.3s; cursor: pointer; display: flex; flex-direction: column;
+        }
+        .history-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 15px 30px rgba(255, 143, 80, 0.15); }
+        
+        .hc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed var(--border-ui); padding-bottom: 12px; }
+        .hc-date { font-size: 0.8rem; font-weight: 700; color: var(--text-sub); }
+        
+        /* Điểm số màu cam nổi bật */
+        .hc-score { font-size: 1.1rem; font-weight: 900; color: #ea580c; background: #ffedd5; padding: 4px 12px; border-radius: 10px; }
+        
+        .hc-body { flex-grow: 1; }
+        .hc-body h4 { font-size: 1rem; font-weight: 800; color: var(--text-heading); margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+        .hc-body p { font-size: 0.9rem; color: var(--text-sub); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5; }
+        
+        .hc-footer { margin-top: 15px; font-size: 0.85rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 5px; }
+        .history-card:hover .hc-footer i { transform: translateX(5px); transition: 0.3s; }
+
+        /* Scrollbar cho lưới lịch sử */
+        .history-grid::-webkit-scrollbar { width: 6px; }
+        .history-grid::-webkit-scrollbar-track { background: transparent; }
+        .history-grid::-webkit-scrollbar-thumb { background: rgba(255, 143, 80, 0.3); border-radius: 10px; }
+        .history-grid::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        @media (max-width: 1024px) { .history-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 640px) { .history-grid { grid-template-columns: 1fr; } }
+
+        html.dark .history-card { background: var(--bg-panel); border-color: var(--border-panel); }
+        html.dark .hc-score { background: rgba(234, 88, 12, 0.15); color: #fb923c; }
     </style>
 </head>
 <body>
@@ -289,6 +344,45 @@
                 <i class="fas fa-tasks card-icon-bg" style="color: var(--primary);"></i>
             </div>
         </div>
+
+        </div> 
+        
+        <div class="practice-grid-bottom">
+            <div class="card card-gold" onclick="window.location.href='../phongluyende/decanhan.html'">
+                <div class="card-content">
+                    <div class="card-title">Đề Của Tôi<br>(Cá Nhân Hóa)</div>
+                    <p class="card-desc">Tự soạn hoặc dán đề thi thử của trường. Làm bài ngay và để AI chấm điểm.</p>
+                </div>
+                <div class="card-btn">Soạn đề ngay <i class="fas fa-arrow-right"></i></div>
+                <i class="fas fa-file-signature card-icon-bg"></i>
+            </div>
+
+            <div class="card card-rose" onclick="openHistoryModal()">
+                <div class="card-content">
+                    <div class="card-title">Lịch Sử<br>Làm Bài</div>
+                    <p class="card-desc">Xem lại các bài viết đã nộp, kiểm tra điểm số và đọc lại nhận xét chi tiết của hệ thống AI.</p>
+                </div>
+                <div class="card-btn">Xem lịch sử <i class="fas fa-history"></i></div>
+                <i class="fas fa-clipboard-check card-icon-bg"></i>
+            </div>
+        </div>
+    </main> <div id="historyModal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 1000px; width: 95%; padding: 40px;">
+            <span class="close-modal" onclick="closeHistoryModal()">&times;</span>
+            <div class="modal-header" style="margin-bottom: 30px;">
+                <h3 style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+                    <div style="background: rgba(255,143,80,0.1); color: var(--primary); width: 45px; height: 45px; border-radius: 12px; display: flex; justify-content: center; align-items: center;">
+                        <i class="fas fa-history"></i>
+                    </div> 
+                    Lịch Sử Làm Bài
+                </h3>
+                <p>Xem lại các bài luyện tập gần nhất và nhận xét từ AI.</p>
+            </div>
+            
+            <div id="history-list" class="history-grid">
+                </div>
+        </div>
+    </div>
     </main>
 
     <div id="topicModal" class="modal-overlay">
@@ -327,6 +421,51 @@
         </div>
     </div>
 
+    <div id="customExamModal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 950px; width: 95%; padding: 40px;">
+            <span class="close-modal" onclick="closeCustomExamModal()">&times;</span>
+            <div class="modal-header" style="margin-bottom: 30px;">
+                <h3 style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+                    <div style="background: #eff6ff; color: #3b82f6; width: 45px; height: 45px; border-radius: 12px; display: flex; justify-content: center; align-items: center;"><i class="fas fa-folder-plus"></i></div> 
+                    Kho Đề Của Tôi
+                </h3>
+                <p>Đề bài được lưu an toàn trực tiếp trên trình duyệt của bạn.</p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="flex-1 bg-white dark:bg-slate-800 p-6 rounded-3xl border border-gray-100 dark:border-slate-700 shadow-sm">
+                    <h4 class="font-bold text-lg mb-4 text-[var(--text-heading)] flex items-center gap-2"><i class="fas fa-pen-alt text-blue-500"></i> Tạo đề mới</h4>
+                    <input type="text" id="ce-title" placeholder="Tên đề (VD: Thi thử THPT Hà Nội...)" class="w-full mb-4 px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-[var(--text-heading)] focus:outline-none focus:border-blue-500 transition">
+                    <textarea id="ce-content" rows="6" placeholder="Nhập nội dung đề bài vào đây..." class="w-full mb-4 px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-[var(--text-heading)] focus:outline-none focus:border-blue-500 transition resize-none custom-scrollbar"></textarea>
+                    <button onclick="saveCustomExam()" class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1 transition-all">Lưu & Thêm vào kho</button>
+                </div>
+                <div class="flex-1 flex flex-col">
+                    <h4 class="font-bold text-lg mb-4 text-[var(--text-heading)] flex items-center justify-between">
+                        <span class="flex items-center gap-2"><i class="fas fa-list text-orange-500"></i> Đã lưu</span>
+                        <span id="ce-count" class="bg-orange-100 text-orange-600 px-3 py-1 rounded-lg text-sm">0 đề</span>
+                    </h4>
+                    <div id="ce-list" class="custom-exam-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 1000px; width: 95%; padding: 40px;">
+            <span class="close-modal" onclick="closeHistoryModal()">&times;</span>
+            <div class="modal-header" style="margin-bottom: 30px;">
+                <h3 style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+                    <div style="background: #e6fffa; color: #10b981; width: 45px; height: 45px; border-radius: 12px; display: flex; justify-content: center; align-items: center;"><i class="fas fa-history"></i></div> 
+                    Lịch Sử Làm Bài
+                </h3>
+                <p>Xem lại các bài luyện tập gần nhất của bạn.</p>
+            </div>
+            
+            <div id="history-list" class="history-grid">
+                </div>
+        </div>
+    </div>
+
 <script type="module" src="gam.js"></script> 
 <script src="../chatbot.js"></script>
 
@@ -334,7 +473,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     // MỚI: Thêm import Firestore để lấy ảnh avatar
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
+    import { getFirestore, doc, getDoc, collection, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { 
         apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", 
@@ -465,6 +604,95 @@
     
     window.alertLocked = () => { alert("Chủ đề này đang được biên soạn. Bạn vui lòng quay lại sau nhé!"); };
 </script>
+
+<script>
+        // Mock data giả lập Lịch sử làm bài (Bạn có thể xóa đi sau khi gọi data từ Firebase)
+        if(!localStorage.getItem('hopvan_exam_history')) {
+            localStorage.setItem('hopvan_exam_history', JSON.stringify([
+                { id: '1', date: '10:30 - 20/05/2026', score: '8.5', prompt: 'Phân tích nhân vật Tràng A Phủ', essay: 'Mở bài: Vợ chồng A Phủ là tác phẩm xuất sắc...' },
+                { id: '2', date: '14:15 - 18/05/2026', score: '9.0', prompt: 'NLXH về sức mạnh của lời nói', essay: 'Trong thời đại mạng xã hội phát triển...' },
+                { id: '3', date: '09:00 - 15/05/2026', score: '7.5', prompt: 'Cảm nhận đoạn 1 Tây Tiến', essay: 'Bức tranh thiên nhiên Tây Bắc hiện lên...' },
+                { id: '4', date: '20:45 - 12/05/2026', score: '8.0', prompt: 'Phân tích Rừng Xà Nu', essay: 'Rừng Xà Nu không chỉ là bối cảnh...' },
+                { id: '5', date: '08:15 - 10/05/2026', score: '8.25', prompt: 'NLXH về ý chí vươn lên', essay: 'Con đường dẫn đến thành công luôn đầy rẫy...' }
+            ]));
+        }
+
+        // =========================================
+        // HÀM XỬ LÝ LỊCH SỬ LÀM BÀI (DÙNG FIREBASE)
+        // =========================================
+
+        window.openHistoryModal = () => { 
+            document.getElementById('historyModal').style.display = 'flex'; 
+            document.body.style.overflow = 'hidden';
+            window.renderHistory(); 
+        };
+        
+        window.closeHistoryModal = () => { 
+            document.getElementById('historyModal').style.display = 'none'; 
+            document.body.style.overflow = 'auto';
+        };
+
+        window.viewHistoryDetail = (id) => { 
+            localStorage.setItem('hopvan_current_history_id', id);
+            window.location.href = '../phongluyende/lichsulambai.html';
+        };
+
+        window.renderHistory = async () => {
+            const list = document.getElementById('history-list');
+            list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:50px;"><i class="fas fa-spinner fa-spin text-3xl text-orange-500 mb-4"></i><br><b class="text-gray-500">Đang tải dữ liệu...</b></div>`;
+            
+            const currentUser = auth.currentUser;
+            if(!currentUser) {
+                list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:red; padding:50px;">Vui lòng đăng nhập để xem lịch sử!</div>`;
+                return;
+            }
+
+            try {
+                // Truy vấn: Tìm các bài của User này, xếp mới nhất lên đầu, lấy 15 bài gần nhất
+                const q = query(
+                    collection(db, "exam_history"), 
+                    where("userId", "==", currentUser.uid),
+                    orderBy("timestamp", "desc"),
+                    limit(15)
+                );
+                
+                const querySnapshot = await getDocs(q);
+                let historyHTML = '';
+
+                querySnapshot.forEach((doc) => {
+                    const item = doc.data();
+                    const dateStr = item.timestamp ? item.timestamp.toDate().toLocaleString('vi-VN') : 'Vừa xong';
+                    
+                    historyHTML += `
+                    <div class="history-card" onclick="viewHistoryDetail('${doc.id}')">
+                        <div class="hc-header">
+                            <span class="hc-date"><i class="far fa-calendar-check"></i> ${dateStr}</span>
+                            <span class="hc-score">${item.score}</span>
+                        </div>
+                        <div class="hc-body">
+                            <h4>${item.prompt || "Đề Luyện Tập"}</h4>
+                            <p>${(item.essay || "").substring(0, 80)}...</p>
+                        </div>
+                        <div class="hc-footer">Xem chi tiết <i class="fas fa-arrow-right"></i></div>
+                    </div>`;
+                });
+
+                if (historyHTML === '') {
+                    list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:50px; color:var(--text-light);">Bạn chưa làm bài nào! Bắt đầu luyện đề ngay nhé.</div>`;
+                } else {
+                    list.innerHTML = historyHTML;
+                }
+            } catch (error) {
+                console.error("Lỗi lấy lịch sử Firebase:", error);
+                list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:#ef4444; padding:30px; background:#fee2e2; border-radius:15px;">Lỗi tải dữ liệu. (Ghi chú cho Dev: Hãy mở Console F12 và click vào link để tạo Index Firebase)</div>`;
+            }
+        };
+
+        // Đóng Modal khi click ra khoảng xám
+        window.addEventListener('click', (e) => { 
+            if (e.target === document.getElementById('historyModal')) closeHistoryModal(); 
+        });
+    </script>
 
 <script type="text/javascript">
     // 1. Chặn Chuột phải (Để ẩn menu "Inspect/Kiểm tra" và "View Source/Xem nguồn")

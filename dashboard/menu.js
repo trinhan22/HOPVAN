@@ -160,9 +160,6 @@ const menuHTML = `
             </a>
 
             <div class="px-4 mt-4 mb-2 text-[9px] font-black text-gray-400 uppercase tracking-widest opacity-80">Quản Lý Học Tập</div>
-            <a href="classrooms.html" class="sb-link" data-page="classrooms">
-                <i class="fas fa-chalkboard-teacher w-5 text-center"></i> Lớp học của tôi
-            </a>
             <a href="phongluyende.html" class="sb-link" data-page="phongluyende">
                 <i class="fas fa-pen-nib w-5 text-center"></i> Phòng luyện đề
             </a>
@@ -204,7 +201,7 @@ const menuHTML = `
             ">
                 <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px;">HopVan Platform</span>
                 <span style="width: 4px; height: 4px; border-radius: 50%; background-color: #22c55e;"></span>
-                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.1.7</span>
+                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.1.8</span>
             </div>
         </div>
     </div>

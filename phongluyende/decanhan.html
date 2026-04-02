@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HopVan - Luyện Đề Tổng Hợp</title>
+    <title>HopVan - Luyện Đề Cá Nhân</title>
     
     <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
     <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh." />
@@ -50,138 +50,63 @@
         .loader-robot { font-size: 4rem; color: var(--primary); animation: bounce 1s infinite; }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
         .ai-result-view { padding: 24px; overflow-y: auto; height: 100%; background: #f8fafc; }
-        .custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 20000; justify-content: center; align-items: center; animation: fadeIn 0.2s; }
+        
+        .custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 20000; justify-content: center; align-items: center; animation: fadeIn 0.2s; }
         .modal-box { background: white; padding: 30px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: scale(0.9); animation: zoomIn 0.2s forwards; }
         .modal-icon { font-size: 3rem; margin-bottom: 15px; }
         .modal-actions { margin-top: 25px; display: flex; gap: 10px; justify-content: center; }
-        .modal-btn { flex: 1; padding: 12px; border-radius: 12px; font-weight: 700; transition: 0.2s; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 12px; font-weight: 700; transition: 0.2s; cursor: pointer; }
         .popup-error .modal-icon { color: #ef4444; } .popup-error button { background: #ef4444; color: white; }
         .popup-warning .modal-icon { color: #f59e0b; } .popup-warning button { background: #f59e0b; color: white; }
         .popup-info .modal-icon { color: #3b82f6; } .popup-info button { background: #3b82f6; color: white; }
+        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes zoomIn { from { transform: scale(0.9); } to { transform: scale(1); } }
+        
         .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 70px; background: white; z-index: 100; align-items: center; padding: 0 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         @media (max-width: 1024px) { body { overflow: auto; height: auto; } .mobile-header { display: flex; } .header-bar { display: none; } .main-content { padding: 80px 16px 20px; height: auto; } .workspace-grid { display: flex; flex-direction: column; height: auto; } .column-card { height: 600px; } }
         #output-section { flex: 1; min-height: 0; display: none; }
         #ai-correction-box { height: 100%; overflow-y: auto; }
 
-/* --- GLOBAL SCROLLBAR STYLE --- */
+        /* --- GLOBAL SCROLLBAR STYLE --- */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
 
-/* 1. Thiết lập độ rộng/cao của thanh trượt */
-::-webkit-scrollbar {
-    width: 10px;  /* Độ rộng cho thanh dọc */
-    height: 10px; /* Độ cao cho thanh ngang */
-}
-
-/* 2. Thiết lập rãnh trượt (Track) - Nền chìm */
-::-webkit-scrollbar-track {
-    background: rgba(255, 143, 80, 0.05); /* Màu cam cực nhạt, gần như trong suốt */
-    border-radius: 10px;
-}
-
-/* 3. Thiết lập tay nắm (Thumb) - Phần di chuyển */
-::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 143, 80, 0.3); /* Mặc định là cam nhạt */
-    border-radius: 10px; /* Bo tròn mềm mại */
-    
-    /* Mẹo: Tạo viền trong suốt để thanh trượt trông nhỏ hơn và "lơ lửng" */
-    border: 2px solid transparent;
-    background-clip: content-box;
-    transition: background-color 0.3s ease;
-}
-
-/* 4. Hiệu ứng khi di chuột vào (Hover) */
-::-webkit-scrollbar-thumb:hover {
-    background-color: #FF8F50; /* Đổi sang màu cam chính thương hiệu */
-    border: 1px solid transparent; /* Làm thanh trượt to ra một chút khi hover */
-}
-
-/* 5. (Tùy chọn) Ẩn nút mũi tên 2 đầu (nếu trình duyệt hiển thị) */
-::-webkit-scrollbar-button {
-    display: none;
-}
-
-/* --- FULLSCREEN POPUP NEON SYNC --- */
-        .fs-modal-box {
-            background: white; 
-            padding: 45px 35px; 
-            border-radius: 32px; /* Bo góc cực đại như Stat Card */
-            width: 90%; 
-            max-width: 420px; 
-            text-align: center;
-            position: relative;
-            /* Hiệu ứng viền Neon mờ */
-            border: 2px solid rgba(255, 143, 80, 0.2);
-            /* Đổ bóng Glow đặc trưng */
-            box-shadow: 0 20px 60px rgba(255, 107, 107, 0.15), 0 0 30px rgba(255, 143, 80, 0.1);
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        /* Icon mở rộng với Gradient cam đào */
-        .fs-icon-wrap {
-            width: 80px; height: 80px;
-            margin: 0 auto 25px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 3rem;
-            background: linear-gradient(135deg, #FF8F50 0%, #FF6B6B 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 8px 15px rgba(255, 107, 107, 0.3));
-        }
-
-        /* Nút bấm đồng bộ với phong cách Dashboard */
-        .btn-neon-fs {
-            width: 100%;
-            padding: 16px;
-            border-radius: 18px;
-            background: linear-gradient(135deg, #FF8F50 0%, #FF6B6B 100%);
-            color: white;
-            font-weight: 800;
-            font-size: 1.1rem;
-            text-transform: none; /* Giữ chữ thường như ảnh mẫu */
-            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
-            transition: 0.3s;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-neon-fs:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.5);
-            filter: brightness(1.1);
-        }
-
-        @keyframes popIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
+        /* --- FULLSCREEN POPUP NEON SYNC --- */
+        .fs-modal-box { background: white; padding: 45px 35px; border-radius: 32px; width: 90%; max-width: 420px; text-align: center; position: relative; border: 2px solid rgba(255, 143, 80, 0.2); box-shadow: 0 20px 60px rgba(255, 107, 107, 0.15), 0 0 30px rgba(255, 143, 80, 0.1); animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .fs-icon-wrap { width: 80px; height: 80px; margin: 0 auto 25px; display: flex; align-items: center; justify-content: center; font-size: 3rem; background: linear-gradient(135deg, #FF8F50 0%, #FF6B6B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 8px 15px rgba(255, 107, 107, 0.3)); }
+        .btn-neon-fs { width: 100%; padding: 16px; border-radius: 18px; background: linear-gradient(135deg, #FF8F50 0%, #FF6B6B 100%); color: white; font-weight: 800; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3); transition: 0.3s; border: none; cursor: pointer; }
+        .btn-neon-fs:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(255, 107, 107, 0.5); filter: brightness(1.1); }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         /* --- CSS CHẤM CHỮA CỦA GIÁO VIÊN AI --- */
-        .text-bad { 
-            background-color: #fee2e2; /* Nền đỏ nhạt */
-            color: #dc2626; /* Chữ đỏ đậm */
-            text-decoration: line-through; /* Gạch ngang phần sai */
-            padding: 2px 4px;
-            border-radius: 4px;
-            margin-right: 4px;
-        }
+        .text-bad { background-color: #fee2e2; color: #dc2626; text-decoration: line-through; padding: 2px 4px; border-radius: 4px; margin-right: 4px; }
+        .text-fix { background-color: #fef9c3; color: #b45309; font-weight: bold; padding: 2px 4px; border-radius: 4px; border: 1px dashed #facc15; }
+        .text-good { background-color: #dcfce7; color: #166534; font-style: italic; padding: 2px 4px; border-radius: 4px; }
 
-        .text-fix {
-            background-color: #fef9c3; /* Nền vàng nhạt */
-            color: #b45309; /* Chữ vàng đậm/cam */
-            font-weight: bold;
-            padding: 2px 4px;
-            border-radius: 4px;
-            border: 1px dashed #facc15;
-        }
+        /* --- POPUP SETUP ĐỀ CÁ NHÂN --- */
+        .setup-modal-box { background: white; padding: 0; border-radius: 24px; width: 95%; max-width: 1100px; display: flex; flex-direction: column; md:flex-row; box-shadow: 0 30px 60px rgba(0,0,0,0.3); overflow: hidden; animation: zoomIn 0.3s forwards; }
+        .setup-left { flex: 6; padding: 30px; border-right: 1px solid #f1f5f9; max-height: 85vh; overflow-y: auto; background: #fffcf8;}
+        .setup-right { flex: 4; padding: 30px; background: #f8fafc; max-height: 85vh; overflow-y: auto;}
         
-        .text-good {
-            background-color: #dcfce7; /* Nền xanh nhạt */
-            color: #166534; /* Chữ xanh đậm */
-            font-style: italic;
-            padding: 2px 4px;
-            border-radius: 4px;
-        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 800; color: #1e293b; margin-bottom: 8px; font-size: 0.95rem; }
+        .form-input { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid #cbd5e1; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.95rem; transition: 0.2s; outline: none; background: white;}
+        .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255, 143, 80, 0.2); }
+        .form-textarea { min-height: 100px; resize: vertical; }
+        
+        .img-upload-box { border: 2px dashed #cbd5e1; padding: 20px; text-align: center; border-radius: 12px; cursor: pointer; transition: 0.2s; background: white;}
+        .img-upload-box:hover { border-color: var(--primary); background: #fff7ed; }
+        #preview-img { max-width: 100%; max-height: 200px; border-radius: 8px; display: none; margin-top: 10px; object-fit: contain; }
+
+        .saved-exam-item { background: white; padding: 16px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 12px; cursor: pointer; transition: 0.2s; display: flex; justify-content: space-between; align-items: center;}
+        .saved-exam-item:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255, 143, 80, 0.1); }
+        .exam-title-list { font-weight: 800; color: #1e293b; font-size: 1rem; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;}
+        .exam-date-list { font-size: 0.8rem; color: #64748b; }
+        .btn-del-exam { color: #ef4444; background: #fee2e2; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: 0.2s;}
+        .btn-del-exam:hover { background: #ef4444; color: white; }
     </style>
 </head>
 <body>
@@ -215,18 +140,65 @@
         </div>
     </div>
 
-<div id="fullscreen-popup" class="custom-modal" style="display: none; z-index: 40000; background: rgba(255, 245, 236, 0.7); backdrop-filter: blur(8px);">
-        <div class="fs-modal-box">
-            <div class="fs-icon-wrap">
-                <i class="fas fa-expand-arrows-alt"></i>
-            </div>
+    <div id="setup-exam-modal" class="custom-modal" style="display: flex;">
+        <div class="setup-modal-box flex-col md:flex-row">
             
-            <h3 class="text-2xl font-black text-gray-800 mb-2">Chế độ Làm bài thi</h3>
-            <p class="text-gray-500 leading-relaxed mb-8 px-4">Để đảm bảo sự tập trung cao nhất, hệ thống sẽ chuyển sang <b>Toàn màn hình</b>.</p>
-            
-            <div class="modal-actions">
-                <button onclick="enableFullscreen()" class="btn-neon-fs">Tiếp tục</button>
+            <div class="setup-left custom-scrollbar">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-black text-gray-800 flex items-center gap-2"><i class="fas fa-pen-nib text-orange-500"></i> Tạo Đề Mới</h2>
+                    <a href="../dashboard/phongluyende.html" class="text-sm font-bold text-gray-400 hover:text-orange-500"><i class="fas fa-arrow-left"></i> Quay lại</a>
+                </div>
+
+                <div class="form-group">
+                    <label>Tên Đề / Kỳ Thi</label>
+                    <input type="text" id="ce-title" class="form-input" placeholder="VD: Thi thử THPT Chuyên KHTN lần 1...">
+                </div>
+
+                <div class="form-group">
+                    <label>Phần Đọc Hiểu (Văn bản)</label>
+                    <textarea id="ce-reading-text" class="form-input form-textarea" placeholder="Nhập văn bản đọc hiểu vào đây..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Câu hỏi Đọc hiểu (Mỗi câu xuống dòng [ENTER])</label>
+                    <textarea id="ce-reading-qs" class="form-input form-textarea" placeholder="Câu 1: Thể thơ của đoạn trích là gì?&#10;Câu 2: Theo tác giả, ..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Câu Nghị Luận Xã Hội (NLXH)</label>
+                    <textarea id="ce-nlxh" class="form-input form-textarea" style="min-height: 70px;" placeholder="Nhập yêu cầu câu NLXH..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Câu Nghị Luận Văn Học (NLVH)</label>
+                    <textarea id="ce-nlvh" class="form-input form-textarea" style="min-height: 70px;" placeholder="Nhập yêu cầu câu NLVH..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Đính kèm Ảnh Đề (Tùy chọn)</label>
+                    <div class="img-upload-box" onclick="document.getElementById('ce-image').click()">
+                        <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+                        <p class="text-sm text-gray-500 font-bold">Bấm để tải ảnh đề thi lên</p>
+                        <input type="file" id="ce-image" accept="image/*" class="hidden" onchange="previewImage(event)">
+                        <img id="preview-img" src="" alt="Preview">
+                    </div>
+                </div>
+
+                <button onclick="saveAndStartCustomExam()" class="btn-neon-fs mt-4">
+                    <i class="fas fa-play mr-2"></i> Lưu & Bắt đầu làm bài
+                </button>
             </div>
+
+            <div class="setup-right custom-scrollbar">
+                <h2 class="text-xl font-black text-gray-800 mb-6 flex items-center justify-between">
+                    <span><i class="fas fa-archive text-blue-500 mr-2"></i> Kho Đề Của Tôi</span>
+                    <span id="saved-count" class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-lg">0 đề</span>
+                </h2>
+                
+                <div id="saved-exam-list" class="flex flex-col">
+                    </div>
+            </div>
+
         </div>
     </div>
     
@@ -237,17 +209,14 @@
             </div>
             <span class="font-bold text-gray-700 text-sm">Thoát</span>
         </a>
-        
         <div class="ml-auto bg-gray-900 text-white px-3 py-1 rounded text-xs font-bold font-mono" id="timer-mobile">120:00</div>
     </div>
 
     <div class="dashboard-container">
-        <div id="menu-placeholder"></div>
-        <main class="main-content">
-            <div class="header-bar hidden lg:flex">
+        <main class="main-content !ml-0 !w-full"> <div class="header-bar hidden lg:flex">
                 <div class="flex items-center gap-4">
                     <a href="../dashboard/phongluyende.html" class="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-orange-500 hover:bg-orange-50 transition shadow-sm"><i class="fas fa-arrow-left"></i></a>
-                    <h2 class="text-2xl font-black text-gray-800">Luyện Đề Tổng Hợp</h2>
+                    <h2 class="text-2xl font-black text-gray-800">Luyện Đề Cá Nhân Hóa</h2>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="bg-white rounded-xl border border-gray-200 flex items-center p-1 shadow-sm">
@@ -256,7 +225,7 @@
                         <span class="w-px h-4 bg-gray-200 mx-1"></span>
                         <button onclick="adjustPromptSize(1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded text-gray-600"><i class="fas fa-plus text-xs"></i></button>
                     </div>
-                    <button onclick="randomizeQuestion()" class="bg-white px-4 py-2 rounded-xl font-bold text-gray-600 hover:text-orange-600 border border-gray-200 text-sm shadow-sm flex gap-2 items-center"><i class="fas fa-sync-alt"></i> Đổi đề</button>
+                    <button onclick="window.location.reload()" class="bg-white px-4 py-2 rounded-xl font-bold text-gray-600 hover:text-blue-600 border border-gray-200 text-sm shadow-sm flex gap-2 items-center"><i class="fas fa-exchange-alt"></i> Đổi đề khác</button>
                     <div class="bg-gray-900 text-white px-5 py-2 rounded-xl font-mono font-bold flex items-center gap-2 shadow-lg"><i class="fas fa-clock text-orange-400"></i> <span id="timer">120:00</span></div>
                 </div>
             </div>
@@ -264,12 +233,14 @@
             <div class="workspace-grid">
                 <div class="column-card">
                     <div class="card-header">
-                        <div class="flex items-center gap-2"><span class="font-bold text-orange-600 uppercase text-xs tracking-widest bg-white px-3 py-1 rounded-full border border-orange-100"><i class="fas fa-file-alt mr-1"></i> Đề chính thức</span><span class="text-[10px] text-gray-400 italic">(Bôi đen để Highlight)</span></div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-orange-600 uppercase text-xs tracking-widest bg-white px-3 py-1 rounded-full border border-orange-100"><i class="fas fa-file-alt mr-1"></i> Đề Cá Nhân</span>
+                            <span class="text-[10px] text-gray-400 italic">(Bôi đen để Highlight)</span>
+                        </div>
                         <span id="exam-code" class="text-xs font-bold text-gray-400">LOADING...</span>
                     </div>
                     <div class="scrollable-content prompt-body" id="prompt-content">
-                        <div class="animate-pulse space-y-4"><div class="h-4 bg-gray-200 rounded w-3/4"></div><div class="h-4 bg-gray-200 rounded w-full"></div><div class="h-4 bg-gray-200 rounded w-5/6"></div></div>
-                    </div>
+                        </div>
                 </div>
 
                 <div class="column-card relative">
@@ -285,8 +256,9 @@
                         <div class="flex-1 overflow-hidden relative">
                             <textarea id="student-essay" class="writing-area" placeholder="Viết bài làm của bạn tại đây..."></textarea>
                         </div>
-                        <div class="footer-action"><button onclick="handleAISubmission()" class="submit-btn flex items-center gap-2"><span>NỘP BÀI</span> <i class="fas fa-paper-plane"></i></button></div>
+                        <div class="footer-action"><button onclick="handleAISubmission()" class="submit-btn flex items-center gap-2"><span>NỘP BÀI TỰ LUẬN</span> <i class="fas fa-paper-plane"></i></button></div>
                     </div>
+                    
                     <div id="output-section" class="hidden h-full flex-col">
                         <div class="card-header bg-gray-900 border-none text-white"><span class="font-bold text-sm uppercase"><i class="fas fa-robot mr-2 text-orange-400"></i>Kết quả chấm</span><button onclick="resetExam()" class="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded transition">Làm lại</button></div>
                         <div id="ai-correction-box" class="ai-result-view"></div>
@@ -299,16 +271,14 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Dùng chung file backend đã chỉnh sửa để gọi Groq
     const API_URL = `/.netlify/functions/gemini-proxy`;
-    let questionsData = []; 
     window.currentExamData = null;
 
     // --- HELPER FUNCTIONS ---
@@ -323,6 +293,7 @@
         else if (type === 'warning') { box.classList.add('popup-warning'); icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>'; } 
         else { box.classList.add('popup-info'); icon.innerHTML = '<i class="fas fa-info-circle"></i>'; }
         modal.style.display = 'flex';
+        modal.style.zIndex = '50000';
     };
     window.closePopup = () => document.getElementById('generic-popup').style.display = 'none';
 
@@ -335,65 +306,172 @@
         document.querySelectorAll('.exam-content').forEach(el => el.style.fontSize = `${promptFontSize}px`);
     };
 
-    // --- LOAD DATA ---
-    async function loadQuestions() {
-        try {
-            const querySnapshot = await getDocs(collection(db, "fulltest_bank"));
-            questionsData = [];
-            querySnapshot.forEach(doc => questionsData.push({ id: doc.id, ...doc.data() }));
-            if (questionsData.length === 0) {
-                document.getElementById('prompt-content').innerHTML = `<div class="text-center py-10 text-gray-400">Kho đề trống.</div>`;
+    // --- LOGIC QUẢN LÝ ĐỀ LOCAL STORAGE ---
+    let base64Image = "";
+
+    window.previewImage = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                showPopup("Ảnh quá lớn", "Vui lòng chọn ảnh dưới 2MB để hệ thống lưu trữ mượt mà.", "warning");
+                event.target.value = '';
                 return;
             }
-            randomizeQuestion();
-        } catch (e) {
-            console.error("Lỗi:", e);
-            showPopup("Lỗi Kết Nối", "Không thể tải đề thi: " + e.message, "error");
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                base64Image = e.target.result;
+                const imgEl = document.getElementById('preview-img');
+                imgEl.src = base64Image;
+                imgEl.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
         }
-    }
+    };
 
-    // --- RENDER EXAM ---
-    window.randomizeQuestion = () => {
-        if (!questionsData || questionsData.length === 0) return;
-        const q = questionsData[Math.floor(Math.random() * questionsData.length)];
+    window.renderSavedExams = () => {
+        const list = document.getElementById('saved-exam-list');
+        let exams = JSON.parse(localStorage.getItem('hopvan_local_exams')) || [];
+        document.getElementById('saved-count').innerText = `${exams.length} đề`;
+
+        if(exams.length === 0) {
+            list.innerHTML = `<div class="text-center p-6 text-gray-400 border-2 border-dashed border-gray-200 rounded-2xl mt-4"><i class="fas fa-folder-open text-3xl mb-2 opacity-50"></i><br>Kho đề trống</div>`;
+            return;
+        }
+
+        list.innerHTML = exams.map(e => `
+            <div class="saved-exam-item" onclick="startSavedExam('${e.id}')">
+                <div>
+                    <div class="exam-title-list">${e.title || 'Đề không tên'}</div>
+                    <div class="exam-date-list"><i class="far fa-clock"></i> ${e.date}</div>
+                </div>
+                <button class="btn-del-exam" onclick="event.stopPropagation(); deleteExam('${e.id}')"><i class="fas fa-trash-alt"></i></button>
+            </div>
+        `).join('');
+    };
+
+    window.saveAndStartCustomExam = () => {
+        const title = document.getElementById('ce-title').value.trim() || "Đề Cá Nhân " + new Date().toLocaleDateString('vi-VN');
+        const readingText = document.getElementById('ce-reading-text').value.trim();
+        const rawQs = document.getElementById('ce-reading-qs').value.trim();
+        const nlxh = document.getElementById('ce-nlxh').value.trim();
+        const nlvh = document.getElementById('ce-nlvh').value.trim();
+
+        if(!readingText && !nlxh && !nlvh && !base64Image) {
+            showPopup("Khoan đã", "Bạn cần nhập ít nhất một nội dung (Đọc hiểu, NLXH, NLVH hoặc Ảnh đề) để tạo đề.", "warning");
+            return;
+        }
+
+        const qsArray = rawQs ? rawQs.split('\n').filter(q => q.trim().length > 0) : [];
+
+        const newExam = {
+            id: 'CE_' + Date.now().toString().slice(-6),
+            title: title,
+            reading_text: readingText,
+            reading_questions: qsArray,
+            nlxh_topic: nlxh,
+            nlvh_topic: nlvh,
+            image_url: base64Image,
+            date: new Date().toLocaleDateString('vi-VN')
+        };
+
+        // Save to local storage
+        let exams = JSON.parse(localStorage.getItem('hopvan_local_exams')) || [];
+        exams.unshift(newExam);
+        localStorage.setItem('hopvan_local_exams', JSON.stringify(exams));
+
+        document.getElementById('setup-exam-modal').style.display = 'none';
+        renderExamToWorkspace(newExam);
+    };
+
+    window.deleteExam = (id) => {
+        if(confirm("Bạn muốn xóa đề này khỏi kho?")) {
+            let exams = JSON.parse(localStorage.getItem('hopvan_local_exams')) || [];
+            exams = exams.filter(e => e.id !== id);
+            localStorage.setItem('hopvan_local_exams', JSON.stringify(exams));
+            renderSavedExams();
+        }
+    };
+
+    window.startSavedExam = (id) => {
+        let exams = JSON.parse(localStorage.getItem('hopvan_local_exams')) || [];
+        const exam = exams.find(e => e.id === id);
+        if(exam) {
+            document.getElementById('setup-exam-modal').style.display = 'none';
+            renderExamToWorkspace(exam);
+        }
+    };
+
+    // Gọi render lúc đầu
+    renderSavedExams();
+
+    // --- RENDER EXAM VÀO WORKSPACE ---
+    window.renderExamToWorkspace = (q) => {
         window.currentExamData = q;
-        document.getElementById('exam-code').innerText = `MÃ: ${q.id.slice(0, 6).toUpperCase()}`;
+        document.getElementById('exam-code').innerText = `${q.title.toUpperCase()}`;
         document.getElementById('student-essay').value = "";
         
-        setupHighlightEvent();
-        
-        document.getElementById('prompt-content').innerHTML = `
-            <div id="reading-passage" class="relative pb-10">
-                <div class="passage-box">
-                    <span class="section-badge bg-blue-100 text-blue-700">I. ĐỌC HIỂU (4.0 điểm)</span>
-                    <div class="exam-content highlight-text mt-3" id="text-content">${q.reading_text || "Đang cập nhật..."}</div>
+        let htmlContent = `<div id="reading-passage" class="relative pb-10">`;
+
+        // Phần Ảnh đề (nếu có)
+        if(q.image_url) {
+            htmlContent += `
+                <span class="section-badge bg-gray-100 text-gray-700">ẢNH ĐỀ THI ĐÍNH KÈM</span>
+                <div class="passage-box" style="text-align: center;">
+                    <img src="${q.image_url}" alt="Ảnh Đề" style="max-width: 100%; border-radius: 12px;">
+                </div>
+            `;
+        }
+
+        // Phần Đọc Hiểu
+        if(q.reading_text || (q.reading_questions && q.reading_questions.length > 0)) {
+            htmlContent += `
+                <div class="passage-box mt-4">
+                    <span class="section-badge bg-blue-100 text-blue-700">I. ĐỌC HIỂU</span>
+                    ${q.reading_text ? `<div class="exam-content highlight-text mt-3" id="text-content">${q.reading_text}</div>` : ''}
                     <div class="mt-6 space-y-3">
                         ${(q.reading_questions || []).map((txt, idx) => `
                             <div class="question-box">
-                                <span class="font-bold text-blue-600 block mb-1 text-sm uppercase">Câu ${idx + 1} (${idx < 2 ? '0.5' : '1.0'}đ)</span>
+                                <span class="font-bold text-blue-600 block mb-1 text-sm uppercase">Câu ${idx + 1}</span>
                                 <div class="text-gray-800 text-sm font-medium leading-relaxed">${txt}</div>
                             </div>`).join('')}
                     </div>
                 </div>
-                <div class="mt-8">
-                    <span class="section-badge bg-orange-100 text-orange-700 mb-4 block text-center">II. LÀM VĂN (6.0 điểm)</span>
+            `;
+        }
+
+        // Phần Làm Văn
+        if(q.nlxh_topic || q.nlvh_topic) {
+            htmlContent += `<div class="mt-8"><span class="section-badge bg-orange-100 text-orange-700 mb-4 block text-center">II. LÀM VĂN</span>`;
+            
+            if(q.nlxh_topic) {
+                htmlContent += `
                     <div class="passage-box">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold uppercase">Câu 1 (2.0đ)</span>
-                        </div>
-                        <div class="exam-content">"${q.nlxh_topic}"</div>
+                        <div class="flex items-center gap-2 mb-3"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold uppercase">Nghị Luận Xã Hội</span></div>
+                        <div class="exam-content">${q.nlxh_topic}</div>
                     </div>
+                `;
+            }
+            if(q.nlvh_topic) {
+                htmlContent += `
                     <div class="passage-box">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-bold uppercase">Câu 2 (4.0đ)</span>
-                        </div>
+                        <div class="flex items-center gap-2 mb-3"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-bold uppercase">Nghị Luận Văn Học</span></div>
                         <div class="exam-content">${q.nlvh_topic}</div>
                     </div>
-                </div>
-            </div>`;
+                `;
+            }
+            htmlContent += `</div>`;
+        }
+
+        htmlContent += `</div>`;
+        document.getElementById('prompt-content').innerHTML = htmlContent;
+
         promptFontSize = 17;
         document.querySelector('.prompt-body').style.fontSize = `17px`;
         setTimeout(setupHighlightEvent, 100);
+        
+        // Kích hoạt toàn màn hình (tuỳ chọn)
+        enableFullscreen();
+        startTimer();
     };
 
     // --- HIGHLIGHT (FIX DOM) ---
@@ -437,7 +515,7 @@
         }
     };
 
-    // --- 1. RENDER KẾT QUẢ ---
+    // --- 1. RENDER KẾT QUẢ AI ---
     function renderAIResult(result) {
         document.getElementById('input-section').classList.add('hidden');
         const out = document.getElementById('output-section');
@@ -450,12 +528,10 @@
         document.getElementById('ai-correction-box').innerHTML = `
             <div class="max-w-3xl mx-auto pb-10 custom-scrollbar" style="font-family: 'Merriweather', serif; font-weight: 300;">
                 <div class="text-center mb-8">
-                    <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Kết quả từ AI</div>
+                    <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Kết quả từ AI (Đề Tự Tạo)</div>
                     <div class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2">${result.score}</div>
-                    <div class="grid grid-cols-3 gap-2 max-w-sm mx-auto mt-4">
-                        <div class="bg-blue-50 py-2 rounded-lg text-[10px] font-bold text-blue-600 text-center">Đọc hiểu: ${result.detailed_scores.reading}</div>
-                        <div class="bg-green-50 py-2 rounded-lg text-[10px] font-bold text-green-600 text-center">Câu 1: ${result.detailed_scores.writing_c1}</div>
-                        <div class="bg-purple-50 py-2 rounded-lg text-[10px] font-bold text-purple-600 text-center">Câu 2: ${result.detailed_scores.writing_c2}</div>
+                    <div class="grid grid-cols-1 gap-2 max-w-sm mx-auto mt-4">
+                        <div class="bg-blue-50 py-2 px-4 rounded-lg text-xs font-bold text-blue-600 text-center">Đánh giá chung: Đã chấm xong</div>
                     </div>
                 </div>
                 <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm mb-6">
@@ -464,18 +540,17 @@
                     <p class="text-[11px] text-gray-400 mt-2 italic">"${result.ai_comment}"</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    <div class="bg-green-50/50 p-5 rounded-2xl border border-green-100"><h4 class="text-green-700 font-bold text-[10px] uppercase mb-3">Điểm tích cực</h4><ul class="text-xs text-green-800 space-y-2 font-medium">${result.strengths.map(s => `<li>• ${s}</li>`).join('')}</ul></div>
-                    <div class="bg-red-50/50 p-5 rounded-2xl border border-red-100"><h4 class="text-red-700 font-bold text-[10px] uppercase mb-3">Cần lưu ý</h4><ul class="text-xs text-red-800 space-y-2 font-medium">${result.weaknesses.map(w => `<li>• ${w}</li>`).join('')}</ul></div>
+                    <div class="bg-green-50/50 p-5 rounded-2xl border border-green-100"><h4 class="text-green-700 font-bold text-[10px] uppercase mb-3">Điểm tích cực</h4><ul class="text-xs text-green-800 space-y-2 font-medium">${(result.strengths||[]).map(s => `<li>• ${s}</li>`).join('')}</ul></div>
+                    <div class="bg-red-50/50 p-5 rounded-2xl border border-red-100"><h4 class="text-red-700 font-bold text-[10px] uppercase mb-3">Cần lưu ý</h4><ul class="text-xs text-red-800 space-y-2 font-medium">${(result.weaknesses||[]).map(w => `<li>• ${w}</li>`).join('')}</ul></div>
                 </div>
                 <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm mb-8"><h4 class="font-black text-gray-800 border-b pb-4 mb-6 text-xs uppercase">Chi tiết sửa bài</h4><div class="leading-loose text-gray-700 text-lg space-y-4 text-justify font-light">${result.correction_html}</div><div class="mt-6 pt-4 border-t text-sm italic text-gray-500 text-center font-light">"${result.general_comment}"</div></div>
-                <div class="bg-gray-900 text-white p-6 rounded-2xl shadow-xl"><div class="flex items-center gap-2 mb-2 text-orange-400"><i class="fas fa-compass"></i><span class="text-[10px] font-black uppercase">Định hướng</span></div><p class="text-sm text-gray-300 italic font-light">"${result.orientation}"</p></div>
+                <div class="bg-gray-900 text-white p-6 rounded-2xl shadow-xl"><div class="flex items-center gap-2 mb-2 text-orange-400"><i class="fas fa-compass"></i><span class="text-[10px] font-black uppercase">Định hướng cải thiện</span></div><p class="text-sm text-gray-300 italic font-light">"${result.orientation}"</p></div>
             </div>`;
     }
 
-    // --- 2. HÀM NỘP BÀI (CẬP NHẬT: TỰ ĐỘNG NHẬN DIỆN LOẠI ĐỀ NLXH/NLVH) ---
+    // --- 2. HÀM NỘP BÀI ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
-        // Kiểm tra độ dài tối thiểu (50 từ)
         if(content.split(/\s+/).filter(x => x).length < 50) { 
             document.getElementById('short-essay-popup').style.display = 'flex'; return; 
         }
@@ -485,76 +560,39 @@
         
         const q = window.currentExamData;
         if (!q) {
-            showPopup("Lỗi", "Dữ liệu đề bị trống. Hãy reload trang.", "error");
+            showPopup("Lỗi", "Chưa có dữ liệu đề bài.", "error");
             loading.style.display = 'none';
             return;
         }
         
-        // --- SYSTEM PROMPT LINH HOẠT ---
+        // Điều chỉnh System Prompt phù hợp với đề tự do
         const systemPrompt = `
-        VAI TRÒ: Bạn là Giáo viên Ngữ văn lớp 12 (Chatbot Giáo viên Ngữ văn K12).
+        VAI TRÒ: Bạn là Giáo viên Ngữ văn AI.
         
-        KIẾN THỨC NỀN TẢNG:
-        - Am hiểu sâu rộng Lí luận văn học, SGK mới, Chương trình GDPT 2018.
-        - Chuyên gia về các thể loại văn học và các vấn đề xã hội.
-
-        THÁI ĐỘ CHẤM BÀI:
-        - Nghiêm túc, tỉ mỉ, khích lệ nhưng thẳng thắn chỉ ra lỗi sai.
-        - Ngôn ngữ nhận xét: Đậm chất văn học, mang tính học thuật, tuyệt đối không dùng từ ngữ sáo rỗng.
-
-        BAREM ĐIỂM & CẤU TRÚC ĐỀ (LINH HOẠT):
-        1. PHẦN ĐỌC HIỂU (4.0 điểm):
-           - Câu 1, 2 (0.5đ/câu): Nhận biết (Thể thơ, PTBĐ, Ngôi kể...). Sai là 0 điểm.
-           - Câu 3, 4, 5 (1.0đ/câu): Thông hiểu, Vận dụng. Trả lời hời hợt trừ 50% điểm.
-        
-        2. PHẦN LÀM VĂN (6.0 điểm) - Gồm 2 câu:
-           - Câu 1 (2.0 điểm) và Câu 2 (4.0 điểm).
-           - QUAN TRỌNG: Thể loại của Câu 1 và Câu 2 là NGẪU NHIÊN (có thể là Nghị luận Xã hội hoặc Nghị luận Văn học).
-           - NHIỆM VỤ CỦA AI: Bạn phải đọc nội dung đề bài của từng câu để xác định thể loại:
-             + Nếu là NLXH: Chấm điểm dựa trên tư duy phản biện, dẫn chứng thực tế, góc nhìn xã hội sâu sắc.
-             + Nếu là NLVH: Chấm điểm dựa trên khả năng cảm thụ, phân tích nghệ thuật, vận dụng lý luận văn học.
-
-        QUY TRÌNH CHẤM 3 BƯỚC (BẮT BUỘC):
-
-        BƯỚC 1: ĐÁNH GIÁ TỔNG QUÁT
-        - Điểm tích cực: Sự sáng tạo, dẫn chứng "đắt", văn phong mượt mà, xác định đúng trọng tâm.
-        - Hạn chế: Thiếu dẫn chứng, phân tích hời hợt, diễn xuôi (kể lể), dùng văn mẫu sáo rỗng.
-
-        BƯỚC 2: SỬA BÀI CHI TIẾT (HIGHLIGHT)
-        - Trích dẫn lại văn bản gốc và chèn thẻ sửa lỗi:
-          + <span class='text-bad'>...</span>: Cho phần dùng từ sai, diễn đạt lủng củng, lập luận yếu.
-          + <span class='text-fix'>...</span>: Nội dung giáo viên sửa lại/gợi ý thay thế ngay bên cạnh.
-        - Yêu cầu: Phần sửa phải nâng tầm bài viết (Ví dụ: Thay từ ngữ bình dân bằng thuật ngữ văn học/chính trị xã hội sắc bén).
-
-        BƯỚC 3: TỔNG KẾT VÀ ĐỊNH HƯỚNG
-        - Đưa ra lời khuyên cụ thể để học sinh cải thiện tư duy (không nói chung chung "cần cố gắng hơn").
-
-        OUTPUT JSON FORMAT (DUY NHẤT):
-        {
-            "human_score": (int 0-100, độ chân thực),
-            "score": (float 0-10.0, tổng điểm toàn bài),
-            "detailed_scores": {
-                "reading": "x/4.0",
-                "writing_c1": "x/2.0 (Ghi chú: NLXH hay NLVH)",
-                "writing_c2": "x/4.0 (Ghi chú: NLXH hay NLVH)"
-            },
-            "type_detected": "Đề Tổng Hợp (Tự động nhận diện)",
-            "general_comment": "Nhận xét tổng quát (Bước 1)",
-            "ai_comment": "Nhận xét về việc có dùng văn mẫu/AI hay không",
-            "strengths": ["Điểm tốt 1", "Điểm tốt 2"],
-            "weaknesses": ["Hạn chế 1", "Hạn chế 2"],
-            "correction_html": "Văn bản đã highlight (Bước 2)",
-            "orientation": "Lời khuyên định hướng (Bước 3)"
-        }
-
-        DỮ LIỆU ĐỀ BÀI:
-        - Đọc hiểu: ${q.reading_text}
-        - Câu hỏi Đọc hiểu: ${q.reading_questions}
-        - Làm văn Câu 1 (2.0đ): ${q.nlxh_topic} (Lưu ý: Hãy tự kiểm tra xem đây là NLXH hay NLVH)
-        - Làm văn Câu 2 (4.0đ): ${q.nlvh_topic} (Lưu ý: Hãy tự kiểm tra xem đây là NLXH hay NLVH)
+        ĐỀ BÀI CỦA HỌC SINH TỰ TẠO:
+        - Đọc hiểu: ${q.reading_text || 'Không có'}
+        - Câu hỏi: ${(q.reading_questions||[]).join(' | ') || 'Không có'}
+        - NLXH: ${q.nlxh_topic || 'Không có'}
+        - NLVH: ${q.nlvh_topic || 'Không có'}
+        *(Lưu ý: Học sinh có thể đính kèm ảnh đề, do đó phần text đề bài có thể bị trống. Bạn hãy dựa trực tiếp vào bài làm của học sinh để đoán xem họ đang phân tích tác phẩm gì/vấn đề gì để chấm điểm cho phù hợp).*
 
         BÀI LÀM CỦA HỌC SINH:
         ${content}
+
+        NHIỆM VỤ CỦA AI:
+        Chấm điểm bài làm trên thang điểm 10. Tập trung vào việc nhận xét lỗi lập luận, diễn đạt, sai chính tả.
+        
+        OUTPUT JSON FORMAT DUY NHẤT:
+        {
+            "human_score": (int 0-100, độ chân thực),
+            "score": (float 0-10.0, tổng điểm toàn bài),
+            "general_comment": "Nhận xét tổng quát",
+            "ai_comment": "Nhận xét về việc có dùng văn mẫu/AI hay không",
+            "strengths": ["Điểm tốt 1", "Điểm tốt 2"],
+            "weaknesses": ["Hạn chế 1", "Hạn chế 2"],
+            "correction_html": "Trích dẫn lại 1 vài đoạn văn sai lầm của HS và chèn thẻ sửa lỗi <span class='text-bad'>...</span> và <span class='text-fix'>...</span> kế bên",
+            "orientation": "Lời khuyên định hướng"
+        }
         `;
 
         try {
@@ -563,21 +601,19 @@
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ 
                     systemPrompt: systemPrompt, 
-                    messages: `Học sinh gửi bài làm Đề Tổng Hợp. Hãy xác định thể loại từng câu và chấm theo quy trình K12.`
+                    messages: `Hãy chấm bài luận cá nhân hóa này theo đúng JSON format.`
                 }) 
             });
 
             if (!res.ok) throw new Error("SERVER_ERROR");
 
             const data = await res.json();
-            
             if (!data.choices || !data.choices[0] || !data.choices[0].message) {
                 throw new Error("NO_CONTENT");
             }
 
             let rawText = data.choices[0].message.content;
             
-            // JSON CLEANING
             rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
             const firstBrace = rawText.indexOf('{');
             const lastBrace = rawText.lastIndexOf('}');
@@ -587,35 +623,34 @@
             
             const result = JSON.parse(rawText);
 
-            // DATA SANITIZATION
             let safeScore = parseFloat(result.score);
             if (isNaN(safeScore)) safeScore = 0;
             if (safeScore > 10) safeScore = 10;
-
             result.score = safeScore;
             result.human_score = parseInt(result.human_score) || 100;
             
-            // Render kết quả
             renderAIResult(result);
 
-            // Lưu vào Firebase
-            if (auth.currentUser) {
-                // Lưu vào Collection 'exam_history'
-                await addDoc(collection(db, "exam_history"), {
-                    userId: auth.currentUser.uid, // ID học sinh
-                    userName: auth.currentUser.displayName || auth.currentUser.email.split('@')[0],
-                    prompt: q.title || "Đề Luyện Tập", // Tên đề
-                    essay: content, // Bài làm nguyên văn
-                    score: result.score, // Điểm số AI chấm
-                    feedback: result.correction_html, // Lời phê & sửa lỗi của AI
-                    timestamp: serverTimestamp() // Thời gian nộp chuẩn Google
-                });
-            }
+            // Lưu bài vào Local History
+            const now = new Date();
+            const dateStr = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')} - ${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()}`;
+            
+            let history = JSON.parse(localStorage.getItem('hopvan_exam_history')) || [];
+            history.unshift({
+                id: 'HIST_' + Date.now().toString().slice(-6),
+                date: dateStr,
+                score: result.score,
+                prompt: q.title || "Đề Tự Chọn",
+                essay: content.substring(0, 100) + '...', // Lưu 1 đoạn ngắn làm preview
+                feedback: result.correction_html
+            });
+            localStorage.setItem('hopvan_exam_history', JSON.stringify(history));
+
         } catch(e) { 
             console.error(e); 
             let msg = "Có lỗi xảy ra, vui lòng thử lại!";
             if (e.message === "SERVER_ERROR") msg = "Server đang bận. Bạn hãy bấm nộp lại nhé!";
-            if (e.message === "INVALID_FORMAT") msg = "Dữ liệu trả về bị lỗi. Vui lòng bấm nộp lại!";
+            if (e.name === "SyntaxError") msg = "Dữ liệu AI trả về bị lỗi cấu trúc. Vui lòng bấm nộp lại!";
             showPopup("Lỗi AI", msg, "error");
         } finally { 
             loading.style.display = 'none'; 
@@ -628,104 +663,76 @@
         document.getElementById('output-section').style.display = 'none';
     };
 
+    let timerInterval;
     let timeLeft = 7200; 
-    function startTimer() { setInterval(() => { if(timeLeft > 0) { timeLeft--; const m = Math.floor(timeLeft / 60); const s = timeLeft % 60; document.getElementById('timer').innerText = `${Math.floor(m/60)}:${(m%60).toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; if(document.getElementById('timer-mobile')) document.getElementById('timer-mobile').innerText = document.getElementById('timer').innerText; } else if (timeLeft === 0) { timeLeft = -1; showPopup("Hết Giờ!", "Đã hết thời gian làm bài.", "warning"); } }, 1000); }
+    function startTimer() { 
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => { 
+            if(timeLeft > 0) { 
+                timeLeft--; 
+                const m = Math.floor(timeLeft / 60); 
+                const s = timeLeft % 60; 
+                const timeStr = `${Math.floor(m/60)}:${(m%60).toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                document.getElementById('timer').innerText = timeStr; 
+                if(document.getElementById('timer-mobile')) document.getElementById('timer-mobile').innerText = timeStr; 
+            } else if (timeLeft === 0) { 
+                timeLeft = -1; showPopup("Hết Giờ!", "Đã hết thời gian làm bài.", "warning"); 
+            } 
+        }, 1000); 
+    }
 
-    onAuthStateChanged(auth, u => { if(u) { startTimer(); loadQuestions(); } else window.location.href="../log.html"; });
-    document.getElementById('file-upload').addEventListener('change', (e) => { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); if(f.name.endsWith('.docx')) { r.onload = (ev) => mammoth.extractRawText({arrayBuffer: ev.target.result}).then(res => document.getElementById('student-essay').value = res.value); r.readAsArrayBuffer(f); } else showPopup("Lỗi", "Chỉ nhận file .docx", "error"); });
-    document.getElementById('student-essay').oninput = function() { document.getElementById('word-count').innerText = `${this.value.trim().split(/\s+/).filter(x => x).length} TỪ`; };
+    onAuthStateChanged(auth, u => { 
+        if(!u) window.location.href="../log.html"; 
+    });
 
-// --- FULLSCREEN LOGIC ---
-    // Hàm kích hoạt toàn màn hình
+    document.getElementById('file-upload').addEventListener('change', (e) => { 
+        const f = e.target.files[0]; 
+        if(!f) return; 
+        const r = new FileReader(); 
+        if(f.name.endsWith('.docx')) { 
+            r.onload = (ev) => mammoth.extractRawText({arrayBuffer: ev.target.result}).then(res => document.getElementById('student-essay').value = res.value); 
+            r.readAsArrayBuffer(f); 
+        } else showPopup("Lỗi", "Chỉ nhận file .docx", "error"); 
+    });
+    
+    document.getElementById('student-essay').oninput = function() { 
+        document.getElementById('word-count').innerText = `${this.value.trim().split(/\s+/).filter(x => x).length} TỪ`; 
+    };
+
+    // --- FULLSCREEN LOGIC ---
     window.enableFullscreen = () => {
         const elem = document.documentElement;
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.webkitRequestFullscreen) { /* Safari */
-            elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) { /* IE11 */
-            elem.msRequestFullscreen();
-        }
-        // Ẩn popup sau khi bật
+        if (elem.requestFullscreen) { elem.requestFullscreen(); } 
+        else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); } 
+        else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
         document.getElementById('fullscreen-popup').style.display = 'none';
     };
 
-    // Tự động hiện popup khi tải trang
-    window.addEventListener('load', () => {
-        // Chỉ hiện nếu chưa ở chế độ fullscreen
-        if (!document.fullscreenElement) {
-            setTimeout(() => {
-                document.getElementById('fullscreen-popup').style.display = 'flex';
-            }, 500); // Delay nhẹ 0.5s để mượt hơn
-        }
-    });
-
-    // Lắng nghe sự kiện thoát fullscreen (tùy chọn: hiện lại popup nếu thoát ra)
-    document.addEventListener('fullscreenchange', () => {
-        if (!document.fullscreenElement) {
-            // Nếu người dùng thoát fullscreen, có thể hiện lại thông báo hoặc cảnh báo (tuỳ ý)
-            // console.log("Đã thoát chế độ toàn màn hình");
-        }
-    });
-
     // --- CHỐNG COPY PASTE (ANTI CHEAT) ---
     const essayArea = document.getElementById('student-essay');
-
     if (essayArea) {
-        // 1. Chặn hành động Dán (Paste)
         essayArea.addEventListener('paste', (e) => {
-            e.preventDefault(); // Ngăn chặn hành động dán
+            e.preventDefault(); 
             showPopup("Chế độ Luyện Tập", "Vui lòng tự gõ bài để rèn luyện tư duy.\nHệ thống không cho phép Copy-Paste.", "warning");
         });
-
-        // 2. Chặn hành động Sao chép & Cắt (Copy & Cut) - Để tránh copy đề hoặc bài ra ngoài
         essayArea.addEventListener('copy', (e) => e.preventDefault());
         essayArea.addEventListener('cut', (e) => e.preventDefault());
-
-        // 3. Chặn Kéo thả text vào ô (Drop)
         essayArea.addEventListener('drop', (e) => e.preventDefault());
-
-        // 4. (Tuỳ chọn) Chặn Menu chuột phải trong ô nhập liệu
-        essayArea.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-        });
+        essayArea.addEventListener('contextmenu', (e) => e.preventDefault());
     }
 </script>
 
 <script type="text/javascript">
-    // 1. Chặn Chuột phải (Để ẩn menu "Inspect/Kiểm tra" và "View Source/Xem nguồn")
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        // Không hiện thông báo gì cả để trải nghiệm mượt mà hơn
-    });
-
-    // 2. Chặn các phím tắt Developer Tools
+    document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
     document.addEventListener('keydown', function(e) {
-        // Chặn F12
-        if (e.key === 'F12' || e.keyCode === 123) {
-            e.preventDefault();
-            return false;
-        }
-
-        // Chặn các tổ hợp phím Ctrl + ...
+        if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
         if (e.ctrlKey) {
             switch (e.key.toLowerCase()) {
-                case 'u': // Chặn Ctrl + U (Xem source code)
-                case 's': // Chặn Ctrl + S (Lưu trang web)
-                case 'p': // Chặn Ctrl + P (In trang web - thường hiện code)
-                // Lưu ý: KHÔNG chặn 'c' (Copy) và 'a' (Select All)
-                    e.preventDefault();
-                    return false;
+                case 'u': case 's': case 'p': e.preventDefault(); return false;
             }
-
-            // Chặn Ctrl + Shift + ... (Các phím mở DevTools)
             if (e.shiftKey) {
                 switch (e.key.toLowerCase()) {
-                    case 'i': // Inspect Element
-                    case 'j': // Console
-                    case 'c': // Element Inspector
-                        e.preventDefault();
-                        return false;
+                    case 'i': case 'j': case 'c': e.preventDefault(); return false;
                 }
             }
         }

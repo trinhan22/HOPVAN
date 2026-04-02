@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Lịch Sử Làm Bài - HopVan</title>
+    <meta name="theme-color" content="#FF8F50">
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root { --primary: #FF8F50; --primary-dark: #ea580c; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #FFF5EC; min-height: 100vh; color: #334155; overflow-x: hidden; }
+        
+        .fixed-bg { position: fixed; inset: 0; z-index: -10; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.6; animation: float 10s infinite alternate; }
+        .blob-1 { width: 500px; height: 500px; background: #ffe4d3; top: -100px; left: -100px; }
+        .blob-2 { width: 400px; height: 400px; background: #ffdec2; bottom: -50px; right: -50px; }
+        @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 50px); } }
+
+        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border: 1px solid white; box-shadow: 0 20px 60px -10px rgba(255, 143, 80, 0.15); border-radius: 28px; }
+        
+        .score-circle { width: 150px; height: 150px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; margin: 0 auto; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); transition: 0.5s; }
+        .score-circle.graded { background: conic-gradient(var(--primary) 0%, #fed7aa 0%); box-shadow: 0 10px 40px rgba(255, 143, 80, 0.3); }
+        .score-inner { width: 120px; height: 120px; background: white; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+        .st-badge { padding: 6px 16px; border-radius: 30px; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px; }
+        .st-done { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+        
+        .q-card { background: white; border-radius: 20px; padding: 28px; margin-bottom: 24px; border: 1px solid #f1f5f9; box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: 0.2s; position: relative; }
+        
+        /* CSS CHẤM CHỮA AI */
+        .text-bad { background-color: #fee2e2; color: #dc2626; text-decoration: line-through; padding: 2px 4px; border-radius: 4px; margin-right: 4px; }
+        .text-fix { background-color: #fef9c3; color: #b45309; font-weight: bold; padding: 2px 4px; border-radius: 4px; border: 1px dashed #facc15; }
+        .text-good { background-color: #dcfce7; color: #166534; font-style: italic; padding: 2px 4px; border-radius: 4px; }
+
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
+    </style>
+</head>
+<body class="p-4 md:p-8 overflow-y-auto custom-scrollbar pb-10">
+
+    <div class="fixed-bg"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+
+    <div class="max-w-5xl mx-auto flex justify-between items-center mb-8 relative z-20">
+        <button onclick="window.history.back()" class="flex items-center gap-2 text-gray-500 font-bold hover:text-orange-600 transition bg-white/60 px-5 py-2.5 rounded-xl backdrop-blur-sm shadow-sm hover:shadow-md">
+            <i class="fas fa-arrow-left"></i> <span>Về Phòng luyện đề</span>
+        </button>
+
+        <div class="flex items-center gap-3 bg-white/80 p-2 pr-5 rounded-full shadow-sm backdrop-blur-sm border border-white">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-red-500 text-white flex items-center justify-center font-bold shadow-md" id="user-avatar">U</div>
+            <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase">Học sinh</p>
+                <p class="text-sm font-bold text-gray-800 leading-none truncate max-w-[150px]" id="user-name">Đang tải...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading-screen" class="flex flex-col items-center justify-center py-40">
+        <i class="fas fa-spinner fa-spin text-5xl text-orange-500 mb-4"></i>
+        <p class="font-bold text-gray-600">Đang truy xuất dữ liệu trên máy chủ...</p>
+    </div>
+
+    <div id="error-screen" class="hidden flex flex-col items-center justify-center py-20 text-center">
+        <div class="w-24 h-24 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-4xl mb-6 shadow-sm"><i class="fas fa-search-minus"></i></div>
+        <h3 class="text-2xl font-black text-gray-800">Không tìm thấy bài làm</h3>
+        <p class="text-gray-500 mt-2 max-w-md mx-auto" id="error-msg">Có vẻ như dữ liệu lịch sử này đã bị xóa hoặc không tồn tại.</p>
+        <button onclick="window.history.back()" class="mt-8 px-8 py-3 bg-gray-800 text-white rounded-xl font-bold hover:bg-black transition shadow-lg">Quay lại</button>
+    </div>
+
+    <div id="main-content" class="max-w-5xl mx-auto hidden animate-fade-in">
+        
+        <div class="glass-panel p-8 mb-8 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-orange-400 to-red-500"></div>
+            
+            <div class="text-center mb-12"> 
+                <span class="st-badge st-done mb-5 inline-block shadow-sm">ĐÃ CHẤM TỰ ĐỘNG</span>
+                <h1 class="text-3xl md:text-4xl font-black text-gray-800 mt-3 mb-3 leading-tight px-4" id="test-name">Tên Đề Bài</h1>
+                <p class="text-gray-500 font-medium flex items-center justify-center gap-2">
+                    <i class="far fa-clock"></i> Nộp lúc: <span id="submit-time">--:--</span>
+                </p>
+            </div>
+
+            <div class="flex justify-center relative z-10 mb-8">
+                <div class="score-circle graded" id="score-ring">
+                    <div class="score-inner">
+                        <span class="text-5xl font-black text-gray-800 tracking-tighter" id="final-score">--</span>
+                        <span class="text-[10px] font-bold text-gray-400 uppercase mt-1 tracking-wider">Tổng Điểm</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <p class="text-sm text-gray-400 italic"><i class="fas fa-robot text-orange-400"></i> Điểm số và nhận xét do AI cung cấp mang tính chất tham khảo.</p>
+            </div>
+        </div>
+
+        <div class="glass-panel p-6 md:p-10 bg-white/95">
+            <div class="flex justify-between items-center mb-8 border-b pb-6 border-gray-100">
+                <h3 class="text-xl font-black text-gray-800 flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center"><i class="fas fa-list-ul"></i></span>
+                    Chi tiết bài làm
+                </h3>
+                <div class="text-xs font-bold text-gray-500 bg-gray-100 px-4 py-2 rounded-full border border-gray-200 shadow-sm">Chi tiết AI Feedback</div>
+            </div>
+            
+            <div id="questions-list" class="space-y-8">
+                </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const errorScreen = document.getElementById('error-screen');
+        const mainContent = document.getElementById('main-content');
+        const loadingScreen = document.getElementById('loading-screen');
+
+        // BẮT SỰ KIỆN ĐĂNG NHẬP
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Set Tên Avatar
+                const name = user.displayName || user.email.split('@')[0];
+                document.getElementById('user-name').innerText = name;
+                document.getElementById('user-avatar').innerText = name.charAt(0).toUpperCase();
+
+                // Lấy ID Lịch sử truyền sang
+                const historyId = localStorage.getItem('hopvan_current_history_id');
+                if (!historyId) {
+                    showError("Lỗi: Không tìm thấy ID Bài làm để truy xuất dữ liệu.");
+                    return;
+                }
+
+                // Gọi Database
+                try {
+                    const docRef = doc(db, "exam_history", historyId);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        const submissionData = docSnap.data();
+                        
+                        // Nếu user cố tình xem bài của người khác -> Chặn
+                        if (submissionData.userId !== user.uid) {
+                            showError("Bạn không có quyền xem bài làm của người khác.");
+                            return;
+                        }
+
+                        renderHistoryData(submissionData);
+                    } else {
+                        showError("Bài làm này không tồn tại trên hệ thống hoặc đã bị xóa.");
+                    }
+                } catch (e) {
+                    console.error("Lỗi lấy dữ liệu:", e);
+                    showError("Mất kết nối máy chủ. Vui lòng kiểm tra lại mạng.");
+                }
+
+            } else {
+                window.location.href = "../log.html"; // Ép đăng nhập
+            }
+        });
+
+        function showError(msg) {
+            loadingScreen.style.display = 'none';
+            document.getElementById('error-msg').innerText = msg;
+            errorScreen.classList.remove('hidden');
+        }
+
+        // HÀM RENDER DỮ LIỆU
+        function renderHistoryData(data) {
+            loadingScreen.style.display = 'none';
+            mainContent.classList.remove('hidden');
+            
+            document.getElementById('test-name').innerText = data.prompt || "Đề Tự Chọn";
+            document.getElementById('submit-time').innerText = data.timestamp ? data.timestamp.toDate().toLocaleString('vi-VN') : "Không rõ";
+            
+            let score = parseFloat(data.score) || 0;
+            document.getElementById('final-score').innerText = score.toFixed(1);
+            
+            const ring = document.getElementById('score-ring');
+            const color = score >= 8 ? '#10B981' : (score >= 5 ? '#F59E0B' : '#EF4444');
+            ring.style.background = `conic-gradient(${color} ${(score/10)*100}%, #f1f5f9 0%)`;
+
+            const qList = document.getElementById('questions-list');
+            let feedbackContent = data.feedback || "<p class='text-gray-400 italic'>AI chưa lưu nhận xét chi tiết cho bài làm này.</p>";
+
+            qList.innerHTML = `
+                <div class="q-card border-l-4 border-orange-400">
+                    <div class="flex justify-between items-center mb-3 pl-1">
+                        <span class="font-black text-gray-400 text-sm"><i class="fas fa-pen-nib mr-1"></i> BÀI LÀM GỐC</span>
+                    </div>
+                    
+                    <div class="text-gray-800 whitespace-pre-wrap text-[15px] leading-8 mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100" style="font-family: 'Merriweather', serif;">
+                        ${data.essay}
+                    </div>
+
+                    <div class="flex justify-between items-center mb-3 pl-1 border-t pt-4">
+                        <span class="font-black text-orange-500 text-sm"><i class="fas fa-robot mr-1"></i> AI SỬA LỖI & PHÂN TÍCH</span>
+                    </div>
+
+                    <div class="leading-loose text-gray-700 text-lg space-y-4 text-justify font-light" style="font-family: 'Merriweather', serif;">
+                        ${feedbackContent}
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

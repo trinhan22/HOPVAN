@@ -622,13 +622,15 @@
 
             // Lưu vào Firebase (Lưu ý type là nlvh, genre là Kịch)
             if (auth.currentUser) {
-                await addDoc(collection(db, "activities"), {
-                    uid: auth.currentUser.uid,
-                    type: "nlvh",
-                    genre: "Kịch",
-                    score: safeScore,
-                    timestamp: serverTimestamp(),
-                    examId: q.id
+                // Lưu vào Collection 'exam_history'
+                await addDoc(collection(db, "exam_history"), {
+                    userId: auth.currentUser.uid, // ID học sinh
+                    userName: auth.currentUser.displayName || auth.currentUser.email.split('@')[0],
+                    prompt: q.title || "Đề Luyện Tập", // Tên đề
+                    essay: content, // Bài làm nguyên văn
+                    score: result.score, // Điểm số AI chấm
+                    feedback: result.correction_html, // Lời phê & sửa lỗi của AI
+                    timestamp: serverTimestamp() // Thời gian nộp chuẩn Google
                 });
             }
         } catch(e) { 

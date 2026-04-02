@@ -453,6 +453,190 @@
     100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
 }
 
+
+        /* =========================================
+           HERO SLIDER - HOPVAN STYLE (ROUNDED CARD)
+           ========================================= */
+        .hero-wrapper {
+            position: relative;
+            width: 100%;
+            height: 75vh; /* Kéo dài card xuống nữa */
+            min-height: 600px; /* Chiều cao tối thiểu lớn hơn */
+            overflow: hidden;
+            margin-bottom: 40px; 
+            background: #fff;
+            border-radius: 36px; 
+            box-shadow: 0 20px 50px rgba(255, 143, 80, 0.15); 
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        /* Ẩn hoàn toàn sương mù đen */
+        .hero-fog, .hero-wrapper::after { display: none !important; }
+
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center 20%;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            display: flex;
+            align-items: flex-end; 
+            
+            /* ĐÃ SỬA: Tách padding ra để dễ căn chỉnh */
+            /* Cú pháp: padding: Trên Phải Dưới Trái; */
+            padding: 0 60px 160px 100px; 
+        }
+
+        .hero-slide.active { opacity: 1; z-index: 1; }
+
+        /* Lớp màng siêu mỏng, chỉ để chữ trắng đọc được trên nền sáng */
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.2); /* Chỉ làm tối 20%, không dùng gradient đen nữa */
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 3;
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; 
+            text-align: left;
+            gap: 12px; /* Thu hẹp khoảng cách giữa các phần tử */
+            animation: fadeUp 0.8s ease-out forwards;
+        }
+
+        .hero-origin-name {
+            color: #FF8F50;
+            font-size: 0.8rem; /* Chữ nhỏ lại */
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 4px 14px;
+            border-radius: 50px;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .hero-title-main {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 2.4rem; /* Giảm size chữ tiêu đề */
+            font-weight: 900;
+            line-height: 1.3;
+            color: #ffffff;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.6); /* Giảm độ đậm của viền bóng đen */
+        }
+
+        .hero-meta {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 0.85rem; color: #f8fafc; font-weight: 600; /* Chữ meta nhỏ lại */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .quality-badge {
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .hero-desc {
+            color: #f8fafc;
+            font-size: 0.95rem; /* Chữ mô tả nhỏ lại */
+            line-height: 1.6;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            font-weight: 400;
+        }
+
+        .hero-actions { display: flex; align-items: center; gap: 15px; margin-top: 15px; }
+        
+        .btn-read-hero {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 12px 30px; /* Nút nhỏ gọn hơn */
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 10px 25px rgba(255, 143, 80, 0.4);
+            transition: 0.3s; cursor: pointer; border: none;
+        }
+        .btn-read-hero:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(255, 143, 80, 0.6); }
+
+        .btn-heart-hero {
+            width: 48px; height: 48px; /* Nút tim nhỏ gọn hơn */
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.4);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 1.1rem;
+            cursor: pointer; transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .btn-heart-hero:hover { background: #ff4757; border-color: transparent; transform: scale(1.1); box-shadow: 0 10px 20px rgba(255, 71, 87, 0.4);}
+
+        .hero-thumbnails {
+            position: absolute; bottom: 50px; right: 50px;
+            z-index: 10; display: flex; gap: 15px;
+        }
+        .thumb-item {
+            width: 140px; height: 80px; 
+            border-radius: 14px; overflow: hidden; cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.3); transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        .thumb-item img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.6); transition: 0.3s; }
+        .thumb-item:hover img { filter: brightness(0.9); }
+        .thumb-item.active { border-color: var(--primary); transform: scale(1.05); box-shadow: 0 10px 25px rgba(255, 143, 80, 0.4); }
+        .thumb-item.active img { filter: brightness(1); }
+
+        html.dark .hero-wrapper { background: var(--bg-card); border-color: var(--border-card); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+
+        @media (max-width: 900px) {
+            .hero-wrapper { height: auto; min-height: 400px; border-radius: 24px; }
+            .hero-slide { padding: 30px 20px; align-items: center; }
+            .hero-thumbnails { display: none; }
+            .hero-content { width: 100%; align-items: center; text-align: center; }
+            .hero-title-main { font-size: 1.8rem; }
+        }
+
+        /* =========================================
+           CSS CHO TOAST THÔNG BÁO YÊU THÍCH (FIX Z-INDEX)
+           ========================================= */
+        #fav-toast {
+            position: fixed; bottom: 40px; right: 40px;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            color: var(--text-heading);
+            padding: 16px 24px; border-radius: 16px;
+            border-left: 6px solid #ff4757; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2); /* Bóng đổ mạnh hơn để nổi bật */
+            display: flex; align-items: center; gap: 15px;
+            z-index: 999999 !important; /* QUAN TRỌNG: Đẩy z-index lên cao nhất */
+            transform: translateX(150%);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            opacity: 0; pointer-events: none;
+        }
+        #fav-toast.show { transform: translateX(0); opacity: 1; pointer-events: auto; }
+        
+        .toast-icon-wrap {
+            background: #ffe2e5; color: #ff4757;
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+        }
+        html.dark #fav-toast { background: var(--bg-card); color: white; border-color: #ff4757; }
+        html.dark .toast-icon-wrap { background: rgba(255, 71, 87, 0.2); }
     </style>
 </head>
 <body>
@@ -481,24 +665,40 @@
     <div id="menu-placeholder"></div>
 
     <main class="main-content">
+        <div id="fav-toast">
+            <div class="toast-icon-wrap">
+                <i class="fas fa-heart"></i>
+            </div>
+            <div>
+                <h4 style="font-weight: 800; font-size: 1rem; margin-bottom: 2px;">Thành công!</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Đã lưu bài viết vào bộ sưu tập.</p>
+            </div>
+        </div>
         
-        <div class="page-header" style="margin-bottom: 50px;">
-            <div style="display: inline-block; background: rgba(255, 143, 80, 0.1); padding: 8px 20px; border-radius: 50px; color: #FF8F50; font-weight: 800; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px;">Thư viện tri thức</div>
-            <h1 class="page-title" style="font-size: 3.5rem;">Bản Tin <span class="text-gradient">Văn Học</span></h1>
-            <p class="page-subtitle" style="font-size: 1.1rem; max-width: 600px; margin: 11px auto 0; line-height: 1.6;">Khám phá kho tàng dẫn chứng, lý luận và bài văn mẫu chất lượng cao dành riêng cho bạn.</p>
+        <div class="hero-wrapper" id="heroWrapper">
+            <div class="hero-overlay"></div>
+            <div class="hero-fog"></div>
             
-        <div class="header-actions" style="margin-top: 20px; gap: 15px;">
+            <div id="heroSlidesContainer">
+                <div class="flex items-center justify-center h-full w-full text-white">
+                    <i class="fas fa-spinner fa-spin text-3xl text-orange-400"></i>
+                </div>
+            </div>
+            
+            <div class="hero-thumbnails" id="heroThumbnails"></div>
+        </div>
+
+        <div class="header-actions" style="margin-top: -20px; gap: 15px; position: relative; z-index: 10;">
             <div class="search-box-wrap">
-                <input type="text" id="search-input" class="search-inp" placeholder="Nhập tên tác phẩm, tác giả hoặc từ khóa..." style="padding: 18px 25px 18px 60px; font-size: 1rem; border-radius: 24px;">
+                <input type="text" id="search-input" class="search-inp" placeholder="Nhập tên bài viết, tác phẩm..." style="padding: 18px 25px 18px 60px; font-size: 1rem; border-radius: 24px;">
                 <i class="fas fa-search search-icon" style="font-size: 1.2rem; left: 25px;"></i>
             </div>
-
-            <button onclick="toggleFavorites()" id="btn-love-mode" class="btn-love-mode" title="Xem bộ sưu tập" style="width: 60px; height: 60px; border-radius: 22px;">
+            <button onclick="toggleFavorites()" id="btn-love-mode" class="btn-love-mode" title="Xem bộ sưu tập">
                 <i class="fas fa-heart"></i>
             </button>
         </div>
 
-        <div class="nav-wrapper">
+        <div class="nav-wrapper" style="margin-top: 20px;">
             <button class="nav-arrow nav-prev" onclick="scrollNav(-1)"><i class="fas fa-chevron-left"></i></button>
             <div class="nav-container" id="nav-scroll-container">
                 <button class="nav-btn active" onclick="filterData('all', this)">Tất cả</button>
@@ -592,62 +792,36 @@
                     };
                 });
 
+                // 🔥 QUAN TRỌNG: Gọi hàm vẽ Hero Slider ở đây!
+                if(typeof renderHeroArticles === 'function') {
+                    renderHeroArticles(allArticles);
+                }
+
                 renderLayout(allArticles);
             } catch (e) {
-                console.error(e);
+                console.error("Lỗi tải dữ liệu:", e);
                 document.getElementById('content-area').innerHTML = `<div class="loading-state text-red-400">Lỗi tải dữ liệu. Hãy tải lại trang.</div>`;
+                
+                // Báo lỗi lên Hero luôn
+                const slidesContainer = document.getElementById('heroSlidesContainer');
+                if(slidesContainer) slidesContainer.innerHTML = '<div class="text-center text-white mt-20">Không tải được dữ liệu Hero.</div>';
             }
         }
 
-        // 3. Hiển thị Giao diện
+        // 3. Hiển thị Giao diện danh sách bên dưới
         function renderLayout(articles) {
             const container = document.getElementById('content-area');
-            if (isFavMode && articles.length > 0) {
-                // Đã được xử lý header riêng ở toggleFavorites
-            } else {
-                container.innerHTML = '';
-            }
+            if (!isFavMode) container.innerHTML = '';
 
             if (articles.length === 0 && !isFavMode) {
                 container.innerHTML = '<div class="loading-state">Chưa có bài viết nào.</div>';
                 return;
             }
 
-            let featured = null;
-            let list = [...articles];
-
-            if (currentFilter === 'all' && !isFavMode && list.length > 0) {
-                featured = list.shift(); 
-            }
-
-            let html = '';
+            let html = '<div class="news-grid">';
             const view2Categories = ['maicau', 'cuango', 'khoinguon'];
 
-            if (featured) {
-                const cat = getCatInfo(featured.category);
-                const targetView = view2Categories.includes(featured.category) ? 'view2.html' : 'view.html';
-                const link = `../bantinvanhoc/${targetView}?${featured.slug ? `slug=${featured.slug}` : `id=${featured.id}`}`;
-
-                html += `
-                    <a href="${link}" class="featured-card card">  
-                        <div class="c-img-box f-img-wrap">
-                            <img src="${featured.img}" class="c-img f-img" loading="lazy">
-                            <div class="c-badge" style="background:var(--primary); color:white; border:none;">MỚI NHẤT</div>
-                        </div>
-                        <div class="c-body f-content">
-                            <div class="c-badge" style="position:static; width:fit-content; margin-bottom:10px; background:rgba(255,143,80,0.1); color:#FF8F50;">${cat.name}</div>
-                            <h2 class="c-title f-title">${featured.title}</h2>
-                            <p class="c-desc f-desc">${featured.summary}</p>
-                            <div class="c-footer">
-                                <span>${featured.date}</span>
-                                <span class="read-link">Đọc ngay <i class="fas fa-arrow-right"></i></span>
-                            </div>
-                        </div>
-                    </a>`;
-            }
-
-            html += '<div class="news-grid">';
-            list.forEach(item => {
+            articles.forEach(item => {
                 const cat = getCatInfo(item.category);
                 const targetView = view2Categories.includes(item.category) ? 'view2.html' : 'view.html';
                 const link = `../bantinvanhoc/${targetView}?${item.slug ? `slug=${item.slug}` : `id=${item.id}`}`;
@@ -750,6 +924,119 @@
         };
 
         window.addEventListener('trigger-firebase-signout', async () => { await signOut(auth); window.location.href = "../index.html"; });
+
+        import { limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Biến toàn cục cho Slider
+        window.currentHeroSlide = 0;
+        window.heroSlideInterval = null;
+
+        // Bổ sung hàm render Hero Slider (Phong cách HopVan Card Bo Tròn)
+        function renderHeroArticles(articles) {
+            const slidesContainer = document.getElementById('heroSlidesContainer');
+            const thumbsContainer = document.getElementById('heroThumbnails');
+            if (!slidesContainer) return;
+
+            // Lấy 3 bài mới nhất
+            const top3 = articles.slice(0, 3);
+            if (top3.length === 0) {
+                slidesContainer.innerHTML = '';
+                return;
+            }
+
+            let slidesHtml = '';
+            let thumbsHtml = '';
+
+            top3.forEach((m, index) => {
+                const active = index === 0 ? 'active' : '';
+                const catName = getCatInfo(m.category).name;
+                const finalImage = m.img || 'https://hopvan.netlify.app/panel.webp';
+                
+                // Xác định link đọc bài
+                const view2Categories = ['maicau', 'cuango', 'khoinguon'];
+                const targetView = view2Categories.includes(m.category) ? 'view2.html' : 'view.html';
+                const link = `../bantinvanhoc/${targetView}?${m.slug ? `slug=${m.slug}` : `id=${m.id}`}`;
+
+                slidesHtml += `
+                    <div class="hero-slide ${active}" id="hero-slide-${index}" style="background-image: url('${finalImage}');">
+                        <div class="hero-overlay"></div>
+                        <div class="hero-content">
+                            <div class="hero-origin-name"><i class="fas fa-layer-group"></i> ${catName}</div>
+                            
+                            <div class="hero-title-main">${m.title}</div>
+                            
+                            <div class="hero-meta">
+                                <span class="quality-badge"><i class="fas fa-fire text-orange-400"></i> MỚI NHẤT</span>
+                                <span><i class="far fa-clock"></i> ${m.date}</span>
+                            </div>
+
+                            <div class="hero-desc">${m.summary}</div>
+
+                            <div class="hero-actions">
+                                <button class="btn-read-hero" onclick="window.location.href='${link}'" title="Đọc bài viết">
+                                    <i class="fas fa-play"></i> ĐỌC NGAY
+                                </button>
+                                <button class="btn-heart-hero" title="Thêm vào bộ sưu tập" onclick="toggleFavoriteIcon('${m.id}')">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                thumbsHtml += `
+                    <div class="thumb-item ${active}" onclick="window.changeHeroSlide(${index})">
+                        <img src="${finalImage}" loading="lazy">
+                    </div>
+                `;
+            });
+
+            slidesContainer.innerHTML = slidesHtml;
+            thumbsContainer.innerHTML = thumbsHtml;
+
+            clearInterval(window.heroSlideInterval);
+            startHeroTimer(top3.length);
+        }
+
+        // Logic chuyển Slide
+        window.changeHeroSlide = (index) => {
+            const totalSlides = document.querySelectorAll('.hero-slide').length;
+            if(totalSlides === 0) return;
+
+            clearInterval(window.heroSlideInterval);
+            startHeroTimer(totalSlides);
+
+            document.querySelectorAll('.hero-slide').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('active'));
+
+            const slide = document.getElementById(`hero-slide-${index}`);
+            if(slide) slide.classList.add('active');
+            
+            const thumbs = document.querySelectorAll('.thumb-item');
+            if(thumbs && thumbs[index]) thumbs[index].classList.add('active');
+            
+            window.currentHeroSlide = index;
+        }
+
+        function startHeroTimer(total) {
+            if (!total || total <= 0) return;
+            window.heroSlideInterval = setInterval(() => {
+                let next = (window.currentHeroSlide + 1) % total;
+                window.changeHeroSlide(next);
+            }, 6000); 
+        }
+
+        // Hàm click tim tắt từ Hero (Gợi ý thêm)
+        window.toggleFavoriteIcon = (id) => {
+            const toast = document.getElementById('fav-toast');
+            if (toast) {
+                toast.classList.add('show');
+                // Tự động ẩn sau 3 giây
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+        }
     </script>
 
 <script type="text/javascript">
