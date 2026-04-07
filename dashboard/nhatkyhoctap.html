@@ -210,8 +210,15 @@
         .map-scroll-area {
             display: flex; align-items: center; gap: 40px; padding: 20px 50px;
             overflow-x: auto; scroll-behavior: smooth; position: relative; z-index: 10;
+            cursor: grab; /* Thêm con trỏ bàn tay */
         }
         .map-scroll-area::-webkit-scrollbar { display: none; }
+
+        /* Hiệu ứng khi đang bấm chuột để kéo */
+        .map-scroll-area.active-drag {
+            cursor: grabbing;
+            scroll-behavior: auto !important; /* QUAN TRỌNG: Tắt smooth khi kéo để mượt 100% */
+        }
 
         .map-line {
             position: absolute; top: 50%; left: 0; right: 0; height: 12px; background: var(--border-map); 
@@ -228,8 +235,15 @@
             flex-shrink: 0; width: 150px; height: 170px; background: var(--bg-map-node); border-radius: 28px;
             border: 4px solid var(--border-map); position: relative; z-index: 2;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            user-select: none; /* Ngăn bôi đen khi kéo */
+            -webkit-user-drag: none; /* Ngăn kéo thả ảnh mặc định của trình duyệt */
         }
+        /* Chỉ thêm hiệu ứng hover khi KHÔNG kéo */
+        .map-scroll-area:not(.active-drag) .map-node:hover { 
+            transform: translateY(-15px) scale(1.05); border-color: var(--primary); cursor: pointer;
+        }
+        s
         .map-node:hover { transform: translateY(-15px) scale(1.05); border-color: var(--primary); }
         
         .map-node.active { 
@@ -690,8 +704,60 @@
         progressBar.style.width = `${(activeIndex / JOURNEY_DATA.length) * 100}%`;
     }
 
-    // ĐÃ FIX: Hàm xử lý Click bao quát mọi trường hợp
+    // ==========================================
+    // LOGIC: KÉO CHUỘT ĐỂ CUỘN (DRAG TO SCROLL)
+    // ==========================================
+    window.isDraggingMap = false; // Cờ phân biệt kéo và click
+
+    function initDragToScroll() {
+        const slider = document.getElementById('journey-container');
+        if (!slider) return;
+
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        slider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            window.isDraggingMap = false; // Bắt đầu bấm, chưa tính là kéo
+            slider.classList.add('active-drag');
+            startX = e.pageX - slider.offsetLeft;
+            scrollLeft = slider.scrollLeft;
+        });
+
+        slider.addEventListener('mouseleave', () => {
+            isDown = false;
+            slider.classList.remove('active-drag');
+        });
+
+        slider.addEventListener('mouseup', () => {
+            isDown = false;
+            slider.classList.remove('active-drag');
+        });
+
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 1.5; // Tốc độ cuộn (x1.5 cho mượt)
+            
+            // Nếu chuột di chuyển quá 5px, đánh dấu là ĐANG KÉO (chứ không phải click)
+            if (Math.abs(walk) > 5) {
+                window.isDraggingMap = true; 
+            }
+            
+            slider.scrollLeft = scrollLeft - walk;
+        });
+    }
+    
+    // Khởi chạy hàm kéo thả
+    initDragToScroll();
+
+    // ĐÃ FIX: Hàm xử lý Click bao quát mọi trường hợp & Chặn click khi Drag
     window.handleMapClick = (item) => {
+        // NẾU ĐANG KÉO CHUỘT THÌ KHÔNG LÀM GÌ CẢ (CHẶN CLICK NHẦM)
+        if (window.isDraggingMap) return;
+
         const targetId = Number(item.id);
         const currLv = Number(currentLevel) || 1;
         const pLv = Number(paidLevel) || 0;
@@ -713,7 +779,7 @@
         }
         else {
             // Level cao hơn chưa tới lượt -> Gọi Popup Khóa siêu đẹp
-            document.getElementById('locked-msg').innerHTML = `Bạn cần hoàn thành <b class="text-orange-500">Level ${currLv}</b> trước khi khi mở khoá level này nhé!`;
+            document.getElementById('locked-msg').innerHTML = `Bạn cần hoàn thành <b class="text-orange-500">Level ${currLv}</b> trước khi mở khoá level này nhé!`;
             document.getElementById('modal-locked').classList.add('show');
         }
     };
