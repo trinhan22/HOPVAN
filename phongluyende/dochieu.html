@@ -499,11 +499,11 @@
             </div>`;
     }
 
-// --- 2. HÀM NỘP BÀI (PROMPT CHUYÊN SÂU ĐỌC HIỂU - BAREM 4.0) ---
+    // --- 2. HÀM NỘP BÀI (DÙNG PROMPT JSON BÊN NGOÀI) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
         
-        // Kiểm tra độ dài (Đọc hiểu thường ngắn hơn làm văn)
+        // Đọc hiểu ngắn hơn làm văn nên chỉ yêu cầu min 10 từ
         if(content.split(/\s+/).filter(x => x).length < 10) { 
             document.getElementById('short-essay-popup').style.display = 'flex'; 
             return; 
@@ -518,76 +518,34 @@
             loading.style.display = 'none';
             return;
         }
-        
-        // --- PROMPT GIÁO VIÊN ĐỌC HIỂU K12 ---
-        const systemPrompt = `
-        VAI TRÒ: Bạn là Giáo viên Ngữ văn lớp 12 (Chatbot Giáo viên Ngữ văn K12).
-        CHUYÊN MÔN: Chuyên gia về Đọc hiểu văn bản, nắm vững ma trận đề thi GDPT 2018.
-
-        THÁI ĐỘ CHẤM BÀI: 
-        - Nghiêm túc, tỉ mỉ, soi xét kỹ từng thuật ngữ.
-        - Với câu hỏi Nhận biết: Sai là sai, không châm chước.
-        - Với câu hỏi Vận dụng: Đánh giá cao tư duy độc lập, logic.
-
-        BAREM ĐIỂM ĐỌC HIỂU (TỔNG 4.0 ĐIỂM) - TUÂN THỦ NGHIÊM NGẶT:
-        1. Câu 1 (Nhận biết): 0.5 điểm. (Hỏi về Thể thơ, PTBĐ, Phong cách ngôn ngữ, Ngôi kể...). Trả lời sai/thiếu = 0 điểm.
-        2. Câu 2 (Nhận biết): 0.5 điểm. (Tìm chi tiết/hình ảnh trong văn bản).
-        3. Câu 3 (Thông hiểu): 1.0 điểm. (Hiểu nội dung, ý nghĩa của từ ngữ/hình ảnh). Trả lời hời hợt/chung chung trừ 50% điểm.
-        4. Câu 4 (Vận dụng): 1.0 điểm. (Nhận xét về nội dung/nghệ thuật).
-        5. Câu 5 (Vận dụng cao): 1.0 điểm. (Rút ra bài học/Thông điệp/Liên hệ bản thân).
-        *Lưu ý: Nếu đề bài thực tế có số lượng câu hỏi khác (ví dụ chỉ 4 câu), hãy tự phân bổ lại điểm hợp lý nhưng tổng vẫn là 4.0.*
-
-        QUY TRÌNH CHẤM 3 BƯỚC:
-
-        BƯỚC 1: ĐÁNH GIÁ TỔNG QUÁT
-        - Điểm tích cực: Trả lời đúng trọng tâm, gãy gọn, dùng từ chính xác.
-        - Hạn chế: Lan man, dài dòng, sai thuật ngữ cơ bản, chép lại nguyên văn bản một cách máy móc.
-
-        BƯỚC 2: SỬA BÀI CHI TIẾT (HIGHLIGHT)
-        - Nhiệm vụ: Trích dẫn lại câu trả lời của học sinh.
-        - Quy tắc tô màu:
-          + TÔ ĐỎ (<span class='text-bad'>...</span>): Từ ngữ dùng sai, sai kiến thức, câu trả lời lạc đề.
-          + TÔ VÀNG (<span class='text-fix'>...</span>): Đáp án chuẩn (Key) hoặc cách diễn đạt gãy gọn hơn mà giáo viên đề xuất.
-
-        BƯỚC 3: ĐỊNH HƯỚNG KỸ NĂNG
-        - Hướng dẫn học sinh cách trả lời ngắn gọn ("Hỏi gì đáp nấy"), không viết thành đoạn văn dài dòng ở các câu nhận biết.
-
-        OUTPUT JSON FORMAT (DUY NHẤT):
-        {
-            "human_score": (int 0-100, độ chân thực),
-            "reading_score": (float 0-4.0, điểm phần đọc hiểu),
-            "detailed_breakdown": "C1: 0.5/0.5, C2: 0.25/0.5, C3: 0.75/1.0...",
-            "type_detected": "Đọc Hiểu Văn Bản",
-            "general_comment": "Nhận xét tổng quát (Bước 1)",
-            "ai_comment": "Đánh giá về văn phong (có giống AI/Văn mẫu không)",
-            "strengths": ["Điểm tốt 1", "Điểm tốt 2"],
-            "weaknesses": ["Lỗi sai 1", "Lỗi sai 2"],
-            "correction_html": "Bài làm đã highlight (Bước 2)",
-            "orientation": "Lời khuyên kỹ năng (Bước 3)"
-        }
-
-        DỮ LIỆU ĐỀ BÀI:
-        - Văn bản: "${(q.text || '').replace(/"/g, "'")}"
-        - Câu hỏi: ${JSON.stringify(q.questions)}
-
-        BÀI LÀM CỦA HỌC SINH:
-        ${content}
-        `;
 
         try {
+            // 1. TẢI FILE PROMPT JSON TỪ SERVER
+            // Lưu ý: Đảm bảo đường dẫn '../prompts.json' trỏ đúng vị trí file JSON của bạn
+            const promptResponse = await fetch('../prompts.json'); 
+            const promptData = await promptResponse.json();
+            
+            // 2. LẤY MẪU PROMPT CHO ĐỀ ĐỌC HIỂU VÀ ĐIỀN DỮ LIỆU
+            let systemPrompt = promptData.de_doc_hieu;
+            
+            systemPrompt = systemPrompt
+                .replace('{{DOC_HIEU}}', (q.text || '').replace(/"/g, "'"))
+                .replace('{{CAU_HOI}}', JSON.stringify(q.questions || []))
+                .replace('{{BAI_LAM}}', content);
+
+            // 3. GỌI API CHẤM BÀI
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ 
                     systemPrompt: systemPrompt, 
-                    messages: `Học sinh gửi bài làm Đọc Hiểu. Hãy chấm theo Barem 4.0 (0.5-0.5-1-1-1).`
+                    messages: `Học sinh gửi bài làm Đọc Hiểu. Hãy chấm theo Barem 4.0.`
                 }) 
             });
 
             if (!res.ok) throw new Error("SERVER_ERROR");
 
             const data = await res.json();
-            
             if (!data.choices || !data.choices[0] || !data.choices[0].message) {
                 throw new Error("NO_CONTENT");
             }
@@ -610,7 +568,7 @@
                 throw new Error("INVALID_JSON");
             }
 
-            // DATA SANITIZATION
+            // DATA SANITIZATION CHO ĐỌC HIỂU (THANG 4.0)
             let safeReadingScore = parseFloat(result.reading_score);
             if (isNaN(safeReadingScore)) {
                 const match = String(result.reading_score).match(/[\d\.]+/);
@@ -618,7 +576,7 @@
             }
             if (safeReadingScore > 4.0) safeReadingScore = 4.0;
 
-            // Quy đổi sang thang 10 để lưu Database
+            // Quy đổi sang thang 10 để lưu Database thống nhất
             let safeScore = (safeReadingScore / 4.0) * 10;
             safeScore = parseFloat(safeScore.toFixed(2));
 
@@ -629,16 +587,16 @@
             
             renderAIResult(result);
 
+            // 4. LƯU BÀI VÀO FIREBASE
             if (auth.currentUser) {
-                // Lưu vào Collection 'exam_history'
                 await addDoc(collection(db, "exam_history"), {
-                    userId: auth.currentUser.uid, // ID học sinh
+                    userId: auth.currentUser.uid,
                     userName: auth.currentUser.displayName || auth.currentUser.email.split('@')[0],
-                    prompt: q.title || "Đề Luyện Tập", // Tên đề
-                    essay: content, // Bài làm nguyên văn
-                    score: result.score, // Điểm số AI chấm
-                    feedback: result.correction_html, // Lời phê & sửa lỗi của AI
-                    timestamp: serverTimestamp() // Thời gian nộp chuẩn Google
+                    prompt: q.title || "Đề Đọc Hiểu", 
+                    essay: content,
+                    score: result.score, // Vẫn lưu thang 10 vào DB để hiện ở lịch sử cho đẹp
+                    feedback: result.correction_html, 
+                    timestamp: serverTimestamp() 
                 });
             }
 
@@ -646,7 +604,7 @@
             console.error(e); 
             let msg = "Có lỗi xảy ra, vui lòng thử lại!";
             if (e.message === "SERVER_ERROR") msg = "Server đang bận. Bạn hãy bấm nộp lại nhé!";
-            if (e.message === "INVALID_JSON") msg = "AI trả về dữ liệu lỗi. Vui lòng bấm nộp lại!";
+            if (e.message === "INVALID_JSON") msg = "AI trả về dữ liệu lỗi cấu trúc. Vui lòng bấm nộp lại!";
             showPopup("Lỗi AI", msg, "error");
         } finally { 
             loading.style.display = 'none'; 

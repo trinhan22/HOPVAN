@@ -32,10 +32,35 @@
         
         .q-card { background: white; border-radius: 20px; padding: 28px; margin-bottom: 24px; border: 1px solid #f1f5f9; box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: 0.2s; position: relative; }
         
-        /* CSS CHẤM CHỮA AI */
-        .text-bad { background-color: #fee2e2; color: #dc2626; text-decoration: line-through; padding: 2px 4px; border-radius: 4px; margin-right: 4px; }
-        .text-fix { background-color: #fef9c3; color: #b45309; font-weight: bold; padding: 2px 4px; border-radius: 4px; border: 1px dashed #facc15; }
-        .text-good { background-color: #dcfce7; color: #166534; font-style: italic; padding: 2px 4px; border-radius: 4px; }
+        /* --- CSS CHẤM CHỮA CỦA GIÁO VIÊN AI --- */
+        .text-bad { 
+            background-color: #fee2e2; 
+            color: #dc2626; 
+            text-decoration: line-through; 
+            padding: 2px 6px; 
+            border-radius: 6px; 
+            margin: 0 2px;
+            font-weight: 600;
+        }
+        .text-fix { 
+            background-color: #fef9c3; 
+            color: #b45309; 
+            font-weight: 800; 
+            padding: 2px 8px; 
+            border-radius: 6px; 
+            border: 1px dashed #facc15; 
+            margin: 0 2px;
+            box-shadow: 0 2px 5px rgba(250, 204, 21, 0.2);
+        }
+        .text-good { 
+            background-color: #dcfce7; 
+            color: #15803d; 
+            font-weight: 700;
+            padding: 2px 8px; 
+            border-radius: 6px; 
+            border-bottom: 2px solid #4ade80;
+            margin: 0 2px;
+        }
 
         ::-webkit-scrollbar { width: 10px; height: 10px; }
         ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
@@ -177,7 +202,7 @@
             errorScreen.classList.remove('hidden');
         }
 
-        // HÀM RENDER DỮ LIỆU
+        // HÀM RENDER DỮ LIỆU LỊCH SỬ THẨM MỸ HƠN
         function renderHistoryData(data) {
             loadingScreen.style.display = 'none';
             mainContent.classList.remove('hidden');
@@ -195,22 +220,36 @@
             const qList = document.getElementById('questions-list');
             let feedbackContent = data.feedback || "<p class='text-gray-400 italic'>AI chưa lưu nhận xét chi tiết cho bài làm này.</p>";
 
+            // Bố cục mới: Chia làm 2 khối rõ ràng (Bài gốc & AI Sửa)
             qList.innerHTML = `
-                <div class="q-card border-l-4 border-orange-400">
-                    <div class="flex justify-between items-center mb-3 pl-1">
-                        <span class="font-black text-gray-400 text-sm"><i class="fas fa-pen-nib mr-1"></i> BÀI LÀM GỐC</span>
+                <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+                    <div class="bg-slate-50 border-b border-gray-100 p-4 md:p-6">
+                        <h4 class="font-black text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2">
+                            <div class="w-8 h-8 bg-gray-200 text-gray-600 rounded-lg flex items-center justify-center"><i class="fas fa-pen-nib"></i></div> 
+                            Bài làm gốc của bạn
+                        </h4>
                     </div>
-                    
-                    <div class="text-gray-800 whitespace-pre-wrap text-[15px] leading-8 mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100" style="font-family: 'Merriweather', serif;">
-                        ${data.essay}
+                    <div class="p-6 md:p-10">
+                        <div class="text-gray-500 whitespace-pre-wrap text-[1.05rem] leading-8 font-light text-justify" style="font-family: 'Merriweather', serif;">${data.essay}</div>
                     </div>
+                </div>
 
-                    <div class="flex justify-between items-center mb-3 pl-1 border-t pt-4">
-                        <span class="font-black text-orange-500 text-sm"><i class="fas fa-robot mr-1"></i> AI SỬA LỖI & PHÂN TÍCH</span>
+                <div class="bg-white rounded-3xl border border-gray-200 shadow-[0_10px_30px_rgba(0,0,0,0.03)] overflow-hidden">
+                    <div class="bg-orange-50/50 border-b border-orange-100 p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <h4 class="font-black text-orange-800 text-sm uppercase tracking-wider flex items-center gap-2">
+                            <div class="w-8 h-8 bg-orange-500 text-white rounded-lg flex items-center justify-center"><i class="fas fa-robot"></i></div> 
+                            AI Phân tích & Sửa chi tiết
+                        </h4>
+                        <div class="flex flex-wrap gap-3 md:gap-5 text-xs font-bold bg-white px-4 py-2.5 rounded-full shadow-sm border border-orange-50">
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-200 border border-red-400"></span> Lỗi sai</span>
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-100 border border-yellow-400"></span> Gợi ý sửa</span>
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-200 border border-green-400"></span> Khen ngợi</span>
+                        </div>
                     </div>
-
-                    <div class="leading-loose text-gray-700 text-lg space-y-4 text-justify font-light" style="font-family: 'Merriweather', serif;">
-                        ${feedbackContent}
+                    <div class="p-6 md:p-10">
+                        <div class="leading-[2.2] text-slate-800 text-[1.1rem] space-y-4 text-justify font-light" style="font-family: 'Merriweather', serif;">
+                            ${feedbackContent}
+                        </div>
                     </div>
                 </div>
             `;

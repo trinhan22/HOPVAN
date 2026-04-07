@@ -82,9 +82,35 @@
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         /* --- CSS CHẤM CHỮA CỦA GIÁO VIÊN AI --- */
-        .text-bad { background-color: #fee2e2; color: #dc2626; text-decoration: line-through; padding: 2px 4px; border-radius: 4px; margin-right: 4px; }
-        .text-fix { background-color: #fef9c3; color: #b45309; font-weight: bold; padding: 2px 4px; border-radius: 4px; border: 1px dashed #facc15; }
-        .text-good { background-color: #dcfce7; color: #166534; font-style: italic; padding: 2px 4px; border-radius: 4px; }
+        /* --- CSS CHẤM CHỮA CỦA GIÁO VIÊN AI --- */
+        .text-bad { 
+            background-color: #fee2e2; 
+            color: #dc2626; 
+            text-decoration: line-through; 
+            padding: 2px 6px; 
+            border-radius: 6px; 
+            margin: 0 2px;
+            font-weight: 600;
+        }
+        .text-fix { 
+            background-color: #fef9c3; 
+            color: #b45309; 
+            font-weight: 800; 
+            padding: 2px 8px; 
+            border-radius: 6px; 
+            border: 1px dashed #facc15; 
+            margin: 0 2px;
+            box-shadow: 0 2px 5px rgba(250, 204, 21, 0.2);
+        }
+        .text-good { 
+            background-color: #dcfce7; 
+            color: #15803d; 
+            font-weight: 700;
+            padding: 2px 8px; 
+            border-radius: 6px; 
+            border-bottom: 2px solid #4ade80;
+            margin: 0 2px;
+        }
 
         /* --- POPUP SETUP ĐỀ CÁ NHÂN --- */
         .setup-modal-box { background: white; padding: 0; border-radius: 24px; width: 95%; max-width: 1100px; display: flex; flex-direction: column; md:flex-row; box-shadow: 0 30px 60px rgba(0,0,0,0.3); overflow: hidden; animation: zoomIn 0.3s forwards; }
@@ -515,38 +541,87 @@
         }
     };
 
-    // --- 1. RENDER KẾT QUẢ AI ---
-    function renderAIResult(result) {
+    // --- 1. RENDER KẾT QUẢ AI CHI TIẾT & THẨM MỸ ---
+    window.renderAIResult = function(result) {
         document.getElementById('input-section').classList.add('hidden');
         const out = document.getElementById('output-section');
         out.style.display = 'flex';
         out.classList.remove('hidden');
         out.classList.add('flex-col', 'h-full');
 
-        const barColor = result.human_score > 75 ? '#22c55e' : (result.human_score > 50 ? '#f59e0b' : '#ef4444');
+        // Bố cục HTML Trả kết quả
+        const html = `
+            <div class="max-w-4xl mx-auto pb-12 custom-scrollbar w-full" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                
+                <div class="flex flex-col items-center justify-center mb-10 mt-6">
+                    <div class="relative w-40 h-40 flex items-center justify-center bg-white rounded-full shadow-[0_15px_40px_rgba(255,143,80,0.25)] border-4 border-orange-50">
+                        <div class="absolute inset-0 rounded-full border-4 border-transparent border-t-orange-500 border-r-orange-400 opacity-50"></div>
+                        <div class="text-center z-10">
+                            <span class="text-6xl font-black bg-gradient-to-br from-orange-500 to-red-600 -webkit-background-clip-text text-transparent bg-clip-text">${result.score}</span>
+                            <span class="block text-[10px] font-black text-gray-400 mt-1 uppercase tracking-widest">TỔNG ĐIỂM</span>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-gray-600 text-center italic max-w-lg font-medium">"${result.general_comment || 'Bài làm đã được AI chấm hoàn tất.'}"</p>
+                </div>
 
-        document.getElementById('ai-correction-box').innerHTML = `
-            <div class="max-w-3xl mx-auto pb-10 custom-scrollbar" style="font-family: 'Merriweather', serif; font-weight: 300;">
-                <div class="text-center mb-8">
-                    <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Kết quả từ AI (Đề Tự Tạo)</div>
-                    <div class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2">${result.score}</div>
-                    <div class="grid grid-cols-1 gap-2 max-w-sm mx-auto mt-4">
-                        <div class="bg-blue-50 py-2 px-4 rounded-lg text-xs font-bold text-blue-600 text-center">Đánh giá chung: Đã chấm xong</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 md:p-8 rounded-3xl border border-green-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute -top-4 -right-4 p-4 opacity-10 text-8xl text-green-500"><i class="fas fa-check-circle"></i></div>
+                        <h4 class="text-green-700 font-black text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
+                            <i class="fas fa-star text-green-500 text-lg"></i> Điểm thực hiện tốt
+                        </h4>
+                        <ul class="space-y-3 relative z-10">
+                            ${(result.strengths || []).map(s => `<li class="flex items-start gap-3 text-green-800 text-[0.95rem] font-medium leading-relaxed"><i class="fas fa-check mt-1 text-green-500 flex-shrink-0"></i> <span>${s}</span></li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-red-50 to-rose-50 p-6 md:p-8 rounded-3xl border border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute -top-4 -right-4 p-4 opacity-10 text-8xl text-red-500"><i class="fas fa-exclamation-circle"></i></div>
+                        <h4 class="text-red-700 font-black text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
+                            <i class="fas fa-tools text-red-500 text-lg"></i> Điểm cần khắc phục
+                        </h4>
+                        <ul class="space-y-3 relative z-10">
+                            ${(result.weaknesses || []).map(w => `<li class="flex items-start gap-3 text-red-800 text-[0.95rem] font-medium leading-relaxed"><i class="fas fa-times mt-1 text-red-500 flex-shrink-0"></i> <span>${w}</span></li>`).join('')}
+                        </ul>
                     </div>
                 </div>
-                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm mb-6">
-                    <div class="flex justify-between items-center mb-2"><span class="text-[10px] font-black text-gray-400 uppercase">Độ chân thực (AI Check)</span><span class="font-bold text-sm" style="color:${barColor}">${result.human_score}%</span></div>
-                    <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div style="width:${result.human_score}%; background:${barColor}" class="h-full"></div></div>
-                    <p class="text-[11px] text-gray-400 mt-2 italic">"${result.ai_comment}"</p>
+
+                <div class="bg-white rounded-3xl border border-gray-200 shadow-[0_10px_30px_rgba(0,0,0,0.03)] overflow-hidden mb-8">
+                    <div class="bg-slate-50 border-b border-gray-100 p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <h4 class="font-black text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2">
+                            <div class="w-8 h-8 bg-orange-100 text-orange-500 rounded-lg flex items-center justify-center"><i class="fas fa-file-signature"></i></div> 
+                            Bài làm chi tiết
+                        </h4>
+                        <div class="flex flex-wrap gap-3 md:gap-5 text-xs font-bold bg-white px-4 py-2.5 rounded-full shadow-sm border border-gray-100">
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-200 border border-red-400"></span> Lỗi sai</span>
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-100 border border-yellow-400"></span> Gợi ý sửa</span>
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-200 border border-green-400"></span> Khen ngợi</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 md:p-10 bg-white">
+                        <div class="leading-[2.2] text-slate-700 text-[1.1rem] space-y-4 text-justify font-light" style="font-family: 'Merriweather', serif;">
+                            ${result.correction_html}
+                        </div>
+                    </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    <div class="bg-green-50/50 p-5 rounded-2xl border border-green-100"><h4 class="text-green-700 font-bold text-[10px] uppercase mb-3">Điểm tích cực</h4><ul class="text-xs text-green-800 space-y-2 font-medium">${(result.strengths||[]).map(s => `<li>• ${s}</li>`).join('')}</ul></div>
-                    <div class="bg-red-50/50 p-5 rounded-2xl border border-red-100"><h4 class="text-red-700 font-bold text-[10px] uppercase mb-3">Cần lưu ý</h4><ul class="text-xs text-red-800 space-y-2 font-medium">${(result.weaknesses||[]).map(w => `<li>• ${w}</li>`).join('')}</ul></div>
-                </div>
-                <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm mb-8"><h4 class="font-black text-gray-800 border-b pb-4 mb-6 text-xs uppercase">Chi tiết sửa bài</h4><div class="leading-loose text-gray-700 text-lg space-y-4 text-justify font-light">${result.correction_html}</div><div class="mt-6 pt-4 border-t text-sm italic text-gray-500 text-center font-light">"${result.general_comment}"</div></div>
-                <div class="bg-gray-900 text-white p-6 rounded-2xl shadow-xl"><div class="flex items-center gap-2 mb-2 text-orange-400"><i class="fas fa-compass"></i><span class="text-[10px] font-black uppercase">Định hướng cải thiện</span></div><p class="text-sm text-gray-300 italic font-light">"${result.orientation}"</p></div>
-            </div>`;
-    }
+
+                ${result.orientation ? `
+                <div class="bg-slate-900 text-white p-8 md:p-10 rounded-3xl shadow-xl relative overflow-hidden mt-8">
+                    <div class="absolute -right-10 -bottom-10 opacity-5 text-9xl text-white"><i class="fas fa-compass"></i></div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-orange-500/20 text-orange-400 rounded-xl flex items-center justify-center text-xl"><i class="fas fa-lightbulb"></i></div>
+                        <span class="text-sm font-black uppercase tracking-widest text-orange-400">Định hướng phát triển</span>
+                    </div>
+                    <p class="text-gray-300 font-medium leading-relaxed relative z-10 text-[1.05rem]">
+                        ${result.orientation}
+                    </p>
+                </div>` : ''}
+
+            </div>
+        `;
+        document.getElementById('ai-correction-box').innerHTML = html;
+    };
 
     // --- 2. HÀM NỘP BÀI ---
     window.handleAISubmission = async () => {
@@ -564,38 +639,24 @@
             loading.style.display = 'none';
             return;
         }
-        
-        // Điều chỉnh System Prompt phù hợp với đề tự do
-        const systemPrompt = `
-        VAI TRÒ: Bạn là Giáo viên Ngữ văn AI.
-        
-        ĐỀ BÀI CỦA HỌC SINH TỰ TẠO:
-        - Đọc hiểu: ${q.reading_text || 'Không có'}
-        - Câu hỏi: ${(q.reading_questions||[]).join(' | ') || 'Không có'}
-        - NLXH: ${q.nlxh_topic || 'Không có'}
-        - NLVH: ${q.nlvh_topic || 'Không có'}
-        *(Lưu ý: Học sinh có thể đính kèm ảnh đề, do đó phần text đề bài có thể bị trống. Bạn hãy dựa trực tiếp vào bài làm của học sinh để đoán xem họ đang phân tích tác phẩm gì/vấn đề gì để chấm điểm cho phù hợp).*
-
-        BÀI LÀM CỦA HỌC SINH:
-        ${content}
-
-        NHIỆM VỤ CỦA AI:
-        Chấm điểm bài làm trên thang điểm 10. Tập trung vào việc nhận xét lỗi lập luận, diễn đạt, sai chính tả.
-        
-        OUTPUT JSON FORMAT DUY NHẤT:
-        {
-            "human_score": (int 0-100, độ chân thực),
-            "score": (float 0-10.0, tổng điểm toàn bài),
-            "general_comment": "Nhận xét tổng quát",
-            "ai_comment": "Nhận xét về việc có dùng văn mẫu/AI hay không",
-            "strengths": ["Điểm tốt 1", "Điểm tốt 2"],
-            "weaknesses": ["Hạn chế 1", "Hạn chế 2"],
-            "correction_html": "Trích dẫn lại 1 vài đoạn văn sai lầm của HS và chèn thẻ sửa lỗi <span class='text-bad'>...</span> và <span class='text-fix'>...</span> kế bên",
-            "orientation": "Lời khuyên định hướng"
-        }
-        `;
 
         try {
+            // 1. TẢI FILE PROMPT JSON TỪ SERVER
+            // Lưu ý: Đảm bảo đường dẫn '../prompts.json' trỏ đúng vị trí file JSON của bạn
+            const promptResponse = await fetch('prompts.json'); 
+            const promptData = await promptResponse.json();
+            
+            // 2. LẤY MẪU PROMPT VÀ THAY THẾ PLACEHOLDER (Fill dữ liệu thật vào)
+            let systemPrompt = promptData.de_ca_nhan;
+            
+            systemPrompt = systemPrompt
+                .replace('{{DOC_HIEU}}', q.reading_text || 'Không có')
+                .replace('{{CAU_HOI}}', (q.reading_questions||[]).join(' | ') || 'Không có')
+                .replace('{{NLXH}}', q.nlxh_topic || 'Không có')
+                .replace('{{NLVH}}', q.nlvh_topic || 'Không có')
+                .replace('{{BAI_LAM}}', content);
+
+            // 3. GỌI API CHẤM BÀI NHƯ BÌNH THƯỜNG
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
@@ -631,20 +692,18 @@
             
             renderAIResult(result);
 
-            // Lưu bài vào Local History
-            const now = new Date();
-            const dateStr = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')} - ${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()}`;
-            
-            let history = JSON.parse(localStorage.getItem('hopvan_exam_history')) || [];
-            history.unshift({
-                id: 'HIST_' + Date.now().toString().slice(-6),
-                date: dateStr,
-                score: result.score,
-                prompt: q.title || "Đề Tự Chọn",
-                essay: content.substring(0, 100) + '...', // Lưu 1 đoạn ngắn làm preview
-                feedback: result.correction_html
-            });
-            localStorage.setItem('hopvan_exam_history', JSON.stringify(history));
+            // 4. LƯU BÀI VÀO FIREBASE (Đã cập nhật logic gửi lên DB)
+            if (auth.currentUser) {
+                await addDoc(collection(db, "exam_history"), {
+                    userId: auth.currentUser.uid,
+                    userName: auth.currentUser.displayName || auth.currentUser.email.split('@')[0],
+                    prompt: q.title || "Đề Cá Nhân Tự Tạo", 
+                    essay: content,
+                    score: result.score, 
+                    feedback: result.correction_html, 
+                    timestamp: serverTimestamp() 
+                });
+            }
 
         } catch(e) { 
             console.error(e); 

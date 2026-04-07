@@ -158,29 +158,32 @@
 
         /* --- CSS CHẤM CHỮA CỦA GIÁO VIÊN AI --- */
         .text-bad { 
-            background-color: #fee2e2; /* Nền đỏ nhạt */
-            color: #dc2626; /* Chữ đỏ đậm */
-            text-decoration: line-through; /* Gạch ngang phần sai */
-            padding: 2px 4px;
-            border-radius: 4px;
-            margin-right: 4px;
+            background-color: #fee2e2; 
+            color: #dc2626; 
+            text-decoration: line-through; 
+            padding: 2px 6px; 
+            border-radius: 6px; 
+            margin: 0 2px;
+            font-weight: 600;
         }
-
-        .text-fix {
-            background-color: #fef9c3; /* Nền vàng nhạt */
-            color: #b45309; /* Chữ vàng đậm/cam */
-            font-weight: bold;
-            padding: 2px 4px;
-            border-radius: 4px;
-            border: 1px dashed #facc15;
+        .text-fix { 
+            background-color: #fef9c3; 
+            color: #b45309; 
+            font-weight: 800; 
+            padding: 2px 8px; 
+            border-radius: 6px; 
+            border: 1px dashed #facc15; 
+            margin: 0 2px;
+            box-shadow: 0 2px 5px rgba(250, 204, 21, 0.2);
         }
-        
-        .text-good {
-            background-color: #dcfce7; /* Nền xanh nhạt */
-            color: #166534; /* Chữ xanh đậm */
-            font-style: italic;
-            padding: 2px 4px;
-            border-radius: 4px;
+        .text-good { 
+            background-color: #dcfce7; 
+            color: #15803d; 
+            font-weight: 700;
+            padding: 2px 8px; 
+            border-radius: 6px; 
+            border-bottom: 2px solid #4ade80;
+            margin: 0 2px;
         }
     </style>
 </head>
@@ -437,45 +440,88 @@
         }
     };
 
-    // --- 1. RENDER KẾT QUẢ ---
-    function renderAIResult(result) {
+    // --- 1. RENDER KẾT QUẢ AI CHI TIẾT & THẨM MỸ ---
+    window.renderAIResult = function(result) {
         document.getElementById('input-section').classList.add('hidden');
         const out = document.getElementById('output-section');
         out.style.display = 'flex';
         out.classList.remove('hidden');
         out.classList.add('flex-col', 'h-full');
 
-        const barColor = result.human_score > 75 ? '#22c55e' : (result.human_score > 50 ? '#f59e0b' : '#ef4444');
+        const html = `
+            <div class="max-w-4xl mx-auto pb-12 custom-scrollbar w-full" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                
+                <div class="flex flex-col items-center justify-center mb-10 mt-6">
+                    <div class="relative w-40 h-40 flex items-center justify-center bg-white rounded-full shadow-[0_15px_40px_rgba(255,143,80,0.25)] border-4 border-orange-50">
+                        <div class="absolute inset-0 rounded-full border-4 border-transparent border-t-orange-500 border-r-orange-400 opacity-50"></div>
+                        <div class="text-center z-10">
+                            <span class="text-6xl font-black bg-gradient-to-br from-orange-500 to-red-600 -webkit-background-clip-text text-transparent bg-clip-text">${result.score}</span>
+                            <span class="block text-[10px] font-black text-gray-400 mt-1 uppercase tracking-widest">TỔNG ĐIỂM</span>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-gray-600 text-center italic max-w-lg font-medium">"${result.general_comment || 'Bài làm đã được AI chấm hoàn tất.'}"</p>
+                </div>
 
-        document.getElementById('ai-correction-box').innerHTML = `
-            <div class="max-w-3xl mx-auto pb-10 custom-scrollbar" style="font-family: 'Merriweather', serif; font-weight: 300;">
-                <div class="text-center mb-8">
-                    <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Kết quả từ AI</div>
-                    <div class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2">${result.score}</div>
-                    <div class="grid grid-cols-3 gap-2 max-w-sm mx-auto mt-4">
-                        <div class="bg-blue-50 py-2 rounded-lg text-[10px] font-bold text-blue-600 text-center">Đọc hiểu: ${result.detailed_scores.reading}</div>
-                        <div class="bg-green-50 py-2 rounded-lg text-[10px] font-bold text-green-600 text-center">Câu 1: ${result.detailed_scores.writing_c1}</div>
-                        <div class="bg-purple-50 py-2 rounded-lg text-[10px] font-bold text-purple-600 text-center">Câu 2: ${result.detailed_scores.writing_c2}</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 md:p-8 rounded-3xl border border-green-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute -top-4 -right-4 p-4 opacity-10 text-8xl text-green-500"><i class="fas fa-check-circle"></i></div>
+                        <h4 class="text-green-700 font-black text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
+                            <i class="fas fa-star text-green-500 text-lg"></i> Điểm thực hiện tốt
+                        </h4>
+                        <ul class="space-y-3 relative z-10">
+                            ${(result.strengths || []).map(s => `<li class="flex items-start gap-3 text-green-800 text-[0.95rem] font-medium leading-relaxed"><i class="fas fa-check mt-1 text-green-500 flex-shrink-0"></i> <span>${s}</span></li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-red-50 to-rose-50 p-6 md:p-8 rounded-3xl border border-red-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute -top-4 -right-4 p-4 opacity-10 text-8xl text-red-500"><i class="fas fa-exclamation-circle"></i></div>
+                        <h4 class="text-red-700 font-black text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
+                            <i class="fas fa-tools text-red-500 text-lg"></i> Điểm cần khắc phục
+                        </h4>
+                        <ul class="space-y-3 relative z-10">
+                            ${(result.weaknesses || []).map(w => `<li class="flex items-start gap-3 text-red-800 text-[0.95rem] font-medium leading-relaxed"><i class="fas fa-times mt-1 text-red-500 flex-shrink-0"></i> <span>${w}</span></li>`).join('')}
+                        </ul>
                     </div>
                 </div>
-                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm mb-6">
-                    <div class="flex justify-between items-center mb-2"><span class="text-[10px] font-black text-gray-400 uppercase">Độ chân thực (AI Check)</span><span class="font-bold text-sm" style="color:${barColor}">${result.human_score}%</span></div>
-                    <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div style="width:${result.human_score}%; background:${barColor}" class="h-full"></div></div>
-                    <p class="text-[11px] text-gray-400 mt-2 italic">"${result.ai_comment}"</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    <div class="bg-green-50/50 p-5 rounded-2xl border border-green-100"><h4 class="text-green-700 font-bold text-[10px] uppercase mb-3">Điểm tích cực</h4><ul class="text-xs text-green-800 space-y-2 font-medium">${result.strengths.map(s => `<li>• ${s}</li>`).join('')}</ul></div>
-                    <div class="bg-red-50/50 p-5 rounded-2xl border border-red-100"><h4 class="text-red-700 font-bold text-[10px] uppercase mb-3">Cần lưu ý</h4><ul class="text-xs text-red-800 space-y-2 font-medium">${result.weaknesses.map(w => `<li>• ${w}</li>`).join('')}</ul></div>
-                </div>
-                <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm mb-8"><h4 class="font-black text-gray-800 border-b pb-4 mb-6 text-xs uppercase">Chi tiết sửa bài</h4><div class="leading-loose text-gray-700 text-lg space-y-4 text-justify font-light">${result.correction_html}</div><div class="mt-6 pt-4 border-t text-sm italic text-gray-500 text-center font-light">"${result.general_comment}"</div></div>
-                <div class="bg-gray-900 text-white p-6 rounded-2xl shadow-xl"><div class="flex items-center gap-2 mb-2 text-orange-400"><i class="fas fa-compass"></i><span class="text-[10px] font-black uppercase">Định hướng</span></div><p class="text-sm text-gray-300 italic font-light">"${result.orientation}"</p></div>
-            </div>`;
-    }
 
-    // --- 2. HÀM NỘP BÀI (CẬP NHẬT: TỰ ĐỘNG NHẬN DIỆN LOẠI ĐỀ NLXH/NLVH) ---
+                <div class="bg-white rounded-3xl border border-gray-200 shadow-[0_10px_30px_rgba(0,0,0,0.03)] overflow-hidden mb-8">
+                    <div class="bg-slate-50 border-b border-gray-100 p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <h4 class="font-black text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2">
+                            <div class="w-8 h-8 bg-orange-100 text-orange-500 rounded-lg flex items-center justify-center"><i class="fas fa-file-signature"></i></div> 
+                            Bài làm chi tiết
+                        </h4>
+                        <div class="flex flex-wrap gap-3 md:gap-5 text-xs font-bold bg-white px-4 py-2.5 rounded-full shadow-sm border border-gray-100">
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-200 border border-red-400"></span> Lỗi sai</span>
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-100 border border-yellow-400"></span> Gợi ý sửa</span>
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-200 border border-green-400"></span> Khen ngợi</span>
+                        </div>
+                    </div>
+                    <div class="p-6 md:p-10 bg-white">
+                        <div class="leading-[2.2] text-slate-700 text-[1.1rem] space-y-4 text-justify font-light" style="font-family: 'Merriweather', serif;">
+                            ${result.correction_html}
+                        </div>
+                    </div>
+                </div>
+
+                ${result.orientation ? `
+                <div class="bg-slate-900 text-white p-8 md:p-10 rounded-3xl shadow-xl relative overflow-hidden mt-8">
+                    <div class="absolute -right-10 -bottom-10 opacity-5 text-9xl text-white"><i class="fas fa-compass"></i></div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-orange-500/20 text-orange-400 rounded-xl flex items-center justify-center text-xl"><i class="fas fa-lightbulb"></i></div>
+                        <span class="text-sm font-black uppercase tracking-widest text-orange-400">Định hướng phát triển</span>
+                    </div>
+                    <p class="text-gray-300 font-medium leading-relaxed relative z-10 text-[1.05rem]">
+                        ${result.orientation}
+                    </p>
+                </div>` : ''}
+            </div>
+        `;
+        document.getElementById('ai-correction-box').innerHTML = html;
+    };
+
+    // --- 2. HÀM NỘP BÀI (DÙNG PROMPT JSON BÊN NGOÀI) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
-        // Kiểm tra độ dài tối thiểu (50 từ)
         if(content.split(/\s+/).filter(x => x).length < 50) { 
             document.getElementById('short-essay-popup').style.display = 'flex'; return; 
         }
@@ -485,99 +531,46 @@
         
         const q = window.currentExamData;
         if (!q) {
-            showPopup("Lỗi", "Dữ liệu đề bị trống. Hãy reload trang.", "error");
+            showPopup("Lỗi", "Chưa có dữ liệu đề bài.", "error");
             loading.style.display = 'none';
             return;
         }
-        
-        // --- SYSTEM PROMPT LINH HOẠT ---
-        const systemPrompt = `
-        VAI TRÒ: Bạn là Giáo viên Ngữ văn lớp 12 (Chatbot Giáo viên Ngữ văn K12).
-        
-        KIẾN THỨC NỀN TẢNG:
-        - Am hiểu sâu rộng Lí luận văn học, SGK mới, Chương trình GDPT 2018.
-        - Chuyên gia về các thể loại văn học và các vấn đề xã hội.
-
-        THÁI ĐỘ CHẤM BÀI:
-        - Nghiêm túc, tỉ mỉ, khích lệ nhưng thẳng thắn chỉ ra lỗi sai.
-        - Ngôn ngữ nhận xét: Đậm chất văn học, mang tính học thuật, tuyệt đối không dùng từ ngữ sáo rỗng.
-
-        BAREM ĐIỂM & CẤU TRÚC ĐỀ (LINH HOẠT):
-        1. PHẦN ĐỌC HIỂU (4.0 điểm):
-           - Câu 1, 2 (0.5đ/câu): Nhận biết (Thể thơ, PTBĐ, Ngôi kể...). Sai là 0 điểm.
-           - Câu 3, 4, 5 (1.0đ/câu): Thông hiểu, Vận dụng. Trả lời hời hợt trừ 50% điểm.
-        
-        2. PHẦN LÀM VĂN (6.0 điểm) - Gồm 2 câu:
-           - Câu 1 (2.0 điểm) và Câu 2 (4.0 điểm).
-           - QUAN TRỌNG: Thể loại của Câu 1 và Câu 2 là NGẪU NHIÊN (có thể là Nghị luận Xã hội hoặc Nghị luận Văn học).
-           - NHIỆM VỤ CỦA AI: Bạn phải đọc nội dung đề bài của từng câu để xác định thể loại:
-             + Nếu là NLXH: Chấm điểm dựa trên tư duy phản biện, dẫn chứng thực tế, góc nhìn xã hội sâu sắc.
-             + Nếu là NLVH: Chấm điểm dựa trên khả năng cảm thụ, phân tích nghệ thuật, vận dụng lý luận văn học.
-
-        QUY TRÌNH CHẤM 3 BƯỚC (BẮT BUỘC):
-
-        BƯỚC 1: ĐÁNH GIÁ TỔNG QUÁT
-        - Điểm tích cực: Sự sáng tạo, dẫn chứng "đắt", văn phong mượt mà, xác định đúng trọng tâm.
-        - Hạn chế: Thiếu dẫn chứng, phân tích hời hợt, diễn xuôi (kể lể), dùng văn mẫu sáo rỗng.
-
-        BƯỚC 2: SỬA BÀI CHI TIẾT (HIGHLIGHT)
-        - Trích dẫn lại văn bản gốc và chèn thẻ sửa lỗi:
-          + <span class='text-bad'>...</span>: Cho phần dùng từ sai, diễn đạt lủng củng, lập luận yếu.
-          + <span class='text-fix'>...</span>: Nội dung giáo viên sửa lại/gợi ý thay thế ngay bên cạnh.
-        - Yêu cầu: Phần sửa phải nâng tầm bài viết (Ví dụ: Thay từ ngữ bình dân bằng thuật ngữ văn học/chính trị xã hội sắc bén).
-
-        BƯỚC 3: TỔNG KẾT VÀ ĐỊNH HƯỚNG
-        - Đưa ra lời khuyên cụ thể để học sinh cải thiện tư duy (không nói chung chung "cần cố gắng hơn").
-
-        OUTPUT JSON FORMAT (DUY NHẤT):
-        {
-            "human_score": (int 0-100, độ chân thực),
-            "score": (float 0-10.0, tổng điểm toàn bài),
-            "detailed_scores": {
-                "reading": "x/4.0",
-                "writing_c1": "x/2.0 (Ghi chú: NLXH hay NLVH)",
-                "writing_c2": "x/4.0 (Ghi chú: NLXH hay NLVH)"
-            },
-            "type_detected": "Đề Tổng Hợp (Tự động nhận diện)",
-            "general_comment": "Nhận xét tổng quát (Bước 1)",
-            "ai_comment": "Nhận xét về việc có dùng văn mẫu/AI hay không",
-            "strengths": ["Điểm tốt 1", "Điểm tốt 2"],
-            "weaknesses": ["Hạn chế 1", "Hạn chế 2"],
-            "correction_html": "Văn bản đã highlight (Bước 2)",
-            "orientation": "Lời khuyên định hướng (Bước 3)"
-        }
-
-        DỮ LIỆU ĐỀ BÀI:
-        - Đọc hiểu: ${q.reading_text}
-        - Câu hỏi Đọc hiểu: ${q.reading_questions}
-        - Làm văn Câu 1 (2.0đ): ${q.nlxh_topic} (Lưu ý: Hãy tự kiểm tra xem đây là NLXH hay NLVH)
-        - Làm văn Câu 2 (4.0đ): ${q.nlvh_topic} (Lưu ý: Hãy tự kiểm tra xem đây là NLXH hay NLVH)
-
-        BÀI LÀM CỦA HỌC SINH:
-        ${content}
-        `;
 
         try {
+            // 1. TẢI FILE PROMPT JSON TỪ SERVER
+            // Sửa đường dẫn 'prompts.json' hoặc '../prompts.json' tùy vị trí file HTML
+            const promptResponse = await fetch('../prompts.json'); 
+            const promptData = await promptResponse.json();
+            
+            // 2. LẤY MẪU PROMPT CHO ĐỀ TỔNG HỢP VÀ ĐIỀN DỮ LIỆU
+            let systemPrompt = promptData.de_tong_hop;
+            
+            systemPrompt = systemPrompt
+                .replace('{{DOC_HIEU}}', q.reading_text || 'Không có')
+                .replace('{{CAU_HOI}}', (q.reading_questions||[]).join(' | ') || 'Không có')
+                .replace('{{NLXH}}', q.nlxh_topic || 'Không có')
+                .replace('{{NLVH}}', q.nlvh_topic || 'Không có')
+                .replace('{{BAI_LAM}}', content);
+
+            // 3. GỌI API
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ 
                     systemPrompt: systemPrompt, 
-                    messages: `Học sinh gửi bài làm Đề Tổng Hợp. Hãy xác định thể loại từng câu và chấm theo quy trình K12.`
+                    messages: `Hãy chấm bài làm Đề Tổng Hợp này theo đúng JSON format.`
                 }) 
             });
 
             if (!res.ok) throw new Error("SERVER_ERROR");
 
             const data = await res.json();
-            
             if (!data.choices || !data.choices[0] || !data.choices[0].message) {
                 throw new Error("NO_CONTENT");
             }
 
             let rawText = data.choices[0].message.content;
             
-            // JSON CLEANING
             rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
             const firstBrace = rawText.indexOf('{');
             const lastBrace = rawText.lastIndexOf('}');
@@ -587,35 +580,32 @@
             
             const result = JSON.parse(rawText);
 
-            // DATA SANITIZATION
             let safeScore = parseFloat(result.score);
             if (isNaN(safeScore)) safeScore = 0;
             if (safeScore > 10) safeScore = 10;
-
             result.score = safeScore;
             result.human_score = parseInt(result.human_score) || 100;
             
-            // Render kết quả
             renderAIResult(result);
 
-            // Lưu vào Firebase
+            // 4. LƯU BÀI VÀO FIREBASE
             if (auth.currentUser) {
-                // Lưu vào Collection 'exam_history'
                 await addDoc(collection(db, "exam_history"), {
-                    userId: auth.currentUser.uid, // ID học sinh
+                    userId: auth.currentUser.uid,
                     userName: auth.currentUser.displayName || auth.currentUser.email.split('@')[0],
-                    prompt: q.title || "Đề Luyện Tập", // Tên đề
-                    essay: content, // Bài làm nguyên văn
-                    score: result.score, // Điểm số AI chấm
-                    feedback: result.correction_html, // Lời phê & sửa lỗi của AI
-                    timestamp: serverTimestamp() // Thời gian nộp chuẩn Google
+                    prompt: q.id || "Đề Tổng Hợp", 
+                    essay: content,
+                    score: result.score, 
+                    feedback: result.correction_html, 
+                    timestamp: serverTimestamp() 
                 });
             }
+
         } catch(e) { 
             console.error(e); 
             let msg = "Có lỗi xảy ra, vui lòng thử lại!";
             if (e.message === "SERVER_ERROR") msg = "Server đang bận. Bạn hãy bấm nộp lại nhé!";
-            if (e.message === "INVALID_FORMAT") msg = "Dữ liệu trả về bị lỗi. Vui lòng bấm nộp lại!";
+            if (e.name === "SyntaxError") msg = "Dữ liệu AI trả về bị lỗi cấu trúc. Vui lòng bấm nộp lại!";
             showPopup("Lỗi AI", msg, "error");
         } finally { 
             loading.style.display = 'none'; 
