@@ -65,6 +65,13 @@
             -webkit-overflow-scrolling: touch;
         }
 
+        /* --- GIỚI HẠN CHIỀU RỘNG NỘI DUNG --- */
+        .content-wrapper {
+            width: 100%;
+            max-width: 1100px; /* GIỚI HẠN CHIỀU RỘNG CHUẨN ĐỂ KHÔNG BỊ BÈ RA */
+            margin: 0 auto;    /* CANH GIỮA MÀN HÌNH */
+        }
+
         .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; position: relative; z-index: 10;}
         .welcome-text h2 { font-size: 2.2rem; font-weight: 800; color: var(--text-main); }
         .user-avatar { width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.3rem; box-shadow: 0 10px 25px rgba(255, 143, 80, 0.3); transform: rotate(-5deg); transition: 0.3s; cursor: pointer; }
@@ -281,15 +288,17 @@
     <div id="menu-placeholder"></div>
 
     <main class="main-content">
-        <div class="user-header">
-            <div class="welcome-text">
-                <h2 id="welcome-name">Xin chào,</h2>
-                <p style="color: var(--text-light); margin-top: 5px;">Hãy cùng bắt đầu học tập cùng với HopVan nhé!</p>
+        <div class="content-wrapper">
+            
+            <div class="user-header">
+                <div class="welcome-text">
+                    <h2 id="welcome-name">Xin chào,</h2>
+                    <p>Hãy cùng bắt đầu học tập cùng với HopVan nhé!</p>
+                </div>
+                <div class="user-avatar" id="avatar-initial" onclick="window.location.href='account.html'" title="Đi đến trang cá nhân"></div>
             </div>
-            <div class="user-avatar overflow-hidden cursor-pointer" id="avatar-initial" onclick="window.location.href='account.html'" title="Đi đến trang cá nhân"></div>
-        </div>
 
-        <div id="overview" class="content-section active">
+            <div id="overview" class="content-section active">
             
             <div class="stats-grid">
                 <div class="stat-card group">

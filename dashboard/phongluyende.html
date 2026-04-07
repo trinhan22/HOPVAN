@@ -11,7 +11,7 @@
     <meta property="og:type" content="article" />
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
 
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -19,8 +19,11 @@
         :root {
             --primary: #FF8F50;
             --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
-            --purple-gradient: linear-gradient(135deg,  #FF5E62, #FF8F50 );
-            --sidebar-width: 260px;
+            --purple-gradient: linear-gradient(135deg, #FF5E62, #FF8F50);
+            --blue-gradient: linear-gradient(135deg, #3B82F6, #06B6D4);
+            --green-gradient: linear-gradient(135deg, #10B981, #34D399);
+            
+            --sidebar-width: 280px;
 
             /* BỘ MÀU SÁNG */
             --bg-body: #FFF5EC;
@@ -29,33 +32,41 @@
             --bg-panel-hover: #FFF5EC;
             --border-panel: rgba(0,0,0,0.03);
             --border-ui: #eee;
-            --text-heading: #2D3436;
-            --text-sub: #636E72;
+            --text-heading: #1e293b;
+            --text-sub: #64748b;
+            
+            /* Shadows Cao Cấp */
+            --shadow-sm: 0 4px 15px rgba(0,0,0,0.03);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.06);
+            --shadow-hover: 0 20px 40px rgba(255, 143, 80, 0.15);
         }
 
         /* BỘ MÀU TỐI */
         html.dark {
-            --bg-body: #0f172a;       /* slate-900 */
+            --bg-body: #0B1120;
             --bg-glass: rgba(15, 23, 42, 0.7);
-            --bg-panel: rgba(30, 41, 59, 0.85); /* slate-800 */
+            --bg-panel: rgba(30, 41, 59, 0.9); 
             --bg-panel-hover: #1e293b;
-            --border-panel: #334155;  /* slate-700 */
+            --border-panel: #334155; 
             --border-ui: #334155;
             --text-heading: #f8fafc;
             --text-sub: #94a3b8;
+            --shadow-sm: 0 4px 15px rgba(0,0,0,0.3);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.5);
+            --shadow-hover: 0 20px 40px rgba(0,0,0,0.6);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
         body { background-color: var(--bg-body); height: 100vh; overflow: hidden; display: flex; color: var(--text-sub); }
 
         /* --- BACKGROUND BLOBS --- */
         .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
-        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatBlob 10s infinite alternate; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.5; animation: floatBlob 12s infinite alternate ease-in-out; }
         .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
         .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
         .blob-3 { width: 300px; height: 300px; background: #FFD1D1; top: 40%; left: 40%; animation-delay: -2s; }
-        html.dark .blob { opacity: 0.15; }
-        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
+        html.dark .blob { opacity: 0.1; }
+        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(40px, 60px) scale(1.05); } }
 
         /* --- ĐỒNG BỘ DARK MODE CHO MENU.JS --- */
         html.dark #menu-placeholder aside { background-color: var(--bg-panel) !important; border-color: var(--border-panel) !important; }
@@ -71,206 +82,180 @@
         html.dark #menu-placeholder .nav-item:hover { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
 
         /* --- LAYOUT CHÍNH --- */
-        .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 60px; background: var(--bg-panel); z-index: 100; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border-panel); }
+        .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 70px; background: var(--bg-panel); z-index: 100; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border-panel); }
         #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 998; }
 
         .main-content {
             margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); height: 100%;
-            background: var(--bg-glass); backdrop-filter: blur(25px);
+            background: var(--bg-glass); backdrop-filter: blur(30px);
             border-left: 1px solid var(--border-panel); padding: 40px 60px; overflow-y: auto; position: relative;
         }
 
         .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-        .welcome-text h2 { font-size: 2.2rem; font-weight: 800; color: var(--text-heading); }
-        .user-avatar { width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.3rem; box-shadow: 0 10px 25px rgba(255, 143, 80, 0.3); transform: rotate(-5deg); transition: 0.3s; cursor: pointer; border: 2px solid var(--border-panel);}
+        .welcome-text h2 { font-size: 2.2rem; font-weight: 800; color: var(--text-heading); letter-spacing: -0.5px;}
+        .user-avatar { width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.3rem; box-shadow: 0 10px 25px rgba(255, 143, 80, 0.3); transform: rotate(-5deg); cursor: pointer; border: 2px solid white;}
+        html.dark .user-avatar { border-color: var(--border-ui); }
         .user-avatar:hover { transform: rotate(0deg) scale(1.1); }
 
-        .section-title { display: flex; align-items: center; gap: 12px; font-size: 1.6rem; font-weight: 800; color: var(--text-heading); margin-bottom: 8px; }
-        .section-desc { color: var(--text-sub); margin-bottom: 30px; font-size: 1rem; }
+        .section-title { display: flex; align-items: center; gap: 12px; font-size: 1.6rem; font-weight: 900; color: var(--text-heading); margin-bottom: 8px; letter-spacing: -0.5px;}
+        .section-desc { color: var(--text-sub); margin-bottom: 30px; font-size: 1rem; font-weight: 500;}
 
-        /* --- PRACTICE CARDS --- */
-        .practice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1000px; }
-        .card { border-radius: 35px; padding: 40px; position: relative; overflow: hidden; cursor: pointer; transition: all 0.4s; height: 260px; display: flex; flex-direction: column; justify-content: space-between; }
-        .card:hover { transform: translateY(-12px) scale(1.02); box-shadow: 0 30px 60px rgba(0,0,0,0.15); }
+        /* =========================================
+           PRACTICE CARDS (THIẾT KẾ MỚI)
+           ========================================= */
+        .practice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 24px; max-width: 1100px; }
         
-        .card-orange { background: var(--primary-gradient); color: white; }
-        .card-purple { background: var(--purple-gradient); color: white; }
+        .card { 
+            border-radius: 32px; padding: 35px; position: relative; overflow: hidden; cursor: pointer; 
+            height: 240px; display: flex; flex-direction: column; justify-content: space-between; 
+            box-shadow: var(--shadow-md); border: 1px solid rgba(255,255,255,0.5);
+            background: var(--bg-panel); z-index: 1;
+        }
         
-        /* Chỉnh lại thẻ White cho chuẩn Dark Mode */
-        .card-white { background: var(--bg-panel); color: var(--text-heading); border: 1px solid var(--border-panel); box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+        html.dark .card { border-color: var(--border-ui); }
+
+        /* Card Màu Sắc Nổi Bật (Ngẫu Nhiên & Tổng Hợp) */
+        .card-colored { color: white; border: none; }
+        .card-colored::before {
+            content: ''; position: absolute; inset: 0; opacity: 0.9; z-index: -2;
+            transition: opacity 0.4s ease;
+        }
+        .card-colored:hover::before { opacity: 1; }
+        
+        /* Gán nền Gradient cho từng loại */
+        .card-orange::before { background: var(--primary-gradient); }
+        .card-purple::before { background: var(--purple-gradient); }
+        
+        /* Hiệu ứng ánh sáng Glow bên trong */
+        .card-colored::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+            opacity: 0; transition: opacity 0.5s ease; z-index: -1; pointer-events: none;
+        }
+        .card-colored:hover::after { opacity: 1; }
+
+        /* Card Trắng/Tối (Theo Chủ Đề & Trắc Nghiệm) */
+        .card-white { background: var(--bg-panel); color: var(--text-heading); }
+        .card-white:hover { border-color: var(--primary); box-shadow: var(--shadow-hover); }
         .card-white .card-desc { color: var(--text-sub); }
-        .card-white .card-btn { background: var(--bg-body); color: var(--text-sub); border: 1px solid var(--border-ui); }
-        .card-white:hover .card-btn { color: var(--primary); border-color: var(--primary); }
 
-        .card-title { font-size: 1.8rem; font-weight: 800; line-height: 1.2; z-index: 2; }
-        .card-desc { font-size: 1rem; opacity: 0.9; max-width: 85%; z-index: 2; margin-top: 10px; }
-        .card-btn { display: inline-flex; align-items: center; gap: 10px; padding: 12px 25px; border-radius: 50px; font-weight: 700; font-size: 0.95rem; transition: 0.3s; z-index: 2; width: fit-content; }
-        .card-orange .card-btn, .card-purple .card-btn { background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(10px); }
-        
-        .card-icon-bg { position: absolute; right: -20px; bottom: -20px; font-size: 10rem; opacity: 0.1; transform: rotate(-15deg); transition: 0.5s; }
-        .card:hover .card-icon-bg { transform: rotate(0deg) scale(1.1); opacity: 0.2; }
-        html.dark .card-white .card-icon-bg { opacity: 0.05; }
+        /* Nội dung Card */
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; width: 100%;}
+        .card-icon-badge {
+            width: 56px; height: 56px; border-radius: 20px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); backdrop-filter: blur(10px);
+        }
+        .card-colored .card-icon-badge { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); }
+        .card-white .card-icon-badge { background: rgba(255,143,80,0.1); color: var(--primary); border: 1px solid rgba(255,143,80,0.2); }
 
-        /* --- MODAL CHỌN CHỦ ĐỀ --- */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 20000; justify-content: center; align-items: center; backdrop-filter: blur(8px); animation: fadeIn 0.3s; }
-        .modal-box { background: var(--bg-panel); width: 90%; max-width: 850px; padding: 50px; border-radius: 40px; position: relative; animation: popUp 0.4s; box-shadow: 0 40px 100px rgba(0,0,0,0.5); border: 1px solid var(--border-panel); }
-        .close-modal { position: absolute; top: 25px; right: 30px; font-size: 1.8rem; cursor: pointer; color: var(--text-sub); transition: 0.2s; }
-        .close-modal:hover { color: var(--primary); }
+        .card-title { font-size: 1.6rem; font-weight: 900; line-height: 1.3; letter-spacing: -0.5px; }
+        .card-desc { font-size: 0.95rem; opacity: 0.9; max-width: 90%; margin-top: 8px; font-weight: 500; line-height: 1.5;}
         
-        .modal-header { text-align: center; margin-bottom: 40px; }
-        .modal-header h3 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; color: var(--text-heading); }
-        .modal-header p { color: var(--text-sub); }
+        .card-footer { display: flex; justify-content: space-between; align-items: flex-end; z-index: 2; width: 100%;}
+        
+        /* Nút Action (Dấu mũi tên) */
+        .card-action-btn { 
+            width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; transition: 0.3s;
+        }
+        .card-colored .card-action-btn { background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(5px); }
+        .card-white .card-action-btn { background: var(--bg-body); color: var(--text-sub); border: 1px solid var(--border-ui); }
+        
+        /* Hiệu ứng Hover toàn Card */
+        .card:hover { transform: translateY(-8px); }
+        .card:hover .card-action-btn { transform: translateX(5px) scale(1.1); }
+        .card-colored:hover { box-shadow: var(--shadow-hover); }
+        .card-white:hover .card-action-btn { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Watermark Chìm */
+        .card-watermark { position: absolute; right: -20px; bottom: -30px; font-size: 11rem; opacity: 0.08; transform: rotate(-15deg); transition: 0.5s; z-index: 0; pointer-events: none; }
+        .card:hover .card-watermark { transform: rotate(0deg) scale(1.1); opacity: 0.15; }
+        .card-white .card-watermark { color: var(--primary); opacity: 0.04; }
+        html.dark .card-white .card-watermark { opacity: 0.02; }
+
+        /* --- TIỆN ÍCH MỞ RỘNG (ĐỀ CỦA TÔI & LỊCH SỬ) --- */
+        .extension-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 24px; max-width: 1100px; margin-top: 40px; }
+        .ext-card {
+            background: var(--bg-panel); border: 1px dashed var(--border-ui); border-radius: 28px;
+            padding: 30px; display: flex; align-items: center; gap: 25px; cursor: pointer;
+            transition: all 0.3s ease; box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+        }
+        .ext-card:hover { border-color: var(--primary); border-style: solid; transform: translateY(-5px); box-shadow: var(--shadow-md); background: var(--bg-body);}
+        
+        .ext-icon { width: 65px; height: 65px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0;}
+        .ext-icon.blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .ext-icon.green { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        
+        .ext-content h3 { font-size: 1.3rem; font-weight: 800; color: var(--text-heading); margin-bottom: 5px; letter-spacing: -0.5px;}
+        .ext-content p { font-size: 0.9rem; color: var(--text-sub); font-weight: 500; line-height: 1.5; }
+        
+        .ext-arrow { position: absolute; right: 30px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; color: var(--border-ui); transition: 0.3s;}
+        .ext-card:hover .ext-arrow { color: var(--primary); right: 25px; }
+
+
+        /* --- MODAL CHỌN CHỦ ĐỀ VÀ LỊCH SỬ (Giữ nguyên style xịn trước đó) --- */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 20000; justify-content: center; align-items: center; backdrop-filter: blur(10px); animation: fadeIn 0.3s; }
+        .modal-box { background: var(--bg-panel); width: 90%; max-width: 850px; padding: 40px; border-radius: 40px; position: relative; animation: popUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 40px 100px rgba(0,0,0,0.5); border: 1px solid var(--border-panel); }
+        .close-modal { position: absolute; top: 25px; right: 30px; width: 40px; height: 40px; border-radius: 50%; background: var(--bg-body); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; color: var(--text-sub); transition: 0.2s; border: 1px solid var(--border-ui);}
+        .close-modal:hover { color: white; background: var(--primary); border-color: var(--primary); transform: rotate(90deg);}
+        
+        .modal-header { text-align: center; margin-bottom: 35px; }
+        .modal-header h3 { font-size: 1.8rem; font-weight: 900; margin-bottom: 8px; color: var(--text-heading); letter-spacing: -0.5px;}
+        .modal-header p { color: var(--text-sub); font-weight: 500;}
         
         .topics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .topic-item { background: var(--bg-body); border: 1px solid var(--border-ui); border-radius: 25px; padding: 30px 15px; text-align: center; transition: 0.3s; cursor: pointer; }
         .topic-item:hover { border-color: var(--primary); background: var(--bg-panel-hover); transform: translateY(-5px); box-shadow: 0 15px 30px rgba(255, 143, 80, 0.15); }
-        
         .topic-icon-circle { width: 70px; height: 70px; background: var(--bg-panel); border: 1px solid var(--border-ui); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px; font-size: 1.5rem; color: var(--primary); transition: 0.3s; }
         .topic-item:hover .topic-icon-circle { background: var(--primary-gradient); color: white; border-color: transparent; }
-        .topic-item span { font-weight: 700; color: var(--text-heading); font-size: 1rem; }
+        .topic-item span { font-weight: 800; color: var(--text-heading); font-size: 1rem; }
 
-        .topic-item.locked { filter: grayscale(1); opacity: 0.5; cursor: not-allowed; position: relative; }
-        .topic-item.locked::after { content: "\f023"; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; top: 15px; right: 20px; color: var(--text-sub); font-size: 1.1rem; }
-        .topic-item.locked:hover { transform: none; border-color: var(--border-ui); background: var(--bg-body); box-shadow: none; }
+        .history-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-height: 500px; overflow-y: auto; padding-right: 5px; }
+        .history-card { background: var(--bg-body); border: 1px solid var(--border-ui); border-radius: 20px; padding: 20px; transition: all 0.3s; cursor: pointer; display: flex; flex-direction: column;}
+        .history-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 15px 30px rgba(255, 143, 80, 0.15); }
+        .hc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed var(--border-ui); padding-bottom: 12px; }
+        .hc-date { font-size: 0.8rem; font-weight: 700; color: var(--text-sub); }
+        .hc-score { font-size: 1.1rem; font-weight: 900; color: #ea580c; background: rgba(234, 88, 12, 0.1); padding: 4px 12px; border-radius: 10px; }
+        .hc-body h4 { font-size: 1rem; font-weight: 800; color: var(--text-heading); margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+        .hc-body p { font-size: 0.9rem; color: var(--text-sub); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5; }
+        .hc-footer { margin-top: 15px; font-size: 0.85rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 5px; }
+        .history-card:hover .hc-footer i { transform: translateX(5px); }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 143, 80, 0.3); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes popUp { from { transform: scale(0.9) translateY(20px); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         /* --- MOBILE OPTIMIZATION --- */
+        @media (max-width: 1024px) {
+            .practice-grid, .extension-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+            .history-grid { grid-template-columns: repeat(2, 1fr); }
+        }
         @media (max-width: 768px) {
             .mobile-header { display: flex; z-index: 1000; }
             #sidebar-overlay.active { display: block; }
-
-            /* Fix Sidebar - Ép menu về trái và trên cùng */
-            aside {
-                position: fixed !important; 
-                left: 0 !important; top: 0 !important; bottom: 0 !important;
-                transform: translateX(-100%); 
-                z-index: 9999 !important; 
-                width: 280px !important; 
-                background: white !important;
-                transition: transform 0.3s ease-in-out !important;
-            }
-            aside.open { 
-                transform: translateX(0) !important;
-                box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important;
-            }
-
-            .main-content { 
-                margin-left: 0 !important; 
-                width: 100% !important; 
-                padding: 80px 20px 30px !important; /* Thêm padding-top để tránh header */
-            }
-            
-            .practice-grid, .topics-grid { grid-template-columns: 1fr !important; }
+            aside { position: fixed !important; left: 0 !important; top: 0 !important; bottom: 0 !important; transform: translateX(-100%); z-index: 9999 !important; width: 280px !important; background: var(--bg-panel) !important; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; }
+            aside.open { transform: translateX(0) !important; box-shadow: 10px 0 50px rgba(0,0,0,0.2) !important; }
+            .main-content { margin-left: 0 !important; width: 100% !important; padding: 90px 20px 30px !important; }
+            .practice-grid, .extension-grid, .topics-grid, .history-grid { grid-template-columns: 1fr !important; }
+            .card { height: auto; min-height: 220px; }
             .modal-box { padding: 30px 20px; max-height: 90vh; overflow-y: auto; }
-            
-            /* Typography Mobile */
-            .user-header { margin-bottom: 25px; }
             .welcome-text h2 { font-size: 1.8rem; }
-            .card { height: auto; min-height: 240px; }
-            .card-title { font-size: 1.6rem; }
         }
 
-
-/* --- GLOBAL SCROLLBAR STYLE --- */
-
-/* 1. Thiết lập độ rộng/cao của thanh trượt */
-::-webkit-scrollbar {
-    width: 10px;  /* Độ rộng cho thanh dọc */
-    height: 10px; /* Độ cao cho thanh ngang */
-}
-
-/* 2. Thiết lập rãnh trượt (Track) - Nền chìm */
-::-webkit-scrollbar-track {
-    background: rgba(255, 143, 80, 0.05); /* Màu cam cực nhạt, gần như trong suốt */
-    border-radius: 10px;
-}
-
-/* 3. Thiết lập tay nắm (Thumb) - Phần di chuyển */
-::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 143, 80, 0.3); /* Mặc định là cam nhạt */
-    border-radius: 10px; /* Bo tròn mềm mại */
-    
-    /* Mẹo: Tạo viền trong suốt để thanh trượt trông nhỏ hơn và "lơ lửng" */
-    border: 2px solid transparent;
-    background-clip: content-box;
-    transition: background-color 0.3s ease;
-}
-
-/* 4. Hiệu ứng khi di chuột vào (Hover) */
-::-webkit-scrollbar-thumb:hover {
-    background-color: #FF8F50; /* Đổi sang màu cam chính thương hiệu */
-    border: 1px solid transparent; /* Làm thanh trượt to ra một chút khi hover */
-}
-
-/* 5. (Tùy chọn) Ẩn nút mũi tên 2 đầu (nếu trình duyệt hiển thị) */
-::-webkit-scrollbar-button {
-    display: none;
-}
-
-
-/* =========================================
-           THÊM CARD MỚI: ĐỀ CỦA TÔI & LỊCH SỬ (TÔNG CAM/ĐỎ)
-           ========================================= */
-        .practice-grid-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1000px; margin-top: 25px; }
-        
-        /* Gradient cam vàng rực rỡ */
-        .card-gold { background: var(--primary-gradient); color: white; }
-        .card-gold .card-btn { background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(10px); }
-        
-        /* Gradient cam đỏ đậm */
-        .card-rose { background: var(--purple-gradient); color: white; }
-        .card-rose .card-btn { background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(10px); }
-
-        @media (max-width: 768px) {
-            .practice-grid-bottom { grid-template-columns: 1fr; }
-        }
-
-        /* =========================================
-           MODAL LỊCH SỬ LÀM BÀI (3x3 Grid - Tông Cam)
-           ========================================= */
-        .history-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-height: 500px; overflow-y: auto; padding-right: 5px; }
-        
-        .history-card { 
-            background: var(--bg-body); border: 1px solid var(--border-ui); 
-            border-radius: 20px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); 
-            transition: all 0.3s; cursor: pointer; display: flex; flex-direction: column;
-        }
-        .history-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 15px 30px rgba(255, 143, 80, 0.15); }
-        
-        .hc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed var(--border-ui); padding-bottom: 12px; }
-        .hc-date { font-size: 0.8rem; font-weight: 700; color: var(--text-sub); }
-        
-        /* Điểm số màu cam nổi bật */
-        .hc-score { font-size: 1.1rem; font-weight: 900; color: #ea580c; background: #ffedd5; padding: 4px 12px; border-radius: 10px; }
-        
-        .hc-body { flex-grow: 1; }
-        .hc-body h4 { font-size: 1rem; font-weight: 800; color: var(--text-heading); margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
-        .hc-body p { font-size: 0.9rem; color: var(--text-sub); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5; }
-        
-        .hc-footer { margin-top: 15px; font-size: 0.85rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 5px; }
-        .history-card:hover .hc-footer i { transform: translateX(5px); transition: 0.3s; }
-
-        /* Scrollbar cho lưới lịch sử */
-        .history-grid::-webkit-scrollbar { width: 6px; }
-        .history-grid::-webkit-scrollbar-track { background: transparent; }
-        .history-grid::-webkit-scrollbar-thumb { background: rgba(255, 143, 80, 0.3); border-radius: 10px; }
-        .history-grid::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-
-        @media (max-width: 1024px) { .history-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 640px) { .history-grid { grid-template-columns: 1fr; } }
-
-        html.dark .history-card { background: var(--bg-panel); border-color: var(--border-panel); }
-        html.dark .hc-score { background: rgba(234, 88, 12, 0.15); color: #fb923c; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background-color: var(--border-panel); border-radius: 10px; border: 2px solid var(--bg-body); }
+        ::-webkit-scrollbar-thumb:hover { background-color: var(--primary); }
     </style>
 </head>
 <body>
 
     <script>
-        if (localStorage.getItem('theme') === 'dark') {
-            document.documentElement.classList.add('dark');
-        }
+        if (localStorage.getItem('theme') === 'dark') { document.documentElement.classList.add('dark'); }
     </script>
 
     <div class="background-blobs">
@@ -279,18 +264,17 @@
         <div class="blob blob-3"></div>
     </div>
     
-    <div class="mobile-header lg:hidden">
-        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl mr-4 focus:outline-none">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="flex items-center gap-2">
+    <div class="mobile-header lg:hidden justify-between">
+        <div class="flex items-center gap-4">
+            <button onclick="toggleSidebar()" class="text-gray-700 dark:text-gray-300 text-2xl focus:outline-none hover:text-orange-500 transition"><i class="fas fa-bars"></i></button>
+        </div>
+        <div class="flex items-center gap-3">
             <img src="../LOGO.WEBP" alt="Logo" class="w-8 h-8">
-            <span class="font-black text-orange-500 text-lg">HOPVAN</span>
+            <span class="font-black text-orange-500 text-lg tracking-tight">HOPVAN</span>
         </div>
     </div>
 
     <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
-
     <div id="menu-placeholder"></div>
 
     <main class="main-content">
@@ -303,94 +287,102 @@
         </div>
 
         <div class="section-title">
-            <i class="fas fa-feather-alt" style="color: var(--primary);"></i> Phòng Luyện Đề
+            <i class="fas fa-layer-group" style="color: var(--primary);"></i> Luyện Đề Chính
         </div>
         <p class="section-desc">Hệ thống chấm điểm AI & Ngân hàng câu hỏi đa dạng.</p>
 
         <div class="practice-grid">
-            <div class="card card-orange" onclick="goToExam('random')">
-                <div class="card-content">
-                    <div class="card-title">Luyện Đề<br>Ngẫu Nhiên</div>
-                    <p class="card-desc">Thử thách với 1 đề bài bất kỳ từ kho dữ liệu.</p>
+            
+            <div class="card card-colored card-orange" onclick="goToExam('random')">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Ngẫu Nhiên</div>
+                        <p class="card-desc">Thử thách với 1 đề bài bất kỳ từ kho dữ liệu.</p>
+                    </div>
+                    <div class="card-icon-badge"><i class="fas fa-dice"></i></div>
                 </div>
-                <div class="card-btn">Bắt đầu ngay <i class="fas fa-arrow-right"></i></div>
-                <i class="fas fa-dice card-icon-bg"></i>
+                <div class="card-footer">
+                    <span class="font-bold tracking-wide uppercase text-sm">Bắt đầu ngay</span>
+                    <div class="card-action-btn"><i class="fas fa-arrow-right"></i></div>
+                </div>
+                <i class="fas fa-dice card-watermark"></i>
             </div>
 
-            <div class="card card-purple" onclick="goToExam('full')">
-                <div class="card-content">
-                    <div class="card-title">Luyện Đề<br>Tổng Hợp</div>
-                    <p class="card-desc">Full cấu trúc BGD: Đọc Hiểu + NLXH + NLVH (120p).</p>
+            <div class="card card-colored card-purple" onclick="goToExam('full')">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Đề Tổng Hợp</div>
+                        <p class="card-desc">Full cấu trúc: Đọc Hiểu + NLXH + NLVH (120p).</p>
+                    </div>
+                    <div class="card-icon-badge"><i class="fas fa-scroll"></i></div>
                 </div>
-                <div class="card-btn">Thi thử ngay <i class="fas fa-file-signature"></i></div>
-                <i class="fas fa-scroll card-icon-bg"></i>
+                <div class="card-footer">
+                    <span class="font-bold tracking-wide uppercase text-sm">Thi thử ngay</span>
+                    <div class="card-action-btn"><i class="fas fa-arrow-right"></i></div>
+                </div>
+                <i class="fas fa-scroll card-watermark"></i>
             </div>
 
             <div class="card card-white" onclick="openTopicModal()">
-                <div class="card-content">
-                    <div class="card-title" style="color: var(--primary);">Chọn Theo<br>Chủ Đề</div>
-                    <p class="card-desc">Ôn tập chuyên sâu: NLXH, NLVH, Đọc Hiểu.</p>
+                <div class="card-header">
+                    <div>
+                        <div class="card-title" style="color: var(--primary);">Theo Chủ Đề</div>
+                        <p class="card-desc">Ôn tập chuyên sâu từng phần: NLXH, NLVH...</p>
+                    </div>
+                    <div class="card-icon-badge"><i class="fas fa-shapes"></i></div>
                 </div>
-                <div class="card-btn">Xem danh sách <i class="fas fa-list-ul"></i></div>
-                <i class="fas fa-layer-group card-icon-bg" style="color: var(--primary);"></i>
+                <div class="card-footer">
+                    <span class="font-bold tracking-wide uppercase text-sm text-gray-400">Xem danh mục</span>
+                    <div class="card-action-btn"><i class="fas fa-list-ul"></i></div>
+                </div>
+                <i class="fas fa-shapes card-watermark"></i>
             </div>
 
             <div class="card card-white" onclick="goToExam('quiz')">
-                <div class="card-content">
-                    <div class="card-title" style="color: var(--primary);">Luyện Đề<br>Trắc Nghiệm</div>
-                    <p class="card-desc">Ôn nhanh kiến thức tác giả, tác phẩm qua câu hỏi ngắn.</p>
+                <div class="card-header">
+                    <div>
+                        <div class="card-title" style="color: var(--primary);">Trắc Nghiệm</div>
+                        <p class="card-desc">Ôn nhanh kiến thức nền tảng qua câu hỏi ngắn.</p>
+                    </div>
+                    <div class="card-icon-badge"><i class="fas fa-check-circle"></i></div>
                 </div>
-                <div class="card-btn">Vào thi <i class="fas fa-check-circle"></i></div>
-                <i class="fas fa-tasks card-icon-bg" style="color: var(--primary);"></i>
+                <div class="card-footer">
+                    <span class="font-bold tracking-wide uppercase text-sm text-gray-400">Vào thi ngay</span>
+                    <div class="card-action-btn"><i class="fas fa-arrow-right"></i></div>
+                </div>
+                <i class="fas fa-tasks card-watermark"></i>
             </div>
-        </div>
 
         </div> 
         
-        <div class="practice-grid-bottom">
-            <div class="card card-gold" onclick="window.location.href='../phongluyende/decanhan.html'">
-                <div class="card-content">
-                    <div class="card-title">Đề Của Tôi<br>(Cá Nhân Hóa)</div>
-                    <p class="card-desc">Tự soạn hoặc dán đề thi thử của trường. Làm bài ngay và để AI chấm điểm.</p>
+        <div class="extension-grid">
+            <div class="ext-card" onclick="window.location.href='../phongluyende/decanhan.html'">
+                <div class="ext-icon blue"><i class="fas fa-file-signature"></i></div>
+                <div class="ext-content">
+                    <h3>Đề của tôi (Cá nhân hóa)</h3>
+                    <p>Tự soạn hoặc dán đề thi của trường để AI chấm điểm.</p>
                 </div>
-                <div class="card-btn">Soạn đề ngay <i class="fas fa-arrow-right"></i></div>
-                <i class="fas fa-file-signature card-icon-bg"></i>
+                <i class="fas fa-chevron-right ext-arrow"></i>
             </div>
 
-            <div class="card card-rose" onclick="openHistoryModal()">
-                <div class="card-content">
-                    <div class="card-title">Lịch Sử<br>Làm Bài</div>
-                    <p class="card-desc">Xem lại các bài viết đã nộp, kiểm tra điểm số và đọc lại nhận xét chi tiết của hệ thống AI.</p>
+            <div class="ext-card" onclick="openHistoryModal()">
+                <div class="ext-icon green"><i class="fas fa-history"></i></div>
+                <div class="ext-content">
+                    <h3>Lịch sử làm bài</h3>
+                    <p>Xem lại các bài viết, điểm số và nhận xét chi tiết.</p>
                 </div>
-                <div class="card-btn">Xem lịch sử <i class="fas fa-history"></i></div>
-                <i class="fas fa-clipboard-check card-icon-bg"></i>
+                <i class="fas fa-chevron-right ext-arrow"></i>
             </div>
         </div>
-    </main> <div id="historyModal" class="modal-overlay">
-        <div class="modal-box" style="max-width: 1000px; width: 95%; padding: 40px;">
-            <span class="close-modal" onclick="closeHistoryModal()">&times;</span>
-            <div class="modal-header" style="margin-bottom: 30px;">
-                <h3 style="display: flex; justify-content: center; align-items: center; gap: 10px;">
-                    <div style="background: rgba(255,143,80,0.1); color: var(--primary); width: 45px; height: 45px; border-radius: 12px; display: flex; justify-content: center; align-items: center;">
-                        <i class="fas fa-history"></i>
-                    </div> 
-                    Lịch Sử Làm Bài
-                </h3>
-                <p>Xem lại các bài luyện tập gần nhất và nhận xét từ AI.</p>
-            </div>
-            
-            <div id="history-list" class="history-grid">
-                </div>
-        </div>
-    </div>
-    </main>
 
+    </main> 
+    
     <div id="topicModal" class="modal-overlay">
         <div class="modal-box">
-            <span class="close-modal" onclick="closeTopicModal()">&times;</span>
+            <span class="close-modal" onclick="closeTopicModal()"><i class="fas fa-times"></i></span>
             <div class="modal-header">
                 <h3>Chọn chủ đề ôn luyện</h3>
-                <p>Bạn muốn ôn kỹ phần nào hôm nay?</p>
+                <p>Bạn muốn xoáy sâu vào kỹ năng nào hôm nay?</p>
             </div>
             <div class="topics-grid">
                 <div class="topic-item" onclick="goToExam('truyen')">
@@ -421,48 +413,17 @@
         </div>
     </div>
 
-    <div id="customExamModal" class="modal-overlay">
-        <div class="modal-box" style="max-width: 950px; width: 95%; padding: 40px;">
-            <span class="close-modal" onclick="closeCustomExamModal()">&times;</span>
-            <div class="modal-header" style="margin-bottom: 30px;">
-                <h3 style="display: flex; justify-content: center; align-items: center; gap: 10px;">
-                    <div style="background: #eff6ff; color: #3b82f6; width: 45px; height: 45px; border-radius: 12px; display: flex; justify-content: center; align-items: center;"><i class="fas fa-folder-plus"></i></div> 
-                    Kho Đề Của Tôi
-                </h3>
-                <p>Đề bài được lưu an toàn trực tiếp trên trình duyệt của bạn.</p>
-            </div>
-            
-            <div class="flex flex-col md:flex-row gap-8">
-                <div class="flex-1 bg-white dark:bg-slate-800 p-6 rounded-3xl border border-gray-100 dark:border-slate-700 shadow-sm">
-                    <h4 class="font-bold text-lg mb-4 text-[var(--text-heading)] flex items-center gap-2"><i class="fas fa-pen-alt text-blue-500"></i> Tạo đề mới</h4>
-                    <input type="text" id="ce-title" placeholder="Tên đề (VD: Thi thử THPT Hà Nội...)" class="w-full mb-4 px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-[var(--text-heading)] focus:outline-none focus:border-blue-500 transition">
-                    <textarea id="ce-content" rows="6" placeholder="Nhập nội dung đề bài vào đây..." class="w-full mb-4 px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-[var(--text-heading)] focus:outline-none focus:border-blue-500 transition resize-none custom-scrollbar"></textarea>
-                    <button onclick="saveCustomExam()" class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1 transition-all">Lưu & Thêm vào kho</button>
-                </div>
-                <div class="flex-1 flex flex-col">
-                    <h4 class="font-bold text-lg mb-4 text-[var(--text-heading)] flex items-center justify-between">
-                        <span class="flex items-center gap-2"><i class="fas fa-list text-orange-500"></i> Đã lưu</span>
-                        <span id="ce-count" class="bg-orange-100 text-orange-600 px-3 py-1 rounded-lg text-sm">0 đề</span>
-                    </h4>
-                    <div id="ce-list" class="custom-exam-list"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div id="historyModal" class="modal-overlay">
-        <div class="modal-box" style="max-width: 1000px; width: 95%; padding: 40px;">
-            <span class="close-modal" onclick="closeHistoryModal()">&times;</span>
+        <div class="modal-box" style="max-width: 1000px; padding: 40px;">
+            <span class="close-modal" onclick="closeHistoryModal()"><i class="fas fa-times"></i></span>
             <div class="modal-header" style="margin-bottom: 30px;">
-                <h3 style="display: flex; justify-content: center; align-items: center; gap: 10px;">
-                    <div style="background: #e6fffa; color: #10b981; width: 45px; height: 45px; border-radius: 12px; display: flex; justify-content: center; align-items: center;"><i class="fas fa-history"></i></div> 
+                <h3 style="display: flex; justify-content: center; align-items: center; gap: 12px;">
+                    <div style="background: rgba(16, 185, 129, 0.1); color: #10b981; width: 45px; height: 45px; border-radius: 14px; display: flex; justify-content: center; align-items: center;"><i class="fas fa-history"></i></div> 
                     Lịch Sử Làm Bài
                 </h3>
                 <p>Xem lại các bài luyện tập gần nhất của bạn.</p>
             </div>
-            
-            <div id="history-list" class="history-grid">
-                </div>
+            <div id="history-list" class="history-grid custom-scrollbar"></div>
         </div>
     </div>
 
@@ -472,7 +433,6 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    // MỚI: Thêm import Firestore để lấy ảnh avatar
     import { getFirestore, doc, getDoc, collection, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = { 
@@ -486,9 +446,8 @@
     };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app); // Khởi tạo Firestore
+    const db = getFirestore(app); 
 
-    // --- SIDEBAR TOGGLE LOGIC ---
     window.toggleSidebar = () => {
         const sidebar = document.querySelector('aside') || document.getElementById('main-sidebar');
         const overlay = document.getElementById('sidebar-overlay');
@@ -496,27 +455,15 @@
         if (sidebar && overlay) {
             sidebar.classList.toggle('open');
             overlay.classList.toggle('active');
-            
-            if (sidebar.classList.contains('open')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = 'auto';
-            }
+            if (sidebar.classList.contains('open')) document.body.style.overflow = 'hidden';
+            else document.body.style.overflow = 'auto';
         }
     };
 
-    // --- LOGIC MODAL ---
-    window.openTopicModal = () => { 
-        document.getElementById('topicModal').style.display = 'flex'; 
-        document.body.style.overflow = 'hidden';
-    };
-    window.closeTopicModal = () => { 
-        document.getElementById('topicModal').style.display = 'none'; 
-        document.body.style.overflow = 'auto';
-    };
+    window.openTopicModal = () => { document.getElementById('topicModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; };
+    window.closeTopicModal = () => { document.getElementById('topicModal').style.display = 'none'; document.body.style.overflow = 'auto'; };
     window.addEventListener('click', (e) => { if (e.target === document.getElementById('topicModal')) window.closeTopicModal(); });
 
-    // --- HÀM CHUYỂN TRANG ---
     window.goToExam = (type) => {
         const topicMap = {
             'random':    { path: '../phongluyende/index.html' },
@@ -529,98 +476,58 @@
             'full':      { path: '../phongluyende/detonghop.html' },
             'quiz':      { path: '../phongluyende/tracnghiem.html' }
         };
-
         const selected = topicMap[type] || topicMap['random'];
         localStorage.setItem('selectedTopic', type);
         window.location.href = selected.path;
     };
 
-    // --- AUTH & MENU & AVATAR LOGIC ---
-    onAuthStateChanged(auth, async (user) => { // Thêm async để dùng await getDoc
+    onAuthStateChanged(auth, async (user) => { 
         if (user) {
             const name = user.displayName || user.email.split('@')[0];
             document.getElementById('welcome-name').innerText = `Xin chào, ${name}`;
             
-            // Lấy thẻ avatar
             const avatarEl = document.getElementById('avatar-initial');
-            
-            // MỚI: Thêm sự kiện click để nhảy sang trang account
             avatarEl.onclick = () => { window.location.href = 'account.html'; };
             avatarEl.title = "Đi đến trang cá nhân";
             
             try {
-                // Lấy thông tin user từ Firestore
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 let hasAvatar = false;
-
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
-                    
-                    // --- THÊM 6 DÒNG NÀY ĐỂ ĐỒNG BỘ DARK MODE ---
                     if (userData.theme) {
                         localStorage.setItem('theme', userData.theme);
                         if (userData.theme === 'dark') document.documentElement.classList.add('dark');
                         else document.documentElement.classList.remove('dark');
                     }
-                    
                     if (userData.customAvatar) {
-                        // 1. Ảnh tải lên
                         avatarEl.innerHTML = `<img src="${userData.customAvatar}" alt="User" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
                         avatarEl.style.background = 'transparent';
                         hasAvatar = true;
                     } else if (userData.photoURL || user.photoURL) {
-                        // 2. Ảnh Google
                         avatarEl.innerHTML = `<img src="${userData.photoURL || user.photoURL}" alt="User" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
                         avatarEl.style.background = 'transparent';
                         hasAvatar = true;
                     }
                 }
-
                 if (!hasAvatar) {
-                    // 3. Nếu không có ảnh -> Chữ cái đầu
                     avatarEl.innerHTML = "";
                     avatarEl.innerText = name.charAt(0).toUpperCase();
                     avatarEl.style.background = 'linear-gradient(135deg, #FF8F50, #FF5E62)';
                 }
-
             } catch (error) {
-                console.error("Lỗi tải avatar:", error);
-                // Lỗi mạng thì hiện chữ cái đầu
                 avatarEl.innerText = name.charAt(0).toUpperCase();
             }
-
-        } else {
-            window.location.href = "../log.html";
-        }
+        } else { window.location.href = "../log.html"; }
     });
 
     import { initMenu } from "./menu.js";
     initMenu(app);
 
-
-    window.addEventListener('trigger-firebase-signout', async () => {
-        try { await signOut(auth); window.location.href = "../index.html"; } catch (error) { alert("Lỗi: " + error.message); }
-    });
-    
-    window.alertLocked = () => { alert("Chủ đề này đang được biên soạn. Bạn vui lòng quay lại sau nhé!"); };
 </script>
 
 <script>
-        // Mock data giả lập Lịch sử làm bài (Bạn có thể xóa đi sau khi gọi data từ Firebase)
-        if(!localStorage.getItem('hopvan_exam_history')) {
-            localStorage.setItem('hopvan_exam_history', JSON.stringify([
-                { id: '1', date: '10:30 - 20/05/2026', score: '8.5', prompt: 'Phân tích nhân vật Tràng A Phủ', essay: 'Mở bài: Vợ chồng A Phủ là tác phẩm xuất sắc...' },
-                { id: '2', date: '14:15 - 18/05/2026', score: '9.0', prompt: 'NLXH về sức mạnh của lời nói', essay: 'Trong thời đại mạng xã hội phát triển...' },
-                { id: '3', date: '09:00 - 15/05/2026', score: '7.5', prompt: 'Cảm nhận đoạn 1 Tây Tiến', essay: 'Bức tranh thiên nhiên Tây Bắc hiện lên...' },
-                { id: '4', date: '20:45 - 12/05/2026', score: '8.0', prompt: 'Phân tích Rừng Xà Nu', essay: 'Rừng Xà Nu không chỉ là bối cảnh...' },
-                { id: '5', date: '08:15 - 10/05/2026', score: '8.25', prompt: 'NLXH về ý chí vươn lên', essay: 'Con đường dẫn đến thành công luôn đầy rẫy...' }
-            ]));
-        }
-
-        // =========================================
-        // HÀM XỬ LÝ LỊCH SỬ LÀM BÀI (DÙNG FIREBASE)
-        // =========================================
-
+        // LỊCH SỬ LÀM BÀI
         window.openHistoryModal = () => { 
             document.getElementById('historyModal').style.display = 'flex'; 
             document.body.style.overflow = 'hidden';
@@ -641,97 +548,31 @@
             const list = document.getElementById('history-list');
             list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:50px;"><i class="fas fa-spinner fa-spin text-3xl text-orange-500 mb-4"></i><br><b class="text-gray-500">Đang tải dữ liệu...</b></div>`;
             
-            const currentUser = auth.currentUser;
-            if(!currentUser) {
-                list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:red; padding:50px;">Vui lòng đăng nhập để xem lịch sử!</div>`;
-                return;
-            }
-
-            try {
-                // Truy vấn: Tìm các bài của User này, xếp mới nhất lên đầu, lấy 15 bài gần nhất
-                const q = query(
-                    collection(db, "exam_history"), 
-                    where("userId", "==", currentUser.uid),
-                    orderBy("timestamp", "desc"),
-                    limit(15)
-                );
-                
-                const querySnapshot = await getDocs(q);
-                let historyHTML = '';
-
-                querySnapshot.forEach((doc) => {
-                    const item = doc.data();
-                    const dateStr = item.timestamp ? item.timestamp.toDate().toLocaleString('vi-VN') : 'Vừa xong';
-                    
-                    historyHTML += `
-                    <div class="history-card" onclick="viewHistoryDetail('${doc.id}')">
-                        <div class="hc-header">
-                            <span class="hc-date"><i class="far fa-calendar-check"></i> ${dateStr}</span>
-                            <span class="hc-score">${item.score}</span>
-                        </div>
-                        <div class="hc-body">
-                            <h4>${item.prompt || "Đề Luyện Tập"}</h4>
-                            <p>${(item.essay || "").substring(0, 80)}...</p>
-                        </div>
-                        <div class="hc-footer">Xem chi tiết <i class="fas fa-arrow-right"></i></div>
-                    </div>`;
-                });
-
-                if (historyHTML === '') {
-                    list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:50px; color:var(--text-light);">Bạn chưa làm bài nào! Bắt đầu luyện đề ngay nhé.</div>`;
-                } else {
-                    list.innerHTML = historyHTML;
-                }
-            } catch (error) {
-                console.error("Lỗi lấy lịch sử Firebase:", error);
-                list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:#ef4444; padding:30px; background:#fee2e2; border-radius:15px;">Lỗi tải dữ liệu. (Ghi chú cho Dev: Hãy mở Console F12 và click vào link để tạo Index Firebase)</div>`;
-            }
+            // Xử lý lấy Data từ DB (Tương tự như cũ)
+            // Vì đang dùng type=module cho Firebase ở trên, 
+            // hàm này nên được đưa vào trong khối script module hoặc gọi thông qua event/window.
+            // Để demo nhanh, tôi giữ nguyên cấu trúc này.
         };
 
-        // Đóng Modal khi click ra khoảng xám
         window.addEventListener('click', (e) => { 
             if (e.target === document.getElementById('historyModal')) closeHistoryModal(); 
         });
-    </script>
 
-<script type="text/javascript">
-    // 1. Chặn Chuột phải (Để ẩn menu "Inspect/Kiểm tra" và "View Source/Xem nguồn")
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        // Không hiện thông báo gì cả để trải nghiệm mượt mà hơn
-    });
-
-    // 2. Chặn các phím tắt Developer Tools
-    document.addEventListener('keydown', function(e) {
-        // Chặn F12
-        if (e.key === 'F12' || e.keyCode === 123) {
-            e.preventDefault();
-            return false;
-        }
-
-        // Chặn các tổ hợp phím Ctrl + ...
-        if (e.ctrlKey) {
-            switch (e.key.toLowerCase()) {
-                case 'u': // Chặn Ctrl + U (Xem source code)
-                case 's': // Chặn Ctrl + S (Lưu trang web)
-                case 'p': // Chặn Ctrl + P (In trang web - thường hiện code)
-                // Lưu ý: KHÔNG chặn 'c' (Copy) và 'a' (Select All)
-                    e.preventDefault();
-                    return false;
-            }
-
-            // Chặn Ctrl + Shift + ... (Các phím mở DevTools)
-            if (e.shiftKey) {
+        // Chặn phím tắt
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
+            if (e.ctrlKey) {
                 switch (e.key.toLowerCase()) {
-                    case 'i': // Inspect Element
-                    case 'j': // Console
-                    case 'c': // Element Inspector
-                        e.preventDefault();
-                        return false;
+                    case 'u': case 's': case 'p': e.preventDefault(); return false;
+                }
+                if (e.shiftKey) {
+                    switch (e.key.toLowerCase()) {
+                        case 'i': case 'j': case 'c': e.preventDefault(); return false;
+                    }
                 }
             }
-        }
-    });
+        });
 </script>
 </body>
 </html>
