@@ -11,394 +11,506 @@
     <meta property="og:type" content="article" />
     <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
     
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
+        tailwind.config = { darkMode: 'class' }
     </script>
 
     <style>
         :root {
+            /* MÀU ĐẶC TRƯNG CỦA HOPVAN */
             --primary: #FF8F50;
             --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
-            /* BỘ MÀU LIGHT MODE (MẶC ĐỊNH) */
-            --bg-body: #FFF5EC;
-            --bg-glass: rgba(255, 255, 255, 0.6);
-            --bg-panel: rgba(255, 255, 255, 0.85);
-            --bg-panel-hover: white;
-            --border-panel: white;
-            --text-heading: #1f2937; /* gray-800 */
-            --text-sub: #6b7280;     /* gray-500 */
-            --bg-input: #f9fafb;
-            --border-input: #e5e7eb;
-            --blur: 25px;
-            --sidebar-width: 260px;
+            --sidebar-width: 280px;
+
+            /* LIGHT MODE CÂN CHỈNH HOÀN HẢO */
+            --bg-body: #FFF5EC;     /* Xám xanh cực nhạt làm nền tổng */
+            --bg-card: #ffffff;     /* Trắng tinh cho các Panel chính */
+            --bg-item: #f8fafc;     /* Xám nhạt cho các item bên trong */
+            --border-ui: #e2e8f0;   /* Viền xám nhạt */
+            --border-focus: #FF8F50;
+            
+            --text-heading: #0f172a; 
+            --text-sub: #64748b;     
+            
+            --shadow-sm: 0 4px 15px rgba(0,0,0,0.02);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.06);
+            --shadow-hover: 0 15px 35px rgba(255, 143, 80, 0.15);
         }
 
-        /* BỘ MÀU DARK MODE */
+        /* DARK MODE CHI TIẾT SÂU HƠN */
         html.dark {
-            --bg-body: #0f172a;       /* slate-900 */
-            --bg-glass: rgba(15, 23, 42, 0.7);
-            --bg-panel: rgba(30, 41, 59, 0.85); /* slate-800 */
-            --bg-panel-hover: #1e293b;
-            --border-panel: #334155;  /* slate-700 */
-            --text-heading: #f8fafc;  /* slate-50 */
-            --text-sub: #94a3b8;      /* slate-400 */
-            --bg-input: #0f172a;
-            --border-input: #475569;  /* slate-600 */
+            --bg-body: #050b14;     /* Đen sâu */
+            --bg-card: #111827;     /* Đen xám cho panel */
+            --bg-item: #1e293b;     /* Xám đậm hơn cho item */
+            --border-ui: #1f2937;   /* Viền tối */
+            --border-focus: #FF8F50;
+            
+            --text-heading: #f8fafc; 
+            --text-sub: #94a3b8;      
+            
+            --shadow-sm: 0 4px 15px rgba(0,0,0,0.4);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.6);
+            --shadow-hover: 0 15px 35px rgba(255, 143, 80, 0.2);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease; }
         body { background-color: var(--bg-body); height: 100vh; overflow: hidden; display: flex; color: var(--text-heading); }
 
-        /* --- BACKGROUND --- */
+        /* --- BACKGROUND BLOBS (Chỉ còn mờ ảo) --- */
         .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
-        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatBlob 10s infinite alternate; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.3; animation: floatBlob 20s infinite alternate ease-in-out; }
         .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
-        .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
-        .blob-3 { width: 300px; height: 300px; background: #FFD1D1; top: 40%; left: 40%; animation-delay: -2s; }
-        html.dark .blob { opacity: 0.2; }
-        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
+        .blob-2 { width: 400px; height: 400px; background: #FFD1D1; bottom: -50px; right: -50px; animation-delay: -5s; }
+        html.dark .blob { opacity: 0.05; }
+        @keyframes floatBlob { 0% { transform: translate(0, 0); } 100% { transform: translate(20px, 40px); } }
 
-        /* --- LAYOUT --- */
+        /* --- BỐ CỤC CHÍNH --- */
         .main-content { 
             flex: 1; margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width));
-            background: var(--bg-glass); backdrop-filter: blur(var(--blur)); 
-            padding: 30px 40px; overflow-y: auto; position: relative; 
+            background: transparent; 
+            /* Đã nới lề 2 bên từ 50px lên 60px. (Bạn có thể tăng lên 80px nếu muốn xích vô nữa) */
+            padding: 40px 60px; 
+            overflow-y: auto; position: relative; 
         }
-
-        /* --- ĐỒNG BỘ DARK MODE CHO MENU.JS --- */
-        #menu-placeholder aside {
-            background-color: var(--bg-panel) !important;
-            border-color: var(--border-panel) !important;
-        }
-
-        /* 1. ÉP TRONG SUỐT mọi thẻ div bọc ngoài có nền sáng (xám/trắng) để lộ nền tối của Sidebar */
-        #menu-placeholder aside div[class*="bg-gray-"],
-        #menu-placeholder aside div[class*="bg-slate-"],
-        #menu-placeholder aside div[class*="bg-white"] {
-            background-color: transparent !important;
-        }
-
-        /* --- ĐỒNG BỘ DARK MODE CHO MENU.JS --- */
-        /* Lấy chuẩn 100% logic từ Bản Tin Văn Học, đổi biến cho khớp với Cộng Đồng */
         
-        html.dark #menu-placeholder aside, 
-        html.dark #menu-placeholder .sidebar {
-            background-color: var(--bg-panel) !important;
-            border-color: var(--border-panel) !important;
+        .content-wrapper { 
+            /* Đã nới chiều rộng ra 980px cho đỡ bị ép quá (bản trước là 900px) */
+            max-width: 980px; 
+            margin: 0 auto; display: flex; flex-direction: column; gap: 24px;
         }
 
-        /* 1. Ép trong suốt mọi thẻ div bọc ngoài có nền sáng để lộ nền tối của Sidebar */
-        html.dark #menu-placeholder aside > div,
-        html.dark #menu-placeholder .sidebar > div {
-            background-color: transparent !important;
-            border-color: var(--border-panel) !important;
-        }
-
-        /* 2. Ép màu nền tối cho các Nút (Góp ý, Thoát,...) ở đáy menu */
-        html.dark #menu-placeholder button {
-            background-color: var(--bg-body) !important; 
-            border: 1px solid var(--border-panel) !important;
-            color: var(--text-sub) !important;
-            box-shadow: none !important;
-        }
-        html.dark #menu-placeholder button:hover {
-            background-color: var(--bg-panel-hover) !important;
-            border-color: var(--primary) !important;
-            color: var(--primary) !important;
-        }
-
-        /* 3. Nút đang Active */
-        html.dark #menu-placeholder .nav-item.active { 
-            background: var(--primary-gradient) !important; 
-            color: white !important; 
-            border-color: transparent !important; 
-            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4) !important;
-        }
-
-        /* 4. Ép màu cục Version (HopVan Platform) đang dùng style inline */
-        html.dark #menu-placeholder div[style*="background-color"] {
-            background-color: var(--bg-body) !important;
-            border-color: var(--border-panel) !important;
-        }
-
-        /* 5. Xử lý Viền và Chữ */
-        html.dark #menu-placeholder [class*="border-"] { border-color: var(--border-panel) !important; }
-        html.dark #menu-placeholder .text-gray-800, 
-        html.dark #menu-placeholder h1 { color: var(--text-heading) !important; }
-        html.dark #menu-placeholder .text-gray-500, 
-        html.dark #menu-placeholder .text-gray-400 { color: var(--text-sub) !important; }
-        
-        /* 6. Hiệu ứng hover của Nav Item */
+        /* ĐỒNG BỘ DARK MODE MENU.JS */
+        html.dark #menu-placeholder aside { background-color: var(--bg-card) !important; border-color: var(--border-ui) !important; }
+        html.dark #menu-placeholder aside > div { background-color: transparent !important; border-color: var(--border-ui) !important; }
+        html.dark #menu-placeholder button { background-color: var(--bg-body) !important; border: 1px solid var(--border-ui) !important; color: var(--text-sub) !important; box-shadow: none !important; }
+        html.dark #menu-placeholder button:hover { background-color: var(--bg-item) !important; border-color: var(--primary) !important; color: var(--primary) !important; }
+        html.dark #menu-placeholder .nav-item.active { background: var(--primary-gradient) !important; color: white !important; border-color: transparent !important; box-shadow: 0 4px 15px rgba(255, 143, 80, 0.3) !important; }
+        html.dark #menu-placeholder div[style*="background-color"] { background-color: var(--bg-body) !important; border-color: var(--border-ui) !important; }
+        html.dark #menu-placeholder [class*="border-"] { border-color: var(--border-ui) !important; }
+        html.dark #menu-placeholder .text-gray-800, html.dark #menu-placeholder h1 { color: var(--text-heading) !important; }
+        html.dark #menu-placeholder .text-gray-500, html.dark #menu-placeholder .text-gray-400 { color: var(--text-sub) !important; }
         html.dark #menu-placeholder .nav-item { color: var(--text-sub) !important; transition: 0.3s; }
         html.dark #menu-placeholder .nav-item:hover { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
 
-        /* --- COMPONENTS --- */
-        .glass-panel {
-            background: var(--bg-panel); backdrop-filter: blur(12px);
-            border: 1px solid var(--border-panel); border-radius: 24px; padding: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.03); height: 100%;
-            position: relative; overflow: hidden; 
-        }
-        .glass-panel:hover {
-            transform: translateY(-5px); 
-            background: var(--bg-panel-hover);
-            box-shadow: 0 20px 40px rgba(255, 143, 80, 0.12); 
-            border-color: var(--primary);
+        /* =========================================
+           1. BANNER PROFILE MỚI (CHUẨN ẢNH)
+           ========================================= */
+        .profile-banner-card {
+            background: var(--bg-card); border-radius: 32px; border: 1px solid var(--border-ui);
+            box-shadow: var(--shadow-md); overflow: hidden; margin-bottom: 10px; position: relative;
         }
         
-        .text-gray-800 { color: var(--text-heading) !important; }
-        .text-gray-500 { color: var(--text-sub) !important; }
+        .pb-cover { 
+            height: 160px; background: var(--primary-gradient); position: relative;
+        }
+        .pb-cover::before {
+            content: ''; position: absolute; inset: 0; opacity: 0.15; mix-blend-mode: overlay;
+            background-image: radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px);
+            background-position: 0 0, 15px 15px; background-size: 30px 30px;
+        }
+        
+        .pb-body { padding: 0 40px 30px; display: flex; align-items: flex-end; gap: 25px; position: relative; }
+        
+        .pb-avatar-wrap {
+            width: 140px; height: 140px; border-radius: 50%; background: var(--bg-card); 
+            padding: 6px; position: relative; z-index: 10; flex-shrink: 0; margin-top: -70px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .pb-avatar-inner {
+            width: 100%; height: 100%; border-radius: 50%; background: var(--border-ui); overflow: hidden;
+            display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white; font-weight: 900;
+        }
+        .pb-avatar-inner img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .pb-btn-cam {
+            position: absolute; bottom: 0px; right: 0px; width: 34px; height: 34px; border-radius: 50%;
+            background: var(--bg-card); border: 1px solid var(--border-ui); color: var(--text-sub);
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 15; font-size: 0.85rem;
+        }
+        .pb-btn-cam:hover { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.1); }
 
-        .glass-panel > div, .glass-panel > form { position: relative; z-index: 2; }
+        .pb-info { padding-bottom: 5px; padding-top: 15px; display: flex; flex-direction: column; justify-content: center;}
+        .pb-name { font-size: 2rem; font-weight: 900; color: var(--text-heading); letter-spacing: -0.5px; margin-bottom: 10px; line-height: 1;}
+        
+        .pb-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+        .badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 10px; font-size: 0.8rem; font-weight: 800; border: 1px solid transparent;}
+        .badge-role { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.2); }
+        .badge-school { background: rgba(249, 115, 22, 0.1); color: #f97316; border-color: rgba(249, 115, 22, 0.2); }
+        html.dark .badge-role { background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.3); color: #fca5a5;}
+        html.dark .badge-school { background: rgba(249, 115, 22, 0.15); border-color: rgba(249, 115, 22, 0.3); color: #fdba74;}
 
-        .panel-watermark {
-            position: absolute; right: -20px; bottom: -20px; font-size: 10rem; 
-            opacity: 0.1; transform: rotate(-15deg); transition: 0.5s; 
-            z-index: 0; pointer-events: none;
-        }
-        html.dark .panel-watermark { opacity: 0.05; }
-        .glass-panel:hover .panel-watermark { transform: rotate(0deg) scale(1.1); opacity: 0.2; }
+        /* =========================================
+           2. LAYOUT GRID (TRÁI/PHẢI)
+           ========================================= */
+        .profile-grid { display: grid; grid-template-columns: 280px 1fr; gap: 24px; align-items: stretch;}
 
-        .glass-input {
-            width: 100%; padding: 12px 16px; background: var(--bg-input); border: 1px solid var(--border-input);
-            border-radius: 12px; font-size: 0.95rem; color: var(--text-heading); outline: none;
+        /* Card Dùng Chung */
+        .panel-card { background: var(--bg-card); border-radius: 28px; border: 1px solid var(--border-ui); padding: 30px; box-shadow: var(--shadow-md); }
+        .panel-title { font-size: 1.15rem; font-weight: 900; color: var(--text-heading); margin-bottom: 24px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px;}
+        
+        /* --- CỘT TRÁI: THÀNH TÍCH (DÀI & CÓ WATERMARK) --- */
+        .achieve-list { display: flex; flex-direction: column; gap: 16px; }
+        .achieve-item { 
+            position: relative; overflow: hidden; display: flex; align-items: center; gap: 14px;
+            background: var(--bg-item); /* Màu xám siêu nhạt để tách biệt */
+            padding: 16px 18px; border-radius: 18px; border: 1px solid transparent; 
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor: default;
         }
-        .glass-input:focus { background: var(--bg-panel-hover); border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255, 143, 80, 0.15); }
-        .glass-input:disabled { background: var(--border-input); color: var(--text-sub); cursor: not-allowed; opacity: 0.7;}
+        
+        .achieve-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; transition: 0.3s; z-index: 2;}
+        .achieve-info { flex-grow: 1; position: relative; z-index: 2; transition: transform 0.3s;}
+        .achieve-info h4 { font-size: 0.7rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;}
+        .achieve-info p { font-size: 1.25rem; font-weight: 900; color: var(--text-heading); display: flex; align-items: baseline; gap: 4px; line-height: 1;}
+        .achieve-info span { font-size: 0.8rem; font-weight: 600; color: var(--text-sub); text-transform: none; letter-spacing: 0;}
+        
+        /* Hiệu ứng Elements ẩn (Watermark HopVan Style) */
+        .achieve-watermark {
+            position: absolute; right: -15px; top: 50%; transform: translateY(-50%) rotate(-20deg) scale(0.5);
+            font-size: 5.5rem; color: var(--primary); opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 0; pointer-events: none;
+        }
 
-        .btn-primary {
-            background: var(--primary-gradient); color: white; padding: 12px 24px; border-radius: 12px; font-weight: 700;
-            border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: 0 4px 15px rgba(255, 94, 98, 0.3);
-        }
-        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 94, 98, 0.4); }
-        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+        .achieve-item:hover { border-color: var(--primary); box-shadow: var(--shadow-hover); background: var(--bg-card); transform: translateY(-3px); }
+        .achieve-item:hover .achieve-watermark { opacity: 0.08; transform: translateY(-50%) rotate(0deg) scale(1); right: -5px;}
+        .achieve-item:hover .achieve-icon { transform: scale(1.05); }
 
-        /* --- TOGGLE THEME BUTTON --- */
-        .theme-toggle-wrapper {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 16px; background: var(--bg-input); border-radius: 16px;
-            border: 1px solid var(--border-input); margin-bottom: 20px;
+        /* MÀU CHO TỪNG ICON */
+        .ai-fire { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+        .ai-layer { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .ai-key { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+        .ai-trophy { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .ai-file { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+        .ai-flag { background: rgba(236, 72, 153, 0.1); color: #ec4899; }
+        
+        /* CỘT TRÁI - CHIỀU CAO FULL 100% */
+        .col-left { height: 100%; display: flex; flex-direction: column; }
+        .col-left .achieve-list { flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+
+        /* --- CỘT PHẢI: FORM CHỈNH SỬA --- */
+        .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;}
+        
+        .btn-edit { background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 10px 18px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s;}
+        .btn-edit:hover { background: #3b82f6; color: white; transform: translateY(-2px);}
+        .btn-edit.active { background: rgba(239, 68, 68, 0.1); color: #ef4444; } /* Hủy thì đỏ nhạt */
+        .btn-edit.active:hover { background: #ef4444; color: white; }
+
+        .input-group { margin-bottom: 22px; position: relative;}
+        .input-label { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;}
+        
+        .custom-input { 
+            width: 100%; padding: 15px 20px; background: var(--bg-item); border: 1px solid var(--border-ui);
+            border-radius: 14px; font-size: 0.95rem; font-weight: 700; color: var(--text-heading); outline: none; transition: 0.3s;
         }
-        .toggle-switch {
-            position: relative; width: 50px; height: 26px; background: #cbd5e1;
-            border-radius: 30px; cursor: pointer; transition: 0.3s;
+        .custom-input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 4px rgba(255, 143, 80, 0.15); background: var(--bg-card); }
+        
+        /* KHI FORM KHÓA: TRỞ THÀNH CHỮ TEXT ĐẸP */
+        .custom-input:disabled { 
+            background: transparent; border-color: transparent; 
+            padding-left: 0; padding-top: 0; padding-bottom: 0; 
+            color: var(--text-heading); opacity: 0.9; font-weight: 800; font-size: 1.05rem;
         }
-        .toggle-switch::after {
-            content: ''; position: absolute; top: 3px; left: 3px;
-            width: 20px; height: 20px; background: white; border-radius: 50%;
-            transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        .custom-select:disabled { appearance: none; background-image: none;}
+        
+        .input-note { font-size: 0.75rem; font-style: italic; color: var(--text-sub); margin-top: 6px; display: block;}
+
+        .btn-save-wrap { display: none; margin-top: 30px; text-align: right;}
+        .btn-save-wrap.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);}
+        
+        .btn-save {
+            background: var(--primary-gradient); color: white; padding: 15px 30px; border-radius: 14px; font-weight: 800; font-size: 0.95rem;
+            border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+            box-shadow: 0 8px 20px rgba(255, 143, 80, 0.3); transition: 0.3s; justify-content: center; width: 100%;
         }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(255, 143, 80, 0.4); }
+
+        /* KHỐI MẬT KHẨU & THEME */
+        .extra-panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px;}
+
+        .theme-toggle-wrapper { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: var(--bg-item); border-radius: 16px; border: 1px solid var(--border-ui); cursor: pointer; transition: 0.3s;}
+        .theme-toggle-wrapper:hover { border-color: var(--primary); }
+        .toggle-switch { position: relative; width: 50px; height: 26px; background: #cbd5e1; border-radius: 30px; transition: 0.3s; }
+        .toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         html.dark .toggle-switch { background: var(--primary); }
         html.dark .toggle-switch::after { transform: translateX(24px); }
 
-        /* --- AVATAR STYLES --- */
-        .avatar-wrapper { position: relative; width: 100px; height: 100px; margin: 0 auto 10px; }
-        .avatar-circle {
-            width: 100%; height: 100%; background: var(--primary-gradient); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem; font-weight: 800;
-            box-shadow: 0 10px 30px rgba(255, 143, 80, 0.3); border: 4px solid var(--bg-panel); overflow: hidden;
-        }
-        .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
-        .avatar-edit-btn {
-            position: absolute; bottom: 0; right: 0; width: 32px; height: 32px;
-            background: var(--bg-panel-hover); border: 1px solid var(--border-input); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; color: var(--text-sub); cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: all 0.2s;
-        }
-        .avatar-edit-btn:hover { background: #FF8F50; color: white; transform: scale(1.1); border-color: #FF8F50;}
+        /* Nút đổi mật khẩu tối màu */
+        .btn-dark { background: #0f172a; color: white; }
+        .btn-dark:hover { background: #1e293b; box-shadow: 0 8px 20px rgba(0,0,0,0.2);}
+        html.dark .btn-dark { background: var(--primary-gradient); }
+        html.dark .btn-dark:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 143, 80, 0.3);}
 
         /* --- TOAST NOTIFICATION --- */
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; }
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 12px; }
         .toast {
-            background: var(--bg-panel); backdrop-filter: blur(10px); padding: 16px 20px; border-radius: 16px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 15px;
+            background: var(--bg-card); backdrop-filter: blur(10px); padding: 14px 18px; border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 12px;
             transform: translateX(120%); opacity: 0; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            border: 1px solid var(--border-panel); min-width: 320px; position: relative; overflow: hidden;
+            border: 1px solid var(--border-ui); min-width: 280px;
         }
         .toast.show { transform: translateX(0); opacity: 1; }
-        .toast-icon { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
-        .toast.success .toast-icon { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
-        .toast.error .toast-icon { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-        .toast-content { flex: 1; }
-        .toast-title { font-weight: 800; font-size: 0.9rem; color: var(--text-heading); }
-        .toast-msg { font-size: 0.8rem; color: var(--text-sub); font-weight: 500; }
+        .toast-icon { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+        .toast.success .toast-icon { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+        .toast.error .toast-icon { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .toast-title { font-weight: 800; font-size: 0.85rem; color: var(--text-heading); }
+        .toast-msg { font-size: 0.75rem; color: var(--text-sub); font-weight: 600; }
 
-        /* --- CUSTOM MODAL POPUP --- */
-        .custom-modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-            z-index: 10000; display: none; align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 0.3s ease;
-        }
+        /* --- CẢNH BÁO MODAL --- */
+        .custom-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 10000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
         .custom-modal-overlay.open { display: flex; opacity: 1; }
-        .custom-modal-box {
-            background: var(--bg-panel); padding: 35px; border-radius: 28px; width: 90%; max-width: 400px; text-align: center;
-            box-shadow: 0 30px 60px -10px rgba(0,0,0,0.5); transform: scale(0.9); transition: transform 0.3s;
-            border: 1px solid var(--border-panel);
-        }
+        .custom-modal-box { background: var(--bg-card); padding: 35px; border-radius: 28px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.3); transform: scale(0.9); transition: transform 0.3s; border: 1px solid var(--border-ui); }
         .custom-modal-overlay.open .custom-modal-box { transform: scale(1); }
         .modal-icon { width: 70px; height: 70px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
-        .modal-icon.danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-        .modal-icon.info { background: rgba(2, 132, 199, 0.2); color: #0ea5e9; }
+        .modal-icon.danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
         .modal-btn-group { display: flex; gap: 12px; margin-top: 25px; }
         .modal-btn { flex: 1; padding: 12px; border-radius: 14px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; }
-        .btn-cancel { background: var(--bg-input); color: var(--text-sub); border: 1px solid var(--border-input);}
-        .btn-cancel:hover { filter: brightness(0.9); }
-        .btn-confirm-danger { background: #dc2626; color: white; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3); }
-        .btn-confirm-danger:hover { background: #b91c1c; }
+        .btn-cancel { background: var(--bg-item); color: var(--text-sub); border: 1px solid var(--border-ui);}
+        .btn-cancel:hover { background: var(--border-ui); color: var(--text-heading);}
+        .btn-confirm-danger { background: #ef4444; color: white; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+        .btn-confirm-danger:hover { background: #dc2626; }
 
-        /* Mobile */
-        @media (max-width: 768px) {
-            #menu-placeholder aside { display: none; } 
-            .main-content { margin-left: 0; width: 100%; padding: 80px 20px 30px; }
-            .grid-layout { grid-template-columns: 1fr !important; }
+        /* --- MOBILE OPTIMIZATION --- */
+        .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 65px; background: var(--bg-card); z-index: 100; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border-ui); backdrop-filter: blur(20px);}
+        #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 998; }
+
+        @media (max-width: 1024px) {
+            .profile-grid { grid-template-columns: 1fr; }
+            .pb-body { flex-direction: column; align-items: center; text-align: center; gap: 15px; margin-top: -60px; padding: 20px;}
+            .pb-badges { justify-content: center; }
+            .extra-panel-grid { grid-template-columns: 1fr; }
+            .col-left .achieve-list { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         }
 
-        /* --- GLOBAL SCROLLBAR STYLE --- */
-        ::-webkit-scrollbar { width: 10px; height: 10px; }
-        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
-        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
-        ::-webkit-scrollbar-button { display: none; }
+        @media (max-width: 768px) {
+            .mobile-header { display: flex; }
+            .main-content { margin-left: 0; width: 100%; padding: 85px 15px 30px; }
+            aside { position: fixed !important; left: -285px !important; top: 0; bottom: 0; width: 280px; transition: transform 0.4s ease !important; z-index: 1001 !important; background: var(--bg-card) !important;}
+            aside.open { transform: translateX(285px) !important; box-shadow: 10px 0 30px rgba(0,0,0,0.5) !important;}
+            #sidebar-overlay.active { display: block; }
+            
+            .profile-banner-card { border-radius: 20px; }
+            .pb-avatar-wrap { width: 110px; height: 110px; }
+            .pb-name { font-size: 1.6rem;}
+            .panel-card { padding: 20px; border-radius: 20px;}
+            .col-left .achieve-list { grid-template-columns: 1fr;}
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: var(--border-ui); border-radius: 10px;}
+        ::-webkit-scrollbar-thumb:hover { background-color: var(--text-sub); }
     </style>
 </head>
 <body>
 
     <script>
-        if (localStorage.getItem('theme') === 'dark') {
-            document.documentElement.classList.add('dark');
-        }
+        if (localStorage.getItem('theme') === 'dark') { document.documentElement.classList.add('dark'); }
     </script>
 
     <div class="background-blobs">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
     </div>
+
+    <div class="mobile-header lg:hidden justify-between">
+        <div class="flex items-center gap-3">
+            <button onclick="toggleSidebar()" class="text-gray-600 dark:text-gray-300 text-xl focus:outline-none hover:text-orange-500"><i class="fas fa-bars"></i></button>
+            <div class="flex items-center gap-2"><img src="../LOGO.WEBP" alt="Logo" class="w-7 h-7"><span class="font-bold text-orange-500 text-lg">HOPVAN</span></div>
+        </div>
+    </div>
+    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <div id="menu-placeholder"></div>
 
     <main class="main-content">
-        <div id="toast-container"></div>
+        <div class="content-wrapper">
+            <div id="toast-container"></div>
 
-        <div id="custom-modal" class="custom-modal-overlay">
-            <div class="custom-modal-box">
-                <div id="modal-icon-container" class="modal-icon danger">
-                    <i id="modal-icon-class" class="fas fa-exclamation-triangle"></i>
-                </div>
-                <h3 id="modal-title" class="text-xl font-black text-gray-800 mb-2">Thông báo</h3>
-                <p id="modal-message" class="text-sm text-gray-500 leading-relaxed">Nội dung thông báo...</p>
-                <div class="modal-btn-group">
-                    <button class="modal-btn btn-cancel" onclick="closeModal()">Hủy</button>
-                    <button id="modal-confirm-btn" class="modal-btn btn-confirm-danger">Xác nhận</button>
+            <div id="custom-modal" class="custom-modal-overlay">
+                <div class="custom-modal-box">
+                    <div id="modal-icon-container" class="modal-icon danger">
+                        <i id="modal-icon-class" class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3 id="modal-title" class="text-xl font-black text-gray-800 mb-2">Thông báo</h3>
+                    <p id="modal-message" class="text-sm text-gray-500 leading-relaxed">Nội dung thông báo...</p>
+                    <div class="modal-btn-group">
+                        <button class="modal-btn btn-cancel" onclick="closeModal()">Hủy</button>
+                        <button id="modal-confirm-btn" class="modal-btn btn-confirm-danger">Xác nhận</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="flex items-center justify-between mb-8">
-            <div>
-                <h1 class="text-2xl font-black text-gray-800">Quản lý tài khoản</h1>
-                <p class="text-gray-500 text-sm mt-1">Cập nhật thông tin và giao diện hiển thị.</p>
-            </div>
-            <button onclick="document.querySelector('#menu-placeholder aside').style.display='flex'" class="md:hidden w-10 h-10 rounded-full flex items-center justify-center shadow-sm text-gray-500 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 grid-layout" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px;">
-            
-            <div class="glass-panel">
-                <i class="fas fa-id-card panel-watermark text-orange-400"></i>
-                
-                <div class="text-center mb-8">
-                    <div class="avatar-wrapper">
-                        <div class="avatar-circle" id="user-avatar-display"></div>
-                        <button onclick="document.getElementById('avatar-input').click()" class="avatar-edit-btn" title="Đổi ảnh đại diện">
+            <div class="profile-banner-card">
+                <div class="pb-cover"></div>
+                <div class="pb-body">
+                    <div class="pb-avatar-wrap">
+                        <div class="pb-avatar-inner" id="user-avatar-display">
+                            <i class="fas fa-spinner fa-spin text-3xl text-gray-300"></i>
+                        </div>
+                        <button onclick="document.getElementById('avatar-input').click()" class="pb-btn-cam" title="Đổi ảnh đại diện">
                             <i class="fas fa-camera"></i>
                         </button>
                         <input type="file" id="avatar-input" hidden accept="image/*">
                     </div>
                     
-                    <h2 class="font-bold text-lg text-gray-800" id="display-name-header">Đang tải...</h2>
-                    <p class="text-xs font-bold uppercase tracking-wider mt-1" id="user-role-display">Đang tải</p>
+                    <div class="pb-info">
+                        <h2 class="pb-name" id="display-name-header">Đang tải...</h2>
+                        <div class="pb-badges">
+                            <span class="badge badge-role" id="user-role-display"><i class="fas fa-user-graduate"></i> Học sinh</span>
+                            <span class="badge badge-school"><i class="fas fa-school"></i> <span id="display-school-badge">Chưa cập nhật</span></span>
+                        </div>
+                    </div>
                 </div>
-
-                <form id="profile-form" class="space-y-5">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="col-span-2">
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Họ và tên</label>
-                            <input id="profile-name" type="text" class="glass-input" required placeholder="Nhập tên của bạn">
-                        </div>
-                        <div class="col-span-2">
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Email</label>
-                            <input id="profile-email" type="email" class="glass-input" disabled value="loading...">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Trường học</label>
-                            <input id="profile-school" type="text" class="glass-input" placeholder="VD: THPT FPT Cần Thơ">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Khối lớp</label>
-                            <select id="profile-grade" class="glass-input cursor-pointer">
-                                <option value="10" class="dark:bg-slate-800">Lớp 10</option>
-                                <option value="11" class="dark:bg-slate-800">Lớp 11</option>
-                                <option value="12" class="dark:bg-slate-800">Lớp 12</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="pt-2 text-right">
-                        <button type="submit" class="btn-primary w-full md:w-auto">
-                            <i class="fas fa-save"></i> Lưu thông tin
-                        </button>
-                    </div>
-                </form>
             </div>
 
-            <div class="space-y-8">
-                <div class="glass-panel h-auto" style="padding-bottom: 20px;">
-                    <i class="fas fa-paint-brush panel-watermark text-blue-400"></i>
-                    <h3 class="font-black text-gray-800 text-lg mb-6 flex items-center gap-2">
-                        <i class="fas fa-moon text-blue-500"></i> Giao diện
-                    </h3>
+            <div class="profile-grid">
+                
+                <div class="panel-card col-left">
+                    <h3 class="panel-title"><i class="fas fa-medal text-orange-500"></i> Thành tích cá nhân</h3>
                     
-                    <div class="theme-toggle-wrapper" onclick="toggleDarkModeLogic()">
-                        <div>
-                            <p class="font-bold text-sm text-gray-800">Chế độ ban đêm</p>
-                            <p class="text-[10px] text-gray-500 mt-1">Giảm chói mắt khi học buổi tối</p>
+                    <div class="achieve-list">
+                        <div class="achieve-item">
+                            <div class="achieve-icon ai-fire"><i class="fas fa-fire"></i></div>
+                            <div class="achieve-info">
+                                <h4>Chuỗi ngày học</h4>
+                                <p id="streak-val">0 <span>ngày</span></p>
+                            </div>
+                            <i class="fas fa-fire achieve-watermark"></i>
                         </div>
-                        <div class="toggle-switch" id="theme-switch"></div>
+                        
+                        <div class="achieve-item">
+                            <div class="achieve-icon ai-layer"><i class="fas fa-layer-group"></i></div>
+                            <div class="achieve-info">
+                                <h4>Cấp độ hiện tại</h4>
+                                <p id="rank-val" style="font-size: 1.1rem; color: var(--primary);">Tân binh</p>
+                            </div>
+                            <i class="fas fa-layer-group achieve-watermark"></i>
+                        </div>
+                        
+                        <div class="achieve-item">
+                            <div class="achieve-icon ai-key"><i class="fas fa-key"></i></div>
+                            <div class="achieve-info">
+                                <h4>Keys tích lũy</h4>
+                                <p id="keys-val">0 <span>keys</span></p>
+                            </div>
+                            <i class="fas fa-key achieve-watermark"></i>
+                        </div>
+
+                        <div class="achieve-item">
+                            <div class="achieve-icon ai-trophy"><i class="fas fa-trophy"></i></div>
+                            <div class="achieve-info">
+                                <h4>Xếp hạng Keys</h4>
+                                <p id="rank-keys-val" style="color: #10b981;">--</p>
+                            </div>
+                            <i class="fas fa-trophy achieve-watermark"></i>
+                        </div>
+
+                        <div class="achieve-item">
+                            <div class="achieve-icon ai-file"><i class="fas fa-file-signature"></i></div>
+                            <div class="achieve-info">
+                                <h4>Đề thi đã làm</h4>
+                                <p id="exams-val">0 <span>bài</span></p>
+                            </div>
+                            <i class="fas fa-file-signature achieve-watermark"></i>
+                        </div>
+                        
+                        <div class="achieve-item">
+                            <div class="achieve-icon ai-flag"><i class="fas fa-flag-checkered"></i></div>
+                            <div class="achieve-info">
+                                <h4>Cấp độ Nhật ký</h4>
+                                <p id="journal-val">Level 1</p>
+                            </div>
+                            <i class="fas fa-flag-checkered achieve-watermark"></i>
+                        </div>
                     </div>
                 </div>
 
-                <div class="glass-panel h-auto">
-                    <i class="fas fa-user-shield panel-watermark text-red-400"></i>
-                    <h3 class="font-black text-gray-800 text-lg mb-6 flex items-center gap-2">
-                        <i class="fas fa-shield-alt text-red-500"></i> Bảo mật
-                    </h3>
-                    <form id="password-form" class="space-y-5">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Mật khẩu mới</label>
-                            <input id="new-password" type="password" class="glass-input" required placeholder="••••••••">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Xác nhận mật khẩu</label>
-                            <input id="confirm-password" type="password" class="glass-input" required placeholder="••••••••">
-                        </div>
-                        <div class="pt-4">
-                            <button type="submit" class="btn-primary w-full bg-gray-800 hover:shadow-gray-300">
-                                <i class="fas fa-key"></i> Đổi mật khẩu
+                <div class="space-y-6">
+                    
+                    <div class="panel-card">
+                        <div class="form-header">
+                            <h3 class="panel-title mb-0" style="margin: 0;">Thông tin cơ bản</h3>
+                            <button class="btn-edit" id="btn-toggle-edit" onclick="toggleEditMode()">
+                                <i class="fas fa-pen"></i> Chỉnh sửa hồ sơ
                             </button>
                         </div>
-                    </form>
-                </div>
-            </div>
 
+                        <form id="profile-form">
+                            <div class="input-group">
+                                <label class="input-label"><i class="far fa-envelope text-gray-400"></i> Địa chỉ Email</label>
+                                <input id="profile-email" type="email" class="custom-input" disabled value="Đang tải...">
+                                <span class="input-note">* Email được liên kết với Google và không thể thay đổi.</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                                <div class="input-group mb-0">
+                                    <label class="input-label"><i class="far fa-user text-gray-400"></i> Họ và tên</label>
+                                    <input id="profile-name" type="text" class="custom-input" disabled required placeholder="Nhập tên hiển thị">
+                                </div>
+                                <div class="input-group mb-0">
+                                    <label class="input-label"><i class="fas fa-hashtag text-gray-400"></i> Mã học sinh</label>
+                                    <input id="profile-id" type="text" class="custom-input" disabled value="Đang tải...">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                                <div class="input-group mb-0">
+                                    <label class="input-label"><i class="fas fa-school text-gray-400"></i> Trường học</label>
+                                    <input id="profile-school" type="text" class="custom-input" disabled placeholder="Chưa cập nhật">
+                                </div>
+                                <div class="input-group mb-0">
+                                    <label class="input-label"><i class="fas fa-book text-gray-400"></i> Khối lớp</label>
+                                    <select id="profile-grade" class="custom-input custom-select cursor-pointer" disabled style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 15px center; background-size: 12px auto;">
+                                        <option value="10" class="dark:bg-slate-800">Lớp 10</option>
+                                        <option value="11" class="dark:bg-slate-800">Lớp 11</option>
+                                        <option value="12" class="dark:bg-slate-800">Lớp 12</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="btn-save-wrap" id="action-save-wrap">
+                                <button type="submit" class="btn-save"><i class="fas fa-check-circle"></i> Lưu thông tin</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="extra-panel-grid">
+                        <div class="panel-card" style="padding: 25px;">
+                            <h3 class="panel-title mb-4"><i class="fas fa-moon text-indigo-500"></i> Giao diện</h3>
+                            <div class="theme-toggle-wrapper" onclick="toggleDarkModeLogic()">
+                                <div>
+                                    <p class="font-bold text-[0.95rem] text-[var(--text-heading)]">Dark Mode</p>
+                                    <p class="text-xs text-[var(--text-sub)] mt-1">Dịu mắt ban đêm</p>
+                                </div>
+                                <div class="toggle-switch" id="theme-switch"></div>
+                            </div>
+                        </div>
+
+                        <div class="panel-card" style="padding: 25px;">
+                            <h3 class="panel-title mb-4"><i class="fas fa-shield-alt text-red-500"></i> Đổi mật khẩu</h3>
+                            <form id="password-form">
+                                <div class="input-group mb-3">
+                                    <input id="new-password" type="password" class="custom-input" style="padding: 12px 16px; background: #f4f7fb;" required placeholder="Mật khẩu mới">
+                                </div>
+                                <div class="input-group mb-4">
+                                    <input id="confirm-password" type="password" class="custom-input" style="padding: 12px 16px; background: #f4f7fb;" required placeholder="Xác nhận lại">
+                                </div>
+                                <button type="submit" class="btn-save btn-dark" style="padding: 12px; border-radius: 14px; margin-top: 0; width: 100%;">
+                                    <i class="fas fa-key"></i> Đổi mật khẩu
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </main>
 
@@ -408,7 +520,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, updateDoc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         import { initMenu } from "./menu.js";
 
@@ -418,10 +530,51 @@
         const db = getFirestore(app);
 
         initMenu(app, 'account');
-
         let currentUser = null;
+        let isEditMode = false;
 
-        // --- 1. TOAST NOTIFICATION ---
+        // --- CÁC HÀM UI ---
+        window.toggleSidebar = () => {
+            const sidebar = document.querySelector('aside');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            }
+        };
+
+        window.toggleEditMode = () => {
+            isEditMode = !isEditMode;
+            
+            const inputs = [document.getElementById('profile-name'), document.getElementById('profile-school'), document.getElementById('profile-grade')];
+            const btnToggle = document.getElementById('btn-toggle-edit');
+            const saveWrap = document.getElementById('action-save-wrap');
+
+            inputs.forEach(inp => {
+                inp.disabled = !isEditMode;
+                if(isEditMode) {
+                    inp.style.background = 'var(--bg-input)';
+                    inp.style.borderColor = 'var(--border-input)';
+                    inp.style.paddingLeft = '18px';
+                } else {
+                    inp.style.background = 'transparent';
+                    inp.style.borderColor = 'transparent';
+                    inp.style.paddingLeft = '0';
+                }
+            });
+
+            if (isEditMode) {
+                btnToggle.innerHTML = '<i class="fas fa-times"></i> Hủy';
+                btnToggle.classList.add('active');
+                saveWrap.classList.add('active');
+                inputs[0].focus();
+            } else {
+                btnToggle.innerHTML = '<i class="fas fa-pen"></i> Chỉnh sửa hồ sơ';
+                btnToggle.classList.remove('active');
+                saveWrap.classList.remove('active');
+            }
+        };
+
         window.showToast = (title, msg, type = 'success') => {
             const container = document.getElementById('toast-container');
             const div = document.createElement('div');
@@ -430,56 +583,25 @@
             div.innerHTML = `<div class="toast-icon"><i class="fas ${iconClass}"></i></div><div class="toast-content"><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
             container.appendChild(div);
             setTimeout(() => div.classList.add('show'), 10);
-            setTimeout(() => { div.classList.remove('show'); setTimeout(() => div.remove(), 400); }, 3500);
+            setTimeout(() => { div.classList.remove('show'); setTimeout(() => div.remove(), 400); }, 3000);
         }
 
-        // --- 2. MODAL LOGIC ---
-        window.openModal = (title, msg, type = 'danger', onConfirm) => {
-            const modal = document.getElementById('custom-modal');
-            const iconContainer = document.getElementById('modal-icon-container');
-            const icon = document.getElementById('modal-icon-class');
-            
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-message').innerText = msg;
-            iconContainer.className = `modal-icon ${type}`;
-            icon.className = type === 'danger' ? 'fas fa-trash-alt' : 'fas fa-info-circle';
-            
-            document.getElementById('modal-confirm-btn').onclick = () => { onConfirm(); window.closeModal(); };
-            modal.classList.add('open');
-        }
-        window.closeModal = () => document.getElementById('custom-modal').classList.remove('open');
-
-        // --- 3. XỬ LÝ THEME (DARK MODE) ---
         window.toggleDarkModeLogic = async () => {
             const html = document.documentElement;
-            
-            // Xác định chính xác trạng thái tiếp theo
             const isCurrentlyDark = html.classList.contains('dark');
             const newTheme = isCurrentlyDark ? 'light' : 'dark';
 
-            // Cập nhật giao diện ngay lập tức
-            if (newTheme === 'dark') {
-                html.classList.add('dark');
-            } else {
-                html.classList.remove('dark');
-            }
+            if (newTheme === 'dark') html.classList.add('dark');
+            else html.classList.remove('dark');
 
-            // Lưu bộ nhớ trình duyệt
             localStorage.setItem('theme', newTheme);
 
-            // Lưu lên Firebase
             if (currentUser) {
-                try {
-                    // ĐÃ FIX: Dùng setDoc với merge:true để đảm bảo lưu 100% thành công
-                    await setDoc(doc(db, "users", currentUser.uid), { theme: newTheme }, { merge: true });
-                } catch(e) { 
-                    console.error("Không thể lưu theme lên cloud:", e); 
-                    window.showToast("Lỗi", "Không thể đồng bộ giao diện", "error");
-                }
+                try { await setDoc(doc(db, "users", currentUser.uid), { theme: newTheme }, { merge: true }); } catch(e) {}
             }
         };
 
-        // --- 4. XỬ LÝ ẢNH ĐẠI DIỆN ---
+        // --- ẢNH ĐẠI DIỆN ---
         const compressImage = (file) => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -490,15 +612,13 @@
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
-                        const MAX_WIDTH = 150; const MAX_HEIGHT = 150;
+                        const MAX_WIDTH = 250; const MAX_HEIGHT = 250; 
                         let width = img.width, height = img.height;
-
                         if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
                         else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
-
                         canvas.width = width; canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.8));
+                        resolve(canvas.toDataURL('image/jpeg', 0.9));
                     };
                 };
                 reader.onerror = (error) => reject(error);
@@ -508,35 +628,78 @@
         document.getElementById('avatar-input').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            if (file.size > 5 * 1024 * 1024) return window.showToast('Lỗi', 'Ảnh quá lớn! Vui lòng chọn ảnh dưới 5MB.', 'error');
+            if (file.size > 5 * 1024 * 1024) return window.showToast('Lỗi', 'Ảnh phải nhỏ hơn 5MB.', 'error');
 
             try {
                 const avatarDisplay = document.getElementById('user-avatar-display');
-                avatarDisplay.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                avatarDisplay.innerHTML = '<i class="fas fa-spinner fa-spin text-gray-500"></i>';
+                avatarDisplay.style.background = 'white'; 
+                
                 const base64Image = await compressImage(file);
                 await updateDoc(doc(db, "users", currentUser.uid), { customAvatar: base64Image });
-                avatarDisplay.innerHTML = `<img src="${base64Image}" alt="User">`;
-                window.showToast('Thành công', 'Đổi ảnh đại diện thành công!', 'success');
+                
+                avatarDisplay.innerHTML = `<img src="${base64Image}" alt="Avatar">`;
+                window.showToast('Thành công', 'Đã cập nhật ảnh đại diện.', 'success');
             } catch (error) {
-                window.showToast('Lỗi', 'Không thể tải ảnh lên. Thử ảnh khác nhé!', 'error');
-                initUserData(currentUser, await (await getDoc(doc(db, "users", currentUser.uid))).data()); 
+                window.showToast('Lỗi', 'Không thể tải ảnh.', 'error');
+                location.reload(); 
             }
         });
 
-        // --- 5. LOAD DỮ LIỆU VÀ KHÔNG ĐIỀU HƯỚNG ---
+        // --- FETCH DỮ LIỆU ĐỘNG (BÀI ĐÃ LÀM, XẾP HẠNG KEYS) ---
+        async function fetchDynamicStats(user) {
+            try {
+                // 1. Số bài đã làm
+                const qActs = query(collection(db, "activities"), where("uid", "==", user.uid));
+                const snapActs = await getDocs(qActs);
+                document.getElementById('exams-val').innerHTML = `${snapActs.size} <span>bài</span>`;
+
+                // 2. Xếp hạng Keys
+                const qUsers = query(collection(db, "users"));
+                const snapUsers = await getDocs(qUsers);
+                let allU = [];
+                snapUsers.forEach(d => {
+                    const data = d.data();
+                    if(data.email) allU.push({id: d.id, keys: data.keys || 0});
+                });
+                allU.sort((a,b) => b.keys - a.keys);
+                const myIdx = allU.findIndex(u => u.id === user.uid);
+                
+                const rankEl = document.getElementById('rank-keys-val');
+                if(myIdx !== -1) {
+                    const rankNum = myIdx + 1;
+                    rankEl.textContent = `#${rankNum}`;
+                    if(rankNum <= 3) rankEl.style.color = '#FF8F50'; // Top 3 thì tô màu cam
+                } else {
+                    rankEl.textContent = '--';
+                }
+
+            } catch(e) { console.error("Lỗi lấy stats phụ", e); }
+        }
+
+        // --- LOAD DỮ LIỆU CƠ BẢN ---
         async function initUserData(user, data) {
-            const displayName = data.name || user.email.split('@')[0];
+            const displayName = data.name || user.displayName || user.email.split('@')[0];
             
             document.getElementById('display-name-header').textContent = displayName;
             
-            // ĐÃ FIX: Xử lý đồng bộ Theme chuẩn xác
+            const schoolBadge = document.getElementById('display-school-badge');
+            if(data.school) schoolBadge.textContent = data.school;
+            
+            document.getElementById('streak-val').innerHTML = `${data.streak || 1} <span>ngày</span>`;
+            document.getElementById('keys-val').innerHTML = `${data.keys || 0} <span>keys</span>`;
+            document.getElementById('journal-val').textContent = `Level ${data.journalLevel || 1}`; // Giả định có trường journalLevel
+            
+            let r = "Tân Binh";
+            const s = data.streak || 1;
+            if (s >= 3) r = "Chớm Lửa"; if (s >= 7) r = "Giữ Lửa"; if (s >= 30) r = "Bền Lửa"; if (s >= 100) r = "Huyền Thoại";
+            document.getElementById('rank-val').textContent = r;
+
             if (data.theme) {
-                // Nếu Cloud có dữ liệu -> Lấy Cloud đè xuống máy tính
                 localStorage.setItem('theme', data.theme);
                 if (data.theme === 'dark') document.documentElement.classList.add('dark');
                 else document.documentElement.classList.remove('dark');
             } else {
-                // Nếu Cloud bị rỗng -> Lấy từ máy tính đẩy lên Cloud
                 const localTheme = localStorage.getItem('theme') || 'light';
                 await setDoc(doc(db, "users", user.uid), { theme: localTheme }, { merge: true });
             }
@@ -550,13 +713,17 @@
                  avatarEl.style.background = 'transparent';
             } else {
                 avatarEl.innerHTML = displayName.charAt(0).toUpperCase();
-                avatarEl.style.background = 'linear-gradient(135deg, #FF8F50, #FF5E62)';
+                avatarEl.style.background = 'var(--primary-gradient)';
             }
 
-            document.getElementById('profile-name').value = data.name || '';
+            document.getElementById('profile-name').value = displayName;
             document.getElementById('profile-email').value = user.email || '';
+            document.getElementById('profile-id').value = "ID: " + user.uid.substring(0, 8).toUpperCase(); 
             document.getElementById('profile-school').value = data.school || '';
             document.getElementById('profile-grade').value = data.grade || '12';
+            
+            // Gọi hàm tính thêm bài đã làm & Rank
+            fetchDynamicStats(user);
         }
 
         onAuthStateChanged(auth, async (user) => {
@@ -569,19 +736,17 @@
                     const role = data.role;
                     const roleEl = document.getElementById('user-role-display');
 
-                    // MỌI NGƯỜI ĐỀU Ở LẠI TRANG NÀY, CHỈ ĐỔI HIỂN THỊ ROLE CHO ĐẸP
                     if (role === 'admin' || user.email === 'admin@hopvan.com') {
-                        roleEl.textContent = "QUẢN TRỊ VIÊN";
-                        roleEl.className = "text-[10px] text-orange-600 font-black uppercase tracking-wider bg-orange-100 dark:bg-orange-900/30 px-3 py-1 rounded-full inline-block mt-1";
+                        roleEl.innerHTML = `<i class="fas fa-user-shield"></i> Quản Trị Viên`;
+                        roleEl.className = "badge badge-role";
                     } else if (role === 'teacher') {
-                        roleEl.textContent = "GIÁO VIÊN";
-                        roleEl.className = "text-[10px] text-blue-600 font-black uppercase tracking-wider bg-blue-100 dark:bg-blue-900/30 px-3 py-1 rounded-full inline-block mt-1";
+                        roleEl.innerHTML = `<i class="fas fa-chalkboard-teacher"></i> Giáo Viên`;
+                        roleEl.className = "badge bg-blue-100 dark:bg-blue-900/30 text-blue-600 border-blue-200 dark:border-blue-900";
                     } else {
-                        roleEl.textContent = "HỌC VIÊN";
-                        roleEl.className = "text-[10px] text-gray-500 font-black uppercase tracking-wider bg-gray-100 dark:bg-slate-700 px-3 py-1 rounded-full inline-block mt-1";
+                        roleEl.innerHTML = `<i class="fas fa-user-graduate"></i> Học Viên`;
+                        roleEl.className = "badge bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-slate-600";
                     }
 
-                    // Load Data lên UI
                     await initUserData(user, data); 
                 }
             } else {
@@ -589,12 +754,12 @@
             }
         });
 
-        // --- 6. UPDATE PROFILE ---
+        // --- LƯU THÔNG TIN ---
         document.getElementById('profile-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button');
             const originalContent = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Đang lưu...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
             btn.disabled = true;
 
             const name = document.getElementById('profile-name').value.trim();
@@ -605,25 +770,32 @@
                 await updateDoc(doc(db, "users", currentUser.uid), {
                     name: name, school: school, grade: parseInt(grade), selectedGrade: parseInt(grade)
                 });
+                
+                // Cập nhật lại UI lập tức
                 document.getElementById('display-name-header').textContent = name;
+                document.getElementById('display-school-badge').textContent = school || "Chưa cập nhật";
                 const avatarEl = document.getElementById('user-avatar-display');
-                if (!avatarEl.querySelector('img')) avatarEl.textContent = name.charAt(0).toUpperCase();
-                window.showToast('Thành công', 'Thông tin đã được cập nhật!', 'success');
-            } catch (error) { window.showToast('Lỗi', error.message, 'error'); } 
+                if (!avatarEl.querySelector('img')) {
+                    avatarEl.textContent = name.charAt(0).toUpperCase();
+                }
+                
+                window.showToast('Thành công', 'Hồ sơ đã được lưu lại.', 'success');
+                window.toggleEditMode(); // Tự động khóa lại
+            } catch (error) { window.showToast('Lỗi', 'Không thể lưu thông tin.', 'error'); } 
             finally { btn.innerHTML = originalContent; btn.disabled = false; }
         });
 
-        // --- 7. CHANGE PASSWORD & DELETE ACCOUNT ---
+        // --- ĐỔI MẬT KHẨU ---
         document.getElementById('password-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button');
             const p1 = document.getElementById('new-password').value;
             const p2 = document.getElementById('confirm-password').value;
 
-            if (p1.length < 6) return window.showToast('Thất bại', 'Mật khẩu phải từ 6 ký tự!', 'error');
-            if (p1 !== p2) return window.showToast('Thất bại', 'Mật khẩu xác nhận không khớp!', 'error');
+            if (p1.length < 6) return window.showToast('Lỗi', 'Mật khẩu phải từ 6 ký tự!', 'error');
+            if (p1 !== p2) return window.showToast('Lỗi', 'Mật khẩu xác nhận không khớp!', 'error');
 
-            btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Đang đổi...';
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang đổi...';
 
             try {
                 await updatePassword(currentUser, p1);
@@ -631,57 +803,20 @@
                 e.target.reset();
             } catch (error) {
                 if (error.code === 'auth/requires-recent-login') window.showToast('Cảnh báo', 'Vui lòng đăng xuất và đăng nhập lại để đổi mật khẩu.', 'error');
-                else window.showToast('Lỗi', error.message, 'error');
+                else window.showToast('Lỗi', 'Đã xảy ra lỗi, vui lòng thử lại.', 'error');
             } finally {
                 btn.disabled = false; btn.innerHTML = '<i class="fas fa-key"></i> Đổi mật khẩu';
             }
         });
-
-        window.confirmDeleteAccount = () => {
-            window.openModal("Xóa tài khoản?", "Hành động này không thể hoàn tác. Mọi dữ liệu học tập của bạn sẽ bị xóa vĩnh viễn.", "danger", () => {
-                window.showToast("Thông báo", "Yêu cầu đã được gửi đến Admin.", "success");
-            });
-        };
     </script>
 
     <script type="text/javascript">
-    // 1. Chặn Chuột phải (Để ẩn menu "Inspect/Kiểm tra" và "View Source/Xem nguồn")
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        // Không hiện thông báo gì cả để trải nghiệm mượt mà hơn
-    });
-
-    // 2. Chặn các phím tắt Developer Tools
-    document.addEventListener('keydown', function(e) {
-        // Chặn F12
-        if (e.key === 'F12' || e.keyCode === 123) {
-            e.preventDefault();
-            return false;
-        }
-
-        // Chặn các tổ hợp phím Ctrl + ...
-        if (e.ctrlKey) {
-            switch (e.key.toLowerCase()) {
-                case 'u': // Chặn Ctrl + U (Xem source code)
-                case 's': // Chặn Ctrl + S (Lưu trang web)
-                case 'p': // Chặn Ctrl + P (In trang web - thường hiện code)
-                // Lưu ý: KHÔNG chặn 'c' (Copy) và 'a' (Select All)
-                    e.preventDefault();
-                    return false;
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if (e.key === 'F12' || e.keyCode === 123 || (e.ctrlKey && ['u','s','p'].includes(e.key.toLowerCase())) || (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase()))) {
+                e.preventDefault(); return false;
             }
-
-            // Chặn Ctrl + Shift + ... (Các phím mở DevTools)
-            if (e.shiftKey) {
-                switch (e.key.toLowerCase()) {
-                    case 'i': // Inspect Element
-                    case 'j': // Console
-                    case 'c': // Element Inspector
-                        e.preventDefault();
-                        return false;
-                }
-            }
-        }
-    });
-</script>
+        });
+    </script>
 </body>
 </html>
