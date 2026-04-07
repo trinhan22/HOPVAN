@@ -161,7 +161,7 @@ const menuHTML = `
 
             <div class="px-4 mt-4 mb-2 text-[9px] font-black text-gray-400 uppercase tracking-widest opacity-80">Quản Lý Học Tập</div>
             <a href="lythuyet.html" class="sb-link" data-page="lythuyet">
-                <i class="fas fa-feather-alt w-5 text-center"></i> Lý thuyết
+                <i class="fas fa-feather-alt w-5 text-center"></i> Lý thuyết Ngữ Văn
             </a>
             <a href="phongluyende.html" class="sb-link" data-page="phongluyende">
                 <i class="fas fa-pen-nib w-5 text-center"></i> Phòng luyện đề
