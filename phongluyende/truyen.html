@@ -532,75 +532,66 @@
         document.getElementById('ai-correction-box').innerHTML = html;
     };
 
-    // --- 2. HÀM NỘP BÀI (DÙNG JSON PROMPT THEO DẠNG TRUYỆN) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
-        
         if(content.split(/\s+/).filter(x => x).length < 50) { 
-            document.getElementById('short-essay-popup').style.display = 'flex'; 
-            return; 
+            document.getElementById('short-essay-popup').style.display = 'flex'; return; 
         }
 
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex';
-        clearInterval(timerInterval); // Dừng đồng hồ
+        clearInterval(timerInterval);
 
         const q = window.currentExamData;
         if (!q) {
             showPopup("Lỗi", "Dữ liệu đề bị trống. Hãy reload trang.", "error");
-            loading.style.display = 'none';
-            return;
+            loading.style.display = 'none'; return;
         }
 
         try {
-            // 1. TẢI FILE PROMPT JSON
-            const promptResponse = await fetch('../prompts.json'); 
+            const promptResponse = await fetch('prompts.json'); 
             const promptData = await promptResponse.json();
             
-            // 2. THAY THẾ DỮ LIỆU
-            let systemPrompt = promptData.de_truyen;
+            // BƯỚC KHỬ MÃ ĐỘC: Lọc sạch toàn bộ xuống dòng (\n), ngoặc kép (") từ bài làm học sinh
+            const safe = (str) => {
+                if (!str) return 'Không có';
+                if (Array.isArray(str)) str = str.join(' | ');
+                return String(str).replace(/"/g, "'").replace(/\n/g, '<br>').replace(/\\/g, "/");
+            };
             
+            let systemPrompt = promptData.de_truyen; // <--- ĐỔI TÊN Ở ĐÂY CHO TỪNG FILE (de_tho, de_truyen...)
+            
+            // DÙNG SPLIT.JOIN THAY VÌ REPLACE ĐỂ TRÁNH LỖI KÝ TỰ ĐẶC BIỆT
             systemPrompt = systemPrompt
-                .replace('{{TOPIC}}', q.topic || 'Không có yêu cầu')
-                .replace('{{DOC_HIEU}}', q.text ? q.text.replace(/"/g, "'") : 'Học sinh tự chọn đoạn trích')
-                .replace('{{HINT}}', q.hint || '')
-                .replace('{{BAI_LAM}}', content);
+                .split('{{TOPIC}}').join(safe(q.topic))
+                .split('{{DOC_HIEU}}').join(safe(q.text))
+                .split('{{HINT}}').join(safe(q.hint))
+                .split('{{BAI_LAM}}').join(safe(content));
 
-            // 3. GỌI API CHẤM BÀI
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ 
                     systemPrompt: systemPrompt, 
-                    messages: `Học sinh gửi bài làm Nghị luận Truyện hiện đại. Hãy chấm theo quy trình K12.`
+                    messages: `Học sinh gửi bài làm. Hãy chấm theo quy trình K12.`
                 }) 
             });
 
             if (!res.ok) throw new Error("SERVER_ERROR");
-
             const data = await res.json();
-            if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                throw new Error("NO_CONTENT");
-            }
+            if (!data.choices || !data.choices[0] || !data.choices[0].message) throw new Error("NO_CONTENT");
 
             let rawText = data.choices[0].message.content;
-            
-            // JSON CLEANING
             rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
             const firstBrace = rawText.indexOf('{');
             const lastBrace = rawText.lastIndexOf('}');
-            if (firstBrace !== -1 && lastBrace !== -1) {
-                rawText = rawText.substring(firstBrace, lastBrace + 1);
-            }
+            if (firstBrace !== -1 && lastBrace !== -1) rawText = rawText.substring(firstBrace, lastBrace + 1);
             
-            let result;
-            try {
-                result = JSON.parse(rawText);
-            } catch (err) {
-                throw new Error("INVALID_JSON");
-            }
+            // DIỆT CÁC KÝ TỰ ẨN (INVISIBLE CHARACTERS) LÀM CRASH JSON CỦA AI
+            rawText = rawText.replace(/[\u0000-\u0019]+/g,"");
 
-            // DATA SANITIZATION
+            const result = JSON.parse(rawText);
+
             let safeScore = parseFloat(result.score);
             if (isNaN(safeScore)) safeScore = 0;
             if (safeScore > 10) safeScore = 10;
@@ -608,15 +599,13 @@
             result.score = safeScore;
             result.human_score = parseInt(result.human_score) || 100;
             
-            // Render kết quả
             renderAIResult(result);
 
-            // 4. LƯU BÀI VÀO FIREBASE
             if (auth.currentUser) {
                 await addDoc(collection(db, "exam_history"), {
                     userId: auth.currentUser.uid,
                     userName: auth.currentUser.displayName || auth.currentUser.email.split('@')[0],
-                    prompt: q.title || "Nghị Luận Truyện", 
+                    prompt: q.title || "Truyện", // <--- ĐỔI TÊN Ở ĐÂY THEO FILE
                     essay: content,
                     score: result.score, 
                     feedback: result.correction_html, 
@@ -627,7 +616,7 @@
             console.error(e); 
             let msg = "Có lỗi xảy ra, vui lòng thử lại!";
             if (e.message === "SERVER_ERROR") msg = "Server đang bận. Bạn hãy bấm nộp lại nhé!";
-            if (e.message === "INVALID_JSON") msg = "AI trả về dữ liệu lỗi. Vui lòng bấm nộp lại!";
+            if (e.name === "SyntaxError") msg = "Dữ liệu AI trả về bị lỗi cấu trúc. Vui lòng bấm nộp lại!";
             showPopup("Lỗi AI", msg, "error");
         } finally { 
             loading.style.display = 'none'; 

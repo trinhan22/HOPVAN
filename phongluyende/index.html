@@ -539,7 +539,6 @@
         document.getElementById('ai-correction-box').innerHTML = html;
     };
 
-    // --- 2. HÀM NỘP BÀI (AUTO FETCH JSON THEO DẠNG ĐỀ) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
         if(content.split(/\s+/).filter(x => x).length < 20) { 
@@ -548,41 +547,43 @@
 
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex';
+        clearInterval(timerInterval);
         
         const q = window.currentExamData;
         if (!q) {
             showPopup("Lỗi", "Dữ liệu đề bị trống. Hãy reload trang.", "error");
-            loading.style.display = 'none';
-            return;
+            loading.style.display = 'none'; return;
         }
 
         try {
-            // 1. Fetch file Prompt JSON
-            const promptResponse = await fetch('../prompts.json'); 
+            const promptResponse = await fetch('prompts.json'); 
             const promptData = await promptResponse.json();
             
+            const safe = (str) => {
+                if (!str) return 'Không có';
+                if (Array.isArray(str)) str = str.join(' | ');
+                return String(str).replace(/"/g, "'").replace(/\n/g, '<br>').replace(/\\/g, "/");
+            };
+
             let systemPrompt = "";
             let messages = "";
 
-            // 2. NHẬN DIỆN DẠNG ĐỀ & THAY PLACEHOLDER
             if (q.type === 'dochieu') {
                 systemPrompt = promptData.de_doc_hieu
-                    .replace('{{DOC_HIEU}}', (q.text || '').replace(/"/g, "'"))
-                    .replace('{{CAU_HOI}}', JSON.stringify(q.questions || []))
-                    .replace('{{BAI_LAM}}', content);
-                messages = "Học sinh gửi bài làm Đọc Hiểu. Hãy chấm theo Barem 4.0 (0.5-0.5-1-1-1).";
+                    .split('{{DOC_HIEU}}').join(safe(q.text))
+                    .split('{{CAU_HOI}}').join(safe(q.questions))
+                    .split('{{BAI_LAM}}').join(safe(content));
+                messages = "Học sinh gửi bài làm Đọc Hiểu. Hãy chấm theo Barem 4.0.";
             } else {
-                // Tái sử dụng de_ca_nhan (vì nó có đủ chỗ trống cho NLXH và NLVH)
                 systemPrompt = promptData.de_ca_nhan
-                    .replace('{{DOC_HIEU}}', q.text || 'Không có')
-                    .replace('{{CAU_HOI}}', 'Không có')
-                    .replace('{{NLXH}}', q.type === 'nlxh' ? q.topic : 'Không có')
-                    .replace('{{NLVH}}', q.type === 'nlvh' ? q.topic : 'Không có')
-                    .replace('{{BAI_LAM}}', content);
-                messages = `Học sinh gửi bài ${q.type === 'nlxh' ? 'Nghị Luận Xã Hội' : 'Nghị Luận Văn Học'}. Hãy chấm theo thang 10.`;
+                    .split('{{DOC_HIEU}}').join(safe(q.text))
+                    .split('{{CAU_HOI}}').join(safe("Không có"))
+                    .split('{{NLXH}}').join(safe(q.type === 'nlxh' ? q.topic : 'Không có'))
+                    .split('{{NLVH}}').join(safe(q.type === 'nlvh' ? q.topic : 'Không có'))
+                    .split('{{BAI_LAM}}').join(safe(content));
+                messages = `Học sinh gửi bài ${q.type === 'nlxh' ? 'NLXH' : 'NLVH'}. Hãy chấm theo thang 10.`;
             }
 
-            // 3. GỌI API
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
@@ -590,23 +591,19 @@
             });
 
             if (!res.ok) throw new Error("SERVER_ERROR");
-
             const data = await res.json();
-            if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                throw new Error("NO_CONTENT");
-            }
+            if (!data.choices || !data.choices[0] || !data.choices[0].message) throw new Error("NO_CONTENT");
 
             let rawText = data.choices[0].message.content;
             rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
             const firstBrace = rawText.indexOf('{');
             const lastBrace = rawText.lastIndexOf('}');
-            if (firstBrace !== -1 && lastBrace !== -1) {
-                rawText = rawText.substring(firstBrace, lastBrace + 1);
-            }
+            if (firstBrace !== -1 && lastBrace !== -1) rawText = rawText.substring(firstBrace, lastBrace + 1);
             
+            rawText = rawText.replace(/[\u0000-\u0019]+/g,"");
+
             const result = JSON.parse(rawText);
 
-            // 4. XỬ LÝ ĐIỂM SỐ DỰA THEO LOẠI ĐỀ
             if (q.type === 'dochieu') {
                 let safeReadingScore = parseFloat(result.reading_score);
                 if (isNaN(safeReadingScore)) {
@@ -615,7 +612,7 @@
                 }
                 if (safeReadingScore > 4.0) safeReadingScore = 4.0;
                 result.reading_score = safeReadingScore;
-                result.score = parseFloat(((safeReadingScore / 4.0) * 10).toFixed(2)); // Quy về thang 10 lưu DB
+                result.score = parseFloat(((safeReadingScore / 4.0) * 10).toFixed(2));
             } else {
                 let safeScore = parseFloat(result.score);
                 if (isNaN(safeScore)) safeScore = 0;
@@ -625,10 +622,8 @@
 
             result.human_score = parseInt(result.human_score) || 100;
             
-            // Render kết quả ra màn hình (truyền thêm type để nó biết vẽ UI cho đúng)
             renderAIResult(result, q.type);
 
-            // 5. LƯU BÀI VÀO FIREBASE
             if (auth.currentUser) {
                 const promptTitle = q.type === 'dochieu' ? (q.title || "Đọc Hiểu Ngẫu Nhiên") 
                                   : (q.type === 'nlxh' ? "Nghị Luận Xã Hội" : "Nghị Luận Văn Học");
@@ -638,7 +633,7 @@
                     userName: auth.currentUser.displayName || auth.currentUser.email.split('@')[0],
                     prompt: promptTitle, 
                     essay: content,
-                    score: result.score, // Luôn lưu thang 10
+                    score: result.score, 
                     feedback: result.correction_html, 
                     timestamp: serverTimestamp() 
                 });
