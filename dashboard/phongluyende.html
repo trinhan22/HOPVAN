@@ -287,7 +287,7 @@
         </div>
 
         <div class="section-title">
-            <i class="fas fa-layer-group" style="color: var(--primary);"></i> Luyện Đề Chính
+            <i class="fas fa-layer-group" style="color: var(--primary);"></i> Phòng luyện đề
         </div>
         <p class="section-desc">Hệ thống chấm điểm AI & Ngân hàng câu hỏi đa dạng.</p>
 
@@ -296,7 +296,7 @@
             <div class="card card-colored card-orange" onclick="goToExam('random')">
                 <div class="card-header">
                     <div>
-                        <div class="card-title">Ngẫu Nhiên</div>
+                        <div class="card-title">ĐỀ NGẪU NHIÊN</div>
                         <p class="card-desc">Thử thách với 1 đề bài bất kỳ từ kho dữ liệu.</p>
                     </div>
                     <div class="card-icon-badge"><i class="fas fa-dice"></i></div>
@@ -311,7 +311,7 @@
             <div class="card card-colored card-purple" onclick="goToExam('full')">
                 <div class="card-header">
                     <div>
-                        <div class="card-title">Đề Tổng Hợp</div>
+                        <div class="card-title">ĐỀ TỔNG HỢP</div>
                         <p class="card-desc">Full cấu trúc: Đọc Hiểu + NLXH + NLVH (120p).</p>
                     </div>
                     <div class="card-icon-badge"><i class="fas fa-scroll"></i></div>
@@ -326,7 +326,7 @@
             <div class="card card-white" onclick="openTopicModal()">
                 <div class="card-header">
                     <div>
-                        <div class="card-title" style="color: var(--primary);">Theo Chủ Đề</div>
+                        <div class="card-title" style="color: var(--primary);">THEO CHỦ ĐỀ</div>
                         <p class="card-desc">Ôn tập chuyên sâu từng phần: NLXH, NLVH...</p>
                     </div>
                     <div class="card-icon-badge"><i class="fas fa-shapes"></i></div>
@@ -341,7 +341,7 @@
             <div class="card card-white" onclick="goToExam('quiz')">
                 <div class="card-header">
                     <div>
-                        <div class="card-title" style="color: var(--primary);">Trắc Nghiệm</div>
+                        <div class="card-title" style="color: var(--primary);">TRẮC NGHIỆM</div>
                         <p class="card-desc">Ôn nhanh kiến thức nền tảng qua câu hỏi ngắn.</p>
                     </div>
                     <div class="card-icon-badge"><i class="fas fa-check-circle"></i></div>
@@ -524,55 +524,138 @@
     import { initMenu } from "./menu.js";
     initMenu(app);
 
-</script>
+    // ==========================================
+    // LOGIC LỊCH SỬ LÀM BÀI (ĐÃ FIX KẾT NỐI FIREBASE)
+    // ==========================================
+    
+    window.openHistoryModal = () => { 
+        document.getElementById('historyModal').style.display = 'flex'; 
+        document.body.style.overflow = 'hidden';
+        window.renderHistory(); 
+    };
+    
+    window.closeHistoryModal = () => { 
+        document.getElementById('historyModal').style.display = 'none'; 
+        document.body.style.overflow = 'auto';
+    };
 
-<script>
-        // LỊCH SỬ LÀM BÀI
-        window.openHistoryModal = () => { 
-            document.getElementById('historyModal').style.display = 'flex'; 
-            document.body.style.overflow = 'hidden';
-            window.renderHistory(); 
-        };
+    window.viewHistoryDetail = (id) => { 
+        localStorage.setItem('hopvan_current_history_id', id);
+        window.location.href = '../phongluyende/lichsulambai.html';
+    };
+
+    window.renderHistory = async () => {
+        const list = document.getElementById('history-list');
+        list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:50px;"><i class="fas fa-spinner fa-spin text-3xl text-orange-500 mb-4"></i><br><b class="text-gray-500">Đang tải dữ liệu...</b></div>`;
         
-        window.closeHistoryModal = () => { 
-            document.getElementById('historyModal').style.display = 'none'; 
-            document.body.style.overflow = 'auto';
-        };
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+            list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:50px; color:#ef4444;"><b>Vui lòng đăng nhập để xem lịch sử.</b></div>`;
+            return;
+        }
 
-        window.viewHistoryDetail = (id) => { 
-            localStorage.setItem('hopvan_current_history_id', id);
-            window.location.href = '../phongluyende/lichsulambai.html';
-        };
-
-        window.renderHistory = async () => {
-            const list = document.getElementById('history-list');
-            list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:50px;"><i class="fas fa-spinner fa-spin text-3xl text-orange-500 mb-4"></i><br><b class="text-gray-500">Đang tải dữ liệu...</b></div>`;
+        try {
+            // Lấy dữ liệu từ Collection exam_history, xếp theo thời gian mới nhất (limit 20 bài)
+            const q = query(
+                collection(db, "exam_history"), 
+                where("userId", "==", currentUser.uid),
+                orderBy("timestamp", "desc"),
+                limit(20)
+            );
             
-            // Xử lý lấy Data từ DB (Tương tự như cũ)
-            // Vì đang dùng type=module cho Firebase ở trên, 
-            // hàm này nên được đưa vào trong khối script module hoặc gọi thông qua event/window.
-            // Để demo nhanh, tôi giữ nguyên cấu trúc này.
-        };
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.empty) {
+                list.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align:center; padding:50px;">
+                        <i class="fas fa-box-open text-4xl text-gray-300 mb-3"></i>
+                        <p class="text-gray-500 font-bold">Chưa có bài thi nào được lưu.</p>
+                        <p class="text-sm text-gray-400 mt-2">Hãy thử làm một bài luyện tập nhé!</p>
+                    </div>`;
+                return;
+            }
 
-        window.addEventListener('click', (e) => { 
-            if (e.target === document.getElementById('historyModal')) closeHistoryModal(); 
-        });
-
-        // Chặn phím tắt
-        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
-            if (e.ctrlKey) {
-                switch (e.key.toLowerCase()) {
-                    case 'u': case 's': case 'p': e.preventDefault(); return false;
+            let html = '';
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const id = doc.id;
+                
+                // Xử lý điểm và màu sắc
+                let score = parseFloat(data.score) || 0;
+                let maxScore = 10;
+                let scoreLabel = score.toFixed(1);
+                
+                // Nhận diện nếu là đề Đọc Hiểu thì để thang 4.0
+                if (score <= 4.0 && data.prompt && data.prompt.toLowerCase().includes("đọc hiểu")) {
+                    maxScore = 4.0;
+                    scoreLabel = `${score.toFixed(2)}/4.0`;
                 }
-                if (e.shiftKey) {
-                    switch (e.key.toLowerCase()) {
-                        case 'i': case 'j': case 'c': e.preventDefault(); return false;
-                    }
+                
+                const percent = (score / maxScore) * 100;
+                const colorClass = percent >= 80 ? 'text-green-600 bg-green-50' : (percent >= 50 ? 'text-orange-600 bg-orange-50' : 'text-red-600 bg-red-50');
+                
+                const dateStr = data.timestamp ? data.timestamp.toDate().toLocaleString('vi-VN', {
+                    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                }) : "Không rõ";
+
+                // Xử lý text tóm tắt
+                const rawText = data.essay || data.feedback || "";
+                // Loại bỏ tag HTML để hiển thị tóm tắt text sạch sẽ
+                const cleanText = rawText.replace(/<[^>]*>?/gm, ''); 
+                const shortDesc = cleanText.length > 80 ? cleanText.substring(0, 80) + '...' : (cleanText || "Không có nội dung chi tiết.");
+
+                html += `
+                    <div class="history-card" onclick="viewHistoryDetail('${id}')">
+                        <div class="hc-header">
+                            <span class="hc-date"><i class="far fa-calendar-alt mr-1"></i> ${dateStr}</span>
+                            <span class="hc-score ${colorClass}">${scoreLabel}</span>
+                        </div>
+                        <div class="hc-body">
+                            <h4>${data.prompt || "Đề Luyện Tập"}</h4>
+                            <p>${shortDesc}</p>
+                        </div>
+                        <div class="hc-footer">
+                            Xem chi tiết bài sửa <i class="fas fa-long-arrow-alt-right ml-1"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            list.innerHTML = html;
+
+        } catch (error) {
+            console.error("Lỗi tải lịch sử:", error);
+            // Thông báo lỗi thân thiện nếu chưa tạo Index trên Firestore
+            if (error.message.includes("requires an index")) {
+                list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:30px; color:#ef4444; background:#fee2e2; border-radius:15px;"><b>Lỗi Hệ Thống:</b> Database cần tạo Index để tìm kiếm. Vui lòng báo cho Admin.</div>`;
+            } else {
+                list.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:50px; color:#ef4444;"><b>Không thể tải dữ liệu. Vui lòng kiểm tra mạng.</b></div>`;
+            }
+        }
+    };
+
+    // Đóng Modal khi click ra ngoài
+    window.addEventListener('click', (e) => { 
+        if (e.target === document.getElementById('historyModal')) closeHistoryModal(); 
+    });
+
+    // --- CHỐNG F12 BẢO VỆ MÃ NGUỒN ---
+    document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
+        if (e.ctrlKey) {
+            switch (e.key.toLowerCase()) {
+                case 'u': case 's': case 'p': e.preventDefault(); return false;
+            }
+            if (e.shiftKey) {
+                switch (e.key.toLowerCase()) {
+                    case 'i': case 'j': case 'c': e.preventDefault(); return false;
                 }
             }
-        });
+        }
+    });
 </script>
+
+
 </body>
 </html>

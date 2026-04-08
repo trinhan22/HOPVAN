@@ -242,13 +242,124 @@
         .stars { color: #FFC107; font-size: 0.9rem; margin-bottom: 5px; }
         .review-text { font-style: italic; color: var(--text-light); line-height: 1.7; font-size: 1rem; }
 
-        /* --- ABOUT US --- */
-        .about-wrap { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 60px; align-items: center; }
-        .about-img { width: 100%; border-radius: 30px; transform: rotate(0deg); border: 8px solid white; box-shadow: 0 20px 40px rgba(0,0,0,0.1); transition: 0.3s; }
-        .about-img:hover { transform: rotate(0deg) scale(1.02); }
-        .check-list { list-style: none; margin-top: 25px; }
-        .check-list li { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-size: 1.1rem; color: var(--text-main); }
-        .check-list i { color: white; background: var(--primary); padding: 5px; border-radius: 50%; box-shadow: 0 5px 10px rgba(255, 143, 80, 0.3); font-size: 0.8rem; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+        /* =========================================
+           ABOUT US - COMPACT INTERACTIVE TABS (FIXED & PREMIUM)
+           ========================================= */
+        
+        .about-section { margin-top: 20px; position: relative; z-index: 10; }
+        .about-compact-card {
+            display: flex; 
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 36px; border: 1px solid rgba(255, 255, 255, 0.8); 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.05); 
+            overflow: hidden; min-height: 480px;
+        }
+
+        /* --- Menu Trái --- */
+        .about-menu {
+            width: 320px; background: rgba(248, 250, 252, 0.6); padding: 30px 20px; 
+            display: flex; flex-direction: column; gap: 12px; 
+            border-right: 1px solid rgba(0,0,0,0.05); flex-shrink: 0;
+        }
+        .about-tab-btn {
+            display: flex; align-items: center; gap: 16px; padding: 16px; 
+            border-radius: 20px; border: 1px solid transparent; background: transparent; 
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); text-align: left;
+        }
+        .about-tab-btn:hover { background: rgba(255, 143, 80, 0.05); }
+        .about-tab-btn.active { 
+            background: white; border-color: rgba(255, 143, 80, 0.3); 
+            box-shadow: 0 10px 25px rgba(255, 143, 80, 0.1); transform: translateX(8px); 
+        }
+        
+        .tab-icon { width: 50px; height: 50px; border-radius: 16px; object-fit: cover; background: white; border: 2px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.08);}
+        .tab-text { display: flex; flex-direction: column; }
+        .tab-title { font-size: 1.05rem; font-weight: 800; color: var(--text-heading); transition: 0.3s;}
+        .about-tab-btn.active .tab-title { color: var(--primary); }
+        .tab-sub { font-size: 0.8rem; color: var(--text-light); font-weight: 600; margin-top: 3px;}
+
+        /* --- Nội Dung Phải --- */
+        .about-content-area { flex: 1; padding: 40px 50px; position: relative; background: white; overflow: hidden; }
+        .about-pane { display: none; animation: paneFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; height: 100%;}
+        .about-pane.active { display: flex; flex-direction: column; }
+        @keyframes paneFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .pane-watermark { position: absolute; right: -30px; bottom: -30px; font-size: 15rem; color: var(--primary); opacity: 0.03; transform: rotate(-15deg); pointer-events: none;}
+
+        /* --- Tab Dự Án --- */
+        .hopvan-mission h3 { font-size: 2.2rem; font-weight: 900; color: var(--text-heading); margin-bottom: 15px; letter-spacing: -0.5px;}
+        .hopvan-mission p { font-size: 1.1rem; color: var(--text-light); line-height: 1.8; margin-bottom: 30px; }
+        .mission-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .mission-item { background: #f8fafc; padding: 18px 20px; border-radius: 16px; display: flex; align-items: center; gap: 15px; font-weight: 700; font-size: 1rem; color: var(--text-heading); border: 1px solid #f1f5f9; transition: 0.3s;}
+        .mission-item:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 143, 80, 0.1); background: white;}
+        .mission-item i { color: #10b981; font-size: 1.4rem; }
+
+        /* --- Tab Thành Viên (Mini Profile) - CHỈ SỬA RIÊNG TAB NÀY --- */
+        .mp-cover { 
+            height: 110px; background: var(--primary-gradient); position: relative; overflow: hidden; margin-bottom: 0;
+            /* Dùng Margin âm để kéo ảnh bìa tràn ra lấp đầy khoảng trống của thẻ cha */
+            margin-top: -60px; margin-left: -50px; margin-right: -50px; width: calc(100% + 100px); border-radius: 0;
+        }
+        .mp-cover::before { content: ''; position: absolute; inset: 0; opacity: 0.15; background-image: radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px); background-size: 20px 20px; }
+        
+        .mp-body { padding: 0; position: relative; z-index: 2; }
+        .mp-avatar { width: 85px; height: 85px; border-radius: 50%; border: 4px solid var(--bg-card); background: #f1f5f9; box-shadow: 0 5px 15px rgba(0,0,0,0.08); object-fit: cover; margin-top: -40px; margin-bottom: 12px; display: block;}
+        
+        .mp-info { margin-bottom: 15px; }
+        
+        /* ĐÃ FIX: Tăng margin-bottom lên 10px để kéo dãn khoảng cách với tag chức vụ */
+        .mp-info h3 { font-size: 1.5rem; font-weight: 900; color: var(--text-heading); margin-bottom: 10px; line-height: 1;}
+        
+        /* ĐÃ FIX: Bóp nhỏ tag, giảm độ đậm (800 -> 700), bo tròn viên thuốc (20px) */
+        .mp-role { 
+            font-size: 0.7rem; 
+            font-weight: 700; 
+            color: var(--primary); 
+            background: rgba(255, 143, 80, 0.08); 
+            padding: 3px 10px; 
+            border-radius: 20px; 
+            display: inline-block; 
+            letter-spacing: 0.5px; 
+            border: 1px solid rgba(255, 143, 80, 0.25);
+        }
+        
+        .mp-desc { font-size: 0.95rem; font-weight: 500; color: #4b5563; line-height: 1.7; margin-bottom: 25px; flex-grow: 1;}
+        
+        .mp-socials { display: flex; gap: 10px; }
+        .mp-socials a { width: 36px; height: 36px; border-radius: 10px; background: #f8fafc; border: 1px solid #f1f5f9; color: var(--text-sub); display: flex; align-items: center; justify-content: center; font-size: 1.05rem; transition: 0.3s; text-decoration: none;}
+        .mp-socials a:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 8px 15px rgba(255, 143, 80, 0.25);}
+
+        /* --- Dark Mode Sync --- */
+        html.dark .about-compact-card { background: #111827; border-color: #1f2937; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+        html.dark .about-menu { background: #0b1120; border-color: #1f2937; }
+        html.dark .about-tab-btn:hover { background: rgba(255, 143, 80, 0.1); }
+        html.dark .about-tab-btn.active { background: #1e293b; border-color: rgba(255, 143, 80, 0.4); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        html.dark .tab-icon { background: #1e293b; border-color: #334155; }
+        html.dark .about-content-area { background: #111827; }
+        html.dark .mission-item { background: #1e293b; border-color: #334155; color: #f8fafc; }
+        html.dark .mission-item:hover { background: #0b1120; border-color: var(--primary); }
+        html.dark .mp-avatar { border-color: #111827; background: #1e293b; }
+        html.dark .mp-socials a { background: #1e293b; border-color: #334155; color: #94a3b8; }
+        html.dark .mp-socials a:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        html.dark .mp-role { background: var(--primary-gradient); }
+
+        /* --- Mobile Optimization --- */
+        @media (max-width: 992px) {
+            .about-compact-card { flex-direction: column; min-height: auto; }
+            .about-menu { width: 100%; flex-direction: row; overflow-x: auto; padding: 20px; border-right: none; border-bottom: 1px solid var(--border-ui); scroll-behavior: smooth;}
+            .about-menu::-webkit-scrollbar { display: none; }
+            .about-tab-btn { flex-shrink: 0; width: 260px; margin-bottom: 0; margin-right: 15px;}
+            .about-tab-btn.active { transform: translateY(-4px) translateX(0); }
+            
+            .about-content-area { padding: 30px 20px; }
+            .mission-grid { grid-template-columns: 1fr; }
+            
+            /* Bù trừ khoảng trống tràn viền cho điện thoại */
+            .mp-cover { margin-top: -30px; margin-left: -20px; margin-right: -20px; width: calc(100% + 40px); }
+            .mp-body { padding: 0; text-align: center; display: flex; flex-direction: column; align-items: center;}
+            .mp-avatar { margin-left: auto; margin-right: auto;}
+            .mp-socials { justify-content: center; }
+        }
 
         /* --- CTA --- */
         .cta-section { margin: 100px 0; padding: 80px; border-radius: 40px; background: linear-gradient(135deg, var(--primary), #FF5E62); text-align: center; color: white; position: relative; overflow: hidden; box-shadow: 0 30px 60px rgba(255, 94, 98, 0.3); }
@@ -838,14 +949,14 @@
             <div class="bento-grid">
                 <div class="bento-item large">
                     <div class="bento-icon"><i class="fas fa-pen-fancy"></i></div>
-                    <div><h3>Phòng luyện đề</h3><p>Hệ thống tự động random đề, tính giờ và chấm điểm chi tiết từng câu chữ ngay sau khi nộp. Nhận xét lỗi dùng từ, lỗi ngữ pháp và gợi ý sửa.</p></div>
+                    <div><h3>Phòng luyện đề</h3><p>Hệ thống tự động ngẫu nhiên đề, tính giờ và chấm điểm chi tiết từng câu chữ ngay sau khi nộp. Nhận xét lỗi dùng từ, lỗi ngữ pháp và gợi ý sửa.</p></div>
                     <i class="fas fa-robot bento-decoration"></i>
                 </div>
                 <div class="bento-item"><div class="bento-icon"><i class="fas fa-book-reader"></i></div><h3>Bản tin Văn học</h3><p>Gồm kho tài liệu học tập & những dẫn chứng "đắt giá".</p></div>
                 <div class="bento-item"><div class="bento-icon"><i class="fas fa-users"></i></div><h3>Cộng đồng</h3><p>Thảo luận, chia sẻ bí kíp cùng các bạn học sinh trên cả nước.</p></div>
                 <div class="bento-item large">
                     <div class="bento-icon"><i class="fas fa-route"></i></div>
-                    <div><h3>Nhật ký học tập (Gamification)</h3><p>Biến việc học thành trò chơi. Hoàn thành bài học để mở khóa cấp độ mới, tích lũy streak và nhận huy hiệu vinh danh.</p></div>
+                    <div><h3>Nhật ký học tập (Gamification)</h3><p>Biến việc học thành trò chơi. Hoàn thành bài học để mở khóa cấp độ mới, tích lũy chuỗi và nhận huy hiệu vinh danh.</p></div>
                     <i class="fas fa-flag-checkered bento-decoration"></i>
                 </div>
             </div>
@@ -859,9 +970,9 @@
             <div class="reviews-grid">
                 <div class="review-card">
                     <div class="user-info">
-                        <img src="IMG/trinhan.png" alt="User" class="user-avatar">
+                        <img src="IMG/thungan.png" alt="User" class="user-avatar">
                         <div>
-                            <div style="font-weight: 700;">Trí Nhân</div>
+                            <div style="font-weight: 700;">Thu Ngân</div>
                             <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                         </div>
                     </div>
@@ -869,9 +980,9 @@
                 </div>
                 <div class="review-card">
                     <div class="user-info">
-                        <img src="IMG/cattuong.png" alt="User" class="user-avatar">
+                        <img src="IMG/vinhan.png" alt="User" class="user-avatar">
                         <div>
-                            <div style="font-weight: 700;">Cát Tường</div>
+                            <div style="font-weight: 700;">Vĩnh An</div>
                             <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                         </div>
                     </div>
@@ -879,9 +990,9 @@
                 </div>
                 <div class="review-card">
                     <div class="user-info">
-                        <img src="IMG/dangkhoa.png" alt="User" class="user-avatar">
+                        <img src="IMG/minhnguyet.png" alt="User" class="user-avatar">
                         <div>
-                            <div style="font-weight: 700;">Đăng Khoa</div>
+                            <div style="font-weight: 700;">Minh Nguyệt</div>
                             <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                         </div>
                     </div>
@@ -971,20 +1082,124 @@
         </section>
 
         <section id="about" class="section-padding">
-            <div class="about-wrap">
-                <div>
-                    <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 20px;">Về chúng tôi</h2>
-                    <p style="font-size: 1.1rem; color: var(--text-light); line-height: 1.8; margin-bottom: 25px;">
-                        <b>HopVan</b> được xây dựng bởi đội ngũ đam mê văn học và công nghệ, với sứ mệnh xóa bỏ nỗi sợ môn Văn của học sinh Việt Nam. Chúng tôi tin rằng, với phương pháp đúng đắn và sự hỗ trợ của AI, ai cũng có thể viết hay.
-                    </p>
-                    <ul class="check-list">
-                        <li><i class="fas fa-check"></i> <span>Nội dung bám sát chương trình GDPT 2018</span></li>
-                        <li><i class="fas fa-check"></i> <span>Công nghệ AI chữa bài tiên tiến</span></li>
-                        <li><i class="fas fa-check"></i> <span>Tiến trình học tập tối ưu theo cá nhân</span></li>
-                    </ul>
+            <div class="container">
+                <div class="section-header">
+                    <h2>Về Chúng Tôi</h2>
+                    <p style="color: var(--text-light)">Đội ngũ sáng lập & Sứ mệnh của HopVan</p>
                 </div>
-                <div>
-                    <img src="IMG/About.png" alt="About Team" class="about-img">
+                
+                <div class="about-section">
+                    <div class="about-compact-card">
+                        
+                        <div class="about-menu">
+                            <button class="about-tab-btn active" onclick="switchAboutTab('hopvan', this)">
+                                <img src="LOGO.WEBP" class="tab-icon" alt="HopVan">
+                                <div class="tab-text">
+                                    <span class="tab-title">Dự án HopVan</span>
+                                    <span class="tab-sub">Sứ mệnh & Tầm nhìn</span>
+                                </div>
+                            </button>
+
+                            <button class="about-tab-btn" onclick="switchAboutTab('mem1', this)">
+                                <img src="IMG/trinhan.png" onerror="this.src='LOGO.WEBP'" class="tab-icon" alt="Nguyễn Văn A">
+                                <div class="tab-text">
+                                    <span class="tab-title">Nguyễn Trí Nhân</span>
+                                    <span class="tab-sub">Visual & Web Developer</span>
+                                </div>
+                            </button>
+
+                            <button class="about-tab-btn" onclick="switchAboutTab('mem2', this)">
+                                <img src="IMG/cattuong.png" onerror="this.src='LOGO.WEBP'" class="tab-icon" alt="Trần Thị B">
+                                <div class="tab-text">
+                                    <span class="tab-title">Châu Ngọc Cát Tường</span>
+                                    <span class="tab-sub">Content Developer</span>
+                                </div>
+                            </button>
+
+                            <button class="about-tab-btn" onclick="switchAboutTab('mem3', this)">
+                                <img src="IMG/dangkhoa.png" onerror="this.src='LOGO.WEBP'" class="tab-icon" alt="Lê Văn C">
+                                <div class="tab-text">
+                                    <span class="tab-title">Nguyễn Hoàng Đăng Khoa</span>
+                                    <span class="tab-sub">Content Developer</span>
+                                </div>
+                            </button>
+                        </div>
+
+                        <div class="about-content-area">
+                            
+                            <div id="tab-hopvan" class="about-pane active">
+                                <i class="fas fa-rocket pane-watermark"></i>
+                                <div class="hopvan-mission">
+                                    <h3>Xóa bỏ nỗi sợ môn Văn</h3>
+                                    <p>Được xây dựng bởi những người trẻ đam mê văn học và công nghệ, HopVan mang trong mình sứ mệnh ứng dụng Trí tuệ nhân tạo (AI) để tạo ra một phương pháp học tập hoàn toàn mới: <b>Cá nhân hóa, Tư duy logic và Khơi nguồn sáng tạo.</b></p>
+                                    <div class="mission-grid">
+                                        <div class="mission-item"><i class="fas fa-check-circle"></i> Chuẩn GDPT 2018</div>
+                                        <div class="mission-item"><i class="fas fa-robot"></i> AI chấm bài chi tiết</div>
+                                        <div class="mission-item"><i class="fas fa-gamepad"></i> Học qua Gamification</div>
+                                        <div class="mission-item"><i class="fas fa-magic"></i> Giao diện tối giản</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="tab-mem1" class="about-pane">
+                                <i class="fas fa-code pane-watermark"></i>
+                                <div class="mp-cover"></div>
+                                <div class="mp-body">
+                                    <img src="IMG/trinhan.png" onerror="this.src='LOGO.WEBP'" class="mp-avatar" alt="User">
+                                    <div class="mp-info">
+                                        <h3>Nguyễn Trí Nhân</h3>
+                                        <span class="mp-role">Visual & Web Developer</span>
+                                    </div>
+                                    <p class="mp-desc">
+                                        Học sinh lớp 12A8 – Trường THPT FPT Cần Thơ, phụ trách thiết kế, lập trình và phát triển hệ thống cho website HOPVAN.<br>
+                                        Sở hữu tư duy công nghệ linh hoạt cùng khả năng sáng tạo trong lập trình và truyền thông số, Nhân đã góp phần tạo nên một nền tảng hiện đại, liên tục đổi mới để phục vụ người dùng hiệu quả hơn mỗi ngày.</p>
+                                    <div class="mp-socials">
+                                        <a href="https://www.facebook.com/tris.nhaan" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                                        <a href="mailto:nhanntfct30802@gmail.com" title="Email"><i class="fas fa-envelope"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="tab-mem2" class="about-pane">
+                                <i class="fas fa-brain pane-watermark"></i>
+                                <div class="mp-cover"></div>
+                                <div class="mp-body">
+                                    <img src="IMG/cattuong.png" onerror="this.src='LOGO.WEBP'" class="mp-avatar" alt="User">
+                                    <div class="mp-info">
+                                        <h3>Châu Ngọc Cát Tường</h3>
+                                        <span class="mp-role">Content Developer</span>
+                                    </div>
+                                    <p class="mp-desc">
+                                    Học sinh lớp 12A8 – Trường THPT FPT Cần Thơ, phụ trách nội dung, ý tưởng và truyền thông của HOPVAN.<br>
+                                    Với khả năng sáng tạo giàu cảm hứng cùng tư duy ý tưởng mới mẻ, Cát Tường đã góp phần định hình màu sắc riêng cho dự án và lan tỏa tinh thần học tập tích cực đến cộng đồng.</p>
+                                    <div class="mp-socials">
+                                        <a href="https://www.facebook.com/cat.tuong.708243" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                                        <a href="mailto:tuongcncfct30670@gmail.com" title="Email"><i class="fas fa-envelope"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="tab-mem3" class="about-pane">
+                                <i class="fas fa-pen-nib pane-watermark"></i>
+                                <div class="mp-cover"></div>
+                                <div class="mp-body">
+                                    <img src="IMG/dangkhoa.png" onerror="this.src='LOGO.WEBP'" class="mp-avatar" alt="User">
+                                    <div class="mp-info">
+                                        <h3>Nguyễn Hoàng Đăng Khoa</h3>
+                                        <span class="mp-role">Content Developer</span>
+                                    </div>
+                                    <p class="mp-desc">
+                                    Học sinh lớp 12A8 – Trường THPT FPT Cần Thơ, phụ trách nội dung và kiến thức Ngữ văn trên HOPVAN.<br>
+                                    Với tinh thần yêu tiếng Việt, yêu văn chương và mong muốn lan tỏa giá trị học thuật chân thực, Khoa đã góp phần xây dựng nên những nội dung sâu sắc, giàu cảm hứng dành cho cộng đồng người học.</p>
+                                    <div class="mp-socials">
+                                        <a href="https://www.facebook.com/ven.ste.351" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                                        <a href="mailto:khoanhdfct30731@gmail.com" title="Email"><i class="fas fa-envelope"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1008,20 +1223,20 @@
                 </a>
                 <p>Nền tảng học tập Ngữ Văn tích hợp AI tiên phong. Đồng hành cùng bạn trên con đường chinh phục tri thức.</p>
                 <div class="social-links">
-                    <a href="https://www.facebook.com/hopvanapp" class="social-item"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://www.facebook.com/hopvanapp" class="social-item"><i class="fab fa-tiktok"></i></a>
-                    <a href="https://www.facebook.com/hopvanapp" class="social-item"><i class="fab fa-youtube"></i></a>
-                    <a href="https://discord.com/invite/EhsQyEAk2k" class="social-item"><i class="fab fa-discord"></i></a>
+                    <a href="https://www.facebook.com/hopvanapp" target="_blank" class="social-item"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.facebook.com/hopvanapp" target="_blank" class="social-item"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://www.facebook.com/hopvanapp" target="_blank" class="social-item"><i class="fab fa-youtube"></i></a>
+                    <a href="https://discord.com/invite/EhsQyEAk2k" target="_blank" class="social-item"><i class="fab fa-discord"></i></a>
                 </div>
             </div>
             
             <div class="footer-col">
                 <h4>Khám phá</h4>
                 <ul>
-                    <li><a href="dashboard/bantinvanhoc.html">Bản tin Văn học</a></li>
-                    <li><a href="dashboard/nhatkyhoctap.html">Nhật ký học tập</a></li>
-                    <li><a href="dashboard/phongluyende.html">Phòng luyện đề</a></li>
-                    <li><a href="huongdansudung.html">Hướng dẫn sử dụng</a></li>
+                    <li><a href="dashboard/bantinvanhoc.html" target="_blank">Bản tin Văn học</a></li>
+                    <li><a href="dashboard/nhatkyhoctap.html" target="_blank">Nhật ký học tập</a></li>
+                    <li><a href="dashboard/phongluyende.html" target="_blank">Phòng luyện đề</a></li>
+                    <li><a href="huongdansudung.html" target="_blank">Hướng dẫn sử dụng</a></li>
                 </ul>
             </div>
 
@@ -1038,7 +1253,7 @@
             <div class="footer-col">
                 <h4>Tải ứng dụng</h4>
                 <div class="download-container">
-                    <a href="apk.html" class="btn-app">
+                    <a href="apk.html" target="_blank" class="btn-app">
                         <i class="fab fa-android" style="color: #3DDC84;"></i>
                         <div class="app-text">
                             <span class="app-sub">Tải file cài đặt</span>
@@ -1073,7 +1288,7 @@
             ">
                 <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px;">HopVan Platform</span>
                 <span style="width: 4px; height: 4px; border-radius: 50%; background-color: #22c55e;"></span>
-                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.2.1</span>
+                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.2.2</span>
             </div>
         </div>
     </footer>
@@ -1497,6 +1712,22 @@
                     localStorage.setItem('theme', 'light');
                 }
             });
+        }
+    </script>
+
+    <script>
+        // Hàm chuyển đổi Tab trong phần Về Chúng Tôi
+        function switchAboutTab(tabId, btnElement) {
+            // 1. Tắt active tất cả các nút
+            document.querySelectorAll('.about-tab-btn').forEach(btn => btn.classList.remove('active'));
+            // Bật active cho nút vừa bấm
+            btnElement.classList.add('active');
+            
+            // 2. Ẩn tất cả các nội dung (pane)
+            document.querySelectorAll('.about-pane').forEach(pane => pane.classList.remove('active'));
+            // Hiện nội dung tương ứng
+            const targetPane = document.getElementById('tab-' + tabId);
+            if(targetPane) targetPane.classList.add('active');
         }
     </script>
     

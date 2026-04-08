@@ -285,7 +285,7 @@
             <a href="../dashboard/phongluyende.html" class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:text-orange-500 transition border border-gray-100">
                 <i class="fas fa-arrow-left"></i>
             </a>
-            <h1 class="exam-title">Luyện Đề Trắc Nghiệm</h1>
+            <h1 class="exam-title">Luyện đề trắc nghiệm</h1>
         </div>
         <div class="exam-timer">
             <i class="far fa-clock"></i> <span id="timer">40:00</span>
@@ -440,13 +440,17 @@
         isSubmitted = true;
         let score = 0;
 
+        // Xử lý logic chấm điểm UI
         allQuestions.forEach((q, i) => {
             const selected = userAnswers[i];
             const correct = q.correct;
             const dot = document.getElementById(`dot-${i}`);
+            
             if(q.explanation) document.getElementById(`explain-${i}`).classList.remove('hidden');
+            
             if (selected === correct) {
-                score++; dot.className = 'q-dot correct';
+                score++; 
+                dot.className = 'q-dot correct';
                 document.getElementById(`lbl-${i}-${selected}`).className = 'opt-label correct';
             } else {
                 dot.className = 'q-dot wrong';
@@ -455,6 +459,7 @@
             }
         });
 
+        // Tính điểm hệ 10
         const finalScore = (score / allQuestions.length) * 10;
         document.getElementById('score-text').innerText = `${finalScore.toFixed(2)} ĐIỂM`;
         document.getElementById('score-display').classList.remove('hidden');
@@ -462,19 +467,37 @@
         document.getElementById('btn-retry').classList.remove('hidden');
         clearInterval(timerInterval);
 
-        if (auth.currentUser) {
-                // Lưu vào Collection 'exam_history'
+        // Lưu lịch sử (Có bọc Try-Catch bảo vệ)
+        try {
+            if (auth.currentUser) {
+                const totalQuestions = allQuestions.length;
+                const answered = Object.keys(userAnswers).length;
+                
                 await addDoc(collection(db, "exam_history"), {
-                    userId: auth.currentUser.uid, // ID học sinh
+                    userId: auth.currentUser.uid, 
                     userName: auth.currentUser.displayName || auth.currentUser.email.split('@')[0],
-                    prompt: q.title || "Đề Luyện Tập", // Tên đề
-                    essay: content, // Bài làm nguyên văn
-                    score: result.score, // Điểm số AI chấm
-                    feedback: result.correction_html, // Lời phê & sửa lỗi của AI
-                    timestamp: serverTimestamp() // Thời gian nộp chuẩn Google
+                    examId: "QUIZ_EXAM",
+                    prompt: "Đề Trắc Nghiệm", 
+                    // Lưu lại báo cáo tóm tắt thay cho bài tự luận
+                    essay: `Học sinh đã làm bài thi trắc nghiệm.\n- Tổng số câu hỏi: ${totalQuestions}\n- Số câu đã chọn: ${answered}\n- Số câu đúng: ${score}`, 
+                    score: parseFloat(finalScore.toFixed(2)), 
+                    human_score: 100, // Mặc định 100% vì là trắc nghiệm
+                    general_comment: `Bạn đã trả lời đúng ${score}/${totalQuestions} câu hỏi trắc nghiệm.`,
+                    // Phản hồi mặc định cho trắc nghiệm
+                    feedback: "<p class='text-gray-500 italic'>* Hệ thống chấm điểm trắc nghiệm tự động. Vui lòng đối chiếu đáp án trực tiếp tại phòng luyện đề để xem giải thích chi tiết.</p>", 
+                    strengths: [],
+                    weaknesses: [],
+                    orientation: "",
+                    timestamp: serverTimestamp() 
                 });
             }
-        document.getElementById('loading-overlay').style.display = 'none';
+        } catch (error) {
+            console.error("Lỗi lưu lịch sử:", error);
+            showGenericPopup("Cảnh báo", "Đã chấm xong nhưng không thể lưu lịch sử làm bài do lỗi kết nối.", "warning");
+        } finally {
+            // FINALLY đảm bảo dù thành công hay thất bại, màn hình loading đều sẽ tắt
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
     };
 
     let timerInterval;

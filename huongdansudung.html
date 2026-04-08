@@ -31,66 +31,32 @@
         }
 
         /* --- GLOBAL SCROLLBAR STYLE --- */
-
-        /* 1. Thiết lập độ rộng/cao của thanh trượt */
-        ::-webkit-scrollbar {
-            width: 10px;  /* Độ rộng cho thanh dọc */
-            height: 10px; /* Độ cao cho thanh ngang */
-        }
-
-        /* 2. Thiết lập rãnh trượt (Track) - Nền chìm */
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 143, 80, 0.05); /* Màu cam cực nhạt, gần như trong suốt */
-            border-radius: 10px;
-        }
-
-        /* 3. Thiết lập tay nắm (Thumb) - Phần di chuyển */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
         ::-webkit-scrollbar-thumb {
-            background-color: rgba(255, 143, 80, 0.3); /* Mặc định là cam nhạt */
-            border-radius: 10px; /* Bo tròn mềm mại */
-            
-            /* Mẹo: Tạo viền trong suốt để thanh trượt trông nhỏ hơn và "lơ lửng" */
-            border: 2px solid transparent;
-            background-clip: content-box;
-            transition: background-color 0.3s ease;
+            background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; 
+            border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease;
         }
-
-        /* 4. Hiệu ứng khi di chuột vào (Hover) */
-        ::-webkit-scrollbar-thumb:hover {
-            background-color: #FF8F50; /* Đổi sang màu cam chính thương hiệu */
-            border: 1px solid transparent; /* Làm thanh trượt to ra một chút khi hover */
-        }
-
-        /* 5. (Tùy chọn) Ẩn nút mũi tên 2 đầu (nếu trình duyệt hiển thị) */
-        ::-webkit-scrollbar-button {
-            display: none;
-        }
+        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
+        ::-webkit-scrollbar-button { display: none; }
 
         /* --- SIDEBAR --- */
         aside {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.6);
-            height: 100vh;
-            position: sticky;
-            top: 0;
-            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.6); height: 100vh;
+            position: sticky; top: 0; overflow-y: auto;
         }
 
         .sidebar-link {
-            display: flex; align-items: center; gap: 12px;
-            padding: 10px 16px; border-radius: 10px;
-            font-size: 0.9rem; color: var(--text-sub); font-weight: 600;
-            transition: 0.2s; margin-bottom: 2px;
+            display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 10px;
+            font-size: 0.9rem; color: var(--text-sub); font-weight: 600; transition: 0.2s; margin-bottom: 2px;
         }
         .sidebar-link:hover { background: rgba(255, 255, 255, 0.8); color: var(--primary-dark); transform: translateX(2px); }
         .sidebar-link.active {
-            background: linear-gradient(90deg, #fff7ed 0%, #ffffff 100%);
-            color: var(--primary); box-shadow: 0 2px 8px rgba(255, 143, 80, 0.1);
+            background: linear-gradient(90deg, #fff7ed 0%, #ffffff 100%); color: var(--primary); box-shadow: 0 2px 8px rgba(255, 143, 80, 0.1);
         }
         .sidebar-link.active::before {
-            content: ''; position: absolute; left: 0; top: 15%; height: 70%; width: 4px;
-            background: var(--primary); border-radius: 0 4px 4px 0;
+            content: ''; position: absolute; left: 0; top: 15%; height: 70%; width: 4px; background: var(--primary); border-radius: 0 4px 4px 0;
         }
 
         .sidebar-heading {
@@ -108,10 +74,8 @@
 
         /* --- CONTENT --- */
         .section-card {
-            background: rgba(255, 255, 255, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            border-radius: 24px; padding: 40px; margin-bottom: 40px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px; padding: 40px; margin-bottom: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.02);
             transition: 0.5s; position: relative;
         }
         .section-card:hover { background: white; box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
@@ -124,11 +88,9 @@
         .step-list { list-style: none; padding: 0; counter-reset: my-counter; }
         .step-list li { position: relative; padding-left: 45px; margin-bottom: 15px; }
         .step-list li::before {
-            counter-increment: my-counter; content: counter(my-counter);
-            position: absolute; left: 0; top: 0;
-            width: 28px; height: 28px; background: white; border: 2px solid #fdba74;
-            color: var(--primary); border-radius: 50%; font-weight: 700; font-size: 0.8rem;
-            display: flex; align-items: center; justify-content: center;
+            counter-increment: my-counter; content: counter(my-counter); position: absolute; left: 0; top: 0;
+            width: 28px; height: 28px; background: white; border: 2px solid #fdba74; color: var(--primary); 
+            border-radius: 50%; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; justify-content: center;
         }
 
         /* Role Badge */
@@ -137,8 +99,7 @@
             font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
             margin-bottom: 15px;
         }
-        .badge-teacher { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
-        .badge-student { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+        .badge-feature { background: #ffedd5; color: #ea580c; border: 1px solid #fed7aa; }
 
         /* Animation */
         .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -180,36 +141,31 @@
                 </div>
             </a>
 
-            <nav id="sidebar-nav" class="flex-1 overflow-y-auto px-4 py-2">
+            <nav id="sidebar-nav" class="flex-1 overflow-y-auto px-4 py-2 flex flex-col">
                 <a href="#intro" class="sidebar-link active">
                     <div class="icon-box"><i class="fas fa-info"></i></div> Giới thiệu
                 </a>
 
-                <div class="sidebar-heading">Dành cho Giáo viên</div>
-                <a href="#teacher-class" class="sidebar-link">
-                    <div class="icon-box"><i class="fas fa-chalkboard-teacher"></i></div> Tạo & Quản lý lớp
-                </a>
-                <a href="#teacher-grading" class="sidebar-link">
-                    <div class="icon-box"><i class="fas fa-marker"></i></div> Chấm điểm & Feedback
-                </a>
-
-                <div class="sidebar-heading">Dành cho Học sinh</div>
-                <a href="#student-class" class="sidebar-link">
-                    <div class="icon-box"><i class="fas fa-user-graduate"></i></div> Tham gia lớp học
-                </a>
-                <a href="#student-news" class="sidebar-link">
+                <div class="sidebar-heading">Tính năng chính</div>
+                <a href="#news" class="sidebar-link">
                     <div class="icon-box"><i class="fas fa-newspaper"></i></div> Bản tin Văn học
                 </a>
-                <a href="#student-diary" class="sidebar-link">
-                    <div class="icon-box"><i class="fas fa-book-open"></i></div> Nhật ký & Gamification
+                <a href="#theory" class="sidebar-link">
+                    <div class="icon-box"><i class="fas fa-book"></i></div> Lý thuyết
                 </a>
-                <a href="#student-practice" class="sidebar-link">
+                <a href="#diary" class="sidebar-link">
+                    <div class="icon-box"><i class="fas fa-gamepad"></i></div> Nhật ký & Gamification
+                </a>
+                <a href="#practice" class="sidebar-link">
                     <div class="icon-box"><i class="fas fa-pen-nib"></i></div> Luyện đề AI
                 </a>
+                
+                <div class="sidebar-heading">Khác</div>
                 <a href="#community" class="sidebar-link">
                     <div class="icon-box"><i class="fas fa-users"></i></div> Cộng đồng
                 </a>
-                <div class="mt-auto pt-6">
+                
+                <div class="mt-auto pt-6 pb-4">
                     <div class="p-5 bg-white rounded-2xl border border-orange-100 shadow-sm relative overflow-hidden group cursor-pointer hover:shadow-md transition">
                         <div class="absolute -right-4 -top-4 bg-orange-50 w-16 h-16 rounded-full group-hover:scale-150 transition duration-500"></div>
                         <p class="text-sm font-bold text-gray-800 relative z-10">Gặp khó khăn?</p>
@@ -226,164 +182,127 @@
         <main class="flex-1 p-6 md:p-12 w-full max-w-5xl mx-auto">
             <article class="prose w-full max-w-none text-gray-600">
                 
-                <section id="intro" class="reveal min-h-[40vh] flex flex-col justify-center mb-12">
+                <section id="intro" class="reveal min-h-[40vh] flex flex-col justify-center mb-8">
                     <span class="text-orange-500 font-bold uppercase tracking-widest text-xs mb-2">Hướng Dẫn Sử Dụng</span>
                     <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-6 leading-tight">
-                        Làm Chủ Kiến Thức <br>
+                        Làm chủ kiến thức <br>
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">Cùng HopVan AI</span>
                     </h1>
-                    <p class="text-lg max-w-2xl">Chào mừng bạn đến với HopVan! Dưới đây là hướng dẫn chi tiết các tính năng dành cho cả Giáo viên và Học sinh để tối ưu hóa trải nghiệm dạy và học Văn.</p>
+                    <p class="text-lg max-w-2xl">Chào mừng bạn đến với HopVan! Dưới đây là hướng dẫn chi tiết các tính năng giúp bạn tối ưu hóa trải nghiệm tự học và bứt phá điểm số môn Văn.</p>
                 </section>
 
-                <hr class="border-gray-200 mb-12">
-
-                <h3 class="text-2xl font-black text-blue-800 mb-6 flex items-center gap-3">
-                    <i class="fas fa-user-tie bg-blue-100 p-3 rounded-xl"></i> Khu vực Giáo viên
-                </h3>
-
-                <section id="teacher-class" class="reveal section-card">
-                    <span class="h2-number">GV1</span>
-                    <div class="role-badge badge-teacher">Teacher Zone</div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Tạo & Quản lý Lớp học</h2>
-                    <p>Tính năng Classroom cho phép giáo viên tạo không gian học tập riêng, giao bài tập và theo dõi tiến độ của học sinh.</p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
-                        <div class="bg-blue-50/50 p-6 rounded-2xl border border-blue-100">
-                            <h4 class="font-bold text-blue-700 mb-3 text-sm uppercase">Cách tạo lớp mới</h4>
-                            <ul class="step-list text-sm">
-                                <li>Đăng nhập tài khoản Giáo viên.</li>
-                                <li>Vào menu <strong>"Lớp học của tôi"</strong> > Bấm nút <strong>"Tạo lớp mới"</strong>.</li>
-                                <li>Điền thông tin: Tên lớp (VD: 12A8), Môn học, Mô tả.</li>
-                                <li>Sau khi tạo, hệ thống sẽ cấp <strong>Mã Lớp (Class Code)</strong>.</li>
-                                <li><strong>Quan trọng:</strong> Sao chép Mã lớp này và gửi cho học sinh để các em tham gia.</li>
-                            </ul>
+                <section id="news" class="reveal section-card">
+                    <span class="h2-number">01</span>
+                    <div class="role-badge badge-feature">Tính năng</div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">BẢN TIN VĂN HỌC</h2>
+                    <p>Kho tàng kiến thức được cập nhật liên tục. Nơi bạn tìm thấy dẫn chứng Nghị luận xã hội, các bài văn mẫu chọn lọc và những góc nhìn đa chiều.</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                        <div class="bg-gray-50 p-4 rounded-xl text-center border border-gray-100 transition hover:bg-white hover:border-orange-200 hover:shadow-md cursor-pointer">
+                            <i class="fas fa-search text-orange-500 mb-2 text-xl"></i>
+                            <p class="text-xs font-bold text-gray-700">Tìm kiếm nhanh</p>
                         </div>
-                        <div class="flex items-center justify-center bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm group">
-                            <img src="IMG/taolopmoi.png" 
-                                 alt="Giao diện tạo lớp học" 
-                                 class="w-full h-auto object-cover transform group-hover:scale-105 transition duration-500">
+                        <div class="bg-gray-50 p-4 rounded-xl text-center border border-gray-100 transition hover:bg-white hover:border-blue-200 hover:shadow-md cursor-pointer">
+                            <i class="fas fa-filter text-blue-500 mb-2 text-xl"></i>
+                            <p class="text-xs font-bold text-gray-700">Lọc theo chủ đề</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-xl text-center border border-gray-100 transition hover:bg-white hover:border-red-200 hover:shadow-md cursor-pointer">
+                            <i class="fas fa-bookmark text-red-500 mb-2 text-xl"></i>
+                            <p class="text-xs font-bold text-gray-700">Lưu bài viết</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-xl text-center border border-gray-100 transition hover:bg-white hover:border-green-200 hover:shadow-md cursor-pointer">
+                            <i class="fas fa-share-alt text-green-500 mb-2 text-xl"></i>
+                            <p class="text-xs font-bold text-gray-700">Đọc đa nền tảng</p>
                         </div>
                     </div>
                 </section>
 
-                <section id="teacher-grading" class="reveal section-card">
-                    <span class="h2-number">GV2</span>
-                    <div class="role-badge badge-teacher">Teacher Zone</div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Quản lý Bài nộp & Chấm điểm</h2>
-                    <p>Giáo viên có thể xem danh sách bài nộp, chấm điểm thủ công hoặc sử dụng AI hỗ trợ gợi ý chấm.</p>
-                    <ul class="step-list text-sm mt-4">
-                        <li>Truy cập vào Lớp học cụ thể > Tab <strong>"Bài tập"</strong>.</li>
-                        <li>Chọn bài tập muốn chấm > Xem danh sách học sinh đã nộp.</li>
-                        <li>Bấm vào tên học sinh để xem chi tiết bài làm.</li>
-                        <li>Sử dụng công cụ <strong>"Gợi ý chấm AI"</strong> để tham khảo nhận xét (nếu cần).</li>
-                        <li>Nhập điểm số và lời phê, sau đó bấm <strong>"Trả bài"</strong> để công bố điểm cho học sinh.</li>
+                <section id="theory" class="reveal section-card">
+                    <span class="h2-number">02</span>
+                    <div class="role-badge badge-feature bg-red-50 text-red-600 border-red-200">Mới cập nhật</div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">KHO LÝ THUYẾT VÀ TÁC PHẨM</h2>
+                    <p>Hệ thống bài giảng, kiến thức trọng tâm và phân tích tác phẩm chi tiết bám sát chương trình GDPT 2018. Là hành trang vững chắc trước khi bước vào phòng luyện đề.</p>
+                    
+                    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 border border-orange-100 bg-white rounded-xl shadow-sm flex items-start gap-4 hover:-translate-y-1 transition duration-300">
+                            <div class="bg-orange-100 text-orange-500 w-12 h-12 rounded-xl flex items-center justify-center shrink-0 text-xl"><i class="fas fa-feather-alt"></i></div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-sm mb-1">Bài giảng PDF</h4>
+                                <p class="text-xs text-gray-500 leading-relaxed">Các bài giảng chi tiết mới nhất, bám sát chương trình mới GDPT 2018.</p>
+                            </div>
+                        </div>
+                        <div class="p-4 border border-blue-100 bg-white rounded-xl shadow-sm flex items-start gap-4 hover:-translate-y-1 transition duration-300">
+                            <div class="bg-blue-100 text-blue-500 w-12 h-12 rounded-xl flex items-center justify-center shrink-0 text-xl"><i class="fas fa-project-diagram"></i></div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-sm mb-1">Sơ đồ tư duy</h4>
+                                <p class="text-xs text-gray-500 leading-relaxed">Hệ thống hóa kiến thức bằng sơ đồ trực quan, ngắn gọn, dễ nhớ, dễ hiểu.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="diary" class="reveal section-card">
+                    <span class="h2-number">03</span>
+                    <div class="role-badge badge-feature">Tiến độ</div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">NHẬT KÝ HỌC TẬP (GAMIFICATION)</h2>
+                    <p>Biến việc học thành thói quen thú vị như chơi game. Hệ thống sẽ theo dõi tiến độ học tập và thưởng cho những nỗ lực của bạn.</p>
+                    <ul class="step-list text-sm mt-6">
+                        <li><strong>Hành trình văn chương:</strong> Lộ trình học được chia thành các trạm. Hoàn thành trạm trước để mở khóa trạm sau.</li>
+                        <li><strong>Streak (Chuỗi ngày):</strong> Đăng nhập và làm bài mỗi ngày để giữ chuỗi, thăng hạng từ "Tân Binh" lên "Người Ở Lại".</li>
+                        <li><strong>Keys (Chìa khóa):</strong> Điểm danh và hoàn thành bài tập để nhận Keys. Dùng Keys mở khóa tài liệu VIP hoặc các vòng luyện đề khó.</li>
+                        <li><strong>Bảng kỹ năng:</strong> Phân tích điểm mạnh/yếu qua 4 trụ cột: Đọc hiểu, NLXH, NLVH và Ngôn ngữ tư duy.</li>
                     </ul>
                 </section>
 
-                <hr class="border-gray-200 my-12">
-
-                <h3 class="text-2xl font-black text-orange-600 mb-6 flex items-center gap-3">
-                    <i class="fas fa-user-graduate bg-orange-100 p-3 rounded-xl"></i> Khu vực Học sinh
-                </h3>
-
-                <section id="student-class" class="reveal section-card">
-                    <span class="h2-number">HS1</span>
-                    <div class="role-badge badge-student">Student Zone</div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Tham gia Lớp học trực tuyến</h2>
-                    <p>Kết nối với lớp học của thầy cô để nhận bài tập và nộp bài trực tuyến.</p>
+                <section id="practice" class="reveal section-card">
+                    <span class="h2-number">04</span>
+                    <div class="role-badge badge-feature">Thực chiến</div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">PHÒNG LUYỆN ĐỀ AI</h2>
+                    <p>Công cụ mạnh mẽ nhất giúp bạn rèn luyện kỹ năng viết văn thực tế và nhận phản hồi tức thì.</p>
                     
-                    <div class="bg-orange-50 p-6 rounded-2xl border border-orange-100 mt-4">
-                        <h4 class="font-bold text-orange-700 mb-3 text-sm uppercase">Các bước tham gia</h4>
-                        <ol class="step-list text-sm">
-                            <li>Lấy <strong>Mã Lớp (Class Code)</strong> từ giáo viên của bạn.</li>
-                            <li>Vào menu <strong>"Lớp học của tôi"</strong> > Chọn <strong>"Tham gia lớp mới"</strong>.</li>
-                            <li>Nhập mã lớp (6 ký tự) và xác nhận.</li>
-                            <li>Sau khi tham gia thành công, bạn sẽ thấy danh sách bài tập cần làm.</li>
+                    <div class="mt-6 p-5 bg-orange-50 rounded-xl border border-orange-200 text-sm shadow-sm">
+                        <p class="font-bold text-orange-800 mb-3 uppercase tracking-wide text-xs"><i class="fas fa-bolt mr-1"></i> Quy trình tự luyện</p>
+                        <ol class="list-decimal list-inside space-y-2 text-orange-900 font-medium">
+                            <li>Lựa chọn Thể loại mong muốn (Thơ, Truyện, Ký, NLXH, Đọc Hiểu...)</li>
+                            <li>Hệ thống <b>ngẫu nhiên xuất đề</b> từ kho dữ liệu hoặc bạn có thể tự nhập đề cá nhân.</li>
+                            <li>Làm bài trực tiếp vào khung soạn thảo có canh giờ tự động.</li>
+                            <li>Bấm nộp bài và <b>nhận đánh giá từ AI Giám Khảo</b>.</li>
                         </ol>
                     </div>
-                </section>
 
-                <section id="student-news" class="reveal section-card">
-                    <span class="h2-number">HS2</span>
-                    <div class="role-badge badge-student">Student Zone</div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Bản tin Văn học</h2>
-                    <p>Kho tàng kiến thức cập nhật hàng ngày. Nơi bạn tìm thấy dẫn chứng NLXH, lý luận văn học và các bài văn mẫu chọn lọc.</p>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                        <div class="bg-gray-50 p-4 rounded-xl text-center border border-gray-100">
-                            <i class="fas fa-search text-orange-500 mb-2"></i>
-                            <p class="text-xs font-bold">Tìm kiếm nhanh</p>
-                        </div>
-                        <div class="bg-gray-50 p-4 rounded-xl text-center border border-gray-100">
-                            <i class="fas fa-filter text-blue-500 mb-2"></i>
-                            <p class="text-xs font-bold">Lọc chủ đề</p>
-                        </div>
-                        <div class="bg-gray-50 p-4 rounded-xl text-center border border-gray-100">
-                            <i class="fas fa-bookmark text-red-500 mb-2"></i>
-                            <p class="text-xs font-bold">Lưu bài viết</p>
-                        </div>
-                        <div class="bg-gray-50 p-4 rounded-xl text-center border border-gray-100">
-                            <i class="fas fa-share-alt text-green-500 mb-2"></i>
-                            <p class="text-xs font-bold">Chia sẻ</p>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="student-diary" class="reveal section-card">
-                    <span class="h2-number">HS3</span>
-                    <div class="role-badge badge-student">Student Zone</div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Nhật ký & Gamification</h2>
-                    <p>Biến việc học thành thói quen thú vị. Hệ thống sẽ theo dõi tiến độ học tập của bạn.</p>
-                    <ul class="step-list text-sm mt-4">
-                        <li><strong>Streak (Chuỗi ngày):</strong> Đăng nhập và học mỗi ngày để duy trì ngọn lửa nhiệt huyết.</li>
-                        <li><strong>Keys (Chìa khóa):</strong> Hoàn thành bài học để nhận Keys. Dùng Keys để mở khóa các tính năng nâng cao hoặc đổi quà.</li>
-                        <li><strong>Level up:</strong> Tích lũy kinh nghiệm để thăng hạng tài khoản.</li>
-                    </ul>
-                </section>
-
-                <section id="student-practice" class="reveal section-card">
-                    <span class="h2-number">HS4</span>
-                    <div class="role-badge badge-student">Student Zone</div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Phòng luyện đề AI</h2>
-                    <p>Công cụ mạnh mẽ nhất giúp bạn tự luyện viết văn.</p>
-                    <div class="mt-4 p-4 bg-gray-50 rounded-xl border-l-4 border-orange-500 text-sm">
-                        <p class="font-bold text-gray-800 mb-1">Cách hoạt động:</p>
-                        Chọn đề bài có sẵn hoặc tạo đề ngẫu nhiên > Làm bài trực tiếp trên hệ thống > Nộp bài > Nhận kết quả chấm điểm và nhận xét chi tiết từ AI chỉ sau vài giây.
-                    </div>
+                    <p class="text-sm mt-5 italic text-gray-500 border-l-4 border-gray-300 pl-3">
+                        *Lưu ý: Điểm số AI mang tính chất tham khảo dựa trên cấu trúc, lập luận, chính tả và tư duy. Hãy đọc kỹ phần "Bài làm chi tiết" để xem các lỗi dùng từ bị gạch đỏ và gợi ý sửa màu vàng.
+                    </p>
                 </section>
 
                 <hr class="border-gray-200 my-12">
 
                 <section id="community" class="reveal section-card !bg-indigo-50 !border-indigo-100">
-                    <div class="text-center">
-                        <h2 class="text-2xl font-bold text-indigo-900 mb-4">Cộng đồng học tập</h2>
-                        <p class="text-indigo-700 mb-6">Tham gia Discord để trao đổi bài vở, hỏi đáp thắc mắc và giao lưu với hàng ngàn bạn học sinh khác.</p>
-                        <a href="https://discord.com/invite/EhsQyEAk2k" target="_blank" class="inline-flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">
-                            <i class="fab fa-discord"></i> Tham gia Discord
+                    <div class="text-center py-4">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-sm mb-4 text-indigo-500 text-3xl">
+                            <i class="fab fa-discord"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-indigo-900 mb-4">CỘNG ĐỒNG HỌC TẬP</h2>
+                        <p class="text-indigo-700 mb-8 max-w-lg mx-auto">Tham gia kênh Discord của HopVan để trao đổi bài vở, hỏi đáp thắc mắc chuyên sâu và giao lưu với hàng ngàn bạn học sinh khác.</p>
+                        <a href="https://discord.com/invite/EhsQyEAk2k" target="_blank" class="inline-flex items-center gap-2 bg-indigo-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-indigo-700 hover:scale-105 transition duration-300 shadow-lg shadow-indigo-200">
+                            Tham gia Discord ngay
                         </a>
                     </div>
                 </section>
 
             </article>
 
-    <div class="footer-bottom" style="margin-top: 60px; padding-top: 30px; border-top: 1px solid rgba(0,0,0,0.05); width: 100%;">
-        <div class="container" style="text-align: center;">
-            <p style="color: #94a3b8; font-size: 0.9rem; margin: 0;">
-                &copy; 2026 HopVan. All Rights Reserved.
-            </p>
-        </div>
-    </div>
-    <div style="margin-top: 12px; width: 100%; display: flex; justify-content: center;">
-            <div style="
-                display: inline-flex; align-items: center; gap: 6px; 
-                padding: 4px 12px; border-radius: 999px; 
-                background-color: rgba(249, 250, 251, 0.8); border: 1px solid #f3f4f6;
-                cursor: default;
-            ">
-                <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px;">HopVan Platform</span>
-                <span style="width: 4px; height: 4px; border-radius: 50%; background-color: #22c55e;"></span>
-                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.2.1</span>
+            <div class="footer-bottom mt-16 pt-8 border-t border-gray-200 w-full text-center pb-8">
+                <p class="text-gray-400 text-sm m-0">
+                    &copy; 2026 HopVan. All Rights Reserved.
+                </p>
+                <div class="mt-4 flex justify-center">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-gray-200 cursor-default shadow-sm">
+                        <span class="text-[9px] font-black text-gray-400 uppercase letter-spacing-1">HopVan Platform</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                        <span class="text-[10px] font-bold text-orange-500 font-mono">v1.2.2</span>
+                    </div>
+                </div>
             </div>
-        </div>
         </main>
     </div>
 

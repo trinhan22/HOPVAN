@@ -161,7 +161,7 @@ const menuHTML = `
 
             <div class="px-4 mt-4 mb-2 text-[9px] font-black text-gray-400 uppercase tracking-widest opacity-80">Quản Lý Học Tập</div>
             <a href="lythuyet.html" class="sb-link" data-page="lythuyet">
-                <i class="fas fa-feather-alt w-5 text-center"></i> Lý thuyết Ngữ Văn
+                <i class="fas fa-feather-alt w-5 text-center"></i> Lý thuyết Ngữ văn
             </a>
             <a href="phongluyende.html" class="sb-link" data-page="phongluyende">
                 <i class="fas fa-pen-nib w-5 text-center"></i> Phòng luyện đề
@@ -204,7 +204,7 @@ const menuHTML = `
             ">
                 <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px;">HopVan Platform</span>
                 <span style="width: 4px; height: 4px; border-radius: 50%; background-color: #22c55e;"></span>
-                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.2.1</span>
+                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.2.2</span>
             </div>
         </div>
     </div>

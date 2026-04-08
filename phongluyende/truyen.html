@@ -252,7 +252,7 @@
             <div class="header-bar hidden lg:flex">
                 <div class="flex items-center gap-4">
                     <a href="../dashboard/phongluyende.html" class="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-orange-500 transition shadow-sm"><i class="fas fa-arrow-left"></i></a>
-                    <h2 class="text-2xl font-black text-gray-800">Luyện Đề Truyện</h2>
+                    <h2 class="text-2xl font-black text-gray-800">Luyện đề truyện</h2>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="bg-white rounded-xl border border-gray-200 flex items-center p-1 shadow-sm">
@@ -471,10 +471,10 @@
                         </div>
                     </div>
                     <div class="mt-4"><div class="inline-block px-4 py-1.5 bg-orange-50 text-orange-600 rounded-full text-[11px] font-bold border border-orange-100 font-sans">${result.essay_type || "Nghị Luận Văn Học (Truyện)"}</div></div>
-                    <p class="mt-4 text-gray-600 text-center italic max-w-lg font-medium">"${result.general_comment || 'Bài làm đã được AI chấm hoàn tất.'}"</p>
+                    <p class="mt-6 text-gray-600 text-center italic max-w-lg font-medium">"${result.general_comment || 'Bài làm đã được AI chấm hoàn tất.'}"</p>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm mb-6">
+                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm mb-8">
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Độ chân thực (AI Check)</span>
                         <span class="font-bold text-sm" style="color:${barColor}">${humanScore}%</span>
@@ -482,7 +482,7 @@
                     <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                         <div style="width:${humanScore}%; background:${barColor}" class="h-full"></div>
                     </div>
-                    <p class="text-[11px] text-gray-400 mt-2 italic font-light">${result.ai_comment || "Văn phong tự nhiên."}</p>
+                    ${result.ai_comment ? `<p class="text-[11px] text-gray-400 mt-2 italic font-light">${result.ai_comment}</p>` : ''}
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -513,7 +513,7 @@
                     </div>
                     <div class="p-6 md:p-10 bg-white">
                         <div class="leading-[2.2] text-slate-700 text-[1.1rem] space-y-4 text-justify font-light" style="font-family: 'Merriweather', serif;">
-                            ${result.correction_html}
+                            ${result.correction_html || "Không có phản hồi chi tiết."}
                         </div>
                     </div>
                 </div>
@@ -532,6 +532,7 @@
         document.getElementById('ai-correction-box').innerHTML = html;
     };
 
+    // --- 2. XỬ LÝ NỘP BÀI VÀ LƯU DATABASE CHUẨN XÁC ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
         if(content.split(/\s+/).filter(x => x).length < 50) { 
@@ -552,16 +553,15 @@
             const promptResponse = await fetch('prompts.json'); 
             const promptData = await promptResponse.json();
             
-            // BƯỚC KHỬ MÃ ĐỘC: Lọc sạch toàn bộ xuống dòng (\n), ngoặc kép (") từ bài làm học sinh
+            // Khử mã độc
             const safe = (str) => {
                 if (!str) return 'Không có';
                 if (Array.isArray(str)) str = str.join(' | ');
                 return String(str).replace(/"/g, "'").replace(/\n/g, '<br>').replace(/\\/g, "/");
             };
             
-            let systemPrompt = promptData.de_truyen; // <--- ĐỔI TÊN Ở ĐÂY CHO TỪNG FILE (de_tho, de_truyen...)
+            let systemPrompt = promptData.de_truyen; // Gọi đúng Prompt Đề Truyện
             
-            // DÙNG SPLIT.JOIN THAY VÌ REPLACE ĐỂ TRÁNH LỖI KÝ TỰ ĐẶC BIỆT
             systemPrompt = systemPrompt
                 .split('{{TOPIC}}').join(safe(q.topic))
                 .split('{{DOC_HIEU}}').join(safe(q.text))
@@ -587,7 +587,6 @@
             const lastBrace = rawText.lastIndexOf('}');
             if (firstBrace !== -1 && lastBrace !== -1) rawText = rawText.substring(firstBrace, lastBrace + 1);
             
-            // DIỆT CÁC KÝ TỰ ẨN (INVISIBLE CHARACTERS) LÀM CRASH JSON CỦA AI
             rawText = rawText.replace(/[\u0000-\u0019]+/g,"");
 
             const result = JSON.parse(rawText);
@@ -601,14 +600,23 @@
             
             renderAIResult(result);
 
+            // LƯU ĐẦY ĐỦ DỮ LIỆU ĐỂ HIỂN THỊ LỊCH SỬ LÀM BÀI
             if (auth.currentUser) {
                 await addDoc(collection(db, "exam_history"), {
                     userId: auth.currentUser.uid,
                     userName: auth.currentUser.displayName || auth.currentUser.email.split('@')[0],
-                    prompt: q.title || "Truyện", // <--- ĐỔI TÊN Ở ĐÂY THEO FILE
+                    examId: q.id || "FICTION_EXAM",
+                    prompt: q.title || "Truyện", // Lưu tên tiêu đề
                     essay: content,
+                    
                     score: result.score, 
-                    feedback: result.correction_html, 
+                    human_score: result.human_score,
+                    general_comment: result.general_comment || "",
+                    strengths: result.strengths || [],
+                    weaknesses: result.weaknesses || [],
+                    feedback: result.correction_html || "", 
+                    orientation: result.orientation || "",
+                    
                     timestamp: serverTimestamp() 
                 });
             }

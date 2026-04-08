@@ -252,7 +252,7 @@
             <div class="header-bar hidden lg:flex">
                 <div class="flex items-center gap-4">
                     <a href="../dashboard/phongluyende.html" class="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-orange-500 transition shadow-sm"><i class="fas fa-arrow-left"></i></a>
-                    <h2 class="text-2xl font-black text-gray-800">Luyện Đề Đọc Hiểu</h2>
+                    <h2 class="text-2xl font-black text-gray-800">Luyện đề đọc hiểu</h2>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="bg-white rounded-xl border border-gray-200 flex items-center p-1 shadow-sm">
@@ -429,8 +429,8 @@
         }
     };
 
-    // --- 1. RENDER KẾT QUẢ (FIX LỖI BỊ ĐÔN LÊN TRÊN) ---
-    function renderAIResult(result) {
+    // --- 1. RENDER KẾT QUẢ (CÓ BẢO VỆ CHỐNG CRASH) ---
+    window.renderAIResult = function(result) {
         document.getElementById('input-section').classList.add('hidden');
         const out = document.getElementById('output-section');
         out.style.display = 'flex';
@@ -452,7 +452,7 @@
                     <div class="inline-block px-4 py-1.5 bg-orange-50 text-orange-600 rounded-full text-[11px] font-bold border border-orange-100 font-sans">
                         ${result.detailed_breakdown || "Chi tiết điểm thành phần"}
                     </div>
-                    <p class="text-gray-600 italic px-6 mt-4 leading-relaxed text-lg">"${result.general_comment}"</p>
+                    <p class="text-gray-600 italic px-6 mt-4 leading-relaxed text-lg">"${result.general_comment || "Đã hoàn tất chấm điểm."}"</p>
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm mb-8">
@@ -463,29 +463,37 @@
                     <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
                         <div style="width:${result.human_score}%; background:${barColor}" class="h-full"></div>
                     </div>
-                    <p class="text-xs text-gray-400 mt-3 italic font-light font-sans">${result.ai_comment}</p>
+                    <p class="text-xs text-gray-400 mt-3 italic font-light font-sans">${result.ai_comment || ""}</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 font-sans">
                     <div class="bg-green-50/50 p-6 rounded-3xl border border-green-100">
                         <h4 class="text-green-700 font-bold text-xs uppercase mb-4 flex items-center gap-2"><i class="fas fa-check-circle"></i> Điểm tốt</h4>
-                        <ul class="text-sm text-green-800 space-y-3 font-medium leading-relaxed">${result.strengths.map(s => `<li>• ${s}</li>`).join('')}</ul>
+                        <ul class="text-sm text-green-800 space-y-3 font-medium leading-relaxed">${(result.strengths || []).map(s => `<li>• ${s}</li>`).join('')}</ul>
                     </div>
                     <div class="bg-red-50/50 p-6 rounded-3xl border border-red-100">
                         <h4 class="text-red-700 font-bold text-xs uppercase mb-4 flex items-center gap-2"><i class="fas fa-exclamation-triangle"></i> Hạn chế</h4>
-                        <ul class="text-sm text-red-800 space-y-3 font-medium leading-relaxed">${result.weaknesses.map(w => `<li>• ${w}</li>`).join('')}</ul>
+                        <ul class="text-sm text-red-800 space-y-3 font-medium leading-relaxed">${(result.weaknesses || []).map(w => `<li>• ${w}</li>`).join('')}</ul>
                     </div>
                 </div>
 
                 <div class="bg-white p-10 rounded-[30px] border border-gray-100 shadow-lg mb-10">
-                    <h4 class="font-black text-gray-800 border-b pb-6 mb-8 text-sm uppercase tracking-widest flex items-center gap-2 font-sans">
-                        <i class="fas fa-highlighter text-orange-500"></i> Gợi ý sửa bài
-                    </h4>
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-6 mb-8 gap-4">
+                        <h4 class="font-black text-gray-800 text-sm uppercase tracking-widest flex items-center gap-2 font-sans">
+                            <i class="fas fa-highlighter text-orange-500"></i> Gợi ý sửa bài
+                        </h4>
+                        <div class="flex flex-wrap gap-3 md:gap-5 text-xs font-bold font-sans bg-gray-50 px-4 py-2 rounded-full border border-gray-100">
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-200 border border-red-400"></span> Lỗi sai</span>
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-100 border border-yellow-400"></span> Gợi ý sửa</span>
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-200 border border-green-400"></span> Khen ngợi</span>
+                        </div>
+                    </div>
                     <div class="leading-9 text-gray-700 font-light text-lg space-y-6 text-justify">
-                        ${result.correction_html}
+                        ${result.correction_html || "Không có phản hồi chi tiết."}
                     </div>
                 </div>
 
+                ${result.orientation ? `
                 <div class="bg-gray-900 text-white p-8 rounded-3xl shadow-2xl relative overflow-hidden font-sans">
                     <div class="absolute top-0 right-0 p-10 opacity-10 text-9xl"><i class="fas fa-compass"></i></div>
                     <div class="relative z-10">
@@ -495,10 +503,11 @@
                         </div>
                         <p class="text-base text-gray-300 leading-loose font-light italic">"${result.orientation}"</p>
                     </div>
-                </div>
+                </div>` : ''}
             </div>`;
-    }
+    };
 
+    // --- 2. XỬ LÝ NỘP BÀI (MAP ĐÚNG DATA ĐỌC HIỂU) ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
         if(content.split(/\s+/).filter(x => x).length < 50) { 
@@ -507,7 +516,7 @@
 
         const loading = document.getElementById('loading-overlay');
         loading.style.display = 'flex';
-        clearInterval(timerInterval);
+        clearInterval(timerInterval); // Dừng đồng hồ ngay khi nộp
 
         const q = window.currentExamData;
         if (!q) {
@@ -519,20 +528,21 @@
             const promptResponse = await fetch('prompts.json'); 
             const promptData = await promptResponse.json();
             
-            // BƯỚC KHỬ MÃ ĐỘC: Lọc sạch toàn bộ xuống dòng (\n), ngoặc kép (") từ bài làm học sinh
+            // Khử mã độc và escape string
             const safe = (str) => {
                 if (!str) return 'Không có';
                 if (Array.isArray(str)) str = str.join(' | ');
                 return String(str).replace(/"/g, "'").replace(/\n/g, '<br>').replace(/\\/g, "/");
             };
             
-            let systemPrompt = promptData.de_doc_hieu; // <--- ĐỔI TÊN Ở ĐÂY CHO TỪNG FILE (de_tho, de_truyen...)
+            let systemPrompt = promptData.de_doc_hieu; // Gọi đúng Prompt Đọc Hiểu
             
-            // DÙNG SPLIT.JOIN THAY VÌ REPLACE ĐỂ TRÁNH LỖI KÝ TỰ ĐẶC BIỆT
+            // Convert mảng câu hỏi đọc hiểu thành chuỗi để đưa vào Prompt
+            const questionsString = q.questions ? q.questions.map((item, i) => `Câu ${i+1}: ${item.q}`).join(' | ') : 'Không có';
+
             systemPrompt = systemPrompt
-                .split('{{TOPIC}}').join(safe(q.topic))
                 .split('{{DOC_HIEU}}').join(safe(q.text))
-                .split('{{HINT}}').join(safe(q.hint))
+                .split('{{CAU_HOI}}').join(safe(questionsString))
                 .split('{{BAI_LAM}}').join(safe(content));
 
             const res = await fetch(API_URL, { 
@@ -540,7 +550,7 @@
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ 
                     systemPrompt: systemPrompt, 
-                    messages: `Học sinh gửi bài làm. Hãy chấm theo quy trình K12.`
+                    messages: `Học sinh gửi bài làm. Hãy chấm theo quy trình Đọc Hiểu.`
                 }) 
             });
 
@@ -554,28 +564,39 @@
             const lastBrace = rawText.lastIndexOf('}');
             if (firstBrace !== -1 && lastBrace !== -1) rawText = rawText.substring(firstBrace, lastBrace + 1);
             
-            // DIỆT CÁC KÝ TỰ ẨN (INVISIBLE CHARACTERS) LÀM CRASH JSON CỦA AI
+            // Diệt ký tự ẩn
             rawText = rawText.replace(/[\u0000-\u0019]+/g,"");
-
             const result = JSON.parse(rawText);
 
-            let safeScore = parseFloat(result.score);
+            // Bắt lỗi điểm số thang 4.0
+            let safeScore = parseFloat(result.reading_score);
             if (isNaN(safeScore)) safeScore = 0;
-            if (safeScore > 10) safeScore = 10;
+            if (safeScore > 4) safeScore = 4.0;
             
-            result.score = safeScore;
+            result.reading_score = safeScore;
             result.human_score = parseInt(result.human_score) || 100;
             
             renderAIResult(result);
 
+            // LƯU DB ĐẦY ĐỦ TRƯỜNG DỮ LIỆU ĐỌC HIỂU
             if (auth.currentUser) {
                 await addDoc(collection(db, "exam_history"), {
                     userId: auth.currentUser.uid,
                     userName: auth.currentUser.displayName || auth.currentUser.email.split('@')[0],
-                    prompt: q.title || "Đọc Hiểu", // <--- ĐỔI TÊN Ở ĐÂY THEO FILE
+                    examId: q.id || "READING_COMP",
+                    prompt: q.title || "Đề Đọc Hiểu", 
                     essay: content,
-                    score: result.score, 
-                    feedback: result.correction_html, 
+                    
+                    score: result.reading_score, // Lưu vào field 'score' để tái sử dụng component lịch sử
+                    human_score: result.human_score,
+                    detailed_breakdown: result.detailed_breakdown || "",
+                    ai_comment: result.ai_comment || "",
+                    general_comment: result.general_comment || "",
+                    strengths: result.strengths || [],
+                    weaknesses: result.weaknesses || [],
+                    feedback: result.correction_html || "",
+                    orientation: result.orientation || "",
+                    
                     timestamp: serverTimestamp() 
                 });
             }
@@ -594,10 +615,31 @@
         document.getElementById('input-section').classList.remove('hidden');
         document.getElementById('output-section').classList.add('hidden');
         document.getElementById('output-section').style.display = 'none';
+        
+        // Reset timer khi bấm làm lại
+        timeLeft = 1800; // 30 phút
+        startTimer();
     };
 
-    let timeLeft = 1800; 
-    function startTimer() { setInterval(() => { if(timeLeft > 0) { timeLeft--; const m = Math.floor(timeLeft / 60); const s = timeLeft % 60; document.getElementById('timer').innerText = `${Math.floor(m/60)}:${(m%60).toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; if(document.getElementById('timer-mobile')) document.getElementById('timer-mobile').innerText = document.getElementById('timer').innerText; } else if (timeLeft === 0) { timeLeft = -1; showPopup("Hết Giờ", "Đã hết thời gian làm bài Đọc Hiểu!", "warning"); } }, 1000); }
+    // --- 3. ĐÃ FIX GLOBAL TIMER INTERVAL ---
+    let timerInterval;
+    let timeLeft = 1800; // Đọc hiểu thường 30 phút
+    function startTimer() { 
+        clearInterval(timerInterval); // Đảm bảo xóa timer cũ nếu có
+        timerInterval = setInterval(() => { 
+            if(timeLeft > 0) { 
+                timeLeft--; 
+                const m = Math.floor(timeLeft / 60); 
+                const s = timeLeft % 60; 
+                const timeStr = `${Math.floor(m/60)}:${(m%60).toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                document.getElementById('timer').innerText = timeStr; 
+                if(document.getElementById('timer-mobile')) document.getElementById('timer-mobile').innerText = timeStr; 
+            } else if (timeLeft === 0) { 
+                timeLeft = -1; 
+                showPopup("Hết Giờ", "Đã hết thời gian làm bài Đọc Hiểu!", "warning"); 
+            } 
+        }, 1000); 
+    }
 
     onAuthStateChanged(auth, u => { if(u) { startTimer(); loadQuestions(); } else window.location.href="../log.html"; });
     document.getElementById('file-upload').addEventListener('change', (e) => { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); if(f.name.endsWith('.docx')) { r.onload = (ev) => mammoth.extractRawText({arrayBuffer: ev.target.result}).then(res => document.getElementById('student-essay').value = res.value); r.readAsArrayBuffer(f); } else showPopup("Lỗi", "Chỉ nhận file .docx", "error"); });
