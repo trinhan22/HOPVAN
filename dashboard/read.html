@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Đọc sách - HopVan</title>
+    
+    <link rel="icon" type="image/webp" href="../LOGO.WEBP" />
+    <meta name="theme-color" content="#FFF5EC">
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
+            --ui-bg: rgba(255, 255, 255, 0.95);
+            --ui-text: #1e293b;
+            --ui-border: rgba(0,0,0,0.05);
+            
+            /* Themes đọc sách */
+            --bg-light: #F8FAFC;
+            --bg-sepia: #f4ecd8;
+            --bg-dark: #0f172a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent;}
+        
+        body { 
+            background-color: var(--bg-light); height: 100vh; overflow: hidden; 
+            display: flex; flex-direction: column; transition: background-color 0.4s ease;
+        }
+        body.theme-sepia { background-color: var(--bg-sepia); }
+        body.theme-dark { background-color: var(--bg-dark); }
+
+        /* --- TOOLBARS (HEADER & FOOTER) --- */
+        .toolbar {
+            position: fixed; left: 0; right: 0; background: var(--ui-bg); backdrop-filter: blur(20px);
+            z-index: 100; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid var(--ui-border);
+        }
+        body.theme-dark .toolbar { --ui-bg: rgba(15, 23, 42, 0.95); --ui-text: #f8fafc; --ui-border: rgba(255,255,255,0.05); box-shadow: 0 4px 20px rgba(0,0,0,0.5);}
+
+        .header-bar { top: 0; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;}
+        .footer-bar { bottom: 0; padding: 15px 25px 25px; border-top-left-radius: 24px; border-top-right-radius: 24px;}
+
+        /* Ẩn hiện toolbar */
+        .ui-hidden .header-bar { transform: translateY(-100%); opacity: 0; }
+        .ui-hidden .footer-bar { transform: translateY(100%); opacity: 0; }
+
+        .btn-icon {
+            width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; color: var(--ui-text); background: transparent; border: none; cursor: pointer; transition: 0.2s;
+        }
+        .btn-icon:hover { background: rgba(128,128,128,0.1); color: var(--primary); }
+
+        .book-info { text-align: center; flex: 1; margin: 0 15px; overflow: hidden; }
+        .book-title { font-family: 'Merriweather', serif; font-weight: 800; font-size: 1.1rem; color: var(--ui-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .book-author { font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        body.theme-dark .book-author { color: #94a3b8; }
+
+        /* --- READER AREA --- */
+        .reader-container {
+            flex: 1; position: relative; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px;
+        }
+
+        #pdf-render-canvas {
+            max-width: 100%; max-height: 100%; object-fit: contain;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-radius: 8px;
+            transition: opacity 0.3s ease; background: white;
+        }
+        /* Giảm chói ảnh PDF khi ở Dark Mode */
+        body.theme-dark #pdf-render-canvas { filter: brightness(0.85) contrast(1.1); box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+
+        /* TOUCH ZONES & MŨI TÊN CHỈ HƯỚNG */
+        .touch-zone { position: absolute; top: 0; bottom: 0; z-index: 50; display: flex; align-items: center; transition: 0.3s; }
+        .touch-left { left: 0; width: 20%; justify-content: flex-start; padding-left: 30px; cursor: pointer; }
+        .touch-right { right: 0; width: 20%; justify-content: flex-end; padding-right: 30px; cursor: pointer; }
+        .touch-center { left: 20%; right: 20%; width: 60%; cursor: pointer; display: block; }
+
+        /* Giao diện nút mũi tên */
+        .nav-arrow {
+            width: 50px; height: 50px; border-radius: 50%; 
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; color: var(--primary);
+            opacity: 0; pointer-events: none; /* Không cản trở cú click */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        /* Chỉnh màu mũi tên khi bật Dark Mode */
+        body.theme-dark .nav-arrow {
+            background: rgba(30, 41, 59, 0.95); color: #f8fafc; border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Hiệu ứng trượt ra khi Hover */
+        .touch-left .nav-arrow { transform: translateX(-30px); }
+        .touch-right .nav-arrow { transform: translateX(30px); }
+
+        .touch-left:hover .nav-arrow { opacity: 1; transform: translateX(0); }
+        .touch-right:hover .nav-arrow { opacity: 1; transform: translateX(0); }
+
+        /* Trên Mobile/Tablet không có chuột để hover nên ta ẩn mũi tên đi */
+        @media (max-width: 1024px) {
+            .nav-arrow { display: none; }
+        }
+
+        /* --- FOOTER CONTROLS --- */
+        .progress-container { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        .page-text { font-weight: 800; font-size: 0.85rem; color: var(--ui-text); font-variant-numeric: tabular-nums; width: 45px; text-align: center;}
+        
+        /* Slider CSS */
+        input[type=range] { -webkit-appearance: none; flex: 1; background: transparent; }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: rgba(128,128,128,0.2); border-radius: 10px; }
+        input[type=range]::-webkit-slider-thumb { height: 20px; width: 20px; border-radius: 50%; background: var(--primary); cursor: pointer; -webkit-appearance: none; margin-top: -7px; box-shadow: 0 2px 6px rgba(255,143,80,0.4); border: 3px solid white;}
+        body.theme-dark input[type=range]::-webkit-slider-thumb { border-color: var(--bg-dark); }
+
+        .control-actions { display: flex; justify-content: space-between; align-items: center; padding: 0 10px;}
+        .btn-text { font-size: 0.85rem; font-weight: 800; color: var(--ui-text); background: transparent; border: none; padding: 8px 12px; cursor: pointer; text-transform: uppercase; transition: 0.2s;}
+        .btn-text:hover { color: var(--primary); }
+
+        /* LOADING */
+        #loading-overlay { position: absolute; inset: 0; background: var(--bg-light); z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.3s;}
+        body.theme-dark #loading-overlay { background: var(--bg-dark); }
+        body.theme-sepia #loading-overlay { background: var(--bg-sepia); }
+        .spinner { width: 45px; height: 45px; border: 4px solid rgba(255,143,80,0.2); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px;}
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* THEME MENU */
+        .theme-menu { position: absolute; top: 70px; right: 20px; background: var(--ui-bg); border-radius: 16px; padding: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--ui-border); display: none; flex-direction: column; gap: 8px; z-index: 150;}
+        .theme-menu.show { display: flex; }
+        .theme-btn { width: 100%; text-align: left; padding: 10px 20px; border-radius: 10px; font-weight: 700; font-size: 0.85rem; color: var(--ui-text); border: none; cursor: pointer; background: transparent; display: flex; align-items: center; gap: 10px;}
+        .theme-btn:hover { background: rgba(128,128,128,0.1); }
+        .theme-btn i { font-size: 1.1rem; }
+    </style>
+</head>
+<body class="ui-visible">
+
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p class="font-bold text-gray-500" id="loading-text">Đang tải sách...</p>
+    </div>
+
+    <header class="toolbar header-bar">
+        <button class="btn-icon" onclick="goBack()"><i class="fas fa-arrow-left"></i></button>
+        <div class="book-info">
+            <h1 class="book-title" id="display-title">Đang tải...</h1>
+            <p class="book-author" id="display-author">Vui lòng chờ</p>
+        </div>
+        <button class="btn-icon" onclick="toggleThemeMenu()"><i class="fas fa-palette"></i></button>
+    </header>
+
+    <div class="theme-menu" id="theme-menu">
+        <button class="theme-btn" onclick="setTheme('light')"><i class="fas fa-sun text-yellow-500"></i> Nền Sáng</button>
+        <button class="theme-btn" onclick="setTheme('sepia')"><i class="fas fa-book text-amber-700"></i> Nền Giấy</button>
+        <button class="theme-btn" onclick="setTheme('dark')"><i class="fas fa-moon text-blue-400"></i> Nền Tối</button>
+    </div>
+
+    <main class="reader-container">
+        <div class="touch-zone touch-left" onclick="onPrevPage()">
+            <div class="nav-arrow shadow-md"><i class="fas fa-chevron-left"></i></div>
+        </div>
+        <div class="touch-zone touch-center" onclick="toggleUI()"></div>
+        <div class="touch-zone touch-right" onclick="onNextPage()">
+            <div class="nav-arrow shadow-md"><i class="fas fa-chevron-right"></i></div>
+        </div>
+
+        <canvas id="pdf-render-canvas"></canvas>
+    </main>
+
+    <footer class="toolbar footer-bar">
+        <div class="progress-container">
+            <span class="page-text" id="page-num">1</span>
+            <input type="range" id="page-slider" min="1" max="100" value="1" oninput="onSliderInput()" onchange="onSliderChange()">
+            <span class="page-text" id="page-count">100</span>
+        </div>
+        <div class="control-actions">
+            <button class="btn-text" onclick="onPrevPage()"><i class="fas fa-chevron-left mr-1"></i> Trang trước</button>
+            <span class="text-xs font-bold text-gray-400" id="progress-percent">0%</span>
+            <button class="btn-text" onclick="onNextPage()">Trang sau <i class="fas fa-chevron-right ml-1"></i></button>
+        </div>
+    </footer>
+
+    <script>
+        // ==========================================
+        // DATABASE GIẢ LẬP (Giống bên tacpham.html)
+        // ==========================================
+        const booksDB = {
+            "binh-ngo-dai-cao": { title: "Bình Ngô Đại Cáo", author: "Nguyễn Trãi", url: "../data/books/binhngodaicao.pdf" },
+            "luc-van-tien": { title: "Lục Vân Tiên", author: "Nguyễn Đình Chiểu", url: "../data/books/lucvantien.pdf" },
+            "nam-quoc-son-ha": { title: "Nam Quốc Sơn Hà", author: "Lý Thường Kiệt", url: "../data/books/namquocsonha.pdf" },
+            "nu-than-mat-troi-va-mat-trang": { title: "Nữ Thần Mặt Trời Và Mặt Trăng", author: "Khuyết Danh", url: "../data/books/nuthanmattroi.pdf" },
+            "song": { title: "Sóng", author: "Xuân Quỳnh", url: "../data/books/song.pdf" },
+            "tay-tien": { title: "Tây Tiến", author: "Quang Dũng", url: "../data/books/taytien.pdf" },
+            "thanh-giong": { title: "Thánh Gióng", author: "Lê Thánh Tông", url: "../data/books/thanhgiong.pdf" },
+            "thi-mau": { title: "Thị Mầu", author: "Vương Trọng", url: "../data/books/thimau.pdf" },
+            "truyen-kieu": { title: "Truyện Kiều", author: "Nguyễn Du", url: "../data/books/truyenkieu.pdf" },
+            "tuyen-ngon-doc-lap": { title: "Tuyên Ngôn Độc Lập", author: "Hồ Chí Minh", url: "../data/books/tuyenngondoclap.pdf" },
+            "van-te-nghia-si-can-giuoc": { title: "Văn Tế Nghĩa Sĩ Cần Giuộc", author: "Nguyễn Đình Chiểu", url: "../data/books/vantenghiasicangiuoc.pdf" },
+            "tien-dan-nguoi-yeu": { title: "Tiễn Dặn Người Yêu", author: "Khuyết Danh", url: "../data/books/tiendannguoiyeu.pdf" },
+
+            // Mặc định nếu không tìm thấy ID
+            "default": { title: "Tác Phẩm Văn Học", author: "Bộ GD&ĐT", url: "../data/lythuyet_default.pdf" }
+        };
+
+        // Khởi tạo Theme
+        const savedTheme = localStorage.getItem('hopvan_reader_theme') || 'light';
+        setTheme(savedTheme);
+
+        function setTheme(theme) {
+            document.body.className = `theme-${theme}`;
+            localStorage.setItem('hopvan_reader_theme', theme);
+            document.getElementById('theme-menu').classList.remove('show');
+        }
+
+        function toggleThemeMenu() {
+            document.getElementById('theme-menu').classList.toggle('show');
+        }
+
+        // Lấy ID sách từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookId = urlParams.get('id') || 'default';
+        const currentBook = booksDB[bookId] || booksDB['default'];
+
+        document.getElementById('display-title').textContent = currentBook.title;
+        document.getElementById('display-author').textContent = currentBook.author;
+
+        // Trở về trang trước
+        function goBack() {
+            window.location.href = "tacpham.html"; // Trở về trang thư viện
+        }
+
+        // Ẩn/Hiện Toolbar
+        let uiVisible = true;
+        function toggleUI() {
+            uiVisible = !uiVisible;
+            if (uiVisible) {
+                document.body.classList.remove('ui-hidden');
+                document.getElementById('theme-menu').classList.remove('show');
+            } else {
+                document.body.classList.add('ui-hidden');
+            }
+        }
+
+        // ==========================================
+        // LOGIC LẬT TRANG PDF.JS
+        // ==========================================
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        let pdfDoc = null,
+            pageNum = 1,
+            pageIsRendering = false,
+            pageNumPending = null;
+
+        const canvas = document.getElementById('pdf-render-canvas');
+        const ctx = canvas.getContext('2d');
+        const loadingEl = document.getElementById('loading-overlay');
+        const slider = document.getElementById('page-slider');
+
+        // Khôi phục tiến độ
+        const progressKey = `hopvan_book_${bookId}`;
+        const savedProgress = localStorage.getItem(progressKey);
+        if (savedProgress) {
+            pageNum = parseInt(savedProgress, 10);
+        }
+
+        function renderPage(num) {
+            pageIsRendering = true;
+            canvas.style.opacity = 0.5;
+
+            pdfDoc.getPage(num).then(page => {
+                // Tùy chỉnh tỷ lệ (Scale 2.0 để nét căng trên Mobile/Tablet)
+                const viewport = page.getViewport({ scale: 2.0 });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                const renderCtx = { canvasContext: ctx, viewport: viewport };
+
+                page.render(renderCtx).promise.then(() => {
+                    pageIsRendering = false;
+                    canvas.style.opacity = 1;
+                    
+                    if (loadingEl.style.display !== 'none') {
+                        loadingEl.style.opacity = '0';
+                        setTimeout(() => loadingEl.style.display = 'none', 300);
+                        // Tự động ẩn UI sau 2 giây khi mới vào đọc cho tập trung
+                        setTimeout(() => { if(uiVisible) toggleUI(); }, 2000);
+                    }
+                    
+                    if (pageNumPending !== null) {
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                });
+
+                // Cập nhật Footer UI
+                document.getElementById('page-num').textContent = num;
+                slider.value = num;
+                
+                const percent = Math.round((num / pdfDoc.numPages) * 100);
+                document.getElementById('progress-percent').textContent = `${percent}%`;
+
+                // Lưu tiến độ vào LocalStorage
+                localStorage.setItem(progressKey, num);
+            });
+        }
+
+        const queueRenderPage = num => {
+            if (pageIsRendering) { pageNumPending = num; } 
+            else { renderPage(num); }
+        };
+
+        window.onPrevPage = () => {
+            if (pageNum <= 1) return;
+            pageNum--;
+            queueRenderPage(pageNum);
+            window.scrollTo(0,0); // Reset scroll nếu đang zoom
+        };
+
+        window.onNextPage = () => {
+            if (pageNum >= pdfDoc.numPages) return;
+            pageNum++;
+            queueRenderPage(pageNum);
+            window.scrollTo(0,0);
+        };
+
+        // Kéo thả Slider
+        window.onSliderInput = () => {
+            document.getElementById('page-num').textContent = slider.value;
+        };
+        window.onSliderChange = () => {
+            pageNum = parseInt(slider.value, 10);
+            queueRenderPage(pageNum);
+        };
+
+        // Tải PDF
+        pdfjsLib.getDocument(currentBook.url).promise.then(pdfDoc_ => {
+            pdfDoc = pdfDoc_;
+            
+            const totalPages = pdfDoc.numPages;
+            document.getElementById('page-count').textContent = totalPages;
+            slider.max = totalPages;
+
+            // Nếu trang lưu trước đó lớn hơn tổng số trang (trường hợp đổi file) thì reset về 1
+            if (pageNum > totalPages) pageNum = 1;
+
+            renderPage(pageNum);
+        }).catch(err => {
+            console.error("Lỗi load sách:", err);
+            document.getElementById('loading-text').innerHTML = `<span style="color:red">Lỗi tải dữ liệu tác phẩm!</span><br><button onclick="goBack()" style="margin-top:10px; padding: 5px 15px; border-radius: 5px; background:#e2e8f0;">Quay lại</button>`;
+            document.querySelector('.spinner').style.display = 'none';
+        });
+
+        // Hỗ trợ nút mũi tên bàn phím để chuyển trang
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') onNextPage();
+            else if (e.key === 'ArrowLeft') onPrevPage();
+        });
+
+    </script>
+
+    <script type="text/javascript">
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
+            if (e.ctrlKey) {
+                switch (e.key.toLowerCase()) {
+                    case 'u': case 's': case 'p': e.preventDefault(); return false;
+                }
+                if (e.shiftKey) {
+                    switch (e.key.toLowerCase()) {
+                        case 'i': case 'j': case 'c': e.preventDefault(); return false;
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

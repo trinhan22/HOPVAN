@@ -34,7 +34,7 @@ const menuStyles = `
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* HEADER SIDEBAR (LOGO & NÚT CLOSE) */
+    /* HEADER SIDEBAR */
     .sb-header { display: flex; align-items: center; justify-content: space-between; padding-right: 15px; }
     .sb-logo-link {
         padding: 30px 20px 25px 30px; display: flex; align-items: center; gap: 10px; text-decoration: none; transition: all 0.3s ease; flex: 1;
@@ -60,19 +60,38 @@ const menuStyles = `
     }
     .sb-close-btn:hover { background: #fee2e2; color: #ef4444; }
 
-    /* MENU LIST (CHO PHÉP CUỘN KHI MÀN HÌNH NHỎ) */
+    /* MENU LIST */
     .sb-list-container { flex: 1; overflow-y: auto; overflow-x: hidden; padding-bottom: 20px; }
     .sb-list-container::-webkit-scrollbar { width: 5px; }
     .sb-list-container::-webkit-scrollbar-thumb { background: rgba(255,143,80,0.3); border-radius: 10px; }
-    .sb-list { list-style: none; padding: 0 15px; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+    .sb-list { list-style: none; padding: 0 15px; margin: 0; display: flex; flex-direction: column; gap: 4px; }
     
+    .sb-section-title {
+        font-size: 0.60rem; font-weight: 900; color: #94a3b8; text-transform: uppercase; 
+        letter-spacing: 1px; margin: 15px 0 5px 15px; opacity: 0.8;
+    }
+
+    /* ĐÃ SỬA MÀU CHỮ VÀ ICON NHẸ NHÀNG HƠN Ở ĐÂY */
     .sb-link {
-        display: flex; align-items: center; gap: 14px; padding: 12px 16px;
-        border-radius: 14px; color: #64748b; font-weight: 700; font-size: 0.9rem;
+        display: flex; align-items: center; gap: 12px; 
+        padding: 10px 16px; 
+        border-radius: 14px; 
+        color: #64748b; /* Màu nhạt hơn, trùng icon */
+        font-weight: 610; /* Giảm độ đậm một chút để nhìn thanh thoát */
+        font-size: 0.9rem;
         text-decoration: none; transition: all 0.2s;
     }
+    .sb-link i { 
+        font-size: 0.9rem; width: 20px; text-align: center; 
+        color: #64748b; /* Trùng với màu chữ */
+        transition: 0.2s;
+    }
+    
     .sb-link:hover { background: #fff7ed; color: var(--sb-primary); transform: translateX(5px); }
-    .sb-link.active { background: var(--sb-gradient); color: white !important; box-shadow: 0 8px 20px rgba(255, 94, 98, 0.25); }
+    .sb-link:hover i { color: var(--sb-primary); }
+    
+    .sb-link.active { background: var(--sb-gradient); color: white !important; box-shadow: 0 6px 15px rgba(255, 94, 98, 0.25); font-weight: 700; }
+    .sb-link.active i { color: white; }
 
     /* FOOTER SIDEBAR */
     .sb-footer { padding: 15px; border-top: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; background: rgba(255,255,255,0.5); }
@@ -127,9 +146,20 @@ const menuStyles = `
     .fb-empty { text-align: center; padding: 40px 0; color: #cbd5e1; font-weight: 600; font-size: 0.9rem; }
     .fb-empty i { font-size: 2.5rem; margin-bottom: 15px; display: block; opacity: 0.5; }
 
+    /* DARK MODE */
+    html.dark .sidebar-comp { background: var(--bg-panel) !important; border-color: var(--border-ui) !important; }
+    html.dark .sb-logo-link h1 { color: #f8fafc; }
+    html.dark .logo-card-box { background: transparent !important; border-color: #334155 !important; }
+    html.dark .sb-link { color: #94a3b8; }
+    html.dark .sb-link i { color: #94a3b8; }
+    html.dark .sb-link:hover { background: rgba(255,143,80,0.1); color: var(--sb-primary); }
+    html.dark .sb-link:hover i { color: var(--sb-primary); }
+    html.dark .sb-footer { border-color: #334155; background: transparent; }
+    html.dark .btn-feedback { background: transparent; border-color: var(--sb-primary); }
+
     /* MOBILE RESPONSIVE TWEAKS */
     @media (max-width: 1024px) {
-        .sidebar-comp { transform: translateX(-100%); width: 260px; }
+        .sidebar-comp { transform: translateX(-100%); width: 280px; }
         .sidebar-comp.open { transform: translateX(0); }
         .sb-close-btn { display: flex; }
     }
@@ -156,31 +186,37 @@ const menuHTML = `
     <div class="sb-list-container">
         <nav class="sb-list">
             <a href="../dashboard" class="sb-link" data-page="index">
-                <i class="fas fa-home w-5 text-center"></i> Tổng quan
+                <i class="fas fa-home"></i> Tổng quan
             </a>
 
-            <div class="px-4 mt-4 mb-2 text-[9px] font-black text-gray-400 uppercase tracking-widest opacity-80">Quản Lý Học Tập</div>
+            <div class="sb-section-title">Quản Lý Học Tập</div>
+            
             <a href="lythuyet.html" class="sb-link" data-page="lythuyet">
-                <i class="fas fa-feather-alt w-5 text-center"></i> Lý thuyết Ngữ văn
+                <i class="fas fa-feather-alt"></i> Kiến thức nền
             </a>
             <a href="phongluyende.html" class="sb-link" data-page="phongluyende">
-                <i class="fas fa-pen-nib w-5 text-center"></i> Phòng luyện đề
+                <i class="fas fa-pen-nib"></i> Phòng luyện đề
             </a>
             <a href="nhatkyhoctap.html" class="sb-link" data-page="nhatkyhoctap">
-                <i class="fas fa-book-journal-whills w-5 text-center"></i> Nhật ký học tập
+                <i class="fas fa-book-journal-whills"></i> Nhật ký học tập
             </a>
 
-            <div class="px-4 mt-4 mb-2 text-[9px] font-black text-gray-400 uppercase tracking-widest opacity-80">Khám Phá</div>
+            <div class="sb-section-title">Khám Phá</div>
+            
+            <a href="tacpham.html" class="sb-link" data-page="tacpham">
+                <i class="fas fa-swatchbook"></i> Tác phẩm Văn học
+            </a>
             <a href="bantinvanhoc.html" class="sb-link" data-page="bantinvanhoc">
-                <i class="fas fa-newspaper w-5 text-center"></i> Bản tin Văn học
+                <i class="fas fa-newspaper"></i> Bản tin Văn học
             </a>
             <a href="congdong.html" class="sb-link" data-page="congdong">
-                <i class="fas fa-users w-5 text-center"></i> Cộng đồng
+                <i class="fas fa-users"></i> Cộng đồng
             </a>        
 
-            <div class="px-4 mt-4 mb-2 text-[9px] font-black text-gray-400 uppercase tracking-widest opacity-80">Cá Nhân</div>
+            <div class="sb-section-title">Cá Nhân</div>
+            
             <a href="account.html" class="sb-link" data-page="account">
-                <i class="fas fa-user-cog w-5 text-center"></i> Quản lý tài khoản
+                <i class="fas fa-user-cog"></i> Quản lý tài khoản
             </a>
         </nav>
     </div>
@@ -204,7 +240,7 @@ const menuHTML = `
             ">
                 <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px;">HopVan Platform</span>
                 <span style="width: 4px; height: 4px; border-radius: 50%; background-color: #22c55e;"></span>
-                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.2.2</span>
+                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.2.4</span>
             </div>
         </div>
     </div>
@@ -274,6 +310,7 @@ function startMenuLogic(auth, db) {
     links.forEach(link => {
         link.classList.remove('active');
         const page = link.getAttribute('data-page');
+        
         if (currentPath.includes(page) || (page === 'index' && (currentPath.endsWith('/') || currentPath.includes('index.html')))) {
             link.classList.add('active');
         }

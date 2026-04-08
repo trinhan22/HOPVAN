@@ -612,50 +612,60 @@
         });
     }
 
-    // --- HÀM LOAD TIẾN ĐỘ LÝ THUYẾT (ĐÃ FIX) ---
+    // --- HÀM LOAD TIẾN ĐỘ LÝ THUYẾT (ĐÃ UPDATE FULL PROGRESS BAR) ---
     function loadTheoryProgress() {
         const savedData = localStorage.getItem('hopvan_theory_progress');
         const chapterEl = document.getElementById('dash-theory-chapter');
         const lessonEl = document.getElementById('dash-theory-lesson');
+        const progressBarFill = document.querySelector('.progress-bar-fill'); // Lấy thanh progress
         
         if (savedData) {
             try {
                 const data = JSON.parse(savedData);
                 lessonEl.textContent = data.title; // Lấy tên bài
                 
+                // TÍNH PHẦN TRĂM TIẾN ĐỘ
+                if(data.currentPage && data.totalPages && progressBarFill) {
+                    const percent = Math.round((data.currentPage / data.totalPages) * 100);
+                    progressBarFill.style.width = `${percent}%`;
+                }
+                
                 let chapterName = "Lý thuyết Ngữ Văn"; 
                 const id = data.id;
 
                 // Match đúng ID từ trang lythuyet.html
-                if (['ls-truyen-ngan-hien-dai', 'ls-diem-nhin', 'ls-tieu-thuyet', 'ls-dac-diem-tt'].includes(id)) {
-                    chapterName = "Truyện Ngắn & Tiểu Thuyết Hiện Đại";
+                if (['ls-truyen-ngan-hien-dai', 'ls-diem-nhin', 'ls-tieu-thuyet', 'ls-dac-diem-tt', 'ls-truyen-tieu-thuyet'].includes(id)) {
+                    chapterName = "Truyện Ngắn & Tiểu Thuyết";
                 } 
-                else if (['ls-vb-nghiluan-kn', 'ls-cautruc-vbnl', 'ls-yeuto-botro', 'ls-thaotac-nl', 'ls-vb-thongtin', 'ls-dulieu-vbtt', 'ls-dotincay'].includes(id)) {
+                else if (['ls-vb-nghiluan-kn', 'ls-cautruc-vbnl', 'ls-yeuto-botro', 'ls-thaotac-nl', 'ls-vb-thongtin', 'ls-dulieu-vbtt', 'ls-dotincay', 'ls-vb-nghiluan-thongtin'].includes(id)) {
                     chapterName = "VB Nghị Luận & VB Thông Tin";
                 } 
-                else if (['ls-hai-kich', 'ls-dacdiem-haikich', 'ls-nhatki-phongsu', 'ls-phihucau'].includes(id)) {
-                    chapterName = "Hài Kịch – Nhật Kí – Phóng Sự – Hồi Kí";
+                else if (['ls-hai-kich', 'ls-dacdiem-haikich', 'ls-nhatki-phongsu', 'ls-phihucau', 'ls-hai-kich-nhat-ky'].includes(id)) {
+                    chapterName = "Hài Kịch – Nhật Kí – Hồi Kí";
                 } 
-                else if (['ls-tuy-but', 'ls-tan-van', 'ls-but-ki', 'ls-diem-chung'].includes(id)) {
+                else if (['ls-tuy-but', 'ls-tan-van', 'ls-but-ki', 'ls-diem-chung', 'ls-tuy-but-tan-van'].includes(id)) {
                     chapterName = "Tùy Bút – Tản Văn – Bút Kí";
                 } 
-                else if (['ls-kn-tho', 'ls-chuthe-trutinh', 'ls-camxuc', 'ls-nghethuat-tho', 'ls-tho-hiendai'].includes(id)) {
+                else if (['ls-kn-tho', 'ls-chuthe-trutinh', 'ls-camxuc', 'ls-nghethuat-tho', 'ls-tho-hiendai', 'ls-tho-tru-tinh'].includes(id)) {
                     chapterName = "Thơ Trữ Tình";
                 } 
-                else if (['ls-nghiluan-xh', 'ls-dang-nlxh', 'ls-vietdoan-nlxh', 'ls-nghiluan-vh', 'ls-dang1', 'ls-dang2', 'ls-dang3'].includes(id)) {
+                else if (['ls-nghiluan-xh', 'ls-dang-nlxh', 'ls-vietdoan-nlxh', 'ls-nghiluan-vh', 'ls-dang1', 'ls-dang2', 'ls-dang3', 'ls-cac-dang-de'].includes(id)) {
                     chapterName = "Các Dạng Đề Nghị Luận";
                 } 
-                else if (['ls-ngonngu-trangtrong', 'ls-kethop-phongcach', 'ls-loi-logich', 'ls-cau-moho', 'ls-nghichngu', 'ls-sohuutritue', 'ls-noimia', 'ls-phingonngu'].includes(id)) {
+                else if (['ls-ngonngu-trangtrong', 'ls-kethop-phongcach', 'ls-loi-logich', 'ls-cau-moho', 'ls-nghichngu', 'ls-sohuutritue', 'ls-noimia', 'ls-phingonngu', 'ls-tri-thuc-tieng-viet'].includes(id)) {
                     chapterName = "Tri Thức Tiếng Việt";
-                } else if (['ls-taytien', 'ls-vietbac', 'ls-song'].includes(id)){
-                    chapterName = "Thơ Hiện Đại Việt Nam"; // Thêm fallback cho các ID cũ
-                }
+                } 
 
                 chapterEl.textContent = chapterName;
 
             } catch(e) {
                 console.log("Lỗi parse data lý thuyết", e);
+                // Reset thanh progress nếu lỗi
+                if(progressBarFill) progressBarFill.style.width = `0%`;
             }
+        } else {
+            // Nếu chưa học thì trả về 0%
+            if(progressBarFill) progressBarFill.style.width = `0%`;
         }
     }
 

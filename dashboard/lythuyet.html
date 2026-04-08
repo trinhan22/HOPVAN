@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HopVan - Lý Thuyết Ngữ Văn</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HopVan - Kiến Thức Nền</title>
     
     <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
-    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh." />
+    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
     <meta property="og:image" content="https://hopvan.netlify.app/panel.webp" />
     <meta property="og:url" content="https://hopvan.netlify.app" />
     <meta property="og:type" content="article" />
@@ -19,13 +19,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
-<style>
+    <style>
         :root { 
             --primary: #FF8F50; 
             --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
-            --glass-bg: rgba(255, 255, 255, 0.5); 
-            --sidebar-width: 280px;
+            --glass-bg: rgba(255, 255, 255, 0.45); 
+            
+            /* SỬA LẠI SỐ 320px THÀNH 280px Ở DÒNG DƯỚI NÀY */
+            --sidebar-width: 280px; 
             
             --bg-body: #FFF5EC;
             --bg-card: rgba(255, 255, 255, 0.95);
@@ -35,25 +39,22 @@
             --bg-hover: #f8fafc;
             --bg-active: #fff7ed;
             
-            /* Box Shadows Cao Cấp */
-            --shadow-sm: 0 2px 10px rgba(0,0,0,0.02);
+            --shadow-sm: 0 4px 15px rgba(0,0,0,0.02);
             --shadow-md: 0 10px 30px -5px rgba(0,0,0,0.05);
             --shadow-lg: 0 20px 50px -10px rgba(0,0,0,0.08);
+            --shadow-floating: 0 15px 35px rgba(255, 143, 80, 0.2);
         }
 
         html.dark {
             --bg-body: #0B1120;
-            --glass-bg: rgba(15, 23, 42, 0.6);
+            --glass-bg: rgba(15, 23, 42, 0.5);
             --bg-card: #111827;
             --border-ui: #1f2937;
             --text-main: #f8fafc;
             --text-light: #94a3b8;
             --bg-hover: #1f2937;
             --bg-active: rgba(255, 143, 80, 0.1);
-            
-            --shadow-sm: 0 2px 10px rgba(0,0,0,0.3);
-            --shadow-md: 0 10px 30px -5px rgba(0,0,0,0.5);
-            --shadow-lg: 0 20px 50px -10px rgba(0,0,0,0.6);
+            --shadow-floating: 0 15px 35px rgba(0, 0, 0, 0.4);
         }
 
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); height: 100vh; overflow: hidden; transition: background-color 0.3s ease; }
@@ -62,197 +63,196 @@
 
         /* --- BACKGROUND --- */
         .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
-        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatBlob 10s infinite alternate; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; animation: floatBlob 10s infinite alternate; }
         .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
         .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
-        .blob-3 { width: 300px; height: 300px; background: #FFD1D1; top: 40%; left: 40%; animation-delay: -2s; }
-        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
+        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.05); } }
 
         /* --- BỐ CỤC CHÍNH --- */
         .main-content { 
             width: calc(100% - var(--sidebar-width)); margin-left: var(--sidebar-width);
             height: 100vh; background: var(--glass-bg); backdrop-filter: blur(25px);
-            padding: 20px; display: flex; gap: 20px; transition: all 0.3s ease;
+            padding: 25px; display: flex; gap: 25px; transition: all 0.3s ease;
         }
 
         /* =========================================
-           TOC SIDEBAR (MỤC LỤC) - PC & MOBILE
+           TOC SIDEBAR (MỤC LỤC THEO LỚP)
            ========================================= */
         .toc-sidebar {
-            width: 350px; background: var(--bg-card); border-radius: 32px;
-            border: 1px solid var(--border-ui); box-shadow: var(--shadow-lg);
+            width: 360px; background: var(--bg-card); border-radius: 32px;
+            border: 1px solid rgba(255,255,255,0.6); box-shadow: var(--shadow-lg);
             display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0;
             transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             position: relative; z-index: 30;
         }
+        html.dark .toc-sidebar { border-color: var(--border-ui); }
         
-        .toc-sidebar.collapsed {
-            width: 0; border: none; opacity: 0; margin-right: -24px; 
-            visibility: hidden; padding: 0; transform: translateX(-30px);
-        }
+        .toc-sidebar.collapsed { width: 0; border: none; opacity: 0; margin-right: -25px; visibility: hidden; padding: 0; transform: translateX(-30px); }
         
         .toc-header {
-            padding: 24px; border-bottom: 1px solid var(--border-ui);
+            padding: 24px 24px 20px; border-bottom: 1px solid var(--border-ui);
             display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255,255,255,0.4); backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);
         }
-        html.dark .toc-header { background: rgba(0,0,0,0.2); }
+        html.dark .toc-header { background: rgba(0,0,0,0.1); }
 
         .btn-toggle-toc {
-            width: 38px; height: 38px; border-radius: 12px; border: 1px solid var(--border-ui);
-            background: var(--bg-hover); color: var(--text-light);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.3s ease;
+            width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--border-ui);
+            background: var(--bg-hover); color: var(--text-light); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s ease; box-shadow: var(--shadow-sm);
         }
-        .btn-toggle-toc:hover { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05) translateX(-2px); box-shadow: 0 4px 12px rgba(255, 143, 80, 0.3); }
+        .btn-toggle-toc:hover { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
 
         .toc-body { flex: 1; overflow-y: auto; padding: 20px 16px; scroll-behavior: smooth; }
 
-        /* Khối Chương */
-        .chapter-group { margin-bottom: 16px; border-radius: 20px; overflow: hidden; border: 1px solid transparent; transition: all 0.4s ease;}
-        .chapter-group.open { border-color: var(--border-ui); background: var(--bg-hover); padding-bottom: 12px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.01);}
+        /* Khối Lớp Học (Level 1) */
+        .chapter-group { margin-bottom: 16px; border-radius: 20px; overflow: hidden; border: 1px solid transparent; transition: all 0.3s ease;}
+        .chapter-group.open { border-color: var(--border-ui); background: var(--bg-hover); padding-bottom: 12px; }
         
         .chapter-title {
-            font-size: 0.85rem; font-weight: 800; color: var(--text-main); text-transform: uppercase;
-            letter-spacing: 0.5px; padding: 16px; margin: 0; display: flex; align-items: center; justify-content: space-between;
-            cursor: pointer; transition: 0.3s; user-select: none;
+            font-size: 0.95rem; font-weight: 900; color: var(--text-main); text-transform: uppercase;
+            letter-spacing: 0.5px; padding: 18px 20px; margin: 0; display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; transition: 0.3s; user-select: none; background: white; border-radius: 16px; border: 1px solid var(--border-ui);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
         }
-        .chapter-title:hover { background: var(--bg-active); border-radius: 16px; color: var(--primary);}
+        html.dark .chapter-title { background: #1e293b; }
+        .chapter-group.open .chapter-title { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: none; background: var(--bg-active); color: var(--primary); box-shadow: none;}
+        
         .chapter-icon-wrap { display: flex; align-items: center; gap: 12px;}
-        .chapter-arrow { transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); color: var(--text-light); font-size: 0.9rem;}
+        .chapter-arrow { transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); color: var(--text-light); font-size: 1rem;}
         .chapter-group.open .chapter-arrow { transform: rotate(180deg); color: var(--primary); }
         
-        .lesson-list { max-height: 0; overflow: hidden; transition: max-height 0.6s cubic-bezier(0.25, 1, 0.5, 1); padding: 0 12px;}
-        .chapter-group.open .lesson-list { max-height: 1000px; margin-top: 4px; }
+        .lesson-list { 
+            max-height: 0; opacity: 0; overflow: hidden; 
+            transition: max-height 0.4s ease-in-out, opacity 0.3s ease, margin-top 0.3s ease; 
+            padding: 0 16px;
+        }
+        .chapter-group.open .lesson-list { max-height: 600px; opacity: 1; margin-top: 8px; }
 
-        /* Nút Bài học (Lesson Item) */
+        /* Nút Bài học (Lesson Item Level 3) */
         .lesson-item {
             display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
-            padding: 14px; border-radius: 16px; color: var(--text-light); font-weight: 600; font-size: 0.9rem;
+            padding: 14px 16px; border-radius: 14px; color: var(--text-light); font-weight: 600; font-size: 0.9rem;
             cursor: pointer; transition: all 0.3s ease; border: 1px solid transparent; margin-bottom: 6px;
-            position: relative; overflow: hidden;
+            position: relative; overflow: hidden; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.01);
         }
-        .lesson-item i, .lesson-item span { position: relative; z-index: 2; }
-        .lesson-item i { font-size: 1.1rem; transition: 0.3s; width: 22px; text-align: center; }
+        html.dark .lesson-item { background: transparent; box-shadow: none; }
+        .lesson-item i { font-size: 1.2rem; transition: 0.3s; width: 24px; text-align: center;}
         
-        .lesson-item:hover { background: rgba(0,0,0,0.03); color: var(--text-main); transform: translateX(4px); }
+        .lesson-item:hover { background: var(--bg-active); color: var(--primary); transform: translateX(4px); border-color: rgba(255,143,80,0.2); }
         html.dark .lesson-item:hover { background: rgba(255,255,255,0.03); }
         
-        .lesson-item.active { background: white; border-color: var(--border-ui); color: var(--primary); box-shadow: var(--shadow-sm); font-weight: 800; transform: translateX(4px); }
-        html.dark .lesson-item.active { background: #1f2937; }
-        .lesson-item.active i { color: var(--primary); }
-        
-        .lesson-item .live-dot { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; position: absolute; right: 15px; opacity: 0; transition: 0.3s; z-index: 2; box-shadow: 0 0 10px var(--primary); animation: pulseDot 1.5s infinite;}
-        .lesson-item.active .live-dot { opacity: 1; }
-        @keyframes pulseDot { 0% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.3); opacity: 1; } 100% { transform: scale(0.8); opacity: 0.5; } }
-
-        .lesson-item::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: var(--primary-gradient); border-radius: 0 4px 4px 0; transform: scaleY(0); transition: transform 0.3s ease; transform-origin: center; z-index: 2; }
-        .lesson-item.active::before { transform: scaleY(0.6); }
-
-        .lesson-item::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: linear-gradient(90deg, rgba(255,143,80,0.1) 0%, transparent 100%); opacity: 0; transition: opacity 0.4s ease; z-index: 0; }
-        html.dark .lesson-item::after { background: linear-gradient(90deg, rgba(255,143,80,0.05) 0%, transparent 100%); }
-        .lesson-item.active::after { opacity: 1; }
-
+        .lesson-item.active { background: var(--primary-gradient); border-color: transparent; color: white; box-shadow: 0 8px 20px rgba(255,143,80,0.3); font-weight: 800; transform: translateX(6px); }
+        .lesson-item.active i { color: white; }
 
         /* =========================================
-           VIEWER AREA (KHU VỰC HIỂN THỊ)
+           VIEWER AREA (LẬT TRANG PDF)
            ========================================= */
         .viewer-area {
             flex: 1; background: var(--bg-card); border-radius: 32px;
-            border: 1px solid var(--border-ui); box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255,255,255,0.6); box-shadow: var(--shadow-lg);
             display: flex; flex-direction: column; overflow: hidden;
-            position: relative; z-index: 20;
-            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-            max-width: 1200px; /* Bóp gọn lại trên PC cho đẹp */
-            margin: 0 auto;
+            position: relative; z-index: 20; transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            max-width: 1200px; margin: 0 auto;
         }
+        html.dark .viewer-area { border-color: var(--border-ui); }
 
         .btn-open-toc {
-            position: absolute; left: 0px; top: 20px; z-index: 100;
-            height: 48px; padding: 0 20px 0 16px;
-            border-radius: 0 16px 16px 0; border: none;
-            background: var(--bg-card); color: var(--primary);
-            border: 1px solid var(--border-ui); border-left: none; 
-            box-shadow: 10px 0 20px rgba(0,0,0,0.05);
-            display: flex; align-items: center; justify-content: center; gap: 8px;
+            position: absolute; left: 0px; top: 24px; z-index: 100;
+            height: 48px; padding: 0 20px 0 16px; border-radius: 0 16px 16px 0; border: none;
+            background: var(--bg-card); color: var(--primary); border: 1px solid var(--border-ui); border-left: none; 
+            box-shadow: 10px 0 20px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; gap: 8px;
             cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             opacity: 0; pointer-events: none; transform: translateX(-100%); 
         }
-        .btn-open-toc i { font-size: 1.1rem; transition: 0.3s; }
-        .btn-open-toc span { font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-        .btn-open-toc:hover { background: var(--bg-hover); padding-left: 20px; padding-right: 25px; }
-        .btn-open-toc:hover i { transform: scale(1.1); }
         .toc-sidebar.collapsed + .viewer-area .btn-open-toc { opacity: 1; pointer-events: auto; transform: translateX(0); }
 
         .viewer-header { 
-            padding: 20px 30px; display: flex; flex-direction: row; 
+            padding: 20px 30px 20px 65px; /* Tăng lề trái lên 65px để nút Mục Lục không đè lên chữ */
+            display: flex; flex-direction: row; 
             justify-content: space-between; align-items: center; gap: 20px; 
-            border-bottom: 1px solid var(--border-ui);
-            background: rgba(255,255,255,0.4); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-ui); background: rgba(255,255,255,0.3); backdrop-filter: blur(10px);
         }
-        html.dark .viewer-header { background: rgba(0,0,0,0.2); }
-        
+        html.dark .viewer-header { background: rgba(0,0,0,0.1); }
+        .lesson-title-main { font-size: 1.5rem; font-weight: 900; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.5px;}
+
+        /* Vùng hiển thị Canvas 3D */
+        .viewer-content-wrapper { 
+            flex: 1; padding: 20px; display: flex; flex-direction: column; position: relative; background: #f8fafc; 
+            overflow: hidden; /* Rất quan trọng: Ngăn chặn PDF tràn ra ngoài màn hình */
+        }
+        html.dark .viewer-content-wrapper { background: #0f172a; }
+
         .viewer-title-row { flex: 1; min-width: 0; display: flex; align-items: center; gap: 15px;}
-        .lesson-title-main { font-size: 1.4rem; font-weight: 800; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3;}
+        .lesson-title-main { font-size: 1.4rem; font-weight: 800; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
 
-        /* Modern Tabs (Pill Style) */
-        .viewer-tabs { 
-            display: flex; gap: 4px; background: var(--bg-body); padding: 4px; 
-            border-radius: 100px; width: fit-content; flex-shrink: 0;
-            border: 1px solid var(--border-ui); box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
-        }
-        html.dark .viewer-tabs { background: #0B1120; }
-        
-        .tab-btn {
-            background: transparent; border: none; padding: 10px 18px; font-size: 0.8rem; font-weight: 800;
-            color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
-            border-radius: 100px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;
-        }
-        .tab-btn:hover { color: var(--text-main); }
-        .tab-btn.active { color: var(--primary); background: var(--bg-card); box-shadow: var(--shadow-sm); }
-
-        /* Khung chứa nội dung */
-        .viewer-content-wrapper { flex: 1; padding: 25px 30px 30px; display: flex; flex-direction: column; position: relative; }
-
-        .viewer-content { 
-            flex: 1; background: #f8fafc; position: relative; border-radius: 24px;
-            border: 1px solid var(--border-ui); overflow: hidden; box-shadow: inset 0 4px 20px rgba(0,0,0,0.02);
-        }
-        html.dark .viewer-content { background: #0f172a; }
-        
-        .viewer-content::before {
-            content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.5;
-            background-image: radial-gradient(var(--border-ui) 1px, transparent 1px); background-size: 20px 20px; z-index: 0;
+        .pdf-canvas-container {
+            flex: 1; position: relative; perspective: 2000px; 
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
+            border-radius: 12px;
+            padding-bottom: 60px; /* Chừa một khoảng trống bên dưới để PDF không bị thanh chuyển trang che mất */
         }
 
-        .media-iframe { width: 100%; height: 100%; border: none; position: absolute; inset: 0; transition: opacity 0.5s ease; opacity: 0; pointer-events: none; z-index: 10;}
-        .media-iframe.active { opacity: 1; pointer-events: auto; }
+        #pdf-render-canvas {
+            max-width: 100%; max-height: 100%; object-fit: contain;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15); border-radius: 6px;
+            background: white; border: 1px solid #e2e8f0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
 
-        /* Mindmap Specific */
-        #mindmap-scroll-area { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 30px; overflow: auto; cursor: grab; }
-        #mindmap-scroll-area.dragging { cursor: grabbing !important; user-select: none; }
-        
-        #mindmap-img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); border-radius: 16px; box-shadow: var(--shadow-lg); user-select: none; -webkit-user-drag: none; pointer-events: none; }
-        #mindmap-img.zoomed { max-width: none; max-height: none; transform: scale(1.6); cursor: zoom-out; }
+        /* Animation Lật Trang CSS Mượt mà */
+        .flip-next { animation: pageFlipNext 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        .flip-prev { animation: pageFlipPrev 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
 
-        .btn-zoom { position: absolute; bottom: 30px; right: 30px; width: 50px; height: 50px; background: var(--bg-card); border-radius: 50%; box-shadow: var(--shadow-md); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: var(--text-main); cursor: pointer; border: 1px solid var(--border-ui); transition: 0.3s; z-index: 50;}
-        .btn-zoom:hover { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.1) translateY(-5px);}
+        @keyframes pageFlipNext {
+            0% { transform: rotateY(0deg); opacity: 1; filter: brightness(1); }
+            49% { transform: rotateY(-90deg) scale(0.98); opacity: 0.3; filter: brightness(0.8); }
+            50% { transform: rotateY(90deg) scale(0.98); opacity: 0; }
+            100% { transform: rotateY(0deg); opacity: 1; filter: brightness(1); }
+        }
 
-        /* SKELETON LOADING */
-        #pdf-loading { background: rgba(248, 250, 252, 0.85); backdrop-filter: blur(15px); z-index: 30; }
-        html.dark #pdf-loading { background: rgba(15, 23, 42, 0.85); }
-        .loading-icon-wrap { width: 80px; height: 80px; background: var(--bg-card); border-radius: 24px; box-shadow: var(--shadow-md); display: flex; align-items: center; justify-content: center; margin-bottom: 30px; border: 1px solid var(--border-ui); }
-        .skeleton-wrapper { width: 100%; max-width: 400px; padding: 0 20px; display: flex; flex-direction: column; gap: 16px;}
-        .skeleton-box { height: 20px; border-radius: 10px; background: #e2e8f0; position: relative; overflow: hidden; }
-        html.dark .skeleton-box { background: #334155; }
-        .skeleton-box.w-full { width: 100%; } .skeleton-box.w-3-4 { width: 75%; } .skeleton-box.w-1-2 { width: 50%; }
-        .skeleton-box::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent); transform: translateX(-100%); animation: shimmer 1.5s infinite; }
-        html.dark .skeleton-box::after { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); }
-        @keyframes shimmer { 100% { transform: translateX(100%); } }
+        @keyframes pageFlipPrev {
+            0% { transform: rotateY(0deg); opacity: 1; filter: brightness(1); }
+            49% { transform: rotateY(90deg) scale(0.98); opacity: 0.3; filter: brightness(0.8); }
+            50% { transform: rotateY(-90deg) scale(0.98); opacity: 0; }
+            100% { transform: rotateY(0deg); opacity: 1; filter: brightness(1); }
+        }
 
-        /* =========================================
-           MOBILE & TABLET OPTIMIZATION
-           ========================================= */
+        /* Thanh điều khiển Nổi (Floating Controls) */
+        .pdf-controls {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8); padding: 8px 12px; border-radius: 50px;
+            display: flex; flex-direction: column; gap: 6px; width: max-content; min-width: 220px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08); z-index: 40;
+        }
+        html.dark .pdf-controls { background: rgba(30, 41, 59, 0.95); border-color: var(--border-ui); }
+
+        .control-buttons { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 20px;}
+
+        .btn-page {
+            width: 36px; height: 36px; background: #f1f5f9; color: #334155;
+            border-radius: 50%; font-size: 1rem; border: none; outline: none;
+            transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+        html.dark .btn-page { background: #334155; color: #cbd5e1; }
+        .btn-page:hover:not(:disabled) { background: #f8fafc; color: var(--primary); transform: scale(1.05); box-shadow: 0 2px 8px rgba(0,0,0,0.05);}
+        .btn-page:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .page-info { font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-size: 0.8rem;}
+        #page-num { font-size: 1.1rem; color: var(--primary); margin: 0 2px; font-weight: 900;}
+
+        .progress-track { width: calc(100% - 20px); height: 3px; background: #e2e8f0; border-radius: 10px; overflow: hidden; margin: 0 auto 2px;}
+        html.dark .progress-track { background: #334155; }
+        .progress-fill { height: 100%; background: var(--primary-gradient); width: 0%; transition: width 0.3s ease; }
+
+        /* LOADING SKELETON */
+        #pdf-loading { background: rgba(248, 250, 252, 0.95); backdrop-filter: blur(15px); z-index: 50; border-radius: 16px;}
+        html.dark #pdf-loading { background: rgba(15, 23, 42, 0.95); }
+        .spinner { width: 50px; height: 50px; border: 4px solid #fed7aa; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;}
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- MOBILE --- */
         .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 65px; background: var(--bg-card); z-index: 100; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border-ui); backdrop-filter: blur(20px);}
         #mobile-toc-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1001; opacity: 0; transition: 0.3s; }
         #mobile-toc-overlay.active { opacity: 1; }
@@ -262,22 +262,16 @@
             .mobile-header { display: flex; }
             .main-content { padding: 85px 15px 20px; height: 100vh; flex-direction: column; gap: 15px; margin-left: 0 !important; width: 100% !important;}
             
-            /* Sidebar biến thành Drawer trên Tablet/Mobile */
-            .toc-sidebar {
-                position: fixed; left: -320px; top: 0; bottom: 0; z-index: 1002; height: 100vh; border-radius: 0; width: 300px;
-                transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); margin: 0;
-            }
+            .toc-sidebar { position: fixed; left: -320px; top: 0; bottom: 0; z-index: 1002; height: 100vh; border-radius: 0; width: 300px; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); margin: 0;}
             .toc-sidebar.open { transform: translateX(320px); }
             #mobile-toc-overlay.active { display: block; }
-
-            .viewer-area { border-radius: 24px; max-width: 100%; margin: 0;}
-            .viewer-header { flex-direction: column; align-items: stretch; padding: 20px; gap: 15px; border-bottom: none; }
-            .viewer-content-wrapper { padding: 0 20px 20px; }
-            .lesson-title-main { font-size: 1.2rem; text-align: center; width: 100%;}
             
-            .viewer-tabs { width: 100%; justify-content: space-between; padding: 4px; gap: 4px; margin: 0 auto;}
-            .tab-btn { flex: 1; justify-content: center; padding: 12px 5px; font-size: 0.75rem;}
-            .tab-btn span { display: none; } /* Ẩn chữ rườm rà trên mobile, chỉ để icon */
+            .viewer-area { border-radius: 24px; max-width: 100%; margin: 0;}
+            .viewer-header { padding: 20px; padding-left: 50px;} /* Tránh nút menu trên mobile */
+            .viewer-content-wrapper { padding: 15px; }
+            .lesson-title-main { font-size: 1.2rem; }
+            
+            .pdf-controls { bottom: 15px; padding: 8px 12px;}
         }
         
         /* --- GLOBAL SCROLLBAR --- */
@@ -290,9 +284,7 @@
 </head>
 <body>
 
-    <script>
-        if (localStorage.getItem('theme') === 'dark') { document.documentElement.classList.add('dark'); }
-    </script>
+    <script>if (localStorage.getItem('theme') === 'dark') { document.documentElement.classList.add('dark'); }</script>
 
     <div class="background-blobs">
         <div class="blob blob-1"></div>
@@ -306,12 +298,9 @@
         <div class="flex items-center gap-4">
             <button onclick="toggleGlobalSidebar()" class="text-gray-700 dark:text-gray-300 text-2xl focus:outline-none hover:text-orange-500 transition"><i class="fas fa-bars"></i></button>
         </div>
-        
         <div class="flex items-center gap-3">
-            <button onclick="toggleTOC()" class="w-9 h-9 rounded-full bg-orange-50 dark:bg-gray-800 text-orange-500 flex items-center justify-center text-sm shadow-sm border border-orange-100 dark:border-gray-700 hover:scale-105 transition">
-                <i class="fas fa-book-open"></i>
-            </button>
-            <a href="../dashboard/phongluyende.html" class="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 shadow-sm border border-gray-200 dark:border-gray-700 hover:text-red-500 transition"><i class="fas fa-times"></i></a>
+            <button onclick="toggleTOC()" class="w-9 h-9 rounded-full bg-orange-50 dark:bg-gray-800 text-orange-500 flex items-center justify-center text-sm shadow-sm border border-orange-100 hover:scale-105 transition"><i class="fas fa-book-open"></i></button>
+            <a href="../dashboard/phongluyende.html" class="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 shadow-sm border border-gray-200 hover:text-red-500 transition"><i class="fas fa-times"></i></a>
         </div>
     </div>
 
@@ -321,209 +310,71 @@
         
         <aside class="toc-sidebar" id="toc-sidebar">
             <div class="toc-header">
-                <h2 class="font-black text-gray-800 dark:text-white flex items-center gap-3 text-lg">
-                    <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center text-base shadow-sm border border-orange-100"><i class="fas fa-book-open"></i></div>
+                <h2 class="font-black text-gray-800 dark:text-white flex items-center gap-3 text-lg tracking-tight">
+                    <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center text-base shadow-sm border border-orange-100"><i class="fas fa-list"></i></div>
                     MỤC LỤC
                 </h2>
-                <button class="hidden lg:flex btn-toggle-toc" onclick="toggleDesktopTOC()" title="Thu gọn mục lục">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <button class="lg:hidden w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-full text-gray-500 flex items-center justify-center" onclick="toggleTOC()"><i class="fas fa-times"></i></button>
+                <button class="hidden lg:flex btn-toggle-toc" onclick="toggleDesktopTOC()" title="Thu gọn"><i class="fas fa-chevron-left"></i></button>
+                <button class="lg:hidden w-8 h-8 bg-gray-100 rounded-full text-gray-500 flex items-center justify-center" onclick="toggleTOC()"><i class="fas fa-times"></i></button>
             </div>
             
             <div class="toc-body custom-scrollbar">
                 
-                <div class="chapter-group open"> 
+                <div class="chapter-group"> 
                     <div class="chapter-title" onclick="toggleChapter(this)">
-                        <div class="chapter-icon-wrap">
-                            <i class="fas fa-book-open text-blue-400 text-lg"></i> TRUYỆN NGẮN & TIỂU THUYẾT HIỆN ĐẠI
-                        </div>
+                        <div class="chapter-icon-wrap"><i class="fas fa-book text-gray-400 text-lg"></i> NGỮ VĂN 10</div>
                         <i class="fas fa-chevron-down chapter-arrow"></i>
                     </div>
                     <div class="lesson-list">
-                        <button id="ls-truyen-ngan-hien-dai" class="lesson-item active" onclick="loadLesson('ls-truyen-ngan-hien-dai', 'Truyện ngắn hiện đại', '../data/lythuyet_default.pdf', '../data/mindmap/truyenngan.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Truyện ngắn hiện đại</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-diem-nhin" class="lesson-item" onclick="loadLesson('ls-diem-nhin', 'Điểm nhìn trong truyện ngắn', '../data/lythuyet_default.pdf', '../data/mindmap/truyenngan.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Điểm nhìn trong truyện ngắn</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-tieu-thuyet" class="lesson-item" onclick="loadLesson('ls-tieu-thuyet', 'Tiểu thuyết hiện đại', '../data/lythuyet_default.pdf', '../data/mindmap/truyenngan.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Tiểu thuyết hiện đại</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-dac-diem-tt" class="lesson-item" onclick="loadLesson('ls-dac-diem-tt', 'Đặc điểm tiểu thuyết hiện đại', '../data/lythuyet_default.pdf', '../data/mindmap/truyenngan.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Đặc điểm tiểu thuyết hiện đại</span> <div class="live-dot"></div>
-                        </button>
+                        <div class="p-5 text-center text-sm text-gray-400 italic font-medium border border-dashed border-gray-200 rounded-xl mt-2">Dữ liệu đang được cập nhật...</div>
                     </div>
                 </div>
 
-                <div class="chapter-group">
+                <div class="chapter-group"> 
                     <div class="chapter-title" onclick="toggleChapter(this)">
-                        <div class="chapter-icon-wrap">
-                            <i class="fas fa-newspaper text-green-400 text-lg"></i> VĂN BẢN NGHỊ LUẬN & VĂN BẢN THÔNG TIN
-                        </div>
+                        <div class="chapter-icon-wrap"><i class="fas fa-book text-gray-400 text-lg"></i> NGỮ VĂN 11</div>
                         <i class="fas fa-chevron-down chapter-arrow"></i>
                     </div>
                     <div class="lesson-list">
-                        <button id="ls-vb-nghiluan-kn" class="lesson-item" onclick="loadLesson('ls-vb-nghiluan-kn', 'Văn bản nghị luận – khái niệm', '../data/lythuyet_default.pdf', '../data/mindmap/nghiluan.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Văn bản nghị luận – khái niệm</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-cautruc-vbnl" class="lesson-item" onclick="loadLesson('ls-cautruc-vbnl', 'Cấu trúc văn bản nghị luận', '../data/lythuyet_default.pdf', '../data/mindmap/nghiluan.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Cấu trúc văn bản nghị luận</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-yeuto-botro" class="lesson-item" onclick="loadLesson('ls-yeuto-botro', 'Yếu tố bổ trợ và tính thuyết phục', '../data/lythuyet_default.pdf', '../data/mindmap/nghiluan.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Yếu tố bổ trợ và tính thuyết phục</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-thaotac-nl" class="lesson-item" onclick="loadLesson('ls-thaotac-nl', 'Thao tác nghị luận', '../data/lythuyet_default.pdf', '../data/mindmap/nghiluan.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Thao tác nghị luận</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-vb-thongtin" class="lesson-item" onclick="loadLesson('ls-vb-thongtin', 'Văn bản thông tin – khái niệm và hình thức', '../data/lythuyet_default.pdf', '../data/mindmap/nghiluan.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Văn bản thông tin – khái niệm và hình thức</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-dulieu-vbtt" class="lesson-item" onclick="loadLesson('ls-dulieu-vbtt', 'Dữ liệu và bố cục trong văn bản thông tin', '../data/lythuyet_default.pdf', '../data/mindmap/nghiluan.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Dữ liệu và bố cục trong VB thông tin</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-dotincay" class="lesson-item" onclick="loadLesson('ls-dotincay', 'Độ tin cậy của thông tin', '../data/lythuyet_default.pdf', '../data/mindmap/nghiluan.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Độ tin cậy của thông tin</span> <div class="live-dot"></div>
-                        </button>
+                        <div class="p-5 text-center text-sm text-gray-400 italic font-medium border border-dashed border-gray-200 rounded-xl mt-2">Dữ liệu đang được cập nhật...</div>
                     </div>
                 </div>
 
-                <div class="chapter-group">
+                <div class="chapter-group open">
                     <div class="chapter-title" onclick="toggleChapter(this)">
-                        <div class="chapter-icon-wrap">
-                            <i class="fas fa-theater-masks text-purple-400 text-lg"></i> HÀI KỊCH – NHẬT KÍ – PHÓNG SỰ – HỒI KÍ
-                        </div>
+                        <div class="chapter-icon-wrap"><i class="fas fa-book-open text-orange-500 text-lg"></i> NGỮ VĂN 12</div>
                         <i class="fas fa-chevron-down chapter-arrow"></i>
                     </div>
                     <div class="lesson-list">
-                        <button id="ls-hai-kich" class="lesson-item" onclick="loadLesson('ls-hai-kich', 'Hài kịch', '../data/lythuyet_default.pdf', '../data/mindmap/haikich-nhatky.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Hài kịch</span> <div class="live-dot"></div>
+                        
+                        <button id="ls-truyen-tieu-thuyet" class="lesson-item active" onclick="loadLesson('ls-truyen-tieu-thuyet', 'Truyện ngắn & Tiểu thuyết hiện đại', '../data/ctgdpt2018_tong_the_193202020.pdf')">
+                            <i class="fas fa-layer-group"></i> <span>Truyện ngắn & Tiểu thuyết hiện đại</span>
                         </button>
-                        <button id="ls-dacdiem-haikich" class="lesson-item" onclick="loadLesson('ls-dacdiem-haikich', 'Đặc điểm nghệ thuật của hài kịch', '../data/lythuyet_default.pdf', '../data/mindmap/haikich-nhatky.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Đặc điểm nghệ thuật của hài kịch</span> <div class="live-dot"></div>
+                        
+                        <button id="ls-vb-nghiluan-thongtin" class="lesson-item" onclick="loadLesson('ls-vb-nghiluan-thongtin', 'Văn bản nghị luận & Văn bản thông tin', '../data/lythuyet_default.pdf')">
+                            <i class="fas fa-newspaper"></i> <span>Văn bản nghị luận & thông tin</span>
                         </button>
-                        <button id="ls-nhatki-phongsu" class="lesson-item" onclick="loadLesson('ls-nhatki-phongsu', 'Nhật kí – Phóng sự – Hồi kí', '../data/lythuyet_default.pdf', '../data/mindmap/haikich-nhatky.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Nhật kí – Phóng sự – Hồi kí</span> <div class="live-dot"></div>
+                        
+                        <button id="ls-hai-kich-nhat-ky" class="lesson-item" onclick="loadLesson('ls-hai-kich-nhat-ky', 'Hài kịch - Nhật ký - Phóng sự - Hồi ký', '../data/lythuyet_default.pdf')">
+                            <i class="fas fa-theater-masks"></i> <span>Hài kịch - Nhật ký - Phóng sự - Hồi ký</span>
                         </button>
-                        <button id="ls-phihucau" class="lesson-item" onclick="loadLesson('ls-phihucau', 'Tính phi hư cấu và thủ pháp nghệ thuật', '../data/lythuyet_default.pdf', '../data/mindmap/haikich-nhatky.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Tính phi hư cấu và thủ pháp nghệ thuật</span> <div class="live-dot"></div>
+                        
+                        <button id="ls-tuy-but-tan-van" class="lesson-item" onclick="loadLesson('ls-tuy-but-tan-van', 'Tuỳ bút - Tản văn - Bút ký', '../data/lythuyet_default.pdf')">
+                            <i class="fas fa-feather-alt"></i> <span>Tuỳ bút - Tản văn - Bút ký</span>
                         </button>
-                    </div>
-                </div>
+                        
+                        <button id="ls-tho-tru-tinh" class="lesson-item" onclick="loadLesson('ls-tho-tru-tinh', 'Thơ trữ tình', '../data/lythuyet_default.pdf')">
+                            <i class="fas fa-wind"></i> <span>Thơ trữ tình</span>
+                        </button>
+                        
+                        <button id="ls-cac-dang-de" class="lesson-item" onclick="loadLesson('ls-cac-dang-de', 'Các dạng đề nghị luận', '../data/lythuyet_default.pdf')">
+                            <i class="fas fa-edit"></i> <span>Các dạng đề nghị luận</span>
+                        </button>
+                        
+                        <button id="ls-tri-thuc-tieng-viet" class="lesson-item" onclick="loadLesson('ls-tri-thuc-tieng-viet', 'Tri thức tiếng Việt', '../data/lythuyet_default.pdf')">
+                            <i class="fas fa-language"></i> <span>Tri thức tiếng Việt</span>
+                        </button>
 
-                <div class="chapter-group">
-                    <div class="chapter-title" onclick="toggleChapter(this)">
-                        <div class="chapter-icon-wrap">
-                            <i class="fas fa-feather-alt text-pink-400 text-lg"></i> TÙY BÚT – TẢN VĂN – BÚT KÍ
-                        </div>
-                        <i class="fas fa-chevron-down chapter-arrow"></i>
-                    </div>
-                    <div class="lesson-list">
-                        <button id="ls-tuy-but" class="lesson-item" onclick="loadLesson('ls-tuy-but', 'Tùy bút', '../data/lythuyet_default.pdf', '../data/mindmap/tuybut-tanvan.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Tùy bút</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-tan-van" class="lesson-item" onclick="loadLesson('ls-tan-van', 'Tản văn', '../data/lythuyet_default.pdf', '../data/mindmap/tuybut-tanvan.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Tản văn</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-but-ki" class="lesson-item" onclick="loadLesson('ls-but-ki', 'Bút kí', '../data/lythuyet_default.pdf', '../data/mindmap/tuybut-tanvan.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Bút kí</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-diem-chung" class="lesson-item" onclick="loadLesson('ls-diem-chung', 'Điểm chung và nét riêng', '../data/lythuyet_default.pdf', '../data/mindmap/tuybut-tanvan.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Điểm chung và nét riêng</span> <div class="live-dot"></div>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="chapter-group">
-                    <div class="chapter-title" onclick="toggleChapter(this)">
-                        <div class="chapter-icon-wrap">
-                            <i class="fas fa-wind text-teal-400 text-lg"></i> THƠ TRỮ TÌNH
-                        </div>
-                        <i class="fas fa-chevron-down chapter-arrow"></i>
-                    </div>
-                    <div class="lesson-list">
-                        <button id="ls-kn-tho" class="lesson-item" onclick="loadLesson('ls-kn-tho', 'Khái niệm thơ trữ tình', '../data/lythuyet_default.pdf', '../data/mindmap/thotrutinh.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Khái niệm thơ trữ tình</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-chuthe-trutinh" class="lesson-item" onclick="loadLesson('ls-chuthe-trutinh', 'Chủ thể trữ tình và nhân vật trữ tình', '../data/lythuyet_default.pdf', '../data/mindmap/thotrutinh.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Chủ thể trữ tình và nhân vật trữ tình</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-camxuc" class="lesson-item" onclick="loadLesson('ls-camxuc', 'Cảm xúc và cảm hứng chủ đạo', '../data/lythuyet_default.pdf', '../data/mindmap/thotrutinh.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Cảm xúc và cảm hứng chủ đạo</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-nghethuat-tho" class="lesson-item" onclick="loadLesson('ls-nghethuat-tho', 'Các yếu tố nghệ thuật trong thơ', '../data/lythuyet_default.pdf', '../data/mindmap/thotrutinh.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Các yếu tố nghệ thuật trong thơ</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-tho-hiendai" class="lesson-item" onclick="loadLesson('ls-tho-hiendai', 'Thơ trữ tình hiện đại', '../data/lythuyet_default.pdf', '../data/mindmap/thotrutinh.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Thơ trữ tình hiện đại</span> <div class="live-dot"></div>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="chapter-group">
-                    <div class="chapter-title" onclick="toggleChapter(this)">
-                        <div class="chapter-icon-wrap">
-                            <i class="fas fa-edit text-orange-400 text-lg"></i> CÁC DẠNG ĐỀ NGHỊ LUẬN
-                        </div>
-                        <i class="fas fa-chevron-down chapter-arrow"></i>
-                    </div>
-                    <div class="lesson-list">
-                        <button id="ls-nghiluan-xh" class="lesson-item" onclick="loadLesson('ls-nghiluan-xh', 'Nghị luận xã hội', '../data/lythuyet_default.pdf', '../data/mindmap/nlxh-nlvh.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Nghị luận xã hội</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-dang-nlxh" class="lesson-item" onclick="loadLesson('ls-dang-nlxh', 'Các dạng nghị luận xã hội', '../data/lythuyet_default.pdf', '../data/mindmap/nlxh-nlvh.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Các dạng nghị luận xã hội</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-vietdoan-nlxh" class="lesson-item" onclick="loadLesson('ls-vietdoan-nlxh', 'Cách viết đoạn nghị luận xã hội', '../data/lythuyet_default.pdf', '../data/mindmap/nlxh-nlvh.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Cách viết đoạn nghị luận xã hội</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-nghiluan-vh" class="lesson-item" onclick="loadLesson('ls-nghiluan-vh', 'Nghị luận văn học', '../data/lythuyet_default.pdf', '../data/mindmap/nlxh-nlvh.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Nghị luận văn học</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-dang1" class="lesson-item" onclick="loadLesson('ls-dang1', 'Dạng 1 – Phân tích một tác phẩm/đoạn trích', '../data/lythuyet_default.pdf', '../data/mindmap/nlxh-nlvh.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Dạng 1 – Phân tích tác phẩm</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-dang2" class="lesson-item" onclick="loadLesson('ls-dang2', 'Dạng 2 – So sánh hai tác phẩm', '../data/lythuyet_default.pdf', '../data/mindmap/nlxh-nlvh.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Dạng 2 – So sánh hai tác phẩm</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-dang3" class="lesson-item" onclick="loadLesson('ls-dang3', 'Dạng 3 – Phân tích đặc điểm thể loại', '../data/lythuyet_default.pdf', '../data/mindmap/nlxh-nlvh.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Dạng 3 – Phân tích đặc điểm thể loại</span> <div class="live-dot"></div>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="chapter-group">
-                    <div class="chapter-title" onclick="toggleChapter(this)">
-                        <div class="chapter-icon-wrap">
-                            <i class="fas fa-language text-indigo-400 text-lg"></i> TRI THỨC TIẾNG VIỆT
-                        </div>
-                        <i class="fas fa-chevron-down chapter-arrow"></i>
-                    </div>
-                    <div class="lesson-list">
-                        <button id="ls-ngonngu-trangtrong" class="lesson-item" onclick="loadLesson('ls-ngonngu-trangtrong', 'Ngôn ngữ trang trọng và ngôn ngữ thân mật', '../data/lythuyet_default.pdf', '../data/mindmap/trithuctiengviet.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Ngôn ngữ trang trọng & thân mật</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-kethop-phongcach" class="lesson-item" onclick="loadLesson('ls-kethop-phongcach', 'Sự kết hợp hai phong cách ngôn ngữ', '../data/lythuyet_default.pdf', '../data/mindmap/trithuctiengviet.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Kết hợp phong cách ngôn ngữ</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-loi-logic" class="lesson-item" onclick="loadLesson('ls-loi-logic', 'Lỗi logic và cách sửa', '../data/lythuyet_default.pdf', '../data/mindmap/trithuctiengviet.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Lỗi logic và cách sửa</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-cau-moho" class="lesson-item" onclick="loadLesson('ls-cau-moho', 'Câu mơ hồ và cách sửa', '../data/lythuyet_default.pdf', '../data/mindmap/trithuctiengviet.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Câu mơ hồ và cách sửa</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-nghichngu" class="lesson-item" onclick="loadLesson('ls-nghichngu', 'Biện pháp tu từ nghịch ngữ', '../data/lythuyet_default.pdf', '../data/mindmap/trithuctiengviet.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Biện pháp tu từ nghịch ngữ</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-sohuutritue" class="lesson-item" onclick="loadLesson('ls-sohuutritue', 'Tôn trọng quyền sở hữu trí tuệ', '../data/lythuyet_default.pdf', '../data/mindmap/trithuctiengviet.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Tôn trọng quyền sở hữu trí tuệ</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-noimia" class="lesson-item" onclick="loadLesson('ls-noimia', 'Biện pháp tu từ nói mỉa', '../data/lythuyet_default.pdf', '../data/mindmap/trithuctiengviet.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Biện pháp tu từ nói mỉa</span> <div class="live-dot"></div>
-                        </button>
-                        <button id="ls-phingonngu" class="lesson-item" onclick="loadLesson('ls-phingonngu', 'Phương tiện giao tiếp phi ngôn ngữ', '../data/lythuyet_default.pdf', '../data/mindmap/trithuctiengviet.png')">
-                            <i class="fas fa-file-pdf"></i> <span>Giao tiếp phi ngôn ngữ</span> <div class="live-dot"></div>
-                        </button>
                     </div>
                 </div>
 
@@ -531,51 +382,38 @@
         </aside>
 
         <section class="viewer-area">
-
             <button class="btn-open-toc hidden lg:flex" onclick="toggleDesktopTOC()" title="Mở mục lục">
                 <i class="fas fa-list-ul text-xl"></i>
             </button>
             
             <div class="viewer-header">
                 <div class="viewer-title-row">
-                    <div class="flex items-center gap-3">
-                        <h1 class="lesson-title-main" id="display-title">Đang tải...</h1>
-                    </div>
+                    <h1 class="lesson-title-main" id="display-title">Đang tải...</h1>
                 </div>
-                
-                <div class="viewer-tabs">
-                    <button class="tab-btn active" id="tab-pdf" onclick="switchTab('pdf')">
-                        <i class="fas fa-book-reader text-lg"></i> <span>BÀI GIẢNG PDF</span>
-                    </button>
-                    <button class="tab-btn" id="tab-mindmap" onclick="switchTab('mindmap')">
-                        <i class="fas fa-project-diagram text-lg"></i> <span>SƠ ĐỒ TƯ DUY</span>
-                    </button>
+                <div class="hidden md:flex gap-2 text-xs font-bold text-gray-400 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">
+                    <i class="fas fa-info-circle mt-0.5"></i> Tài liệu độc quyền
                 </div>
             </div>
 
             <div class="viewer-content-wrapper">
-                <div class="viewer-content">
-                    
-                    <iframe id="pdf-frame" class="media-iframe active" src="about:blank"></iframe>
-                    
-                    <div id="mindmap-frame" class="media-iframe">
-                        <div id="mindmap-scroll-area" class="custom-scrollbar">
-                            <img id="mindmap-img" src="" alt="Sơ đồ tư duy" ondblclick="toggleZoom()" draggable="false">
-                        </div>
-                        <button class="btn-zoom" onclick="toggleZoom()" title="Phóng to/Thu nhỏ"><i class="fas fa-search-plus" id="zoom-icon"></i></button>
+                <div class="pdf-canvas-container">
+                    <div id="pdf-loading" class="absolute inset-0 flex flex-col items-center justify-center z-30">
+                        <div class="spinner"></div>
+                        <p class="font-bold text-gray-500 animate-pulse tracking-wide">Đang tải trang...</p>
                     </div>
                     
-                    <div id="pdf-loading" class="absolute inset-0 flex flex-col items-center justify-center z-20">
-                        <div class="loading-icon-wrap">
-                            <i class="fas fa-spinner fa-spin text-4xl text-orange-400"></i>
-                        </div>
-                        <div class="skeleton-wrapper">
-                            <div class="skeleton-box w-full"></div>
-                            <div class="skeleton-box w-3-4"></div>
-                            <div class="skeleton-box w-1-2"></div>
-                        </div>
+                    <canvas id="pdf-render-canvas"></canvas>
+                </div>
+                
+                <div class="pdf-controls">
+                    <div class="control-buttons">
+                        <button onclick="onPrevPage()" id="btn-prev" class="btn-page" title="Trang trước"><i class="fas fa-chevron-left"></i></button>
+                        <span class="page-info">Trang <span id="page-num">0</span> / <span id="page-count">0</span></span>
+                        <button onclick="onNextPage()" id="btn-next" class="btn-page" title="Trang sau"><i class="fas fa-chevron-right"></i></button>
                     </div>
-
+                    <div class="progress-track">
+                        <div id="pdf-progress" class="progress-fill"></div>
+                    </div>
                 </div>
             </div>
             
@@ -583,10 +421,9 @@
 
     </main>
 
-    <script type="module">
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        
         import { initMenu } from "./menu.js";
 
         const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
@@ -603,27 +440,18 @@
         // CÁC HÀM XỬ LÝ GIAO DIỆN LÝ THUYẾT & TIẾN TRÌNH
         // ----------------------------------------------------
 
-        // Accordion Mở 1 Đóng N
         window.toggleChapter = (headerEl) => {
             const group = headerEl.parentElement;
             const isOpen = group.classList.contains('open');
-            
-            // Đóng tất cả các chương
             document.querySelectorAll('.chapter-group').forEach(g => g.classList.remove('open'));
-            
-            // Mở chương được click (nếu chưa mở)
-            if (!isOpen) {
-                group.classList.add('open');
-            }
+            if (!isOpen) group.classList.add('open');
         };
 
-        // Mở Menu Sidebar chính của hệ thống trên mobile
         window.toggleGlobalSidebar = () => {
             const sidebar = document.querySelector('.sidebar') || document.querySelector('aside:not(#toc-sidebar)');
             if(sidebar) sidebar.classList.toggle('-translate-x-full');
         };
 
-        // Bật/Tắt Mục Lục Bài Giảng trên mobile
         window.toggleTOC = () => {
             const toc = document.getElementById('toc-sidebar');
             const overlay = document.getElementById('mobile-toc-overlay');
@@ -631,107 +459,133 @@
             overlay.classList.toggle('active');
         };
 
-        // Chuyển Tab PDF / SƠ ĐỒ TƯ DUY
-        window.switchTab = (tabName) => {
-            document.getElementById('tab-pdf').classList.remove('active');
-            document.getElementById('tab-mindmap').classList.remove('active');
-            document.getElementById(`tab-${tabName}`).classList.add('active');
-
-            document.getElementById('pdf-frame').classList.remove('active');
-            document.getElementById('mindmap-frame').classList.remove('active');
-            document.getElementById(`${tabName}-frame`).classList.add('active');
-            
-            // Fix: Nếu bấm qua tab Sơ đồ thì phải ẩn luôn màn hình Loading của PDF đi
-            if(tabName === 'mindmap') {
-                document.getElementById('pdf-loading').classList.add('hidden');
-            }
+        window.toggleDesktopTOC = () => {
+            const tocSidebar = document.getElementById('toc-sidebar');
+            if (tocSidebar) tocSidebar.classList.toggle('collapsed');
         };
 
-        // Zoom Ảnh Mindmap
-        window.toggleZoom = () => {
-            const img = document.getElementById('mindmap-img');
-            const icon = document.getElementById('zoom-icon');
-            img.classList.toggle('zoomed');
-            if(img.classList.contains('zoomed')) {
-                icon.classList.remove('fa-search-plus');
-                icon.classList.add('fa-search-minus');
-            } else {
-                icon.classList.add('fa-search-plus');
-                icon.classList.remove('fa-search-minus');
-            }
-        }
+        // ==========================================
+        // LOGIC LẬT TRANG PDF (Sử dụng PDF.js)
+        // ==========================================
+        
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        // TẢI BÀI HỌC VÀ LƯU TIẾN TRÌNH
-        window.loadLesson = (id, title, pdfUrl, mindmapUrl) => {
+        let pdfDoc = null,
+            pageNum = 1,
+            pageIsRendering = false,
+            pageNumPending = null,
+            currentLessonId = "", 
+            currentLessonTitle = "", 
+            currentPdfUrl = "";
+
+        const canvas = document.getElementById('pdf-render-canvas');
+        const ctx = canvas.getContext('2d');
+        const loadingEl = document.getElementById('pdf-loading');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        // Hàm CẬP NHẬT TIẾN TRÌNH MỚI (Full Data cho Dashboard)
+        const updateProgressData = () => {
+            if (!currentLessonId || !pdfDoc) return;
+            const progressData = {
+                id: currentLessonId,
+                title: currentLessonTitle,
+                pdfUrl: currentPdfUrl,
+                currentPage: pageNum,
+                totalPages: pdfDoc.numPages,
+                lastAccessed: new Date().getTime()
+            };
+            localStorage.setItem('hopvan_theory_progress', JSON.stringify(progressData));
+        };
+
+        // Hàm render trang
+        const renderPage = num => {
+            pageIsRendering = true;
+            canvas.style.opacity = 0;
+            canvas.style.transform = "scale(0.98)";
+
+            pdfDoc.getPage(num).then(page => {
+                const viewport = page.getViewport({ scale: 1.5 });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                const renderCtx = { canvasContext: ctx, viewport: viewport };
+
+                page.render(renderCtx).promise.then(() => {
+                    pageIsRendering = false;
+                    loadingEl.classList.add('hidden'); 
+                    canvas.style.opacity = 1;
+                    canvas.style.transform = "scale(1)";
+                    
+                    if (pageNumPending !== null) {
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                });
+
+                document.getElementById('page-num').textContent = num;
+                const progress = (num / pdfDoc.numPages) * 100;
+                document.getElementById('pdf-progress').style.width = `${progress}%`;
+                
+                btnPrev.disabled = (num <= 1);
+                btnNext.disabled = (num >= pdfDoc.numPages);
+
+                // Quan trọng: Mỗi lần chuyển trang đều lưu tiến trình
+                updateProgressData();
+            });
+        };
+
+        const queueRenderPage = num => {
+            if (pageIsRendering) { pageNumPending = num; } 
+            else { renderPage(num); }
+        };
+
+        // Nút Trang trước
+        window.onPrevPage = () => {
+            if (pageNum <= 1) return;
+            pageNum--;
+            queueRenderPage(pageNum);
+        };
+
+        // Nút Trang sau
+        window.onNextPage = () => {
+            if (pageNum >= pdfDoc.numPages) return;
+            pageNum++;
+            queueRenderPage(pageNum);
+        };
+
+        // TẢI BÀI HỌC
+        window.loadLesson = (id, title, pdfUrl, startPage = 1) => {
             const btnElement = document.getElementById(id);
             if(!btnElement) return;
 
-            // 1. LƯU TIẾN TRÌNH VÀO LOCALSTORAGE
-            const lessonData = {
-                id: id,
-                title: title,
-                pdfUrl: pdfUrl,
-                mindmapUrl: mindmapUrl
-            };
-            localStorage.setItem('hopvan_theory_progress', JSON.stringify(lessonData));
+            // Lưu biến toàn cục
+            currentLessonId = id;
+            currentLessonTitle = title;
+            currentPdfUrl = pdfUrl;
 
-            // 2. ĐỔI UI STATE
             document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
             btnElement.classList.add('active');
-
-            const parentChapter = btnElement.closest('.chapter-group');
-            if(parentChapter && !parentChapter.classList.contains('open')) {
-                document.querySelectorAll('.chapter-group').forEach(g => g.classList.remove('open'));
-                parentChapter.classList.add('open');
-            }
-
-            // 3. CẬP NHẬT VIEWER VÀ LOADING
             document.getElementById('display-title').innerText = title;
-            const loading = document.getElementById('pdf-loading');
-            
-            // Chỉ hiện Loading nếu đang ở tab PDF, nếu đang ở Sơ đồ thì không cần hiện
-            const isPdfTabActive = document.getElementById('tab-pdf').classList.contains('active');
-            if(isPdfTabActive) {
-                loading.classList.remove('hidden');
-            }
 
-            const iframe = document.getElementById('pdf-frame');
-            iframe.src = pdfUrl + "#toolbar=0&navpanes=0";
-            
-            const mindmapImg = document.getElementById('mindmap-img');
-            mindmapImg.src = mindmapUrl;
-            mindmapImg.classList.remove('zoomed'); // Reset zoom
-            document.getElementById('zoom-icon').className = 'fas fa-search-plus';
+            loadingEl.classList.remove('hidden');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // FIX LỖI TREO LOADING: Sử dụng cả onload và setTimeout dự phòng
-            let isLoaded = false;
-            
-            iframe.onload = () => {
-                if(!isLoaded) {
-                    isLoaded = true;
-                    setTimeout(() => { loading.classList.add('hidden'); }, 300);
-                }
-            };
-            
-            // Backup: Tự động tắt loading sau 1.5 giây dù iframe có báo onload hay không
-            setTimeout(() => {
-                if(!isLoaded) {
-                    isLoaded = true;
-                    loading.classList.add('hidden');
-                }
-            }, 1500);
+            pdfjsLib.getDocument(pdfUrl).promise.then(pdfDoc_ => {
+                pdfDoc = pdfDoc_;
+                document.getElementById('page-count').textContent = pdfDoc.numPages;
+                
+                // Load số trang chỉ định (hoặc mặc định là 1)
+                pageNum = (startPage && startPage <= pdfDoc.numPages) ? startPage : 1; 
+                renderPage(pageNum);
+                
+            }).catch(err => {
+                console.error("Lỗi load PDF:", err);
+                loadingEl.innerHTML = `<div class="text-center"><i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-2"></i><p class="text-red-500 font-bold">Lỗi không thể tải tài liệu.</p></div>`;
+            });
 
-            // Nếu dùng mobile thì tự động đóng mục lục sau khi chọn bài
             if(window.innerWidth <= 1024 && document.getElementById('toc-sidebar').classList.contains('open')) {
                 toggleTOC();
-            }
-        };
-
-        // Thu gọn mục lục PC
-        window.toggleDesktopTOC = () => {
-            const tocSidebar = document.getElementById('toc-sidebar');
-            if (tocSidebar) {
-                tocSidebar.classList.toggle('collapsed');
             }
         };
 
@@ -742,62 +596,21 @@
             if (savedData) {
                 try {
                     const data = JSON.parse(savedData);
-                    // Tự động load bài học đang học dở
-                    loadLesson(data.id, data.title, data.pdfUrl, data.mindmapUrl);
+                    // Load lại bài VÀ load lại số trang đang xem dở
+                    loadLesson(data.id, data.title, data.pdfUrl, data.currentPage);
                     
-                    // Cuộn chuột đến nút bài học đó trong Mục lục sau khi giao diện render xong
                     setTimeout(() => {
                         const activeBtn = document.getElementById(data.id);
-                        if(activeBtn) {
-                            activeBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }
+                        if(activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }, 500);
                 } catch(e) {
-                    console.log("Lỗi load tiến trình", e);
-                    // Fallback: Mở bài đầu tiên nếu lỗi data
-                    const firstLesson = document.getElementById('ls-truyen-ngan-hien-dai');
+                    const firstLesson = document.getElementById('ls-truyen-tieu-thuyet');
                     if(firstLesson) firstLesson.click();
                 }
             } else {
-                // Nếu chưa học bài nào, click bài đầu tiên
-                const firstLesson = document.getElementById('ls-truyen-ngan-hien-dai');
+                const firstLesson = document.getElementById('ls-truyen-tieu-thuyet');
                 if(firstLesson) firstLesson.click();
             }
-
-            // Xử lý DRAG TO PAN (KÉO CHUỘT ĐỂ DI CHUYỂN SƠ ĐỒ)
-            const mapContainer = document.getElementById('mindmap-scroll-area');
-            let isDown = false;
-            let startX, startY, scrollLeft, scrollTop;
-
-            mapContainer.addEventListener('mousedown', (e) => {
-                isDown = true;
-                mapContainer.classList.add('dragging');
-                startX = e.pageX - mapContainer.offsetLeft;
-                startY = e.pageY - mapContainer.offsetTop;
-                scrollLeft = mapContainer.scrollLeft;
-                scrollTop = mapContainer.scrollTop;
-            });
-
-            mapContainer.addEventListener('mouseleave', () => {
-                isDown = false;
-                mapContainer.classList.remove('dragging');
-            });
-
-            mapContainer.addEventListener('mouseup', () => {
-                isDown = false;
-                mapContainer.classList.remove('dragging');
-            });
-
-            mapContainer.addEventListener('mousemove', (e) => {
-                if (!isDown) return;
-                e.preventDefault(); // Chống bôi đen hoặc kéo ảnh mặc định
-                const x = e.pageX - mapContainer.offsetLeft;
-                const y = e.pageY - mapContainer.offsetTop;
-                const walkX = (x - startX) * 1.5; // Hệ số tốc độ cuộn
-                const walkY = (y - startY) * 1.5;
-                mapContainer.scrollLeft = scrollLeft - walkX;
-                mapContainer.scrollTop = scrollTop - walkY;
-            });
         });
 
     </script>
