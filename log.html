@@ -127,13 +127,16 @@
 
             <form id="register-form" class="space-y-3 hidden">
                 <div class="flex p-1 bg-gray-100 rounded-xl mb-3 relative">
-                    <div id="role-indicator" class="absolute top-1 left-1 w-[calc(50%-4px)] h-[calc(100%-8px)] bg-white rounded-lg shadow-sm transition-all duration-300"></div>
+                    <div id="role-indicator" class="absolute top-1 left-1 w-[calc(100%-8px)] h-[calc(100%-8px)] bg-white rounded-lg shadow-sm transition-all duration-300"></div>
+                    
                     <button type="button" id="btn-role-student" class="flex-1 py-2 text-xs font-black uppercase tracking-wider relative z-10 text-orange-500 transition-colors">
                         <i class="fas fa-user-graduate mr-1"></i> Học sinh
                     </button>
-                    <button type="button" id="btn-role-teacher" class="flex-1 py-2 text-xs font-black uppercase tracking-wider relative z-10 text-gray-400 transition-colors">
+
+                    <button type="button" id="btn-role-teacher" class="hidden flex-1 py-2 text-xs font-black uppercase tracking-wider relative z-10 text-gray-400 transition-colors">
                         <i class="fas fa-chalkboard-teacher mr-1"></i> Giáo viên
                     </button>
+                    
                     <input type="hidden" id="reg-role" value="student">
                 </div>
 
