@@ -270,17 +270,23 @@
         }
 
         /* --- MODALS --- */
-        .hv-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 9999; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
+        .hv-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 9999; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; cursor: pointer; /* Thêm trỏ chuột để báo hiệu có thể click */ }
         .hv-modal.show { display: flex; opacity: 1; }
-        .hv-modal-box { background: var(--bg-card); padding: 40px; border-radius: 32px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.5); border: 1px solid var(--border-ui); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        .hv-modal-box { 
+            background: var(--bg-card); padding: 40px; border-radius: 32px; width: 90%; max-width: 400px; 
+            text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.5); border: 1px solid var(--border-ui); 
+            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            cursor: default; /* Ngăn chặn click nhầm bên trong thẻ */
+        }
         .hv-modal.show .hv-modal-box { transform: scale(1); }
         
-        .hv-modal-box h3 { color: var(--text-heading); }
-        .hv-modal-box p { color: var(--text-muted); }
+        .hv-modal-box h3 { color: var(--text-heading); font-weight: 900; }
+        .hv-modal-box p { color: var(--text-muted); font-weight: 500;}
 
-        .hv-btn { width: 100%; padding: 15px; border-radius: 16px; font-weight: 800; font-size: 1rem; border: none; margin-top: 15px; cursor: pointer; transition: 0.2s; }
+        .hv-btn { width: 100%; padding: 15px; border-radius: 16px; font-weight: 800; font-size: 1rem; border: none; margin-top: 15px; cursor: pointer; transition: 0.3s; }
         .hv-btn-primary { background: var(--primary-gradient); color: white; box-shadow: 0 10px 20px rgba(255, 94, 98, 0.3); }
-        .hv-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 15px 25px rgba(255, 94, 98, 0.4); }
+        .hv-btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(255, 94, 98, 0.5); }
         .hv-btn-gray { background: var(--bg-body); color: var(--text-muted); border: 1px solid var(--border-ui); }
         .hv-btn-gray:hover { background: var(--bg-card-hover); color: var(--text-heading); }
 
@@ -583,13 +589,13 @@
     });
 
     function updateRank(streak) {
-        let r = "Tân Binh";
-        let next = "3 ngày: Chớm lửa";
+        let r = "Tân Binh"; let next = "3 ngày: Chớm lửa";
         if (streak >= 3) { r = "Chớm Lửa"; next = "7 ngày: Giữ lửa"; }
         if (streak >= 7) { r = "Giữ Lửa"; next = "30 ngày: Bền lửa"; }
         if (streak >= 30) { r = "Bền Lửa"; next = "100 ngày: Người ở lại"; }
-        if (streak >= 100) { r = "Người Ở Lại"; next = "Huyền thoại!"; }
-        document.getElementById('rank-val').innerText = r;
+        if (streak >= 100) { r = "Người Ở Lại"; next = "365 ngày: Huyền thoại"; }
+        if (streak >= 365) { r = "Huyền Thoại"; next = "Chuỗi vô cực!"; }
+        document.getElementById('rank-val').innerText = r; 
         document.getElementById('next-rank-info').innerText = next;
     }
 
@@ -799,7 +805,15 @@
         }
     };
 
+    // Hàm đóng Modal cũ
     window.closeModal = () => document.querySelectorAll('.hv-modal').forEach(m => m.classList.remove('show'));
+    
+    // ĐÃ THÊM MỚI: Bấm ra ngoài vùng xám để đóng nhanh Modal
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('hv-modal')) {
+            window.closeModal();
+        }
+    });
     
     window.toggleSidebar = () => {
         const sidebar = document.querySelector('aside');

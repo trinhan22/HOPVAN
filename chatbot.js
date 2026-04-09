@@ -300,14 +300,22 @@ function initChatbot() {
         const loadingId = showLoading();
 
         try {
-            // CẤU TRÚC PROMPT ĐẶC BIỆT ĐỂ "LỪA" PROXY (VÌ PROXY BẮT BUỘC TRẢ JSON)
+            // CẤU TRÚC PROMPT PRO CHO GIA SƯ VĂN HỌC (HOPVAN AI)
             const systemPrompt = `
-            BẠN LÀ: Trợ lý AI của Hopvan (Gia sư văn học).
-            NHIỆM VỤ: Trả lời câu hỏi của người dùng một cách thân thiện, ngắn gọn, dễ hiểu.
-            
-            ⚠️ QUAN TRỌNG: 
-            Do hệ thống yêu cầu output JSON, bạn BẮT BUỘC phải trả lời theo định dạng JSON sau:
-            { "reply": "Nội dung câu trả lời của bạn viết ở đây (dùng markdown nếu cần)" }
+            BẠN LÀ: "HopVan AI" - Gia sư Ngữ Văn nhiệt huyết, thông minh và công tâm.
+            KHÁCH HÀNG CỦA BẠN LÀ: Học sinh THPT đang luyện thi môn Ngữ Văn.
+
+            NHIỆM VỤ CỦA BẠN:
+            1. TRẢ LỜI NGẮN GỌN: Chỉ giải đáp trực tiếp các câu hỏi ngắn về kiến thức (Tác giả, tác phẩm, ý nghĩa chi tiết, biện pháp tu từ, lý luận văn học...). Không viết lan man.
+            2. TỪ CHỐI LÀM HỘ BÀI: Nếu học sinh yêu cầu "Viết cho tôi bài văn/đoạn văn...", bạn PHẢI TỪ CHỐI KHÉO LÉO. Tuyệt đối không làm bài thay học sinh. Hãy trả lời theo kiểu: "Rất tiếc, mình không thể làm bài thay bạn. Nhưng mình có thể gợi ý dàn ý như sau..."
+            3. TẬN TÂM & KIÊN TRÌ: Giải thích cặn kẽ các khái niệm khó hiểu. Nếu học sinh hỏi sai hoặc lạc đề, hãy nhẹ nhàng điều hướng lại về môn Ngữ Văn.
+            4. VĂN PHONG: Thân thiện, xưng hô "Mình - Bạn", có thể dùng emoji để tạo cảm giác gần gũi.
+
+            ⚠️ QUAN TRỌNG - QUY TẮC JSON (BẮT BUỘC):
+            Do hệ thống kỹ thuật yêu cầu output JSON, bạn BẮT BUỘC phải trả lời theo ĐÚNG định dạng JSON sau, không được in ra bất kỳ chữ nào nằm ngoài dấu ngoặc nhọn {}:
+            { 
+            "reply": "Nội dung câu trả lời của bạn viết ở đây. Sử dụng thẻ <br> để xuống dòng. Dùng <b>chữ đậm</b> để nhấn mạnh." 
+            }
             `;
 
             const res = await fetch('/.netlify/functions/gemini-proxy', {
@@ -329,19 +337,28 @@ function initChatbot() {
                 
                 // Parse JSON từ phản hồi của AI
                 try {
+                    // Dọn dẹp Markdown thừa
                     rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+                    const firstBrace = rawText.indexOf('{');
+                    const lastBrace = rawText.lastIndexOf('}');
+                    if (firstBrace !== -1 && lastBrace !== -1) {
+                        rawText = rawText.substring(firstBrace, lastBrace + 1);
+                    }
+                    
                     const jsonRes = JSON.parse(rawText);
                     
                     // Chỉ lấy phần 'reply' để hiển thị
-                    let reply = jsonRes.reply || "AI không trả lời đúng định dạng.";
+                    let reply = jsonRes.reply || "Xin lỗi, mình chưa hiểu ý bạn lắm.";
                     
                     // Format Markdown cơ bản sang HTML
-                    reply = reply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+                    reply = reply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    // Không cần replace \n thành <br> nữa vì prompt đã ép AI dùng <br>
                     
                     appendMessage(reply, 'bot');
                 } catch(e) {
+                    console.error("Lỗi parse JSON chatbot: ", e);
                     // Fallback nếu AI lỡ quên format JSON (hiện text thô)
-                    appendMessage(rawText, 'bot');
+                    appendMessage("Mình đang gặp chút trục trặc trong việc định dạng câu trả lời. Bạn hỏi lại nhé!", 'bot');
                 }
             } else {
                 appendMessage("AI đang bận, thử lại sau nhé!", 'bot');

@@ -200,6 +200,13 @@
             .search-box { width: 100%; }
             .book-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 30px 15px; }
             .book-title { font-size: 0.95rem; }
+            
+            #menu-placeholder aside {
+                position: fixed !important; left: 0 !important; top: 0 !important; bottom: 0 !important;
+                transform: translateX(-100%); z-index: 9999 !important; width: 280px !important; 
+                transition: transform 0.3s ease-in-out !important;
+            }
+            #menu-placeholder aside.open { transform: translateX(0) !important; box-shadow: 10px 0 50px rgba(0,0,0,0.5) !important; }
         }
 
         /* SCROLLBAR */
@@ -220,13 +227,20 @@
     </div>
 
     <div class="mobile-header lg:hidden justify-between">
-        <button onclick="toggleGlobalSidebar()" class="text-orange-500 text-2xl focus:outline-none"><i class="fas fa-bars"></i></button>
+        <button onclick="toggleSidebar()" class="text-orange-500 text-2xl focus:outline-none"><i class="fas fa-bars"></i></button>
         <div class="flex items-center gap-2"><img src="../LOGO.WEBP" alt="Logo" class="w-8 h-8"><span class="font-black text-orange-500 text-lg tracking-tight">HOPVAN</span></div>
     </div>
+    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <div id="menu-placeholder"></div>
 
     <main class="main-content">
+        
+        <div id="keys-val" class="hidden"></div>
+        <div id="streak-val" class="hidden"></div>
+        <div id="rank-val" class="hidden"></div>
+        <div id="total-exams" class="hidden"></div>
+
         <div class="content-wrapper">
             
             <div class="user-header">
@@ -254,7 +268,7 @@
             </div>
 
             <div class="book-grid" id="book-grid">
-                </div>
+            </div>
             
             <div id="empty-state" class="hidden flex-col items-center justify-center py-20 opacity-50">
                 <i class="fas fa-ghost text-6xl mb-4 text-gray-400"></i>
@@ -264,125 +278,59 @@
         </div>
     </main>
 
+    <script type="module" src="gam.js"></script>
+    <script src="../chatbot.js"></script>
+    
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { initMenu } from "./menu.js";
 
-        // Cấu hình Firebase
+        // Cấu hình Firebase (Chống lỗi duplicate app)
         const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6" };
-        const app = initializeApp(firebaseConfig);
+        const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
         const auth = getAuth(app);
         
         // Khởi tạo menu 
         initMenu(app, 'tacpham');
 
+        // Bắt buộc kiểm tra đăng nhập để hệ thống hoạt động ổn định
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "../log.html";
+            }
+        });
+
+        // Hàm mở/đóng sidebar trên Mobile
+        window.toggleSidebar = () => {
+            const sidebar = document.querySelector('aside');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar) sidebar.classList.toggle('open');
+            if (overlay) overlay.classList.toggle('active');
+        };
+
         // ==========================================
         // DỮ LIỆU TÁC PHẨM (MOCK DATA)
         // ==========================================
         const booksData = [
-            {
-                id: "binh-ngo-dai-cao",
-                title: "Bình Ngô Đại Cáo",
-                author: "Nguyễn Trãi",
-                cover: "https://isach.info/images/story/cover/binh_ngo_dai_cao__nguyen_trai.jpg", 
-                grade: "Lớp 12",
-                genre: "Thơ"
-            },
-            {
-                id: "luc-van-tien",
-                title: "Lục Vân Tiên",
-                author: "Nguyễn Đình Chiểu",
-                cover: "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1540993420i/42598061.jpg", 
-                grade: "Lớp 12",
-                genre: "Truyện Thơ"
-            },
-            {
-                id: "nam-quoc-son-ha",
-                title: "Nam Quốc Sơn Hà",
-                author: "Lý Thường Kiệt",
-                cover: "https://dinhnghia.vn/ckfinder/userfiles/images/nam-quoc-son-ha-ly-thuong-kiet-2.png",
-                grade: "Lớp 12",
-                genre: "Thơ"
-            },
-            {
-                id: "nu-than-mat-troi-va-mat-trang",
-                title: "Nữ Thần Mặt Trời Và Mặt Trăng",
-                author: "Khuyết Danh",
-                cover: "https://st.download.vn/data/image/2022/11/21/Mat-troi.jpg",
-                grade: "Lớp 12",
-                genre: "Thần Thoại"
-            },
-            {
-                id: "song",
-                title: "Sóng",
-                author: "Xuân Quỳnh",
-                cover: "https://khongthichmavanphaihocvan.wordpress.com/wp-content/uploads/2021/09/song.png?w=640",
-                grade: "Lớp 12",
-                genre: "Thơ"
-            },
-            {
-                id: "tay-tien",
-                title: "Tây Tiến",
-                author: "Quang Dũng",
-                cover: "https://images.hcmcpv.org.vn/res/news/2019/09/05-09-2019-ra-mat-hoi-ky-doan-binh-tay-tien-cua-nha-tho-quang-dung-7DFD4D6B.jpg",
-                grade: "Lớp 12",
-                genre: "Thơ"
-            },
-            {
-                id: "thanh-giong",
-                title: "Thánh Gióng",
-                author: "Lê Thánh Tông",
-                cover: "https://thuvien.hanoiacademy.edu.vn/wp-content/uploads/2025/04/download-1-99.jpg",
-                grade: "Lớp 12",
-                genre: "Thơ"
-            },
-            {
-                id: "thi-mau",
-                title: "Thị Mầu",
-                author: "Vương Trọng",
-                cover: "https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2023/3/25/1171721/Thi-Mau-La-Ai.jpg",
-                grade: "Lớp 12",
-                genre: "Thơ"
-            },
-            {
-                id: "truyen-kieu",
-                title: "Truyện Kiều",
-                author: "Nguyễn Du",
-                cover: "https://www.nxbtre.com.vn/Images/Book/NXBTreStoryFull_03462015_104616.jpg",
-                grade: "Lớp 12",
-                genre: "Truyện Thơ"
-            },
-            {
-                id: "tuyen-ngon-doc-lap",
-                title: "Tuyên Ngôn Độc Lập",
-                author: "Hồ Chí Minh",
-                cover: "https://media.vov.vn/sites/default/files/styles/large/public/2023-09/bac_ho_2.jpeg.jpg",
-                grade: "Lớp 12",
-                genre: "Chính Luận"
-            },
-            {
-                id: "van-te-nghia-si-can-giuoc",
-                title: "Văn Tế Nghĩa Sĩ Cần Giuộc",
-                author: "Nguyễn Đình Chiểu",
-                cover: "https://gcs.tripi.vn/public-tripi/tripi-feed/img/486480ioZ/anh-mo-ta.png",
-                grade: "Lớp 12",
-                genre: "Văn Tế"
-            },
-            {
-                id: "tien-dan-nguoi-yeu",
-                title: "Tiễn Dặn Người Yêu",
-                author: "Khuyết Danh",
-                cover: "https://img.wattpad.com/cover/290833177-176-k652932.jpg",
-                grade: "Lớp 12",
-                genre: "Truyện"
-            }
+            { id: "truyen-kieu", title: "Truyện Kiều", author: "Nguyễn Du", cover: "https://www.nxbtre.com.vn/Images/Book/NXBTreStoryFull_03462015_104616.jpg", grade: "Lớp 12", genre: "Truyện Thơ" },
+            { id: "luc-van-tien", title: "Lục Vân Tiên", author: "Nguyễn Đình Chiểu", cover: "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1540993420i/42598061.jpg", grade: "Lớp 12", genre: "Truyện Thơ" },
+            { id: "van-te-nghia-si-can-giuoc", title: "Văn Tế Nghĩa Sĩ Cần Giuộc", author: "Nguyễn Đình Chiểu", cover: "https://gcs.tripi.vn/public-tripi/tripi-feed/img/486480ioZ/anh-mo-ta.png", grade: "Lớp 12", genre: "Văn Tế" },
+            { id: "song", title: "Sóng", author: "Xuân Quỳnh", cover: "https://khongthichmavanphaihocvan.wordpress.com/wp-content/uploads/2021/09/song.png?w=640", grade: "Lớp 12", genre: "Thơ" },
+            { id: "tay-tien", title: "Tây Tiến", author: "Quang Dũng", cover: "https://images.hcmcpv.org.vn/res/news/2019/09/05-09-2019-ra-mat-hoi-ky-doan-binh-tay-tien-cua-nha-tho-quang-dung-7DFD4D6B.jpg", grade: "Lớp 12", genre: "Thơ" },
+            { id: "binh-ngo-dai-cao", title: "Bình Ngô Đại Cáo", author: "Nguyễn Trãi", cover: "https://isach.info/images/story/cover/binh_ngo_dai_cao__nguyen_trai.jpg", grade: "Lớp 12", genre: "Thơ" },
+            { id: "nam-quoc-son-ha", title: "Nam Quốc Sơn Hà", author: "Lý Thường Kiệt", cover: "https://dinhnghia.vn/ckfinder/userfiles/images/nam-quoc-son-ha-ly-thuong-kiet-2.png", grade: "Lớp 12", genre: "Thơ" },
+            { id: "nu-than-mat-troi-va-mat-trang", title: "Nữ Thần Mặt Trời Và Mặt Trăng", author: "Khuyết Danh", cover: "https://st.download.vn/data/image/2022/11/21/Mat-troi.jpg", grade: "Lớp 12", genre: "Thần Thoại" },
+            { id: "thanh-giong", title: "Thánh Gióng", author: "Lê Thánh Tông", cover: "https://thuvien.hanoiacademy.edu.vn/wp-content/uploads/2025/04/download-1-99.jpg", grade: "Lớp 12", genre: "Thơ" },
+            { id: "thi-mau", title: "Thị Mầu", author: "Vương Trọng", cover: "https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2023/3/25/1171721/Thi-Mau-La-Ai.jpg", grade: "Lớp 12", genre: "Thơ" },
+            { id: "tuyen-ngon-doc-lap", title: "Tuyên Ngôn Độc Lập", author: "Hồ Chí Minh", cover: "https://media.vov.vn/sites/default/files/styles/large/public/2023-09/bac_ho_2.jpeg.jpg", grade: "Lớp 12", genre: "Chính Luận" },
+            { id: "tien-dan-nguoi-yeu", title: "Tiễn Dặn Người Yêu", author: "Khuyết Danh", cover: "https://img.wattpad.com/cover/290833177-176-k652932.jpg", grade: "Lớp 12", genre: "Truyện" }
         ];
 
         let currentFilter = 'all';
 
         // Hàm render sách ra giao diện
-        function renderBooks(books) {
+        window.renderBooks = function(books) {
             const grid = document.getElementById('book-grid');
             const emptyState = document.getElementById('empty-state');
             grid.innerHTML = '';
@@ -440,7 +388,7 @@
                 return matchSearch && matchFilter;
             });
 
-            renderRenderBooks(filtered); 
+            window.renderRenderBooks(filtered); 
         }
 
         window.setFilter = (filterValue, btnEl) => {
@@ -452,13 +400,13 @@
         }
 
         // Hiệu ứng load sách
-        function renderRenderBooks(data) {
+        window.renderRenderBooks = function(data) {
             const grid = document.getElementById('book-grid');
             grid.style.opacity = '0';
             grid.style.transform = 'translateY(15px)';
             
             setTimeout(() => {
-                renderBooks(data);
+                window.renderBooks(data);
                 grid.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                 grid.style.opacity = '1';
                 grid.style.transform = 'translateY(0)';
@@ -470,7 +418,7 @@
         };
 
         window.addEventListener('DOMContentLoaded', () => {
-            renderBooks(booksData);
+            window.renderBooks(booksData);
         });
 
     </script>

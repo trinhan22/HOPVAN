@@ -368,7 +368,7 @@
                     <div class="tpc-footer">
                         <div class="progress-wrap">
                             <div class="progress-bar-bg">
-                                <div class="progress-bar-fill" style="width: 65%;"></div>
+                                <div class="progress-bar-fill" style="width: 0%;"></div>
                             </div>
                         </div>
                         <span class="tpc-action text-orange-500 font-bold text-sm">Tiếp tục <i class="fas fa-arrow-right text-xs ml-1"></i></span>
@@ -413,11 +413,11 @@
 
             <h3 class="section-h3"><i class="fas fa-lightbulb" style="color: #FF8F50"></i> Bí kíp điểm cao</h3>
             <div class="tips-grid">
-                <div class="tip-card" onclick="window.location.href='bantinvanhoc.html'">
+                <div class="tip-card" onclick="window.location.href='../dashboard/bantinvanhoc.html'">
                     <img src="https://img.freepik.com/free-vector/creative-writing-concept-illustration_114360-8139.jpg" class="tip-img" alt="Tip">
                     <div class="tip-content"><h4>Cách viết mở bài hiệu quả</h4><p>3 công thức mở bài áp dụng cho mọi tác phẩm văn học hiện đại.</p></div>
                 </div>
-                <div class="tip-card" onclick="window.location.href='bantinvanhoc.html'">
+                <div class="tip-card" onclick="window.location.href='../dashboard/bantinvanhoc.html'">
                     <img src="https://img.freepik.com/free-vector/writer-concept-illustration_114360-1490.jpg" class="tip-img" alt="Tip">
                     <div class="tip-content"><h4>Dẫn chứng NLXH "đắt giá"</h4><p>Tổng hợp những dẫn chứng thực tế mới nhất năm 2026.</p></div>
                 </div>
@@ -591,6 +591,11 @@
         const canvas = document.getElementById('miniChart');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
+        
+        // Kiểm tra xem web đang ở chế độ Dark hay Light để đổi màu chữ biểu đồ
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        const textColor = isDarkMode ? '#94A3B8' : '#64748b'; 
+
         if (miniChartInstance) miniChartInstance.destroy();
         miniChartInstance = new Chart(ctx, { 
             type: 'line', 
@@ -608,7 +613,21 @@
                     borderWidth: 2, tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: '#fff', pointBorderColor: '#FF8F50'
                 }] 
             }, 
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 10, ticks: { display: false }, grid: { display: false } }, x: { display: false } }, layout: { padding: 5 } } 
+            options: { 
+                responsive: true, maintainAspectRatio: false, 
+                plugins: { legend: { display: false } }, 
+                scales: { 
+                    y: { 
+                        beginAtZero: true, max: 10, 
+                        ticks: { display: false }, 
+                        grid: { display: false } 
+                    }, 
+                    x: { 
+                        display: false 
+                    } 
+                }, 
+                layout: { padding: 5 } 
+            } 
         });
     }
 
@@ -686,11 +705,40 @@
         const quizValEl = document.getElementById('avg-quiz-score'); if(quizValEl) { quizValEl.textContent = stats.avgQuiz; quizValEl.nextElementSibling.textContent = "TB Trắc nghiệm"; }
         const essayValEl = document.getElementById('avg-essay-score'); if(essayValEl) { essayValEl.textContent = stats.avgEssay; essayValEl.nextElementSibling.textContent = "TB Tự luận"; }
         const totalEl = document.getElementById('total-tests-count'); if(totalEl) totalEl.textContent = stats.total;
+        
         window.openHVModal('statsFullModal');
+        
         setTimeout(() => {
             const ctx = document.getElementById('largeChart').getContext('2d');
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            const gridColor = isDarkMode ? '#334155' : '#e2e8f0';
+            const textColor = isDarkMode ? '#94A3B8' : '#64748b';
+
             if (largeChartInstance) largeChartInstance.destroy();
-            largeChartInstance = new Chart(ctx, { type: 'line', data: { labels: stats.labels, datasets: [{ label: 'Tiến độ điểm số', data: stats.data, borderColor: '#FF5E62', backgroundColor: 'rgba(255, 94, 98, 0.1)', borderWidth: 3, tension: 0.3, fill: true, pointBackgroundColor: '#fff', pointBorderColor: '#FF5E62', pointRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 10 } } } });
+            largeChartInstance = new Chart(ctx, { 
+                type: 'line', 
+                data: { 
+                    labels: stats.labels, 
+                    datasets: [{ 
+                        label: 'Tiến độ điểm số', data: stats.data, borderColor: '#FF5E62', backgroundColor: 'rgba(255, 94, 98, 0.1)', borderWidth: 3, tension: 0.3, fill: true, pointBackgroundColor: '#fff', pointBorderColor: '#FF5E62', pointRadius: 6 
+                    }] 
+                }, 
+                options: { 
+                    responsive: true, maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } }, 
+                    scales: { 
+                        y: { 
+                            beginAtZero: true, max: 10,
+                            grid: { color: gridColor },
+                            ticks: { color: textColor }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: textColor }
+                        }
+                    } 
+                } 
+            });
         }, 400);
     };
 
@@ -740,8 +788,10 @@
         if (streak >= 3) { r = "Chớm Lửa"; next = "7 ngày: Giữ lửa"; }
         if (streak >= 7) { r = "Giữ Lửa"; next = "30 ngày: Bền lửa"; }
         if (streak >= 30) { r = "Bền Lửa"; next = "100 ngày: Người ở lại"; }
-        if (streak >= 100) { r = "Người Ở Lại"; next = "Huyền thoại!"; }
-        document.getElementById('rank-val').innerText = r; document.getElementById('next-rank-info').innerText = next;
+        if (streak >= 100) { r = "Người Ở Lại"; next = "365 ngày: Huyền thoại"; }
+        if (streak >= 365) { r = "Huyền Thoại"; next = "Chuỗi vô cực!"; }
+        document.getElementById('rank-val').innerText = r; 
+        document.getElementById('next-rank-info').innerText = next;
     }
 
     function setupLeaderboard(currentUser) {
