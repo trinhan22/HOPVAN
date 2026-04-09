@@ -220,53 +220,194 @@
         
         @keyframes floatBadge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-        /* --- FEATURES --- */
+        /* --- HỆ SINH THÁI - BENTO GRID PHÁ CÁCH (V2) --- */
         .section-header { text-align: center; margin-bottom: 60px; }
-        .section-header h2 { font-size: 2.5rem; margin-bottom: 10px; font-weight: 800; color: var(--text-main); }
+        .section-header h2 { font-size: 2.8rem; margin-bottom: 10px; font-weight: 900; color: var(--text-main); letter-spacing: -1px; }
         
-        .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-        .bento-item { border-radius: 30px; padding: 40px; transition: 0.3s; position: relative; overflow: hidden; display: flex; flex-direction: column; height: 100%; min-height: 280px; background: rgba(255,255,255,0.6); border: 1px solid white; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); }
-        .bento-item:hover { transform: translateY(-5px); background: rgba(255,255,255,0.95); box-shadow: 0 20px 40px -10px rgba(255, 143, 80, 0.15); }
-        .bento-item.large { grid-column: span 2; }
-        .bento-icon { width: 56px; height: 56px; background: white; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 1.6rem; color: var(--primary); margin-bottom: 25px; box-shadow: 0 8px 16px rgba(0,0,0,0.05); }
-        .bento-item h3 { font-size: 1.5rem; margin-bottom: 15px; font-weight: 800; color: var(--text-main); }
-        .bento-item p { color: var(--text-light); font-size: 1.05rem; line-height: 1.8; margin-bottom: 0; }
-        .bento-decoration { position: absolute; right: -10px; bottom: -10px; font-size: 8rem; opacity: 0.05; color: var(--text-main); transform: rotate(-15deg); pointer-events: none; }
+        .bento-grid-v2 {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr); /* Chia 6 cột siêu linh hoạt */
+            gap: 24px;
+            grid-auto-rows: minmax(220px, auto);
+        }
 
-        /* --- REVIEWS --- */
-        .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
-        .review-card { background: rgba(255,255,255,0.7); border-radius: 25px; padding: 35px; border: 1px solid white; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.03); }
-        .review-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); background: white; }
-        .user-info { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .user-avatar { width: 50px; height: 50px; border-radius: 50%; background: #eee; object-fit: cover; border: 2px solid white; box-shadow: 0 5px 10px rgba(0,0,0,0.1); }
-        .stars { color: #FFC107; font-size: 0.9rem; margin-bottom: 5px; }
-        .review-text { font-style: italic; color: var(--text-light); line-height: 1.7; font-size: 1rem; }
+        .bento-card {
+            border-radius: 32px;
+            padding: 35px;
+            position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none; cursor: pointer;
+        }
+
+        /* Span Control */
+        .bc-span-2 { grid-column: span 2; }
+        .bc-span-3 { grid-column: span 3; }
+        .bc-span-6 { grid-column: span 6; flex-direction: row; align-items: center; justify-content: space-between; padding: 40px 60px;}
+
+        /* --- THEMES CHO TỪNG CARD --- */
+        /* 1. Theme Glass Trắng (Chuẩn mực) */
+        .theme-glass {
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px);
+            border: 1px solid white; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+        }
+        .theme-glass h3 { color: var(--text-main); font-weight: 900; font-size: 1.4rem; margin-bottom: 10px; }
+        .theme-glass p { color: var(--text-light); font-size: 0.95rem; line-height: 1.6; }
+        .theme-glass:hover { transform: translateY(-8px) scale(1.02); background: white; box-shadow: 0 20px 40px -10px rgba(255, 143, 80, 0.15); border-color: var(--primary); }
+
+        /* 2. Theme Dark Tech (Phá cách, dành cho AI) */
+        .theme-dark {
+            background: #0f172a; border: 1px solid #1e293b;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .theme-dark::before { /* Lưới grid mờ nền ảo diệu */
+            content: ''; position: absolute; inset: 0; opacity: 0.1;
+            background-image: linear-gradient(#334155 1px, transparent 1px), linear-gradient(90deg, #334155 1px, transparent 1px);
+            background-size: 20px 20px; pointer-events: none;
+        }
+        .theme-dark h3 { color: #f8fafc; font-weight: 900; font-size: 1.6rem; margin-bottom: 15px; }
+        .theme-dark p { color: #94a3b8; font-size: 1rem; line-height: 1.6; }
+        .theme-dark:hover { transform: translateY(-8px); box-shadow: 0 30px 50px rgba(0,0,0,0.4), inset 0 0 0 1px var(--primary); }
+        .tech-badge { background: rgba(255, 143, 80, 0.15); color: var(--primary); padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px; display: inline-block; margin-bottom: 20px; border: 1px solid rgba(255, 143, 80, 0.3); }
+
+        /* 3. Theme Gradient (Chốt hạ) */
+        .theme-gradient {
+            background: linear-gradient(135deg, var(--primary), #FF5E62);
+            color: white; box-shadow: 0 15px 35px rgba(255, 94, 98, 0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .theme-gradient h3 { color: white; font-weight: 900; font-size: 2rem; margin-bottom: 10px; }
+        .theme-gradient p { color: rgba(255,255,255,0.9); font-size: 1.1rem; max-width: 600px;}
+        .theme-gradient:hover { transform: scale(1.02); box-shadow: 0 25px 50px rgba(255, 94, 98, 0.4); }
+
+        /* Elements bên trong */
+        .bc-icon-wrap {
+            width: 54px; height: 54px; border-radius: 16px; margin-bottom: 25px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .bento-card:hover .bc-icon-wrap { transform: scale(1.15) rotate(-5deg); }
+        
+        .bc-watermark { position: absolute; right: -20px; bottom: -20px; font-size: 8rem; opacity: 0.05; transform: rotate(-15deg); pointer-events: none; transition: 0.5s; }
+        .theme-dark .bc-watermark { opacity: 0.1; color: var(--primary); }
+        .theme-gradient .bc-watermark { color: white; opacity: 0.15; font-size: 12rem; right: 20px; top: -20px; }
+        .bento-card:hover .bc-watermark { transform: rotate(0) scale(1.1); }
+
+        /* Responsive Mobile */
+        @media (max-width: 1024px) {
+            .bento-grid-v2 { grid-template-columns: 1fr; gap: 20px; }
+            .bc-span-2, .bc-span-3, .bc-span-6 { grid-column: span 1; }
+            .bc-span-6 { flex-direction: column; align-items: flex-start; padding: 35px; }
+            .theme-gradient h3 { font-size: 1.6rem; }
+        }
+
+        /* --- REVIEWS (PRO VERSION - ĐỀU NHAU TĂM TẮP) --- */
+        .reviews-section { position: relative; padding: 100px 0; z-index: 10; overflow: hidden; }
+        
+        .reviews-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 30px; 
+            align-items: stretch; /* Ép 3 thẻ phải cao bằng nhau */
+        }
+
+        .review-card { 
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px);
+            border-radius: 30px; padding: 40px 35px; 
+            border: 1px solid rgba(255,255,255,0.9); 
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); 
+            position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
+            height: 100%;
+        }
+        
+        .review-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 20px 40px -10px rgba(255, 143, 80, 0.15); 
+            background: rgba(255, 255, 255, 0.95);
+            border-color: var(--primary);
+        }
+
+        /* Dấu ngoặc kép mờ làm điểm nhấn nền */
+        .review-card::before {
+            content: '\201C'; position: absolute; top: -10px; left: 20px;
+            font-family: 'Merriweather', serif; font-size: 10rem; line-height: 1;
+            color: var(--primary); opacity: 0.05; pointer-events: none;
+            transition: 0.4s;
+        }
+        .review-card:hover::before { opacity: 0.1; transform: translateY(-10px); }
+
+        .review-text { 
+            font-size: 1rem; color: var(--text-main); font-weight: 500; 
+            line-height: 1.7; margin-bottom: 30px; position: relative; z-index: 2;
+            flex-grow: 1; /* Lệnh này giúp đẩy phần footer xuống sát đáy, cân bằng mọi thẻ */
+        }
+
+        .review-footer { 
+            display: flex; align-items: center; justify-content: space-between; 
+            border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px; 
+            position: relative; z-index: 2;
+        }
+        .user-info-wrap { display: flex; align-items: center; gap: 15px; }
+        
+        .user-avatar { 
+            width: 55px; height: 55px; border-radius: 18px; 
+            object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
+        }
+        
+        .user-details h4 { font-weight: 800; color: var(--text-main); font-size: 0.9rem; margin-bottom: 2px;}
+        .user-details p { font-size: 0.7rem; color: var(--text-light); font-weight: 600; margin: 0;}
+        
+        .stars { color: #f59e0b; font-size: 0.85rem; display: flex; gap: 3px; background: #fffbeb; padding: 6px 12px; border-radius: 50px;}
+
+        /* Dark Mode cho Reviews */
+        html.dark .review-card { background: rgba(30, 41, 59, 0.6); border-color: #334155; }
+        html.dark .review-card:hover { background: rgba(30, 41, 59, 0.95); }
+        html.dark .review-text { color: #f8fafc; }
+        html.dark .user-details h4 { color: #f8fafc; }
+        html.dark .review-footer { border-top-color: rgba(255,255,255,0.05); }
+        html.dark .stars { background: rgba(245, 158, 11, 0.1); }
 
         /* =========================================
-           ABOUT US - COMPACT INTERACTIVE TABS (FIXED & PREMIUM)
+           ABOUT US - COMPACT INTERACTIVE TABS (ĐỒNG BỘ BENTO)
            ========================================= */
         
         .about-section { margin-top: 20px; position: relative; z-index: 10; }
+        
         .about-compact-card {
             display: flex; 
-            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 36px; border: 1px solid rgba(255, 255, 255, 0.8); 
-            box-shadow: 0 20px 60px rgba(0,0,0,0.05); 
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 32px; /* Bo góc bự giống Bento */
+            border: 1px solid rgba(255, 255, 255, 0.9); 
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); 
             overflow: hidden; min-height: 480px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        /* Hiệu ứng hover nổi card y như Bento */
+        .about-compact-card:hover {
+            transform: translateY(-5px); 
+            background: rgba(255, 255, 255, 0.95); 
+            box-shadow: 0 20px 40px -10px rgba(255, 143, 80, 0.15); 
+            border-color: var(--primary);
         }
 
         /* --- Menu Trái --- */
         .about-menu {
-            width: 320px; background: rgba(248, 250, 252, 0.6); padding: 30px 20px; 
+            width: 320px; background: rgba(248, 250, 252, 0.4); padding: 30px 20px; 
             display: flex; flex-direction: column; gap: 12px; 
             border-right: 1px solid rgba(0,0,0,0.05); flex-shrink: 0;
+            transition: 0.3s;
         }
+
         .about-tab-btn {
             display: flex; align-items: center; gap: 16px; padding: 16px; 
             border-radius: 20px; border: 1px solid transparent; background: transparent; 
             cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); text-align: left;
         }
-        .about-tab-btn:hover { background: rgba(255, 143, 80, 0.05); }
+        .about-tab-btn:hover { background: rgba(255, 143, 80, 0.05); transform: translateX(5px);}
+        
         .about-tab-btn.active { 
             background: white; border-color: rgba(255, 143, 80, 0.3); 
             box-shadow: 0 10px 25px rgba(255, 143, 80, 0.1); transform: translateX(8px); 
@@ -274,12 +415,12 @@
         
         .tab-icon { width: 50px; height: 50px; border-radius: 16px; object-fit: cover; background: white; border: 2px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.08);}
         .tab-text { display: flex; flex-direction: column; }
-        .tab-title { font-size: 1.05rem; font-weight: 800; color: var(--text-heading); transition: 0.3s;}
+        .tab-title { font-size: 1rem; font-weight: 800; color: var(--text-main); transition: 0.3s;}
         .about-tab-btn.active .tab-title { color: var(--primary); }
-        .tab-sub { font-size: 0.8rem; color: var(--text-light); font-weight: 600; margin-top: 3px;}
+        .tab-sub { font-size: 0.8rem; color: var(--text-light); font-weight: 500; margin-top: 3px;}
 
         /* --- Nội Dung Phải --- */
-        .about-content-area { flex: 1; padding: 40px 50px; position: relative; background: white; overflow: hidden; }
+        .about-content-area { flex: 1; padding: 40px 50px; position: relative; background: transparent; overflow: hidden; }
         .about-pane { display: none; animation: paneFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; height: 100%;}
         .about-pane.active { display: flex; flex-direction: column; }
         @keyframes paneFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -287,61 +428,53 @@
         .pane-watermark { position: absolute; right: -30px; bottom: -30px; font-size: 15rem; color: var(--primary); opacity: 0.03; transform: rotate(-15deg); pointer-events: none;}
 
         /* --- Tab Dự Án --- */
-        .hopvan-mission h3 { font-size: 2.2rem; font-weight: 900; color: var(--text-heading); margin-bottom: 15px; letter-spacing: -0.5px;}
+        .hopvan-mission h3 { font-size: 2.2rem; font-weight: 900; color: var(--text-main); margin-bottom: 15px; letter-spacing: -0.5px;}
         .hopvan-mission p { font-size: 1.1rem; color: var(--text-light); line-height: 1.8; margin-bottom: 30px; }
         .mission-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .mission-item { background: #f8fafc; padding: 18px 20px; border-radius: 16px; display: flex; align-items: center; gap: 15px; font-weight: 700; font-size: 1rem; color: var(--text-heading); border: 1px solid #f1f5f9; transition: 0.3s;}
+        .mission-item { background: rgba(255,255,255,0.5); padding: 18px 20px; border-radius: 16px; display: flex; align-items: center; gap: 15px; font-weight: 700; font-size: 1rem; color: var(--text-main); border: 1px solid rgba(255,255,255,0.8); transition: 0.3s;}
         .mission-item:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 143, 80, 0.1); background: white;}
         .mission-item i { color: #10b981; font-size: 1.4rem; }
 
-        /* --- Tab Thành Viên (Mini Profile) - CHỈ SỬA RIÊNG TAB NÀY --- */
+        /* --- Tab Thành Viên (Mini Profile) --- */
         .mp-cover { 
             height: 110px; background: var(--primary-gradient); position: relative; overflow: hidden; margin-bottom: 0;
-            /* Dùng Margin âm để kéo ảnh bìa tràn ra lấp đầy khoảng trống của thẻ cha */
             margin-top: -60px; margin-left: -50px; margin-right: -50px; width: calc(100% + 100px); border-radius: 0;
         }
         .mp-cover::before { content: ''; position: absolute; inset: 0; opacity: 0.15; background-image: radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px); background-size: 20px 20px; }
         
         .mp-body { padding: 0; position: relative; z-index: 2; }
-        .mp-avatar { width: 85px; height: 85px; border-radius: 50%; border: 4px solid var(--bg-card); background: #f1f5f9; box-shadow: 0 5px 15px rgba(0,0,0,0.08); object-fit: cover; margin-top: -40px; margin-bottom: 12px; display: block;}
+        .mp-avatar { width: 85px; height: 85px; border-radius: 50%; border: 4px solid white; background: #f1f5f9; box-shadow: 0 5px 15px rgba(0,0,0,0.08); object-fit: cover; margin-top: -40px; margin-bottom: 12px; display: block; transition: 0.3s;}
+        .about-compact-card:hover .mp-avatar { transform: scale(1.05); }
         
         .mp-info { margin-bottom: 15px; }
+        .mp-info h3 { font-size: 1.5rem; font-weight: 900; color: var(--text-main); margin-bottom: 10px; line-height: 1;}
         
-        /* ĐÃ FIX: Tăng margin-bottom lên 10px để kéo dãn khoảng cách với tag chức vụ */
-        .mp-info h3 { font-size: 1.5rem; font-weight: 900; color: var(--text-heading); margin-bottom: 10px; line-height: 1;}
-        
-        /* ĐÃ FIX: Bóp nhỏ tag, giảm độ đậm (800 -> 700), bo tròn viên thuốc (20px) */
         .mp-role { 
-            font-size: 0.7rem; 
-            font-weight: 700; 
-            color: var(--primary); 
-            background: rgba(255, 143, 80, 0.08); 
-            padding: 3px 10px; 
-            border-radius: 20px; 
-            display: inline-block; 
-            letter-spacing: 0.5px; 
-            border: 1px solid rgba(255, 143, 80, 0.25);
+            font-size: 0.7rem; font-weight: 700; color: var(--primary); 
+            background: rgba(255, 143, 80, 0.08); padding: 3px 10px; border-radius: 20px; 
+            display: inline-block; letter-spacing: 0.5px; border: 1px solid rgba(255, 143, 80, 0.25);
         }
         
         .mp-desc { font-size: 0.95rem; font-weight: 500; color: #4b5563; line-height: 1.7; margin-bottom: 25px; flex-grow: 1;}
         
         .mp-socials { display: flex; gap: 10px; }
-        .mp-socials a { width: 36px; height: 36px; border-radius: 10px; background: #f8fafc; border: 1px solid #f1f5f9; color: var(--text-sub); display: flex; align-items: center; justify-content: center; font-size: 1.05rem; transition: 0.3s; text-decoration: none;}
+        .mp-socials a { width: 36px; height: 36px; border-radius: 10px; background: white; border: 1px solid rgba(0,0,0,0.05); color: var(--text-light); display: flex; align-items: center; justify-content: center; font-size: 1.05rem; transition: 0.3s; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.02);}
         .mp-socials a:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 8px 15px rgba(255, 143, 80, 0.25);}
 
         /* --- Dark Mode Sync --- */
-        html.dark .about-compact-card { background: #111827; border-color: #1f2937; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
-        html.dark .about-menu { background: #0b1120; border-color: #1f2937; }
+        html.dark .about-compact-card { background: rgba(30, 41, 59, 0.6); border-color: #334155; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+        html.dark .about-compact-card:hover { background: rgba(30, 41, 59, 0.95); border-color: var(--primary);}
+        html.dark .about-menu { background: transparent; border-color: #1f2937; }
         html.dark .about-tab-btn:hover { background: rgba(255, 143, 80, 0.1); }
         html.dark .about-tab-btn.active { background: #1e293b; border-color: rgba(255, 143, 80, 0.4); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
         html.dark .tab-icon { background: #1e293b; border-color: #334155; }
-        html.dark .about-content-area { background: #111827; }
+        html.dark .about-content-area { background: transparent; }
         html.dark .mission-item { background: #1e293b; border-color: #334155; color: #f8fafc; }
         html.dark .mission-item:hover { background: #0b1120; border-color: var(--primary); }
-        html.dark .mp-avatar { border-color: #111827; background: #1e293b; }
+        html.dark .mp-avatar { border-color: #1e293b; background: #111827; }
         html.dark .mp-socials a { background: #1e293b; border-color: #334155; color: #94a3b8; }
         html.dark .mp-socials a:hover { background: var(--primary); color: white; border-color: var(--primary); }
-        html.dark .mp-role { background: var(--primary-gradient); }
+        html.dark .mp-role { background: rgba(255, 143, 80, 0.15); }
 
         /* --- Mobile Optimization --- */
         @media (max-width: 992px) {
@@ -361,11 +494,77 @@
             .mp-socials { justify-content: center; }
         }
 
-        /* --- CTA --- */
-        .cta-section { margin: 100px 0; padding: 80px; border-radius: 40px; background: linear-gradient(135deg, var(--primary), #FF5E62); text-align: center; color: white; position: relative; overflow: hidden; box-shadow: 0 30px 60px rgba(255, 94, 98, 0.3); }
-        .cta-section h2 { font-size: 3rem; margin-bottom: 20px; position: relative; z-index: 2; font-weight: 800; }
-        .cta-btn-white { background: white; color: var(--primary); padding: 18px 45px; border-radius: 50px; font-weight: 800; font-size: 1.1rem; text-decoration: none; display: inline-block; margin-top: 30px; position: relative; z-index: 2; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        .cta-btn-white:hover { transform: scale(1.05); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        /* --- CTA (SẴN SÀNG BỨT PHÁ - BẢN RỘNG CHUẨN CONTAINER) --- */
+        .cta-wrapper { 
+            margin: 100px auto; /* Đưa ra giữa */
+            position: relative; z-index: 10; 
+            padding: 0 20px;
+            max-width: 1200px; /* MỞ RỘNG BẰNG CÁC CARD PHÍA TRÊN */
+        }
+        
+        .cta-card {
+            background: linear-gradient(135deg, var(--primary) 0%, #FF5E62 100%);
+            border-radius: 40px; padding: 70px 40px; text-align: center;
+            color: white; position: relative; overflow: hidden;
+            box-shadow: 0 20px 50px -10px rgba(255, 94, 98, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.3); z-index: 1;
+            width: 100%; /* Phủ kín 100% của 1200px */
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .cta-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px -10px rgba(255, 94, 98, 0.5);
+        }
+
+        /* Mảng sáng chìm tạo chiều sâu */
+        .cta-card::before {
+            content: ''; position: absolute; top: -50%; left: -20%; width: 60%; height: 150%;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(-45deg); pointer-events: none;
+        }
+        /* Họa tiết lưới chấm bi hiện đại */
+        .cta-card::after {
+            content: ''; position: absolute; inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px);
+            background-size: 24px 24px; pointer-events: none;
+        }
+        
+        .cta-content { position: relative; z-index: 10; }
+        
+        .cta-content h2 { 
+            font-size: 2.8rem; font-weight: 900; 
+            margin-bottom: 26px; line-height: 1.2; letter-spacing: -1px; text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .cta-content p { 
+            font-size: 1.1rem; font-weight: 500; opacity: 0.95; margin-bottom: 40px; 
+            max-width: 650px; margin-inline: auto; line-height: 1.6;
+        }
+        
+        .cta-btn {
+            display: inline-flex; align-items: center; gap: 12px;
+            background: white; color: var(--primary);
+            padding: 16px 40px; border-radius: 50px;
+            font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+            text-decoration: none; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .cta-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            color: #FF5E62;
+        }
+
+        /* Dark mode Sync */
+        html.dark .cta-card { box-shadow: 0 20px 60px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.1); }
+
+        @media (max-width: 768px) {
+            .cta-wrapper { margin: 80px 0; padding: 0 15px;}
+            .cta-card { padding: 50px 20px; border-radius: 30px; }
+            .cta-content h2 { font-size: 2.2rem; }
+            .cta-content p { font-size: 1rem; margin-bottom: 30px;}
+        }
 
         footer {
             background: #ffffff;
@@ -596,91 +795,97 @@
     display: none;
 }
 
-            /* =========================================
-           ROADMAP SECTION (Đồng bộ chuẩn với Review Card)
+        /* =========================================
+           ROADMAP SECTION (PRO TIMELINE VERSION)
            ========================================= */
-        .roadmap-section { padding: 100px 0; position: relative; z-index: 5; } /* Đồng bộ padding với các section khác */
-        .roadmap-header { text-align: center; margin-bottom: 60px; }
-        .roadmap-header h2 { font-size: 2.5rem; margin-bottom: 10px; font-weight: 800; color: var(--text-main); }
-        .roadmap-header p { font-size: 1.05rem; color: var(--text-light); max-width: 650px; margin: 0 auto; line-height: 1.6; }
+        .roadmap-section { padding: 100px 0; position: relative; z-index: 5; overflow: hidden;} 
+        .roadmap-header { text-align: center; margin-bottom: 60px; position: relative; z-index: 2;}
+        .roadmap-header h2 { font-size: 2.8rem; margin-bottom: 10px; font-weight: 900; color: var(--text-main); letter-spacing: -1px;}
+        .roadmap-header p { font-size: 1.1rem; color: var(--text-light); max-width: 650px; margin: 0 auto; line-height: 1.6; }
 
         .roadmap-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 24px; /* Đồng bộ khoảng cách chuẩn 24px giống khối Tính năng */
+            gap: 30px;
             align-items: stretch; 
+            position: relative;
+        }
+
+        /* Đường line kết nối 3 thẻ tạo cảm giác Lộ trình */
+        .roadmap-grid::before {
+            content: ''; position: absolute; top: 60px; left: 10%; right: 10%; height: 4px;
+            background: linear-gradient(90deg, rgba(255,143,80,0), rgba(255,143,80,0.3), rgba(255,143,80,0));
+            z-index: 1; border-radius: 10px;
         }
 
         .rm-card { 
-            background: rgba(255,255,255,0.6); 
-            border-radius: 30px; /* Bo góc to 30px */
-            padding: 40px; /* Padding rộng rãi 40px */
-            border: 1px solid white; 
-            transition: 0.3s; 
+            background: rgba(255,255,255,0.7); backdrop-filter: blur(20px);
+            border-radius: 30px; padding: 40px 35px 35px; 
+            border: 1px solid rgba(255,255,255,0.9); 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); 
-            display: flex; 
-            flex-direction: column; 
-            position: relative;
-            overflow: hidden;
-            height: 100%;
+            display: flex; flex-direction: column; 
+            position: relative; overflow: hidden; height: 100%; z-index: 2;
         }
 
         .rm-card:hover { 
-            transform: translateY(-5px); 
+            transform: translateY(-10px); 
             background: rgba(255,255,255,0.95); 
-            box-shadow: 0 20px 40px -10px rgba(255, 143, 80, 0.15); /* Đổ bóng ánh cam rực rỡ như thẻ Tính năng */
+            box-shadow: 0 20px 40px -10px rgba(255, 143, 80, 0.15); 
+            border-color: var(--primary);
         }
 
+        /* Số in chìm khổng lồ */
+        .rm-card::after {
+            content: attr(data-grade);
+            position: absolute; right: -5px; top: -15px;
+            font-size: 12rem; font-weight: 900; line-height: 1;
+            color: var(--primary); opacity: 0.04; pointer-events: none;
+            transition: all 0.5s ease;
+        }
+        .rm-card:hover::after { opacity: 0.08; transform: scale(1.05) translate(-10px, 10px); }
+
         .rm-grade-pill {
-            display: inline-flex;
-            background: #fff5ec;
-            color: var(--primary);
-            font-size: 0.85rem;
-            font-weight: 800;
-            padding: 6px 14px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            width: fit-content;
-            border: 1px solid rgba(255, 143, 80, 0.2);
+            display: inline-flex; align-items: center; justify-content: center;
+            background: rgba(255, 143, 80, 0.1) !important; /* Nền cam nhạt trong suốt */
+            color: #FF8F50 !important; /* Chữ màu cam rực rỡ */
+            font-size: 0.85rem; font-weight: 900; letter-spacing: 1px;
+            padding: 8px 22px; border-radius: 50px; margin-bottom: 25px;
+            border: 1px solid rgba(255, 143, 80, 0.3);
+            align-self: flex-start; position: relative; z-index: 2;
         }
 
         .rm-title {
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: var(--text-main);
-            margin-bottom: 25px;
-            line-height: 1.4;
+            font-size: 1.3rem; font-weight: 800; color: var(--text-main);
+            margin-bottom: 25px; line-height: 1.4; position: relative; z-index: 2;
         }
 
-        .rm-list { list-style: none; flex-grow: 1; padding: 0; margin: 0; }
+        .rm-list { list-style: none; flex-grow: 1; padding: 0; margin: 0; position: relative; z-index: 2;}
         .rm-list li {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 16px;
-            color: var(--text-light);
-            font-size: 0.95rem;
-            line-height: 1.5;
-            font-weight: 500;
+            display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px;
+            color: var(--text-light); font-size: 0.95rem; line-height: 1.6; font-weight: 600;
         }
         .rm-list li:last-child { margin-bottom: 0; }
 
         .rm-list li .tick-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 22px;
-            height: 22px;
-            background: #dcfce7; 
-            color: #22c55e;      
-            border-radius: 50%;
-            font-size: 0.7rem;
-            flex-shrink: 0;
-            margin-top: 2px;
+            display: flex; align-items: center; justify-content: center;
+            width: 24px; height: 24px; flex-shrink: 0; margin-top: 3px;
+            background: rgba(255, 143, 80, 0.15); color: var(--primary);      
+            border-radius: 50%; font-size: 0.75rem;
         }
 
+        /* Dark mode cho Lộ Trình */
+        html.dark .roadmap-grid::before { background: linear-gradient(90deg, rgba(255,143,80,0), rgba(255,143,80,0.15), rgba(255,143,80,0)); }
+        html.dark .rm-card { background: rgba(30, 41, 59, 0.6); border-color: #334155; }
+        html.dark .rm-card:hover { background: rgba(30, 41, 59, 0.95); border-color: var(--primary);}
+        html.dark .rm-title { color: #f8fafc; }
+        html.dark .rm-list li { color: #94a3b8; }
+        html.dark .rm-list li .tick-icon { background: rgba(255, 143, 80, 0.15); color: var(--primary); }
+
         @media (max-width: 992px) {
-            .roadmap-grid { grid-template-columns: 1fr; gap: 20px; } /* Đồng bộ khoảng cách mobile với các khối khác */
+            .roadmap-grid { grid-template-columns: 1fr; gap: 25px; } 
+            .roadmap-grid::before { display: none; } /* Ẩn line kết nối trên mobile */
+            .rm-card::after { font-size: 10rem; }
         }
 
             /* ==========================================
@@ -829,15 +1034,28 @@
         html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark .rm-title { color: #F8FAFC; }
         
         /* Fix màu các Card trên trang chủ */
-        html.dark .main-card, html.dark .floating-badge, html.dark .bento-item, 
+        html.dark .main-card, html.dark .floating-badge, 
         html.dark .review-card, html.dark .rm-card, html.dark .about-img {
             background-color: #1E293B; border-color: #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        html.dark .bento-item { background: rgba(30, 41, 59, 0.6); }
-        html.dark .bento-item:hover { background: rgba(30, 41, 59, 0.95); border-color: var(--primary); }
+
+        /* ĐÃ FIX: Màu nền Dark Mode cho Hệ sinh thái (Bento V2) */
+        html.dark .theme-glass { 
+            background: rgba(30, 41, 59, 0.6); 
+            border-color: #334155; 
+        }
+        html.dark .theme-glass:hover { 
+            background: rgba(30, 41, 59, 0.95); 
+            border-color: var(--primary); 
+        }
+        html.dark .theme-glass h3 { color: #f8fafc; }
+        html.dark .theme-glass p { color: #94a3b8; }
+        html.dark .bento-card .bc-watermark { color: #cbd5e1; opacity: 0.05; }
+        html.dark .theme-gradient .bc-watermark { color: white; opacity: 0.15; }
+
         html.dark .rm-card:hover { border-color: var(--primary); background-color: #0F172A; }
-        html.dark .bento-icon, html.dark .tick-icon { background-color: #0F172A !important; }
-        html.dark .rm-grade-pill { background-color: rgba(255, 143, 80, 0.1); }
+        html.dark .tick-icon { background-color: #0F172A !important; }
+        html.dark .rm-grade-pill { background: rgba(255, 143, 80, 0.15) !important; color: #FF8F50 !important; border-color: rgba(255, 143, 80, 0.4); }
         html.dark .nav-links { background-color: #1E293B; border-color: #334155; }
         
         /* ----- FIX ĐỒNG BỘ FOOTER ----- */
@@ -945,58 +1163,119 @@
         </section>
         
         <section id="features" class="section-padding">
-            <div class="section-header"><h2>Hệ sinh thái học tập</h2><p style="color: var(--text-light)">Tất cả công cụ bạn cần để đạt 9+ môn Văn</p></div>
-            <div class="bento-grid">
-                <div class="bento-item large">
-                    <div class="bento-icon"><i class="fas fa-pen-fancy"></i></div>
-                    <div><h3>Phòng luyện đề</h3><p>Hệ thống tự động ngẫu nhiên đề, tính giờ và chấm điểm chi tiết từng câu chữ ngay sau khi nộp. Nhận xét lỗi dùng từ, lỗi ngữ pháp và gợi ý sửa.</p></div>
-                    <i class="fas fa-robot bento-decoration"></i>
+            <div class="container">
+                <div class="section-header">
+                    <h2>Hệ sinh thái học tập</h2>
+                    <p style="color: var(--text-light); font-size: 1.1rem;">Khám phá bộ công cụ quyền năng giúp bạn làm chủ môn Ngữ Văn</p>
                 </div>
-                <div class="bento-item"><div class="bento-icon"><i class="fas fa-book-reader"></i></div><h3>Bản tin Văn học</h3><p>Gồm kho tài liệu học tập & những dẫn chứng "đắt giá".</p></div>
-                <div class="bento-item"><div class="bento-icon"><i class="fas fa-users"></i></div><h3>Cộng đồng</h3><p>Thảo luận, chia sẻ bí kíp cùng các bạn học sinh trên cả nước.</p></div>
-                <div class="bento-item large">
-                    <div class="bento-icon"><i class="fas fa-route"></i></div>
-                    <div><h3>Nhật ký học tập (Gamification)</h3><p>Biến việc học thành trò chơi. Hoàn thành bài học để mở khóa cấp độ mới, tích lũy chuỗi và nhận huy hiệu vinh danh.</p></div>
-                    <i class="fas fa-flag-checkered bento-decoration"></i>
+                
+                <div class="bento-grid-v2">
+                    
+                    <div class="bento-card bc-span-3 theme-glass" onclick="window.location.href='dashboard/phongluyende.html'">
+                        <div class="bc-icon-wrap" style="background: rgba(255, 143, 80, 0.15); color: #FF8F50;"><i class="fas fa-robot"></i></div>
+                        <h3>Phòng luyện đề</h3>
+                        <p>Hệ thống tự động ngẫu nhiên đề, tính giờ và chấm điểm chi tiết từng câu chữ ngay sau khi nộp. Nhận xét lỗi dùng từ, lỗi ngữ pháp và gợi ý sửa.</p>
+                        <i class="fas fa-microchip bc-watermark" style="color: var(--text-main);"></i>
+                    </div>
+                    
+                    <div class="bento-card bc-span-3 theme-glass" onclick="window.location.href='dashboard/lythuyet.html'">
+                        <div class="bc-icon-wrap" style="background: rgba(255, 143, 80, 0.15); color: #FF8F50;"><i class="fas fa-layer-group"></i></div>
+                        <h3>Kiến thức nền</h3>
+                        <p>Cơ sở dữ liệu lý thuyết Ngữ Văn được số hóa 100%, bám sát khung GDPT 2018. Trình bày qua bài giảng PDF tương tác thông minh, dễ hiểu, dễ nhớ.</p>
+                        <i class="fas fa-book bc-watermark" style="color: var(--text-main);"></i>
+                    </div>
+
+                    <div class="bento-card bc-span-2 theme-glass" onclick="window.location.href='dashboard/tacpham.html'">
+                        <div class="bc-icon-wrap" style="background: rgba(255, 143, 80, 0.15); color: #FF8F50;"><i class="fas fa-swatchbook"></i></div>
+                        <h3>Tác phẩm Văn học</h3>
+                        <p>Thư viện tác phẩm cao cấp với chế độ đọc tập trung và tự động lưu tiến độ.</p>
+                        <i class="fas fa-bookmark bc-watermark" style="color: var(--text-main);"></i>
+                    </div>
+
+                    <div class="bento-card bc-span-2 theme-glass" onclick="window.location.href='dashboard/bantinvanhoc.html'">
+                        <div class="bc-icon-wrap" style="background: rgba(255, 143, 80, 0.15); color: #FF8F50;"><i class="fas fa-newspaper"></i></div>
+                        <h3>Bản tin Văn học</h3>
+                        <p>Gồm kho tài liệu học tập & những dẫn chứng "đắt giá".</p>
+                        <i class="far fa-newspaper bc-watermark" style="color: var(--text-main);"></i>
+                    </div>
+
+                    <div class="bento-card bc-span-2 theme-glass" onclick="window.location.href='dashboard/nhatkyhoctap.html'">
+                        <div class="bc-icon-wrap" style="background: rgba(255, 143, 80, 0.15); color: #FF8F50;"><i class="fas fa-gamepad"></i></div>
+                        <h3>Nhật ký học tập</h3>
+                        <p>Đua top bảng xếp hạng và mở khóa huy hiệu vinh danh.</p>
+                        <i class="fas fa-medal bc-watermark" style="color: var(--text-main);"></i>
+                    </div>
+
+                    <div class="bento-card bc-span-6 theme-gradient" onclick="window.location.href='dashboard/congdong.html'">
+                        <div>
+                            <h3>Cộng đồng Học tập</h3>
+                            <p>Không gian giao lưu năng động. Nơi bạn có thể kết nối, chia sẻ tài liệu, và giải đáp mọi thắc mắc cùng các sĩ tử trên toàn quốc.</p>
+                        </div>
+                        <div class="bc-icon-wrap" style="background: rgba(255,255,255,0.2); color: white; width: 80px; height: 80px; font-size: 2.5rem; margin-bottom: 0;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <i class="fas fa-comments bc-watermark"></i>
+                    </div>
+
                 </div>
             </div>
         </section>
 
-        <section id="reviews" class="section-padding">
-            <div class="section-header">
-                <h2>Học viên nói gì về HopVan?</h2>
-                <p>Những câu chuyện thành công từ cộng đồng</p>
-            </div>
-            <div class="reviews-grid">
-                <div class="review-card">
-                    <div class="user-info">
-                        <img src="IMG/thungan.png" alt="User" class="user-avatar">
-                        <div>
-                            <div style="font-weight: 700;">Thu Ngân</div>
-                            <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                        </div>
-                    </div>
-                    <p class="review-text">"Nhờ tính năng chấm bài AI mà mình biết được lỗi dùng từ lặp lại. Điểm thi học kỳ vừa rồi mình tăng từ 6.5 lên 8.5. Cảm ơn HopVan!"</p>
+        <section id="reviews" class="reviews-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Học viên nói gì về HopVan?</h2>
+                    <p style="color: var(--text-light); font-size: 1.1rem;">Những câu chuyện thành công từ cộng đồng</p>
                 </div>
-                <div class="review-card">
-                    <div class="user-info">
-                        <img src="IMG/vinhan.png" alt="User" class="user-avatar">
-                        <div>
-                            <div style="font-weight: 700;">Vĩnh An</div>
+                
+                <div class="reviews-grid">
+                    <div class="review-card">
+                        <div class="review-text">
+                            "Tính năng chấm bài AI thực sự là một cú hích lớn! Thay vì nộp bài rồi đợi giáo viên cả tuần, mình biết ngay lỗi dùng từ lặp lại và cách triển khai ý kém. Điểm thi học kỳ vừa rồi mình tăng từ 6.5 lên 8.5."
+                        </div>
+                        <div class="review-footer">
+                            <div class="user-info-wrap">
+                                <img src="IMG/thungan.png" alt="Thu Ngân" class="user-avatar">
+                                <div class="user-details">
+                                    <h4>Thu Ngân</h4>
+                                    <p>Học sinh Lớp 12</p>
+                                </div>
+                            </div>
                             <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                         </div>
                     </div>
-                    <p class="review-text">"Mình rất thích phần Bản tin Văn học, nhiều dẫn chứng mới lạ, không bị đụng hàng. Giao diện web cũng rất đẹp và mượt."</p>
-                </div>
-                <div class="review-card">
-                    <div class="user-info">
-                        <img src="IMG/minhnguyet.png" alt="User" class="user-avatar">
-                        <div>
-                            <div style="font-weight: 700;">Minh Nguyệt</div>
+
+                    <div class="review-card">
+                        <div class="review-text">
+                            "Mình cực kỳ ấn tượng với phần Bản tin Văn học. Ở đây tổng hợp được những dẫn chứng thực tế, mới lạ và rất 'đắt giá' chứ không bị rập khuôn. Giao diện đọc E-book cũng siêu mượt, rất có hứng để học."
+                        </div>
+                        <div class="review-footer">
+                            <div class="user-info-wrap">
+                                <img src="IMG/vinhan.png" alt="Vĩnh An" class="user-avatar">
+                                <div class="user-details">
+                                    <h4>Vĩnh An</h4>
+                                    <p>Học sinh Lớp 12</p>
+                                </div>
+                            </div>
+                            <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="review-card">
+                        <div class="review-text">
+                            "Hệ thống Nhật ký học tập của HopVan đánh trúng tâm lý lười học của mình. Việc duy trì Streak và đua top bảng xếp hạng làm mình có động lực học mỗi ngày. Cảm giác học mà như chơi game vậy!"
+                        </div>
+                        <div class="review-footer">
+                            <div class="user-info-wrap">
+                                <img src="IMG/minhnguyet.png" alt="Minh Nguyệt" class="user-avatar">
+                                <div class="user-details">
+                                    <h4>Minh Nguyệt</h4>
+                                    <p>Học sinh Lớp 12</p>
+                                </div>
+                            </div>
                             <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                         </div>
                     </div>
-                    <p class="review-text">"Hệ thống Nhật ký học tập giúp mình có động lực học mỗi ngày để giữ streak. Cảm giác như đang chơi game vậy, rất cuốn!"</p>
                 </div>
             </div>
         </section>
@@ -1009,7 +1288,7 @@
                 </div>
 
                 <div class="roadmap-grid">
-                    <div class="rm-card">
+                    <div class="rm-card" data-grade="10">
                         <div class="rm-grade-pill">NGỮ VĂN 10</div>
                         <h3 class="rm-title">Củng Cố Nền Tảng & Đa Dạng Thể Loại</h3>
                         <ul class="rm-list">
@@ -1032,7 +1311,7 @@
                         </ul>
                     </div>
 
-                    <div class="rm-card">
+                    <div class="rm-card" data-grade="11">
                         <div class="rm-grade-pill">NGỮ VĂN 11</div>
                         <h3 class="rm-title">Khám Phá Chiều Sâu & Nghị Luận Đa Chiều</h3>
                         <ul class="rm-list">
@@ -1055,7 +1334,7 @@
                         </ul>
                     </div>
 
-                    <div class="rm-card">
+                    <div class="rm-card" data-grade="12">
                         <div class="rm-grade-pill">NGỮ VĂN 12</div>
                         <h3 class="rm-title">Tổng Ôn Toàn Diện & Định Hình Tư Duy</h3>
                         <ul class="rm-list">
@@ -1204,13 +1483,16 @@
             </div>
         </section>
 
-        <section class="cta-section">
-            <h2>Sẵn sàng bứt phá điểm số?</h2>
-            <p style="opacity: 0.9; margin-top: 15px; font-size: 1.15rem; margin-bottom: 10px;">Tham gia ngay hôm nay để trải nghiệm phương pháp học Văn hoàn toàn mới.</p>
-            <a href="log.html" class="cta-btn-white">Đăng ký tài khoản ngay</a>
-            
-            <div style="position: absolute; width: 300px; height: 300px; background: rgba(255,255,255,0.1); border-radius: 50%; top: -100px; left: -100px;"></div>
-            <div style="position: absolute; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; bottom: -50px; right: -50px;"></div>
+        <section class="cta-wrapper">
+            <div class="cta-card">
+                <div class="cta-content">
+                    <h2>Sẵn sàng bứt phá điểm số?</h2>
+                    <p>Tham gia ngay hôm nay để trải nghiệm phương pháp học Văn hoàn toàn mới.</p>
+                    <a href="log.html" class="cta-btn">
+                        Đăng ký tài khoản ngay
+                    </a>
+                </div>
+            </div>
         </section>
     </div>
 
@@ -1288,7 +1570,7 @@
             ">
                 <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px;">HopVan Platform</span>
                 <span style="width: 4px; height: 4px; border-radius: 50%; background-color: #22c55e;"></span>
-                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.2.4</span>
+                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.2.5</span>
             </div>
         </div>
     </footer>
