@@ -654,5 +654,22 @@
             }
         });
 </script>
+
+<script type="text/javascript">
+    document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
+        if (e.ctrlKey) {
+            switch (e.key.toLowerCase()) {
+                case 'u': case 's': case 'p': e.preventDefault(); return false;
+            }
+            if (e.shiftKey) {
+                switch (e.key.toLowerCase()) {
+                    case 'i': case 'j': case 'c': e.preventDefault(); return false;
+                }
+            }
+        }
+    });
+</script>
 </body>
 </html>
