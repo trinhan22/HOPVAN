@@ -520,7 +520,7 @@
 
                 // 6. Điều hướng ngay lập tức
                 if (role === 'teacher') {
-                    window.location.replace("teacher/");
+                    window.location.replace("dashboard/");
                 } else {
                     window.location.replace("dashboard/"); 
                 }
@@ -609,7 +609,7 @@
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     if (userDoc.exists()) {
                         const role = userDoc.data().role;
-                        if (role === 'teacher') window.location.replace("teacher/");
+                        if (role === 'teacher') window.location.replace("dashboard/");
                         else if (role === 'admin') window.location.replace("admin/");
                         else window.location.replace("dashboard/");
                     } else {
