@@ -118,24 +118,34 @@
         // Timeline chính
         const tl = gsap.timeline({ 
             paused: true,
+            onUpdate: function() {
+                // ĐỒNG BỘ THỰC TẾ: Thanh tiến độ chạy chính xác theo % hoàn thành của Timeline chữ
+                document.getElementById('bar').style.width = (this.progress() * 100) + "%";
+            },
             onComplete: () => { 
                 gsap.to("body", { opacity: 0, duration: 0.4, onComplete: () => {
-                    // --- CHUYỂN HƯỚNG SAU 3 GIÂY ---
-                    window.location.href = 'dashboard/'; 
+                    
+                    // KIỂM TRA IFRAME: Nếu đang chạy dưới dạng loading nền của Dashboard thì không tự chuyển trang
+                    if (window.self !== window.top) {
+                        return; // Dừng lại, để Dashboard tự làm mờ và tắt Iframe
+                    } 
+                    // Nếu chạy độc lập như trang splash screen bình thường thì chuyển hướng
+                    else {
+                        window.location.href = 'dashboard/'; 
+                    }
+
                 }});
             }
         });
 
         function initAnimation() {
-            // 1. THANH PROGRESS: Chạy trong 3 giây
-            gsap.to("#bar", { width: "100%", duration: 3, ease: "none" });
+            // (ĐÃ XÓA dòng code set cứng 3s của thanh Progress cũ ở đây)
 
-            // 2. SCENES: Ép 4 cảnh hiển thị hết trong vòng 3 giây
+            // 2. SCENES: Cấu hình thời gian xuất hiện của các cảnh
             const ids = ['#s1', '#s2', '#s3', '#s4'];
             
-            // Tính toán: 4 cảnh trong 3s => Mỗi cảnh xuất hiện rất nhanh
-            const fadeTime = 0.3; // Thời gian hiện lên (nhanh hơn)
-            const stayTime = 0.35; // Thời gian dừng lại đọc chữ (ngắn hơn)
+            const fadeTime = 0.3; // Thời gian mờ vào/ra
+            const stayTime = 0.35; // Thời gian giữ lại đọc chữ
             const overlap = "-=0.15"; // Gối đầu lên nhau để mượt
 
             ids.forEach((id, index) => {

@@ -605,14 +605,18 @@
         const snap = await getDocs(q);
         
         let scores = { reading: [], nlxh: [], nlvh: [], lang: [] };
+        let totalCount = 0; // Thêm biến đếm tổng quát
         
         snap.forEach(doc => {
             const d = doc.data();
+            totalCount++; // ĐẾM MỌI HOẠT ĐỘNG, BẤT KỂ TYPE LÀ GÌ
+            
             if (d.score !== undefined && d.score !== null) {
                 let type = d.type; 
-                if (['trac-nghiem','reading','doc_hieu'].includes(type)) type = 'reading';
+                // Map type cũ về 4 nhóm chính để vẽ thanh kỹ năng
+                if (['trac-nghiem','reading','doc_hieu', 'quiz'].includes(type)) type = 'reading';
                 else if (type === 'nlxh') type = 'nlxh';
-                else if (type === 'nlvh') type = 'nlvh';
+                else if (['nlvh', 'truyen', 'tho', 'ky', 'kich'].includes(type)) type = 'nlvh';
                 else if (['ngon-ngu','lang'].includes(type)) type = 'lang';
                 
                 if (scores[type]) scores[type].push(Number(d.score));
@@ -647,11 +651,10 @@
         updateUI('nlvh', scores.nlvh, SKILL_STEPS.nlvh);
         updateUI('lang', scores.lang, SKILL_STEPS.lang);
         
-        // TÍNH TỔNG SỐ BÀI ĐÃ LÀM
-        const totalDone = scores.reading.length + scores.nlxh.length + scores.nlvh.length + scores.lang.length;
+        // TÍNH TỔNG SỐ BÀI ĐÃ LÀM (CHUẨN XÁC THEO TỔNG SỐ DOCS)
         const totalEl = document.getElementById('total-exams');
         if (totalEl) {
-            totalEl.innerText = totalDone;
+            totalEl.innerText = totalCount;
         }
     }
 

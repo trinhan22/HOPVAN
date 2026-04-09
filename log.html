@@ -520,9 +520,9 @@
 
                 // 6. Điều hướng ngay lập tức
                 if (role === 'teacher') {
-                    window.location.replace("teacher/index.html");
+                    window.location.replace("teacher/");
                 } else {
-                    window.location.replace("loading.html"); 
+                    window.location.replace("dashboard/"); 
                 }
 
             } catch (err) {
@@ -572,7 +572,7 @@
                     await setDoc(doc(db, "users_progress", user.uid), { currentLevel: 1, paidLevel: 0 });
                 }
                 
-                window.location.replace("loading.html");
+                window.location.replace("dashboard/");
 
             } catch (err) {
                 isRegistering = false;
@@ -609,9 +609,9 @@
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     if (userDoc.exists()) {
                         const role = userDoc.data().role;
-                        if (role === 'teacher') window.location.replace("teacher/index.html");
-                        else if (role === 'admin') window.location.replace("admin/index.html");
-                        else window.location.replace("loading.html");
+                        if (role === 'teacher') window.location.replace("teacher/");
+                        else if (role === 'admin') window.location.replace("admin/");
+                        else window.location.replace("dashboard/");
                     } else {
                         console.warn("Không tìm thấy user document.");
                         setLoading(false);
