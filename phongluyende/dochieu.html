@@ -211,6 +211,51 @@
             text-decoration-thickness: 2px; 
             text-decoration-color: #ef4444; 
         }
+
+
+        /* --- GIAO DIỆN CÂU HỎI & Ô TRẢ LỜI ĐỌC HIỂU (ĐÃ SỬA LỖI SCROLL) --- */
+        .qa-block {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s ease;
+        }
+        .qa-block:last-child {
+            margin-bottom: 0;
+        }
+        .qa-block:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px rgba(255, 143, 80, 0.15);
+            transform: translateY(-2px);
+        }
+        .qa-question {
+            padding: 16px 20px;
+            background: #eff6ff; 
+            border-bottom: 1px solid #bfdbfe;
+            color: #1e3a8a;
+            font-weight: 600;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .qa-answer {
+            width: 100%;
+            min-height: 120px;
+            padding: 20px;
+            border: none;
+            outline: none;
+            resize: vertical;
+            font-family: 'Merriweather', serif;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #334155;
+            background: transparent;
+            background-image: linear-gradient(#f1f5f9 1px, transparent 1px);
+            background-size: 100% 1.8rem;
+            background-attachment: local;
+        }
     </style>
 </head>
 <body>
@@ -311,8 +356,7 @@
                                 <span id="word-count" class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">0 TỪ</span>
                             </div>
                         </div>
-                        <div class="flex-1 overflow-hidden relative">
-                            <textarea id="student-essay" class="writing-area" placeholder="Trả lời các câu hỏi đọc hiểu tại đây..."></textarea>
+                        <div id="dynamic-qa-container" class="flex-1 overflow-y-auto p-5 bg-[#fafaf9] custom-scrollbar" style="min-height: 0;">
                         </div>
                         <div class="footer-action"><button onclick="handleAISubmission()" class="submit-btn flex items-center gap-2"><span>NỘP BÀI</span> <i class="fas fa-paper-plane"></i></button></div>
                     </div>
@@ -380,36 +424,44 @@
         }
     }
 
-    // --- RENDER EXAM ---
+    // --- RENDER EXAM (CHIA HAI CỘT) ---
     window.randomizeQuestion = () => {
         if (!questionsData || questionsData.length === 0) return;
         const q = questionsData[Math.floor(Math.random() * questionsData.length)];
         window.currentExamData = q;
         document.getElementById('exam-code').innerText = `MÃ: ${q.id.slice(0, 6).toUpperCase()}`;
-        document.getElementById('student-essay').value = "";
         
         setupHighlightEvent();
         
+        // 1. RENDER CỘT TRÁI (CHỈ NGỮ LIỆU)
         document.getElementById('prompt-content').innerHTML = `
             <div id="reading-passage" class="relative pb-10">
                 <div class="mb-4">
-                    <h3 class="font-bold text-lg text-gray-800 mb-2">${q.title || "Văn bản Đọc Hiểu"}</h3>
-                    <div class="passage-box">
+                    <h3 class="font-bold text-lg text-gray-800 mb-4 border-b pb-2">${q.title || "Văn bản Đọc Hiểu"}</h3>
+                    <div class="passage-box shadow-sm">
                         <div class="exam-content highlight-text" id="text-content">${q.text || "Đang cập nhật..."}</div>
                     </div>
                 </div>
-                <div class="space-y-4">
-                    <h4 class="font-black text-gray-700 border-b pb-2 uppercase text-sm">Câu hỏi:</h4>
-                    ${(q.questions || []).map((item, idx) => `
-                        <div class="question-box">
-                            <span class="font-black text-orange-500 block mb-2 text-sm uppercase">Câu ${idx + 1}</span>
-                            <div class="text-gray-800 font-medium leading-relaxed">${item.q}</div>
-                        </div>`).join('')}
-                </div>
             </div>`;
+            
+        // 2. RENDER CỘT PHẢI (CÂU HỎI VÀ Ô TRẢ LỜI)
+        const qaContainer = document.getElementById('dynamic-qa-container');
+        if (qaContainer) {
+            qaContainer.innerHTML = (q.questions || []).map((item, idx) => `
+                <div class="qa-block">
+                    <div class="qa-question">
+                        <span class="font-black text-orange-500 uppercase text-xs mr-2 px-2 py-1 bg-white rounded-md shadow-sm">Câu ${idx + 1}</span>
+                        ${item.q}
+                    </div>
+                    <textarea class="qa-answer student-answer-field" data-q-index="${idx + 1}" placeholder="Nhập câu trả lời của bạn cho Câu ${idx + 1}..."></textarea>
+                </div>
+            `).join('');
+        }
+
         promptFontSize = 17;
         document.querySelector('.prompt-body').style.fontSize = `17px`;
         setTimeout(setupHighlightEvent, 100);
+        updateTotalWordCount(); // Reset bộ đếm từ
     };
 
     // --- HIGHLIGHT (FIX DOM) ---
@@ -563,11 +615,27 @@
         document.getElementById('ai-correction-box').innerHTML = html;
     };
 
-    // --- 2. XỬ LÝ NỘP BÀI (MAP ĐÚNG DATA ĐỌC HIỂU) ---
+    // --- 2. XỬ LÝ NỘP BÀI (GỘP ĐÁP ÁN TỪ NHIỀU Ô) ---
     window.handleAISubmission = async () => {
-        const content = document.getElementById('student-essay').value.trim();
-        if(content.split(/\s+/).filter(x => x).length < 50) { 
-            document.getElementById('short-essay-popup').style.display = 'flex'; return; 
+        // Thu thập toàn bộ câu trả lời
+        const answerFields = document.querySelectorAll('.student-answer-field');
+        let content = "";
+        let totalWords = 0;
+
+        answerFields.forEach(field => {
+            const val = field.value.trim();
+            const qIndex = field.getAttribute('data-q-index');
+            if (val) {
+                content += `[Câu ${qIndex}]: ${val}\n\n`;
+                totalWords += val.split(/\s+/).filter(x => x).length;
+            }
+        });
+
+        // Đọc hiểu ngắn hơn NLVH nên chỉ cần kiểm tra >= 30 từ
+        if(totalWords < 30) { 
+            document.getElementById('short-essay-popup').style.display = 'flex'; 
+            document.querySelector('#short-essay-popup p').innerHTML = 'Tổng số từ các câu trả lời cần ít nhất <strong>30 từ</strong> để AI chấm chính xác. Hãy viết thêm nhé!';
+            return; 
         }
 
         const loading = document.getElementById('loading-overlay');
@@ -702,7 +770,39 @@
 
     onAuthStateChanged(auth, u => { if(u) { startTimer(); loadQuestions(); } else window.location.href="../log.html"; });
     document.getElementById('file-upload').addEventListener('change', (e) => { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); if(f.name.endsWith('.docx')) { r.onload = (ev) => mammoth.extractRawText({arrayBuffer: ev.target.result}).then(res => document.getElementById('student-essay').value = res.value); r.readAsArrayBuffer(f); } else showPopup("Lỗi", "Chỉ nhận file .docx", "error"); });
-    document.getElementById('student-essay').oninput = function() { document.getElementById('word-count').innerText = `${this.value.trim().split(/\s+/).filter(x => x).length} TỪ`; };
+    // --- ĐẾM TỪ TỔNG HỢP ---
+    window.updateTotalWordCount = () => {
+        const textareas = document.querySelectorAll('.student-answer-field');
+        let totalWords = 0;
+        textareas.forEach(ta => {
+            totalWords += ta.value.trim().split(/\s+/).filter(x => x).length;
+        });
+        document.getElementById('word-count').innerText = `${totalWords} TỪ`;
+    };
+
+    // Lắng nghe sự kiện gõ phím trên container
+    const qaContainerNode = document.getElementById('dynamic-qa-container');
+    if (qaContainerNode) {
+        qaContainerNode.addEventListener('input', (e) => {
+            if (e.target.classList.contains('student-answer-field')) {
+                updateTotalWordCount();
+            }
+        });
+
+        // --- CHỐNG COPY PASTE (ANTI CHEAT) ---
+        qaContainerNode.addEventListener('paste', (e) => {
+            if (e.target.classList.contains('student-answer-field')) {
+                e.preventDefault();
+                showPopup("Chế độ Luyện Tập", "Vui lòng tự gõ bài để rèn luyện tư duy.\nHệ thống không cho phép Copy-Paste.", "warning");
+            }
+        });
+
+        ['copy', 'cut', 'drop', 'contextmenu'].forEach(evt => {
+            qaContainerNode.addEventListener(evt, (e) => {
+                if (e.target.classList.contains('student-answer-field')) e.preventDefault();
+            });
+        });
+    }
 
 // --- FULLSCREEN LOGIC ---
     // Hàm kích hoạt toàn màn hình
