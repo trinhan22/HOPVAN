@@ -2,140 +2,156 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     
     <url>
-        <loc>https://hopvan.netlify.app/</loc>
-        <lastmod>2026-02-23</lastmod>
+        <loc>https://hopvan.info.vn/</loc>
+        <lastmod>2026-04-11</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/log.html</loc>
+        <loc>https://hopvan.info.vn/log.html</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/register.html</loc>
+        <loc>https://hopvan.info.vn/huongdansudung.html</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/huongdansudung.html</loc>
+        <loc>https://hopvan.info.vn/khungchuongtrinh.html</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/khungchuongtrinh.html</loc>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-
-    <url>
-        <loc>https://hopvan.netlify.app/hopteam.html</loc>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-
-    <url>
-        <loc>https://hopvan.netlify.app/dashboard/</loc>
+        <loc>https://hopvan.info.vn/dashboard/</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/dashboard/phongluyende.html</loc>
+        <loc>https://hopvan.info.vn/dashboard/phongluyende.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/phongluyende/</loc>
+        <loc>https://hopvan.info.vn/phongluyende/</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/phongluyende/detonghop.html</loc>
+        <loc>https://hopvan.info.vn/phongluyende/detonghop.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/phongluyende/truyen.html</loc>
+        <loc>https://hopvan.info.vn/phongluyende/truyen.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/phongluyende/tho.html</loc>
+        <loc>https://hopvan.info.vn/phongluyende/tho.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/phongluyende/kich.html</loc>
+        <loc>https://hopvan.info.vn/phongluyende/kich.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/phongluyende/ky.html</loc>
+        <loc>https://hopvan.info.vn/phongluyende/ky.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/phongluyende/dochieu.html</loc>
+        <loc>https://hopvan.info.vn/phongluyende/dochieu.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/phongluyende/nghiluanxahoi.html</loc>
+        <loc>https://hopvan.info.vn/phongluyende/nghiluanxahoi.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/phongluyende/tracnghiem.html</loc>
+        <loc>https://hopvan.info.vn/phongluyende/tracnghiem.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/dashboard/bantinvanhoc.html</loc>
+        <loc>https://hopvan.info.vn/phongluyende/decanhan.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/dashboard/congdong.html</loc>
+        <loc>https://hopvan.info.vn/phongluyende/lichsulambai.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/dashboard/nhatkyhoctap.html</loc>
+        <loc>https://hopvan.info.vn/dashboard/bantinvanhoc.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/dashboard/account.html</loc>
+        <loc>https://hopvan.info.vn/dashboard/congdong.html</loc>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/bantinvanhoc/view.html</loc>
+        <loc>https://hopvan.info.vn/dashboard/nhatkyhoctap.html</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <url>
+        <loc>https://hopvan.info.vn/dashboard/account.html</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <url>
+        <loc>https://hopvan.info.vn/dashboard/lythuyet.html</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://hopvan.info.vn/dashboard/tacpham.html</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://hopvan.info.vn/dashboard/read.html</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <url>
+        <loc>https://hopvan.info.vn/bantinvanhoc/view.html</loc>
         <changefreq>always</changefreq>
         <priority>0.9</priority>
     </url>
 
     <url>
-        <loc>https://hopvan.netlify.app/bantinvanhoc/view2.html</loc>
+        <loc>https://hopvan.info.vn/bantinvanhoc/view2.html</loc>
         <changefreq>always</changefreq>
         <priority>0.9</priority>
     </url>
