@@ -1138,50 +1138,84 @@
             </div>
 
 
-<div id="view-maintenance" class="view-section hidden">
-                <div class="glass-panel rounded-3xl p-8 max-w-4xl mx-auto mt-4 relative overflow-hidden">
+            <div id="view-maintenance" class="view-section hidden">
+                <div class="glass-panel rounded-3xl p-8 max-w-5xl mx-auto mt-4 relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500"></div>
-                    <i class="fas fa-hard-hat absolute -bottom-10 -right-10 text-9xl text-red-50 opacity-50 -rotate-12 pointer-events-none"></i>
 
-                    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 relative z-10">
-                        <div>
-                            <h3 class="font-black text-3xl text-gray-800 flex items-center gap-3">
-                                Cấu Hình Bảo Trì <span id="mt-status-badge" class="px-3 py-1 bg-gray-100 text-gray-500 text-[10px] uppercase rounded-full tracking-wider border border-gray-200">Đang Tắt</span>
-                            </h3>
-                            <p class="text-sm text-gray-500 font-medium mt-2">Bật chế độ này để chặn người dùng truy cập trong lúc nâng cấp hệ thống.</p>
+                    <div class="mb-8">
+                        <h3 class="font-black text-3xl text-gray-800 flex items-center gap-3">
+                            Quản Lý Bảo Trì
+                        </h3>
+                        <p class="text-sm text-gray-500 font-medium mt-2">Theo dõi trạng thái thời gian thực và cấu hình khóa hệ thống.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 relative z-10">
+                        <div class="md:col-span-1 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-center items-center text-center transition-all duration-500" id="live-status-box">
+                            <div id="live-status-icon" class="w-16 h-16 rounded-full flex items-center justify-center text-2xl mb-3 bg-gray-100 text-gray-400 transition-all duration-300">
+                                <i class="fas fa-circle-notch fa-spin"></i>
+                            </div>
+                            <h4 class="font-black text-gray-800 text-lg mb-1">Trạng thái Live</h4>
+                            <div id="live-status-text" class="text-[10px] font-black uppercase px-3 py-1 rounded-full bg-gray-100 text-gray-500 transition-all">Đang tải...</div>
                         </div>
-                        
-                        <div class="flex items-center gap-3 bg-red-50 p-3 rounded-2xl border border-red-100 shadow-sm">
-                            <span class="text-sm font-black text-red-500 uppercase tracking-wide">Trạng Thái:</span>
-                            <div class="relative inline-block w-14 align-middle select-none">
-                                <input type="checkbox" name="toggle" id="maintenance-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer opacity-0"/>
-                                <label for="maintenance-toggle" class="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"></label>
+
+                        <div class="md:col-span-2 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-center">
+                            <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                <i class="fas fa-desktop"></i> Giao diện học sinh đang thấy
+                            </h4>
+                            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 mb-4 relative">
+                                <i class="fas fa-quote-left absolute top-2 right-3 text-2xl text-gray-200"></i>
+                                <p id="live-status-msg" class="text-gray-700 font-medium italic text-sm">...</p>
+                            </div>
+                            <div class="flex flex-wrap gap-6 text-xs font-bold text-gray-500">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i class="far fa-clock"></i></div> 
+                                    <span id="live-status-start">--:--</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-full bg-green-50 text-green-500 flex items-center justify-center"><i class="far fa-calendar-check"></i></div> 
+                                    <span id="live-status-end">--:--</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-                        <div class="bg-gray-50/80 p-5 rounded-2xl border border-gray-100">
-                            <label class="label-custom text-blue-600 mb-2"><i class="far fa-calendar-alt"></i> Thời gian bắt đầu</label>
-                            <input type="text" id="mt-start" class="glass-datetime" placeholder="Chọn ngày giờ bắt đầu...">
+                    <div class="bg-gray-50/80 rounded-2xl border border-gray-100 p-6 relative z-10">
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 border-b border-gray-200 pb-6">
+                            <div>
+                                <h4 class="font-black text-xl text-gray-800">Cấu hình cài đặt</h4>
+                                <p class="text-xs text-gray-500 mt-1">Bật công tắc và lưu lại để kích hoạt ngay lập tức chế độ bảo trì.</p>
+                            </div>
+                            <div class="flex items-center gap-3 bg-white p-2 pr-4 pl-3 rounded-xl border border-gray-200 shadow-sm">
+                                <span class="text-sm font-black text-gray-700 uppercase tracking-wide">BẬT BẢO TRÌ</span>
+                                <div class="relative inline-block w-14 align-middle select-none mt-1">
+                                    <input type="checkbox" name="toggle" id="maintenance-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer opacity-0"/>
+                                    <label for="maintenance-toggle" class="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"></label>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="bg-gray-50/80 p-5 rounded-2xl border border-gray-100">
-                            <label class="label-custom text-red-600 mb-2"><i class="far fa-calendar-check"></i> Thời gian dự kiến kết thúc</label>
-                            <input type="text" id="mt-end" class="glass-datetime" placeholder="Chọn ngày giờ kết thúc...">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="label-custom text-blue-600 mb-2"><i class="far fa-calendar-alt"></i> Bắt đầu</label>
+                                <input type="text" id="mt-start" class="glass-datetime" placeholder="Chọn ngày giờ bắt đầu...">
+                            </div>
+
+                            <div>
+                                <label class="label-custom text-green-600 mb-2"><i class="far fa-calendar-check"></i> Dự kiến xong</label>
+                                <input type="text" id="mt-end" class="glass-datetime" placeholder="Chọn ngày giờ kết thúc...">
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="label-custom text-orange-600 mb-2"><i class="fas fa-bullhorn"></i> Lời nhắn gửi đến người dùng</label>
+                                <textarea id="mt-message" class="glass-input h-24 resize-none bg-white" placeholder="VD: HopVan đang được nâng cấp..."></textarea>
+                            </div>
                         </div>
 
-                        <div class="md:col-span-2 bg-gray-50/80 p-5 rounded-2xl border border-gray-100">
-                            <label class="label-custom text-orange-600 mb-2"><i class="fas fa-bullhorn"></i> Lời nhắn gửi đến người dùng</label>
-                            <textarea id="mt-message" class="glass-input h-24 resize-none" placeholder="VD: HopVan đang được nâng cấp để mang lại trải nghiệm tốt hơn. Vui lòng quay lại sau 12:00 nhé!"></textarea>
-                            <p class="text-[10px] text-gray-400 mt-2 font-medium italic">Lời nhắn này sẽ hiển thị to rõ trên màn hình của học sinh khi họ truy cập web.</p>
+                        <div class="mt-6 pt-6 border-t border-gray-200 flex justify-end">
+                            <button onclick="saveMaintenanceSettings()" class="px-8 py-3 rounded-xl bg-gray-900 text-white font-bold shadow-xl shadow-gray-400/20 hover:bg-black hover:-translate-y-1 transition-all duration-300 flex items-center gap-2">
+                                <i class="fas fa-save"></i> Cập Nhật Hệ Thống
+                            </button>
                         </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end relative z-10">
-                        <button onclick="saveMaintenanceSettings()" class="px-8 py-4 rounded-xl bg-gray-900 text-white font-bold shadow-xl hover:bg-black hover:-translate-y-1 transition-all duration-300 flex items-center gap-2">
-                            <i class="fas fa-save"></i> Lưu Cấu Hình Bảo Trì
-                        </button>
                     </div>
                 </div>
             </div>
@@ -1825,61 +1859,119 @@ const CAT_MAP = {
     const fpConfig = {
         enableTime: true,
         time_24hr: true,
-        dateFormat: "Y-m-d\\TH:i", // Lưu vào DB theo chuẩn cũ
+        dateFormat: "Y-m-d\\TH:i",
         altInput: true,
-        altFormat: "d/m/Y H:i", // Hiển thị ra màn hình chuẩn Việt Nam
-        locale: "vn" // Ngôn ngữ tiếng Việt
+        altFormat: "d/m/Y H:i",
+        locale: "vn"
     };
     
-    let fpStart = flatpickr("#mt-start", fpConfig);
-    let fpEnd = flatpickr("#mt-end", fpConfig);
+    // TRÁNH LỖI ARRAY BẰNG CÁCH GỌI TRỰC TIẾP ELEMENT
+    let fpStart = flatpickr(document.getElementById("mt-start"), fpConfig);
+    let fpEnd = flatpickr(document.getElementById("mt-end"), fpConfig);
+
+    // Hàm format thời gian để hiển thị ra Bảng Live
+    function formatDateTimeStr(dateString) {
+        if (!dateString) return '--:--';
+        try {
+            const d = new Date(dateString);
+            return d.toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) + ' - ' + d.toLocaleDateString('vi-VN');
+        } catch (e) { return dateString; }
+    }
     
-    // Cập nhật hàm switchView để load data bảo trì khi click vào tab
+    let maintenanceUnsubscribe = null;
+
     const originalSwitchView = window.switchView;
     window.switchView = (viewId, el) => {
         originalSwitchView(viewId, el);
         if (viewId === 'maintenance') {
             loadMaintenanceSettings();
-        }
-    };
-
-    // Tải dữ liệu bảo trì từ Firestore
-    window.loadMaintenanceSettings = async () => {
-        try {
-            const docRef = doc(db, "system_settings", "maintenance");
-            const snap = await getDoc(docRef);
-            
-            if (snap.exists()) {
-                const data = snap.data();
-                const toggle = document.getElementById('maintenance-toggle');
-                const badge = document.getElementById('mt-status-badge');
-                
-                // Gán dữ liệu vào UI
-                toggle.checked = data.isActive || false;
-                fpStart.setDate(data.startTime || "");
-                fpEnd.setDate(data.endTime || "");
-                document.getElementById('mt-message').value = data.message || "";
-
-                // Cập nhật giao diện huy hiệu
-                if(data.isActive) {
-                    badge.className = "px-3 py-1 bg-red-100 text-red-600 text-[10px] font-black uppercase rounded-full tracking-wider border border-red-200 shadow-sm animate-pulse";
-                    badge.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i> Hệ Thống Đang Đóng';
-                } else {
-                    badge.className = "px-3 py-1 bg-green-100 text-green-600 text-[10px] font-black uppercase rounded-full tracking-wider border border-green-200";
-                    badge.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Hoạt Động Bình Thường';
-                }
+        } else {
+            if (maintenanceUnsubscribe) {
+                maintenanceUnsubscribe();
+                maintenanceUnsubscribe = null;
             }
-        } catch (error) {
-            console.error("Lỗi tải dữ liệu bảo trì:", error);
-            showToast("Không thể tải cài đặt bảo trì!", "error");
         }
     };
+
+    // Tải và LẮNG NGHE DỮ LIỆU REALTIME
+    window.loadMaintenanceSettings = () => {
+        if (maintenanceUnsubscribe) maintenanceUnsubscribe(); 
+
+        try {
+            maintenanceUnsubscribe = onSnapshot(doc(db, "system_settings", "maintenance"), (docSnap) => {
+                
+                let data = { isActive: false, message: "", startTime: "", endTime: "" };
+                
+                if (docSnap.exists()) {
+                    data = docSnap.data();
+                }
+                
+                // Gọi hàm cập nhật giao diện
+                updateMaintenanceUI(data);
+
+            }, (error) => {
+                console.error("Lỗi Firebase khi đọc Maintenance:", error);
+                // Nếu bị lỗi quyền truy cập, ÉP giao diện dừng quay và báo lỗi
+                updateMaintenanceUI({ 
+                    isActive: false, 
+                    message: "LỖI KẾT NỐI: " + error.message, 
+                    startTime: "", 
+                    endTime: "" 
+                });
+            });
+        } catch (error) {
+            console.error("Lỗi JS Cục bộ:", error);
+        }
+    };
+
+    // Tách riêng hàm cập nhật giao diện (Có bọc Try-Catch chống Crash)
+    function updateMaintenanceUI(data) {
+        try {
+            const iconBox = document.getElementById('live-status-icon');
+            const textBox = document.getElementById('live-status-text');
+            const mainBox = document.getElementById('live-status-box');
+
+            if (data.isActive) {
+                mainBox.className = "md:col-span-1 bg-red-50 p-6 rounded-2xl border border-red-200 shadow-sm flex flex-col justify-center items-center text-center transition-all duration-500";
+                iconBox.className = "w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3 bg-red-200 text-red-600 animate-pulse";
+                iconBox.innerHTML = '<i class="fas fa-lock"></i>';
+                textBox.className = "text-[10px] font-black uppercase px-3 py-1 rounded-full bg-red-600 text-white shadow-md";
+                textBox.innerText = "HỆ THỐNG ĐANG KHÓA";
+            } else {
+                mainBox.className = "md:col-span-1 bg-green-50 p-6 rounded-2xl border border-green-200 shadow-sm flex flex-col justify-center items-center text-center transition-all duration-500";
+                iconBox.className = "w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3 bg-green-200 text-green-600";
+                iconBox.innerHTML = '<i class="fas fa-globe"></i>';
+                textBox.className = "text-[10px] font-black uppercase px-3 py-1 rounded-full bg-green-600 text-white shadow-md";
+                textBox.innerText = "HOẠT ĐỘNG BÌNH THƯỜNG";
+            }
+
+            document.getElementById('live-status-msg').innerText = data.message ? `"${data.message}"` : "Không có lời nhắn.";
+            document.getElementById('live-status-start').innerText = formatDateTimeStr(data.startTime);
+            document.getElementById('live-status-end').innerText = formatDateTimeStr(data.endTime);
+
+            // Cập nhật Form
+            document.getElementById('maintenance-toggle').checked = data.isActive === true;
+            document.getElementById('mt-message').value = data.message || "";
+            
+            // Xử lý an toàn cho Flatpickr
+            if (fpStart && typeof fpStart.setDate === 'function') {
+                if (data.startTime) fpStart.setDate(data.startTime); else fpStart.clear();
+            }
+            if (fpEnd && typeof fpEnd.setDate === 'function') {
+                if (data.endTime) fpEnd.setDate(data.endTime); else fpEnd.clear();
+            }
+            
+        } catch (e) {
+            console.error("Lỗi Render UI Maintenance:", e);
+            document.getElementById('live-status-text').innerText = "LỖI HIỂN THỊ";
+        }
+    }
 
     // Lưu dữ liệu bảo trì lên Firestore
     window.saveMaintenanceSettings = async () => {
         const btn = document.querySelector('button[onclick="saveMaintenanceSettings()"]');
         const originalHtml = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
         btn.disabled = true;
 
         const isActive = document.getElementById('maintenance-toggle').checked;
@@ -1887,7 +1979,6 @@ const CAT_MAP = {
         const endTime = document.getElementById('mt-end').value;
         const message = document.getElementById('mt-message').value.trim();
 
-        // Kiểm tra logic nếu bật bảo trì mà chưa nhập giờ
         if (isActive && (!startTime || !endTime)) {
             alert("Vui lòng chọn đầy đủ thời gian bắt đầu và kết thúc khi bật bảo trì!");
             btn.innerHTML = originalHtml;
@@ -1896,22 +1987,19 @@ const CAT_MAP = {
         }
 
         try {
-            // FIX: Lấy user trực tiếp từ Firebase Auth thay vì dùng biến global currentUser
             const user = auth.currentUser;
             const userEmail = user ? user.email : "Unknown Admin";
 
-            // Dùng setDoc với { merge: true } để tạo/cập nhật document
             await setDoc(doc(db, "system_settings", "maintenance"), {
                 isActive: isActive,
                 startTime: startTime,
                 endTime: endTime,
                 message: message,
                 updatedAt: serverTimestamp(),
-                updatedBy: userEmail // Lấy email an toàn
+                updatedBy: userEmail
             }, { merge: true });
 
             showToast("Đã lưu cấu hình bảo trì thành công!", "success");
-            loadMaintenanceSettings(); // Load lại UI
             
         } catch (error) {
             console.error("Lỗi lưu bảo trì:", error);
@@ -3320,44 +3408,6 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
     };
 </script>
 
-<script type="text/javascript">
-    // 1. Chặn Chuột phải (Để ẩn menu "Inspect/Kiểm tra" và "View Source/Xem nguồn")
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        // Không hiện thông báo gì cả để trải nghiệm mượt mà hơn
-    });
 
-    // 2. Chặn các phím tắt Developer Tools
-    document.addEventListener('keydown', function(e) {
-        // Chặn F12
-        if (e.key === 'F12' || e.keyCode === 123) {
-            e.preventDefault();
-            return false;
-        }
-
-        // Chặn các tổ hợp phím Ctrl + ...
-        if (e.ctrlKey) {
-            switch (e.key.toLowerCase()) {
-                case 'u': // Chặn Ctrl + U (Xem source code)
-                case 's': // Chặn Ctrl + S (Lưu trang web)
-                case 'p': // Chặn Ctrl + P (In trang web - thường hiện code)
-                // Lưu ý: KHÔNG chặn 'c' (Copy) và 'a' (Select All)
-                    e.preventDefault();
-                    return false;
-            }
-
-            // Chặn Ctrl + Shift + ... (Các phím mở DevTools)
-            if (e.shiftKey) {
-                switch (e.key.toLowerCase()) {
-                    case 'i': // Inspect Element
-                    case 'j': // Console
-                    case 'c': // Element Inspector
-                        e.preventDefault();
-                        return false;
-                }
-            }
-        }
-    });
-</script>
 </body>
 </html>
