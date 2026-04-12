@@ -3,85 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Đang Bảo Trì - HopVan</title>
+    <title>HopVan - Bảo Trì Hệ Thống</title>
     <link rel="icon" type="image/webp" href="LOGO.WEBP" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #FFF5EC; overflow: hidden; }
-        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3; animation: float 10s infinite alternate; }
-        @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 50px); } }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #FFF5EC; 
+            overflow: hidden; 
+        }
+        
+        /* --- Hiệu ứng nền Blobs --- */
+        .blobs-container { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; animation: float 12s infinite alternate ease-in-out; }
+        .blob-1 { width: 500px; height: 500px; background: #FF8F50; top: -10%; left: -10%; }
+        .blob-2 { width: 400px; height: 400px; background: #FF5E62; bottom: -10%; right: -10%; animation-delay: -4s; }
+        .blob-3 { width: 300px; height: 300px; background: #FCD5B5; top: 40%; left: 50%; animation-delay: -8s; }
+        
+        @keyframes float { 
+            0% { transform: translate(0, 0) scale(1); } 
+            100% { transform: translate(40px, -40px) scale(1.1); } 
+        }
+
+        /* --- Hiệu ứng thanh Loading --- */
+        .loading-bar-container {
+            background: rgba(255, 143, 80, 0.1);
+            border-radius: 999px;
+            overflow: hidden;
+            height: 6px;
+            width: 100%;
+            position: relative;
+        }
+        .loading-bar {
+            position: absolute;
+            top: 0; left: 0; height: 100%;
+            background: linear-gradient(90deg, #FF8F50, #FF5E62);
+            border-radius: 999px;
+            animation: loadingSwipe 2s infinite ease-in-out;
+        }
+        @keyframes loadingSwipe {
+            0% { width: 0%; left: 0%; }
+            50% { width: 50%; left: 25%; }
+            100% { width: 0%; left: 100%; }
+        }
+
+        /* Icon Animation */
+        .gear-spin { animation: spinSlow 8s linear infinite; }
+        @keyframes spinSlow { 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="h-screen flex items-center justify-center relative">
+<body class="h-screen w-screen flex items-center justify-center relative">
 
-    <div class="fixed inset-0 pointer-events-none">
-        <div class="blob w-96 h-96 bg-orange-300 top-0 left-0"></div>
-        <div class="blob w-80 h-80 bg-red-200 bottom-0 right-0"></div>
+    <div class="blobs-container">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
     </div>
 
-    <div class="bg-white/80 backdrop-blur-xl p-10 rounded-3xl shadow-2xl max-w-lg w-full text-center border border-white m-4 relative z-10">
-        <div class="w-24 h-24 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6 text-orange-500 text-4xl animate-bounce">
-            <i class="fas fa-tools"></i>
-        </div>
+    <div class="bg-white/80 backdrop-blur-2xl p-10 md:p-12 rounded-[2.5rem] shadow-[0_20px_80px_-15px_rgba(255,143,80,0.3)] max-w-lg w-full text-center border border-white mx-4 relative z-10 transform transition-all animate-[slideUp_0.5s_ease-out]">
         
-        <h1 class="text-3xl font-black text-gray-800 mb-3">Hệ thống đang bảo trì</h1>
-        <p class="text-gray-500 font-medium mb-6">Chúng tôi đang nâng cấp hệ thống để phục vụ bạn tốt hơn.</p>
-        
-        <div class="bg-orange-50 border border-orange-100 p-4 rounded-xl text-sm text-orange-800 mb-6 italic" id="maintain-reason">
-            "Vui lòng quay lại sau ít phút..."
-        </div>
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-1.5 bg-gradient-to-r from-orange-400 to-red-500 rounded-b-full"></div>
 
-        <div class="flex justify-center gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
-            <span><i class="far fa-clock mr-1"></i> Bắt đầu: <span id="start-time" class="text-gray-600">--:--</span></span>
-            <span>|</span>
-            <span><i class="far fa-bell mr-1"></i> Kết thúc: <span id="end-time" class="text-gray-600">--:--</span></span>
-        </div>
-
-        <div class="mt-8">
-            <div class="w-full bg-gray-100 rounded-full h-1.5 mb-2 overflow-hidden">
-                <div class="bg-orange-500 h-1.5 rounded-full animate-[loading_2s_ease-in-out_infinite]" style="width: 50%"></div>
+        <div class="relative w-24 h-24 mx-auto mb-8">
+            <div class="absolute inset-0 bg-orange-400 blur-xl opacity-40 animate-pulse"></div>
+            <div class="w-full h-full bg-gradient-to-br from-orange-400 to-red-500 rounded-3xl flex items-center justify-center text-white text-4xl shadow-xl shadow-orange-500/30 relative z-10">
+                <i class="fas fa-cog gear-spin"></i>
             </div>
-            <p class="text-[10px] text-gray-400">Trang sẽ tự động tải lại khi bảo trì hoàn tất.</p>
+            <div class="absolute -bottom-2 -right-2 w-10 h-10 bg-white rounded-full flex items-center justify-center text-orange-500 text-lg shadow-lg z-20 animate-bounce">
+                <i class="fas fa-hammer"></i>
+            </div>
+        </div>
+        
+        <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-red-500 mb-3 tracking-tight">Hệ Thống Đang Nâng Cấp</h1>
+        <p class="text-gray-500 font-medium mb-8 text-sm leading-relaxed px-2">Chúng tôi đang thực hiện bảo trì hệ thống để mang lại trải nghiệm học tập mượt mà và tuyệt vời hơn cho bạn.</p>
+        
+        <div class="bg-orange-50/80 border-l-4 border-orange-500 p-5 rounded-r-2xl mb-8 relative text-left shadow-sm">
+            <i class="fas fa-quote-left absolute top-3 right-4 text-3xl text-orange-500/10"></i>
+            <h4 class="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1">Thông báo từ ban quản trị</h4>
+            <p class="text-sm text-gray-700 font-medium italic leading-relaxed relative z-10" id="maintain-reason">
+                "Hệ thống đang tải dữ liệu bảo trì, vui lòng đợi trong giây lát..."
+            </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 bg-gray-50/50 rounded-2xl py-4 px-2 border border-gray-100 mb-8">
+            <div class="text-center">
+                <span class="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1"><i class="far fa-clock text-blue-400 mr-1"></i> Bắt đầu</span>
+                <span id="start-time" class="text-sm font-bold text-gray-700">--:--</span>
+            </div>
+            <div class="hidden sm:block w-px h-8 bg-gray-200"></div>
+            <div class="text-center">
+                <span class="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1"><i class="far fa-calendar-check text-green-500 mr-1"></i> Dự kiến xong</span>
+                <span id="end-time" class="text-sm font-bold text-gray-700">--:--</span>
+            </div>
+        </div>
+
+        <div>
+            <div class="loading-bar-container mb-3">
+                <div class="loading-bar"></div>
+            </div>
+            <p class="text-[11px] font-bold text-gray-400 animate-pulse">Trang sẽ tự động tải lại khi bảo trì hoàn tất</p>
         </div>
     </div>
 
     <style>
-        @keyframes loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+        @keyframes slideUp { 
+            0% { transform: translateY(30px); opacity: 0; } 
+            100% { transform: translateY(0); opacity: 1; } 
+        }
     </style>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", 
+            authDomain: "hopvan-9a648.firebaseapp.com", 
+            projectId: "hopvan-9a648", 
+            storageBucket: "hopvan-9a648.appspot.com", 
+            messagingSenderId: "429347196227", 
+            appId: "1:429347196227:web:917b8d019f0efd0f7833f6", 
+            measurementId: "G-1BG8PSRG0R" 
+        };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Lắng nghe trạng thái bảo trì
-        onSnapshot(doc(db, "system_settings", "general"), (doc) => {
-            if (doc.exists()) {
-                const data = doc.data();
+        // Hàm format thời gian (vì dữ liệu lưu từ input type="datetime-local" là chuỗi String)
+        function formatDateTimeStr(dateString) {
+            if (!dateString) return '--:--';
+            try {
+                const d = new Date(dateString);
+                // Trả về định dạng: 14:30 - 12/04/2026
+                return d.toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) + ' - ' + d.toLocaleDateString('vi-VN');
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        // Lắng nghe trực tiếp từ bảng system_settings/maintenance
+        onSnapshot(doc(db, "system_settings", "maintenance"), (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                console.log("Dữ liệu bảo trì tải về:", data); // In ra để kiểm tra
                 
-                // Nếu Admin TẮT bảo trì -> Tự động chuyển về trang chủ
-                if (data.maintenanceMode === false) {
+                // NẾU ADMIN TẮT BẢO TRÌ -> ĐÁ VỀ TRANG CHỦ NGAY LẬP TỨC
+                if (data.isActive === false) {
                     window.location.href = "index.html"; 
                 }
 
-                // Cập nhật giao diện
-                if (data.maintenanceReason) {
-                    document.getElementById('maintain-reason').innerText = `"${data.maintenanceReason}"`;
+                // Cập nhật lời nhắn
+                if (data.message) {
+                    document.getElementById('maintain-reason').innerText = `"${data.message}"`;
                 }
                 
-                if (data.maintenanceStartTime) {
-                    document.getElementById('start-time').innerText = new Date(data.maintenanceStartTime.seconds * 1000).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'});
-                }
-                if (data.maintenanceEndTime) {
-                    document.getElementById('end-time').innerText = new Date(data.maintenanceEndTime.seconds * 1000).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'});
-                }
+                // Cập nhật thời gian
+                document.getElementById('start-time').innerText = formatDateTimeStr(data.startTime);
+                document.getElementById('end-time').innerText = formatDateTimeStr(data.endTime);
             }
+        }, (error) => {
+            console.error("Lỗi khi tải dữ liệu bảo trì (Có thể do Rules Firebase):", error.message);
         });
     </script>
 </body>

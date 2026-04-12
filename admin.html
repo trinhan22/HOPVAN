@@ -19,6 +19,9 @@
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script>
 
     <style>
         :root {
@@ -60,16 +63,22 @@
 
         /* --- NAVIGATION --- */
         .nav-item {
-            display: flex; align-items: center; gap: 14px;
-            padding: 14px 24px; margin: 4px 16px; border-radius: 16px;
-            color: #64748B; font-weight: 700; font-size: 0.95rem;
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 18px; /* Thu gọn padding trên dưới lại */
+            margin: 4px 16px; border-radius: 14px; /* Bo góc mềm hơn chút */
+            color: #64748B; font-weight: 700; font-size: 0.80rem; /* Giảm font-size cho thanh thoát */
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             cursor: pointer; position: relative; overflow: hidden;
+        }
+        .nav-item i {
+            font-size: 1.1rem; /* Chỉnh size icon đồng đều */
+            width: 24px; /* Fix cứng width cho icon để text luôn thẳng hàng */
+            text-align: center;
         }
         .nav-item:hover { background: rgba(255, 143, 80, 0.08); color: var(--primary); }
         .nav-item.active {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white; box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+            color: white; box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
         }
         .nav-item.active i { color: white; }
 
@@ -586,6 +595,55 @@
         .fb-filter-btn:not(.active):hover {
             background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
+
+        /* --- TOGGLE SWITCH FOR MAINTENANCE --- */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #ef4444; /* Đỏ khi bật bảo trì */
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #ef4444;
+        }
+        .toggle-checkbox {
+            right: 0;
+            z-index: 1;
+            border-color: #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .toggle-label {
+            width: 3.5rem;
+            height: 2rem;
+            background-color: #cbd5e1;
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 0.25rem;
+            left: 0.25rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .toggle-checkbox:checked + .toggle-label::after {
+            transform: translateX(1.5rem);
+        }
+        
+        /* Input Datetime chuyên dụng */
+        .glass-datetime {
+            width: 100%; padding: 12px 16px; border-radius: 14px;
+            background: #F8FAFC; border: 1px solid #E2E8F0; 
+            font-size: 0.95rem; color: #1E293B; outline: none; transition: 0.2s;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+        }
+        .glass-datetime:focus { border-color: #ef4444; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15); }
     </style>
 </head>
 <body class="h-screen flex">
@@ -603,52 +661,53 @@
             </div>
             <div>
                 <h1 class="block text-2xl font-black text-gray-800 tracking-tight leading-none group-hover:text-orange-500 transition-colors">HOPVAN</h1>
-                <p class="text-[12px] font-bold text-orange-500 uppercase tracking-widest">Admin Studio</p>
+                <p class="text-[10px] font-bold text-orange-500 uppercase tracking-widest mt-1">Admin Studio</p>
             </div>
-        </div>
         </a>
 
-        <nav class="flex-1 py-4 overflow-y-auto">
+        <nav class="flex-1 py-2 overflow-y-auto custom-scrollbar">
             <div class="nav-item active" onclick="switchView('dashboard', this)">
-                <i class="fas fa-th-large w-6"></i> Tổng Quan
+                <i class="fas fa-th-large"></i> Tổng Quan
             </div>
             
-            <div class="px-6 mt-5 mb-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Quản Lý Ngân Hàng</div>
+            <div class="px-7 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Quản Lý Ngân Hàng</div>
             <div class="nav-item" onclick="switchView('bank', this)">
-                <i class="fas fa-layer-group w-6"></i> Kho Đề Thi
-            </div>
-            <div class="px-6 mt-5 mb-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Nội Dung</div>
-            <div class="nav-item" onclick="switchView('news', this)">
-                <i class="fas fa-feather-alt w-6"></i> Bản Tin Văn Học
-            </div>
-            <div class="nav-item" onclick="switchView('journal', this)">
-                <i class="fas fa-road w-6"></i> Nhật Ký Học Tập
+                <i class="fas fa-layer-group"></i> Kho Đề Thi
             </div>
 
-            <div class="px-6 mt-5 mb-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Dữ Liệu</div>
+            <div class="px-7 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Nội Dung</div>
+            <div class="nav-item" onclick="switchView('news', this)">
+                <i class="fas fa-feather-alt"></i> Bản Tin Văn Học
+            </div>
+            <div class="nav-item" onclick="switchView('journal', this)">
+                <i class="fas fa-road"></i> Nhật Ký Học Tập
+            </div>
+
+            <div class="px-7 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Dữ Liệu</div>
             <div class="nav-item" onclick="switchView('history', this)">
-                <i class="fas fa-users w-6"></i> Quản Lý Tài Khoản
+                <i class="fas fa-users"></i> Quản Lý Tài Khoản
             </div>
             <div class="nav-item" onclick="switchView('feedbacks', this)">
-                <i class="fas fa-comment-dots w-6"></i> Góp Ý & Phản Hồi
+                <i class="fas fa-comment-dots"></i> Góp Ý & Phản Hồi
+            </div>
+
+            <div class="px-7 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Hệ Thống</div>
+            <div class="nav-item" onclick="switchView('maintenance', this)">
+                <i class="fas fa-tools"></i> Bảo Trì Website
             </div>
         </nav>
 
-        <div class="p-6 border-t border-gray-100">
-            <button id="logout-btn" class="w-full py-4 rounded-2xl bg-red-50 text-red-500 font-bold text-sm hover:bg-red-500 hover:text-white transition flex items-center justify-center gap-2 group">
+        <div class="p-6 border-t border-gray-100 flex flex-col gap-4">
+            <button id="logout-btn" class="w-full py-3.5 rounded-xl bg-red-50 text-red-500 font-bold text-sm hover:bg-red-500 hover:text-white transition flex items-center justify-center gap-2 group">
                 <i class="fas fa-sign-out-alt group-hover:-translate-x-1 transition"></i> Đăng xuất
             </button>
-        </div>
-                <div style="margin-top: -10px; margin-bottom: 18px; width: 100%; display: flex; justify-content: center;">
-            <div style="
-                display: inline-flex; align-items: center; gap: 6px; 
-                padding: 4px 12px; border-radius: 999px; 
-                background-color: rgba(249, 250, 251, 0.8); border: 1px solid #f3f4f6;
-                cursor: default;
-            ">
-                <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px;">HopVan Platform</span>
-                <span style="width: 4px; height: 4px; border-radius: 50%; background-color: #22c55e;"></span>
-                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.2.7</span>
+            
+            <div class="w-full flex justify-center pb-2">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-100 cursor-default">
+                    <span class="text-[8px] font-black text-gray-400 uppercase tracking-wider">HopVan Platform</span>
+                    <span class="w-1 h-1 rounded-full bg-green-500"></span>
+                    <span class="text-[9px] font-bold text-orange-500 font-mono">v1.2.8</span>
+                </div>
             </div>
         </div>
     </aside>
@@ -1078,6 +1137,54 @@
                 </div>
             </div>
 
+
+<div id="view-maintenance" class="view-section hidden">
+                <div class="glass-panel rounded-3xl p-8 max-w-4xl mx-auto mt-4 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500"></div>
+                    <i class="fas fa-hard-hat absolute -bottom-10 -right-10 text-9xl text-red-50 opacity-50 -rotate-12 pointer-events-none"></i>
+
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 relative z-10">
+                        <div>
+                            <h3 class="font-black text-3xl text-gray-800 flex items-center gap-3">
+                                Cấu Hình Bảo Trì <span id="mt-status-badge" class="px-3 py-1 bg-gray-100 text-gray-500 text-[10px] uppercase rounded-full tracking-wider border border-gray-200">Đang Tắt</span>
+                            </h3>
+                            <p class="text-sm text-gray-500 font-medium mt-2">Bật chế độ này để chặn người dùng truy cập trong lúc nâng cấp hệ thống.</p>
+                        </div>
+                        
+                        <div class="flex items-center gap-3 bg-red-50 p-3 rounded-2xl border border-red-100 shadow-sm">
+                            <span class="text-sm font-black text-red-500 uppercase tracking-wide">Trạng Thái:</span>
+                            <div class="relative inline-block w-14 align-middle select-none">
+                                <input type="checkbox" name="toggle" id="maintenance-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer opacity-0"/>
+                                <label for="maintenance-toggle" class="toggle-label block overflow-hidden h-8 rounded-full bg-gray-300 cursor-pointer"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                        <div class="bg-gray-50/80 p-5 rounded-2xl border border-gray-100">
+                            <label class="label-custom text-blue-600 mb-2"><i class="far fa-calendar-alt"></i> Thời gian bắt đầu</label>
+                            <input type="text" id="mt-start" class="glass-datetime" placeholder="Chọn ngày giờ bắt đầu...">
+                        </div>
+
+                        <div class="bg-gray-50/80 p-5 rounded-2xl border border-gray-100">
+                            <label class="label-custom text-red-600 mb-2"><i class="far fa-calendar-check"></i> Thời gian dự kiến kết thúc</label>
+                            <input type="text" id="mt-end" class="glass-datetime" placeholder="Chọn ngày giờ kết thúc...">
+                        </div>
+
+                        <div class="md:col-span-2 bg-gray-50/80 p-5 rounded-2xl border border-gray-100">
+                            <label class="label-custom text-orange-600 mb-2"><i class="fas fa-bullhorn"></i> Lời nhắn gửi đến người dùng</label>
+                            <textarea id="mt-message" class="glass-input h-24 resize-none" placeholder="VD: HopVan đang được nâng cấp để mang lại trải nghiệm tốt hơn. Vui lòng quay lại sau 12:00 nhé!"></textarea>
+                            <p class="text-[10px] text-gray-400 mt-2 font-medium italic">Lời nhắn này sẽ hiển thị to rõ trên màn hình của học sinh khi họ truy cập web.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end relative z-10">
+                        <button onclick="saveMaintenanceSettings()" class="px-8 py-4 rounded-xl bg-gray-900 text-white font-bold shadow-xl hover:bg-black hover:-translate-y-1 transition-all duration-300 flex items-center gap-2">
+                            <i class="fas fa-save"></i> Lưu Cấu Hình Bảo Trì
+                        </button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -1711,6 +1818,109 @@ const CAT_MAP = {
 
     // INIT DATE
     document.getElementById('current-date').innerText = new Date().toLocaleDateString('vi-VN', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
+
+    // --- 8. QUẢN LÝ BẢO TRÌ HỆ THỐNG ---
+    
+    // Khởi tạo bộ chọn Ngày/Giờ chuẩn Việt Nam (Flatpickr)
+    const fpConfig = {
+        enableTime: true,
+        time_24hr: true,
+        dateFormat: "Y-m-d\\TH:i", // Lưu vào DB theo chuẩn cũ
+        altInput: true,
+        altFormat: "d/m/Y H:i", // Hiển thị ra màn hình chuẩn Việt Nam
+        locale: "vn" // Ngôn ngữ tiếng Việt
+    };
+    
+    let fpStart = flatpickr("#mt-start", fpConfig);
+    let fpEnd = flatpickr("#mt-end", fpConfig);
+    
+    // Cập nhật hàm switchView để load data bảo trì khi click vào tab
+    const originalSwitchView = window.switchView;
+    window.switchView = (viewId, el) => {
+        originalSwitchView(viewId, el);
+        if (viewId === 'maintenance') {
+            loadMaintenanceSettings();
+        }
+    };
+
+    // Tải dữ liệu bảo trì từ Firestore
+    window.loadMaintenanceSettings = async () => {
+        try {
+            const docRef = doc(db, "system_settings", "maintenance");
+            const snap = await getDoc(docRef);
+            
+            if (snap.exists()) {
+                const data = snap.data();
+                const toggle = document.getElementById('maintenance-toggle');
+                const badge = document.getElementById('mt-status-badge');
+                
+                // Gán dữ liệu vào UI
+                toggle.checked = data.isActive || false;
+                fpStart.setDate(data.startTime || "");
+                fpEnd.setDate(data.endTime || "");
+                document.getElementById('mt-message').value = data.message || "";
+
+                // Cập nhật giao diện huy hiệu
+                if(data.isActive) {
+                    badge.className = "px-3 py-1 bg-red-100 text-red-600 text-[10px] font-black uppercase rounded-full tracking-wider border border-red-200 shadow-sm animate-pulse";
+                    badge.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i> Hệ Thống Đang Đóng';
+                } else {
+                    badge.className = "px-3 py-1 bg-green-100 text-green-600 text-[10px] font-black uppercase rounded-full tracking-wider border border-green-200";
+                    badge.innerHTML = '<i class="fas fa-check-circle mr-1"></i> Hoạt Động Bình Thường';
+                }
+            }
+        } catch (error) {
+            console.error("Lỗi tải dữ liệu bảo trì:", error);
+            showToast("Không thể tải cài đặt bảo trì!", "error");
+        }
+    };
+
+    // Lưu dữ liệu bảo trì lên Firestore
+    window.saveMaintenanceSettings = async () => {
+        const btn = document.querySelector('button[onclick="saveMaintenanceSettings()"]');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+        btn.disabled = true;
+
+        const isActive = document.getElementById('maintenance-toggle').checked;
+        const startTime = document.getElementById('mt-start').value;
+        const endTime = document.getElementById('mt-end').value;
+        const message = document.getElementById('mt-message').value.trim();
+
+        // Kiểm tra logic nếu bật bảo trì mà chưa nhập giờ
+        if (isActive && (!startTime || !endTime)) {
+            alert("Vui lòng chọn đầy đủ thời gian bắt đầu và kết thúc khi bật bảo trì!");
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
+            return;
+        }
+
+        try {
+            // FIX: Lấy user trực tiếp từ Firebase Auth thay vì dùng biến global currentUser
+            const user = auth.currentUser;
+            const userEmail = user ? user.email : "Unknown Admin";
+
+            // Dùng setDoc với { merge: true } để tạo/cập nhật document
+            await setDoc(doc(db, "system_settings", "maintenance"), {
+                isActive: isActive,
+                startTime: startTime,
+                endTime: endTime,
+                message: message,
+                updatedAt: serverTimestamp(),
+                updatedBy: userEmail // Lấy email an toàn
+            }, { merge: true });
+
+            showToast("Đã lưu cấu hình bảo trì thành công!", "success");
+            loadMaintenanceSettings(); // Load lại UI
+            
+        } catch (error) {
+            console.error("Lỗi lưu bảo trì:", error);
+            alert("Lỗi khi lưu: " + error.message);
+        } finally {
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
+        }
+    };
 
     // AUTH CHECK
     onAuthStateChanged(auth, (user) => {
