@@ -119,6 +119,12 @@
             padding: 30px 40px; overflow-y: auto; position: relative;
         }
 
+        .content-wrapper {
+            width: 100%;
+            max-width: 1100px; /* GIỚI HẠN CHIỀU RỘNG CHUẨN ĐỂ KHÔNG BỊ BÈ RA */
+            margin: 0 auto;    /* CANH GIỮA MÀN HÌNH */
+        }
+        
         /* --- HEADER & STATS --- */
         .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
         .welcome-text h2 { font-size: 2.2rem; font-weight: 800; color: var(--text-heading); }
@@ -342,13 +348,7 @@
     <div id="menu-placeholder"></div>
 
     <main class="main-content">
-        <div class="user-header">
-            <div class="welcome-text">
-                <h2 id="welcome-name">Xin chào,</h2>
-                <p style="color: var(--text-light); margin-top: 5px;">Hãy cùng bắt đầu học tập cùng với HopVan nhé!</p>
-            </div>
-            <div class="user-avatar overflow-hidden cursor-pointer" id="avatar-initial" onclick="window.location.href='account.html'" title="Đi đến trang cá nhân"></div>
-        </div>
+            <div id="hopvan-header-container"></div>
 
         <div class="stats-grid">
             <div class="stat-card">
@@ -492,7 +492,10 @@
     // Thêm onSnapshot vào import để đồng bộ Real-time
     import { getFirestore, doc, setDoc, increment, collection, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     import { initMenu } from "./menu.js";
-
+    import { initHeader } from './header.js'; // Sửa lại đường dẫn /js/ cho chuẩn với source của bạn
+    
+    // Kích hoạt Header
+    initHeader('hopvan-header-container');
     // --- CONFIG ---
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
@@ -526,8 +529,6 @@
     // --- MAIN LOGIC (SỬ DỤNG ONSNAPSHOT ĐỂ ĐỒNG BỘ REAL-TIME) ---
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            const name = user.displayName || user.email.split('@')[0];
-            document.getElementById('welcome-name').innerText = `Xin chào, ${name}`;
             const avatarEl = document.getElementById('avatar-initial');
 
             // 1. Đồng bộ thông tin Keys, Avatar và THEME ngay lập tức

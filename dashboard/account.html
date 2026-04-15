@@ -77,10 +77,10 @@
             overflow-y: auto; position: relative; 
         }
         
-        .content-wrapper { 
-            /* Đã nới chiều rộng ra 980px cho đỡ bị ép quá (bản trước là 900px) */
-            max-width: 980px; 
-            margin: 0 auto; display: flex; flex-direction: column; gap: 24px;
+        .content-wrapper {
+            width: 100%;
+            max-width: 1100px; /* GIỚI HẠN CHIỀU RỘNG CHUẨN ĐỂ KHÔNG BỊ BÈ RA */
+            margin: 0 auto;    /* CANH GIỮA MÀN HÌNH */
         }
 
         /* ĐỒNG BỘ DARK MODE MENU.JS */
@@ -331,6 +331,7 @@
 
     <main class="main-content">
         <div class="content-wrapper">
+            <div id="hopvan-header-container"></div>
             <div id="toast-container"></div>
 
             <div id="custom-modal" class="custom-modal-overlay">
@@ -523,7 +524,10 @@
         import { getFirestore, doc, getDoc, updateDoc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         import { initMenu } from "./menu.js";
-
+        import { initHeader } from './header.js'; // Sửa lại đường dẫn /js/ cho chuẩn với source của bạn
+        
+        // Kích hoạt Header
+        initHeader('hopvan-header-container');
         const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);

@@ -238,14 +238,7 @@
     <div id="menu-placeholder"></div>
 
     <main class="main-content">
-        <div class="user-header">
-            <div class="welcome-text">
-                <h2 id="welcome-name">Xin chào,</h2>
-                <p style="color: var(--text-light); margin-top: 5px;">Hãy cùng bắt đầu học tập cùng với HopVan nhé!</p>
-            </div>
-            <div class="user-avatar" id="avatar-initial" onclick="window.location.href='account.html'" title="Đi đến trang cá nhân">
-                </div>
-        </div>
+        <div id="hopvan-header-container"></div>
 
         <div class="flex justify-between items-center mb-6">
             <h3 class="text-xl font-black text-gray-700 uppercase tracking-wide">Danh sách lớp</h3>
@@ -310,7 +303,10 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc, arrayUnion, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { initMenu } from "./menu.js";
-
+        import { initHeader } from './header.js'; // Sửa lại đường dẫn /js/ cho chuẩn với source của bạn
+        
+        // Kích hoạt Header
+        initHeader('hopvan-header-container');
         const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -360,9 +356,6 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-
-                const name = user.displayName || user.email.split('@')[0];
-                document.getElementById('welcome-name').textContent = `Xin chào, ${name}`;
 
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 let avatarHTML = name.charAt(0).toUpperCase(); 

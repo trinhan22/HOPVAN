@@ -20,6 +20,10 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
     <style>
@@ -28,7 +32,6 @@
             --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
             --glass-bg: rgba(255, 255, 255, 0.45); 
             
-            /* SỬA LẠI SỐ 320px THÀNH 280px Ở DÒNG DƯỚI NÀY */
             --sidebar-width: 280px; 
             
             --bg-body: #FFF5EC;
@@ -72,7 +75,18 @@
         .main-content { 
             width: calc(100% - var(--sidebar-width)); margin-left: var(--sidebar-width);
             height: 100vh; background: var(--glass-bg); backdrop-filter: blur(25px);
-            padding: 25px; display: flex; gap: 25px; transition: all 0.3s ease;
+            padding: 25px 30px; display: flex; flex-direction: column; transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .content-wrapper {
+            width: 100%;
+            max-width: 1100px; /* GIỚI HẠN CHIỀU RỘNG CHUẨN ĐỂ KHÔNG BỊ BÈ RA */
+            margin: 0 auto;    /* CANH GIỮA MÀN HÌNH */
+        }
+
+        .lythuyet-wrapper {
+            display: flex; gap: 25px; flex: 1; min-height: 0; width: 100%;
         }
 
         /* =========================================
@@ -153,7 +167,7 @@
             border: 1px solid rgba(255,255,255,0.6); box-shadow: var(--shadow-lg);
             display: flex; flex-direction: column; overflow: hidden;
             position: relative; z-index: 20; transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-            max-width: 1200px; margin: 0 auto;
+            max-width: 1200px; margin: 0 auto; width: 100%;
         }
         html.dark .viewer-area { border-color: var(--border-ui); }
 
@@ -252,7 +266,45 @@
         .spinner { width: 50px; height: 50px; border: 4px solid #fed7aa; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;}
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- MOBILE --- */
+        /* --- ĐỒNG BỘ DARK MODE CHO MENU.JS --- */
+        html.dark #menu-placeholder aside, 
+        html.dark #menu-placeholder .sidebar {
+            background-color: var(--bg-card) !important;
+            border-color: var(--border-ui) !important;
+        }
+        html.dark #menu-placeholder aside > div,
+        html.dark #menu-placeholder .sidebar > div {
+            background-color: transparent !important;
+            border-color: var(--border-ui) !important;
+        }
+        html.dark #menu-placeholder button {
+            background-color: var(--bg-body) !important; 
+            border: 1px solid var(--border-ui) !important;
+            color: var(--text-light) !important;
+            box-shadow: none !important;
+        }
+        html.dark #menu-placeholder button:hover {
+            background-color: var(--bg-hover) !important;
+            border-color: var(--primary) !important;
+            color: var(--primary) !important;
+        }
+        html.dark #menu-placeholder .nav-item.active { 
+            background: var(--primary-gradient) !important; 
+            color: white !important; 
+            border-color: transparent !important; 
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4) !important;
+        }
+        html.dark #menu-placeholder div[style*="background-color"] {
+            background-color: var(--bg-body) !important;
+            border-color: var(--border-ui) !important;
+        }
+        html.dark #menu-placeholder [class*="border-"] { border-color: var(--border-ui) !important; }
+        html.dark #menu-placeholder .text-gray-800, html.dark #menu-placeholder h1 { color: var(--text-main) !important; }
+        html.dark #menu-placeholder .text-gray-500, html.dark #menu-placeholder .text-gray-400 { color: var(--text-light) !important; }
+        html.dark #menu-placeholder .nav-item { color: var(--text-light) !important; transition: 0.3s; }
+        html.dark #menu-placeholder .nav-item:hover { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
+
+        /* --- MOBILE OPTIMIZATION --- */
         .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 65px; background: var(--bg-card); z-index: 100; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border-ui); backdrop-filter: blur(20px);}
         #mobile-toc-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1001; opacity: 0; transition: 0.3s; }
         #mobile-toc-overlay.active { opacity: 1; }
@@ -261,17 +313,25 @@
             body { overflow: auto; height: auto; }
             .mobile-header { display: flex; }
             .main-content { padding: 85px 15px 20px; height: 100vh; flex-direction: column; gap: 15px; margin-left: 0 !important; width: 100% !important;}
+            .lythuyet-wrapper { flex-direction: column; }
             
             .toc-sidebar { position: fixed; left: -320px; top: 0; bottom: 0; z-index: 1002; height: 100vh; border-radius: 0; width: 300px; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); margin: 0;}
             .toc-sidebar.open { transform: translateX(320px); }
             #mobile-toc-overlay.active { display: block; }
             
-            .viewer-area { border-radius: 24px; max-width: 100%; margin: 0;}
+            .viewer-area { border-radius: 24px; max-width: 100%; margin: 0; flex: none; height: calc(100vh - 100px); }
             .viewer-header { padding: 20px; padding-left: 50px;} /* Tránh nút menu trên mobile */
             .viewer-content-wrapper { padding: 15px; }
             .lesson-title-main { font-size: 1.2rem; }
             
             .pdf-controls { bottom: 15px; padding: 8px 12px;}
+
+            #menu-placeholder aside {
+                position: fixed !important; left: 0 !important; top: 0 !important; bottom: 0 !important;
+                transform: translateX(-100%); z-index: 9999 !important; width: 280px !important; 
+                transition: transform 0.3s ease-in-out !important;
+            }
+            #menu-placeholder aside.open { transform: translateX(0) !important; box-shadow: 10px 0 50px rgba(0,0,0,0.5) !important; }
         }
         
         /* --- GLOBAL SCROLLBAR --- */
@@ -307,8 +367,11 @@
     <div id="mobile-toc-overlay" onclick="toggleTOC()"></div>
 
     <main class="main-content" id="main-layout">
+        <div id="hopvan-header-container"></div>
         
-        <aside class="toc-sidebar" id="toc-sidebar">
+        <div class="lythuyet-wrapper">
+            
+            <aside class="toc-sidebar" id="toc-sidebar">
             <div class="toc-header">
                 <h2 class="font-black text-gray-800 dark:text-white flex items-center gap-3 text-lg tracking-tight">
                     <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center text-base shadow-sm border border-orange-100"><i class="fas fa-list"></i></div>
@@ -362,44 +425,45 @@
             </div>
         </aside>
 
-        <section class="viewer-area">
-            <button class="btn-open-toc hidden lg:flex" onclick="toggleDesktopTOC()" title="Mở mục lục">
-                <i class="fas fa-list-ul text-xl"></i>
-            </button>
-            
-            <div class="viewer-header">
-                <div class="viewer-title-row">
-                    <h1 class="lesson-title-main" id="display-title">Đang tải...</h1>
+            <section class="viewer-area">
+                <button class="btn-open-toc hidden lg:flex" onclick="toggleDesktopTOC()" title="Mở mục lục">
+                    <i class="fas fa-list-ul text-xl"></i>
+                </button>
+                
+                <div class="viewer-header">
+                    <div class="viewer-title-row">
+                        <h1 class="lesson-title-main" id="display-title">Đang tải...</h1>
+                    </div>
+                    <div class="hidden md:flex gap-2 text-xs font-bold text-gray-400 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">
+                        <i class="fas fa-info-circle mt-0.5"></i> Tài liệu độc quyền
+                    </div>
                 </div>
-                <div class="hidden md:flex gap-2 text-xs font-bold text-gray-400 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">
-                    <i class="fas fa-info-circle mt-0.5"></i> Tài liệu độc quyền
-                </div>
-            </div>
 
-            <div class="viewer-content-wrapper">
-                <div class="pdf-canvas-container">
-                    <div id="pdf-loading" class="absolute inset-0 flex flex-col items-center justify-center z-30">
-                        <div class="spinner"></div>
-                        <p class="font-bold text-gray-500 animate-pulse tracking-wide">Đang tải trang...</p>
+                <div class="viewer-content-wrapper">
+                    <div class="pdf-canvas-container">
+                        <div id="pdf-loading" class="absolute inset-0 flex flex-col items-center justify-center z-30">
+                            <div class="spinner"></div>
+                            <p class="font-bold text-gray-500 animate-pulse tracking-wide">Đang tải trang...</p>
+                        </div>
+                        
+                        <canvas id="pdf-render-canvas"></canvas>
                     </div>
                     
-                    <canvas id="pdf-render-canvas"></canvas>
+                    <div class="pdf-controls">
+                        <div class="control-buttons">
+                            <button onclick="onPrevPage()" id="btn-prev" class="btn-page" title="Trang trước"><i class="fas fa-chevron-left"></i></button>
+                            <span class="page-info">Trang <span id="page-num">0</span> / <span id="page-count">0</span></span>
+                            <button onclick="onNextPage()" id="btn-next" class="btn-page" title="Trang sau"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                        <div class="progress-track">
+                            <div id="pdf-progress" class="progress-fill"></div>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="pdf-controls">
-                    <div class="control-buttons">
-                        <button onclick="onPrevPage()" id="btn-prev" class="btn-page" title="Trang trước"><i class="fas fa-chevron-left"></i></button>
-                        <span class="page-info">Trang <span id="page-num">0</span> / <span id="page-count">0</span></span>
-                        <button onclick="onNextPage()" id="btn-next" class="btn-page" title="Trang sau"><i class="fas fa-chevron-right"></i></button>
-                    </div>
-                    <div class="progress-track">
-                        <div id="pdf-progress" class="progress-fill"></div>
-                    </div>
-                </div>
-            </div>
+            </section>
             
-        </section>
-
+        </div>
     </main>
 
     <script type="module" src="gam.js"></script>
@@ -408,16 +472,30 @@
 <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { initMenu } from "./menu.js";
-
+        import { initHeader } from './header.js'; 
+        
+        // Kích hoạt Header
+        initHeader('hopvan-header-container');
         const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
         
         initMenu(app, 'lythuyet');
 
-        onAuthStateChanged(auth, u => { 
-            if(!u) window.location.href="../log.html"; 
+        onAuthStateChanged(auth, async (user) => { 
+            if(user) {
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists() && userDoc.data().theme === 'dark') {
+                        document.documentElement.classList.add('dark');
+                    }
+                } catch (error) {}
+            } else {
+                window.location.href="../log.html"; 
+            }
         });
 
         // ----------------------------------------------------

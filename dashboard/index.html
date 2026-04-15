@@ -72,11 +72,6 @@
             margin: 0 auto;    /* CANH GIỮA MÀN HÌNH */
         }
 
-        .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; position: relative; z-index: 10;}
-        .welcome-text h2 { font-size: 2.2rem; font-weight: 800; color: var(--text-main); }
-        .user-avatar { width: 55px; height: 55px; background: var(--primary-gradient); border-radius: 18px; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 1.3rem; box-shadow: 0 10px 25px rgba(255, 143, 80, 0.3); transform: rotate(-5deg); transition: 0.3s; cursor: pointer; }
-        .user-avatar:hover { transform: rotate(0deg) scale(1.1); }
-
         .content-section { display: none; animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
         .content-section.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -200,16 +195,17 @@
         html.dark body { background-color: var(--bg-body) !important; }
         html.dark .main-content { background-color: var(--bg-body) !important; backdrop-filter: none !important; border-left: 1px solid var(--border-ui) !important; }
         html.dark .blob { opacity: 0.1 !important; }
-        html.dark #menu-placeholder aside { background-color: var(--bg-panel) !important; border-color: var(--border-ui) !important; }
+
+        /* ĐỒNG BỘ DARK MODE MENU.JS */
+        html.dark #menu-placeholder aside { background-color: var(--bg-card) !important; border-color: var(--border-ui) !important; }
         html.dark #menu-placeholder aside > div { background-color: transparent !important; }
-        html.dark #menu-placeholder button.bg-white:nth-child(1) { background-color: transparent !important; border: 1px solid var(--primary) !important; color: var(--primary) !important; box-shadow: none !important; }
-        html.dark #menu-placeholder button.bg-white:nth-child(1):hover { background-color: rgba(255, 143, 80, 0.1) !important; }
-        html.dark #menu-placeholder button.bg-white:nth-child(2) { background-color: transparent !important; border: 1px solid var(--border-ui) !important; color: var(--text-light) !important; box-shadow: none !important; }
-        html.dark #menu-placeholder button.bg-white:nth-child(2):hover { background-color: var(--bg-panel-hover) !important; color: white !important;}
+        html.dark #menu-placeholder button { background-color: transparent !important; border: 1px solid var(--border-ui) !important; color: var(--text-light) !important; box-shadow: none !important; }
+        html.dark #menu-placeholder button:hover { background-color: var(--bg-panel-hover) !important; border-color: var(--primary) !important; color: var(--primary) !important;}
         html.dark #menu-placeholder div[style*="background-color"] { background-color: var(--bg-body) !important; border: 1px solid var(--border-ui) !important;}
         html.dark #menu-placeholder .nav-item.active { background: var(--primary-gradient) !important; color: white !important; border-color: transparent !important; box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3) !important; }
         html.dark #menu-placeholder .nav-item { color: var(--text-light) !important; }
         html.dark #menu-placeholder .nav-item:hover:not(.active) { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
+
         
         html.dark .stat-card, html.dark .activity-box, html.dark .chart-box, html.dark .leaderboard-box, html.dark .tip-card, html.dark .theory-progress-card, html.dark .quote-card { background-color: var(--bg-panel) !important; border: 1px solid var(--border-ui) !important; box-shadow: 0 10px 20px rgba(0,0,0,0.4) !important; }
         html.dark .stat-card:hover, html.dark .activity-box:hover, html.dark .chart-box:hover, html.dark .tip-card:hover, html.dark .theory-progress-card:hover, html.dark .quote-card:hover { background-color: var(--bg-panel-hover) !important; border-color: var(--primary) !important; box-shadow: 0 15px 35px rgba(0,0,0,0.6) !important; }
@@ -238,9 +234,6 @@
             aside { position: fixed !important; left: -280px !important; top: 0 !important; bottom: 0 !important; width: 280px !important; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important; z-index: 1001 !important; background: white !important; }
             aside.open { transform: translateX(280px) !important; }
             #sidebar-overlay.active { display: block !important; }
-            .user-header { margin-bottom: 25px; }
-            .welcome-text h2 { font-size: 1.5rem; }
-            .user-avatar { width: 45px; height: 45px; font-size: 1.1rem; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; overflow-x: visible; padding-bottom: 0; margin-right: 0; }
             .stat-card { min-width: 0; width: auto; padding: 20px 15px; }
             .stat-card .value { font-size: 1.8rem; } 
@@ -313,14 +306,7 @@
 
     <main class="main-content">
         <div class="content-wrapper">
-            
-            <div class="user-header">
-                <div class="welcome-text">
-                    <h2 id="welcome-name">Xin chào,</h2>
-                    <p>Hãy cùng bắt đầu học tập cùng với HopVan nhé!</p>
-                </div>
-                <div class="user-avatar" id="avatar-initial" onclick="window.location.href='account.html'" title="Đi đến trang cá nhân"></div>
-            </div>
+            <div id="hopvan-header-container"></div>
 
             <div id="overview" class="content-section active">
             
@@ -512,7 +498,10 @@
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, orderBy, onSnapshot, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     import { initMenu } from "./menu.js";
-
+    import { initHeader } from './header.js'; // Sửa lại đường dẫn /js/ cho chuẩn với source của bạn
+    
+    // Kích hoạt Header
+    initHeader('hopvan-header-container');
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -538,8 +527,6 @@
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            const name = user.displayName || user.email.split('@')[0];
-            document.getElementById('welcome-name').textContent = `Xin chào, ${name}`;
             
             try {
                 const userDoc = await getDoc(doc(db, "users", user.uid));

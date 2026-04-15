@@ -115,6 +115,12 @@
             backdrop-filter: blur(20px);
         }
 
+        .content-wrapper {
+            width: 100%;
+            max-width: 1100px; /* GIỚI HẠN CHIỀU RỘNG CHUẨN ĐỂ KHÔNG BỊ BÈ RA */
+            margin: 0 auto;    /* CANH GIỮA MÀN HÌNH */
+        }
+
         /* --- TEXT STYLE --- */
         .text-gradient { 
             background: var(--primary-gradient); 
@@ -722,6 +728,7 @@
     <div id="menu-placeholder"></div>
 
     <main class="main-content">
+            <div id="hopvan-header-container"></div>
         <div id="fav-toast">
             <div class="toast-icon-wrap">
                 <i class="fas fa-heart"></i>
@@ -805,7 +812,10 @@
 
         // Import Menu
         import { initMenu } from "./menu.js";
-
+        import { initHeader } from './header.js'; // Sửa lại đường dẫn /js/ cho chuẩn với source của bạn
+        
+        // Kích hoạt Header
+        initHeader('hopvan-header-container');
         const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);

@@ -17,6 +17,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+
     <style>
         :root {
             --primary: #FF8F50;
@@ -56,7 +60,7 @@
             z-index: 998;
         }
 
-        /* --- BỐ CỤC CHÍNH ĐỒNG BỘ DASHBOARD --- */
+        /* --- BỐ CỤC CHÍNH --- */
         .main-content {
             margin-left: var(--sidebar-width);
             width: calc(100% - var(--sidebar-width));
@@ -73,14 +77,14 @@
 
         .content-wrapper {
             width: 100%;
-            max-width: 1100px;
-            margin: 0 auto; 
+            max-width: 1100px; /* GIỚI HẠN CHIỀU RỘNG CHUẨN ĐỂ KHÔNG BỊ BÈ RA */
+            margin: 0 auto;    /* CANH GIỮA MÀN HÌNH */
         }
 
-        /* HEADER */
-        .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; position: relative; z-index: 10;}
-        .welcome-text h2 { font-size: 2.2rem; font-weight: 800; color: var(--text-main); font-family: 'Plus Jakarta Sans', serif; letter-spacing: -0.5px;}
-        .welcome-text p { color: var(--text-light); font-weight: 500; font-size: 1rem; margin-top: 5px; }
+        /* --- TIEU ĐỀ TRANG CŨ ĐƯỢC CHỈNH LẠI --- */
+        .page-header-box { margin-bottom: 30px; }
+        .page-header-box h2 { font-size: 2.2rem; font-weight: 800; color: var(--text-main); font-family: 'Plus Jakarta Sans', serif; letter-spacing: -0.5px;}
+        .page-header-box p { color: var(--text-light); font-weight: 500; font-size: 1rem; margin-top: 5px; }
 
         /* --- FILTER BAR (DẠNG CARD) --- */
         .filter-card {
@@ -178,23 +182,49 @@
         .tag-grade { background: #f1f5f9; color: #475569; }
         .tag-genre { background: rgba(255,143,80,0.1); color: var(--primary); }
 
-        /* --- DARK MODE --- */
-        html.dark { --bg-body: #0B1120; --bg-card: #111827; --border-ui: #1F2937; --text-main: #F8FAFC; --text-light: #94A3B8; --bg-hover: #1e293b;}
+
+        /* ==========================================================
+           DARK MODE XỊN XÒ (FULL ĐỒNG BỘ)
+           ========================================================== */
+        html.dark { 
+            --bg-body: #0B1120; 
+            --bg-card: #111827; 
+            --border-ui: #1F2937; 
+            --text-main: #F8FAFC; 
+            --text-light: #94A3B8; 
+            --bg-hover: #1e293b;
+        }
         html.dark body { background-color: var(--bg-body) !important; }
         html.dark .main-content { background-color: var(--bg-body) !important; backdrop-filter: none !important; border-left: 1px solid var(--border-ui) !important; }
         html.dark .blob { opacity: 0.1 !important; }
+        
+        /* Darkmode Filter Card */
         html.dark .filter-card { background: var(--bg-card); border-color: var(--border-ui); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
         html.dark .search-box input { background: #1e293b; border-color: #334155;}
         html.dark .pill-btn:hover { background: #334155; }
         html.dark .tag-grade { background: #334155; color: #cbd5e1; }
+        html.dark .page-header-box h2 { color: var(--text-main); }
+        html.dark .page-header-box p { color: var(--text-light); }
+        html.dark .book-title { color: var(--text-main); }
+
+        /* ĐỒNG BỘ DARK MODE MENU.JS */
+        html.dark #menu-placeholder aside { background-color: var(--bg-card) !important; border-color: var(--border-ui) !important; }
+        html.dark #menu-placeholder aside > div { background-color: transparent !important; }
+        html.dark #menu-placeholder button { background-color: transparent !important; border: 1px solid var(--border-ui) !important; color: var(--text-light) !important; box-shadow: none !important; }
+        html.dark #menu-placeholder button:hover { background-color: var(--bg-panel-hover) !important; border-color: var(--primary) !important; color: var(--primary) !important;}
+        html.dark #menu-placeholder div[style*="background-color"] { background-color: var(--bg-body) !important; border: 1px solid var(--border-ui) !important;}
+        html.dark #menu-placeholder .nav-item.active { background: var(--primary-gradient) !important; color: white !important; border-color: transparent !important; box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3) !important; }
+        html.dark #menu-placeholder .nav-item { color: var(--text-light) !important; }
+        html.dark #menu-placeholder .nav-item:hover:not(.active) { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
+
 
         /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 768px) {
             body { height: auto; overflow: auto; }
             .mobile-header { display: flex; }
             .main-content { margin-left: 0 !important; width: 100% !important; padding: 85px 20px 40px !important; height: auto !important; border-left: none; }
-            .user-header { margin-bottom: 20px; }
-            .welcome-text h2 { font-size: 1.8rem; }
+            .page-header-box { margin-bottom: 20px; }
+            .page-header-box h2 { font-size: 1.8rem; }
             
             .filter-card { flex-direction: column; align-items: stretch; padding: 15px; border-radius: 20px; gap: 15px; margin-bottom: 25px;}
             .search-box { width: 100%; }
@@ -218,7 +248,11 @@
 </head>
 <body>
 
-    <script>if (localStorage.getItem('theme') === 'dark') { document.documentElement.classList.add('dark'); }</script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 
     <div class="background-blobs">
         <div class="blob blob-1"></div>
@@ -235,19 +269,13 @@
     <div id="menu-placeholder"></div>
 
     <main class="main-content">
-        
-        <div id="keys-val" class="hidden"></div>
-        <div id="streak-val" class="hidden"></div>
-        <div id="rank-val" class="hidden"></div>
-        <div id="total-exams" class="hidden"></div>
 
         <div class="content-wrapper">
+            <div id="hopvan-header-container"></div>
             
-            <div class="user-header">
-                <div class="welcome-text">
-                    <h2>Tác phẩm Văn học</h2>
-                    <p>Tuyển tập tác phẩm Văn học GDPT 2018</p>
-                </div>
+            <div class="page-header-box">
+                <h2>Tác phẩm Văn học</h2>
+                <p>Tuyển tập tác phẩm Văn học GDPT 2018</p>
             </div>
 
             <div class="filter-card">
@@ -268,7 +296,7 @@
             </div>
 
             <div class="book-grid" id="book-grid">
-            </div>
+                </div>
             
             <div id="empty-state" class="hidden flex-col items-center justify-center py-20 opacity-50">
                 <i class="fas fa-ghost text-6xl mb-4 text-gray-400"></i>
@@ -284,19 +312,34 @@
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { initMenu } from "./menu.js";
+        import { initHeader } from './header.js'; 
+        
+        // 1. KÍCH HOẠT HEADER
+        initHeader('hopvan-header-container');
 
-        // Cấu hình Firebase (Chống lỗi duplicate app)
+        // 2. CẤU HÌNH FIREBASE
         const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6" };
         const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
         const auth = getAuth(app);
+        const db = getFirestore(app);
         
         // Khởi tạo menu 
         initMenu(app, 'tacpham');
 
-        // Bắt buộc kiểm tra đăng nhập để hệ thống hoạt động ổn định
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
+        // 3. KIỂM TRA ĐĂNG NHẬP VÀ ĐỒNG BỘ THEME
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists() && userDoc.data().theme === 'dark') {
+                        document.documentElement.classList.add('dark');
+                    }
+                } catch (error) {
+                    console.error("Lỗi đồng bộ theme:", error);
+                }
+            } else {
                 window.location.href = "../log.html";
             }
         });
