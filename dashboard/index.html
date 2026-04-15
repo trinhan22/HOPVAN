@@ -206,16 +206,26 @@
         html.dark #menu-placeholder .nav-item { color: var(--text-light) !important; }
         html.dark #menu-placeholder .nav-item:hover:not(.active) { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
 
+        /* CÁC THẺ CARD CHUNG */
+        html.dark .stat-card, html.dark .activity-box, html.dark .chart-box, html.dark .leaderboard-box, html.dark .tip-card, html.dark .theory-progress-card { background-color: var(--bg-panel) !important; border: 1px solid var(--border-ui) !important; box-shadow: 0 10px 20px rgba(0,0,0,0.4) !important; }
+        html.dark .stat-card:hover, html.dark .activity-box:hover, html.dark .chart-box:hover, html.dark .tip-card:hover, html.dark .theory-progress-card:hover { background-color: var(--bg-panel-hover) !important; border-color: var(--primary) !important; box-shadow: 0 15px 35px rgba(0,0,0,0.6) !important; }
         
-        html.dark .stat-card, html.dark .activity-box, html.dark .chart-box, html.dark .leaderboard-box, html.dark .tip-card, html.dark .theory-progress-card, html.dark .quote-card { background-color: var(--bg-panel) !important; border: 1px solid var(--border-ui) !important; box-shadow: 0 10px 20px rgba(0,0,0,0.4) !important; }
-        html.dark .stat-card:hover, html.dark .activity-box:hover, html.dark .chart-box:hover, html.dark .tip-card:hover, html.dark .theory-progress-card:hover, html.dark .quote-card:hover { background-color: var(--bg-panel-hover) !important; border-color: var(--primary) !important; box-shadow: 0 15px 35px rgba(0,0,0,0.6) !important; }
-        html.dark .stat-watermark { opacity: 0.03 !important; }
-        html.dark .stat-card:hover .stat-watermark { opacity: 0.08 !important; }
+        /* QUOTE CARD (Tách riêng để giữ dải màu gradient sang trọng trên nền tối) */
+        html.dark .quote-card { background: var(--bg-panel) !important; border: 1px solid var(--border-ui) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.4) !important; }
+        html.dark .quote-card:hover {  background-color: var(--bg-panel-hover) !important; border-color: var(--primary) !important; color: var(--primary) !important;}
+        html.dark .quote-icon-wrap { background: rgba(255, 143, 80, 0.15) !important; }
+
+        /* HIỆU ỨNG WATERMARK CHUNG DÙNG CHO CẢ STAT CARD VÀ QUOTE CARD */
+        html.dark .stat-watermark, html.dark .quote-watermark { opacity: 0.05 !important; }
+        html.dark .stat-card:hover .stat-watermark, html.dark .quote-card:hover .quote-watermark { opacity: 0.12 !important; }
+
+        /* TYPOGRAPHY CHUNG */
         html.dark .text-gray-800, html.dark .text-gray-700, html.dark h2, html.dark h3, html.dark h4, html.dark .section-h3 { color: var(--text-main) !important; }
         html.dark .text-gray-500, html.dark .text-gray-400, html.dark p, html.dark .unit { color: var(--text-light) !important; }
         html.dark .tpc-lesson, html.dark .quote-text { color: var(--text-main) !important; }
         html.dark .progress-bar-bg { background: #334155 !important; }
 
+        /* MODAL & TABLE */
         html.dark .modal-content, html.dark .pm-content { background-color: var(--bg-panel) !important; border: 1px solid var(--border-ui) !important; box-shadow: 0 30px 60px rgba(0,0,0,0.8) !important; }
         html.dark .modal-table-container { background-color: transparent !important; }
         html.dark .bg-white.sticky { background-color: var(--bg-panel) !important; border-bottom: 1px solid var(--border-ui) !important; }
@@ -225,7 +235,7 @@
         html.dark .ms-val { color: var(--text-main) !important; }
         html.dark .ms-label { color: var(--text-light) !important; }
         html.dark #full-activity-body td[style*="color: #636e72"], html.dark #full-activity-body td[style*="color: var(--text-main)"] { color: var(--text-main) !important; }
-
+        
         /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 768px) { 
             body { height: auto; overflow: auto; }
