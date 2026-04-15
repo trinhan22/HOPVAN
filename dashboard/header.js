@@ -373,12 +373,30 @@ export function initHeader(containerId) {
         }
     });
 
-    // Hàm load Notification từ Firebase
+    // Hàm load Notification (GOM CẢ CHUNG & RIÊNG) từ Firebase
     function loadNotifications(db, uid) {
-        const q = query(collection(db, "system_notifications"), orderBy("createdAt", "desc"), limit(10));
+        const globalQ = query(collection(db, "system_notifications"), orderBy("createdAt", "desc"), limit(10));
+        const personalQ = query(collection(db, "users", uid, "notifications"), orderBy("createdAt", "desc"), limit(10));
         
-        onSnapshot(q, (snap) => {
-            if (snap.empty) {
+        let globalNotis = [];
+        let personalNotis = [];
+
+        // Hàm gộp và render
+        const mergeAndRender = () => {
+            // Gom 2 mảng lại với nhau
+            let allNotis = [...globalNotis, ...personalNotis];
+
+            // Sắp xếp lại theo thời gian mới nhất (desc)
+            allNotis.sort((a, b) => {
+                const timeA = a.createdAt ? a.createdAt.toMillis() : 0;
+                const timeB = b.createdAt ? b.createdAt.toMillis() : 0;
+                return timeB - timeA;
+            });
+
+            // Chỉ lấy 10 cái mới nhất để khỏi nặng giao diện
+            allNotis = allNotis.slice(0, 10);
+
+            if (allNotis.length === 0) {
                 notiListBody.innerHTML = `
                     <div class="text-center text-xs text-gray-400 py-12 flex flex-col items-center justify-center">
                         <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3 dark:bg-gray-800">
@@ -391,18 +409,28 @@ export function initHeader(containerId) {
                 return;
             }
 
-            let notis = [];
-            snap.forEach(doc => {
-                notis.push({ id: doc.id, ...doc.data() });
-            });
-            renderNotiList(notis);
+            renderNotiList(allNotis);
+        };
+
+        // Lắng nghe Thông báo chung
+        onSnapshot(globalQ, (snap) => {
+            globalNotis = [];
+            snap.forEach(doc => globalNotis.push({ id: doc.id, path: 'system_notifications', ...doc.data() }));
+            mergeAndRender();
+        });
+
+        // Lắng nghe Thông báo cá nhân
+        onSnapshot(personalQ, (snap) => {
+            personalNotis = [];
+            snap.forEach(doc => personalNotis.push({ id: doc.id, path: `users/${uid}/notifications`, ...doc.data() }));
+            mergeAndRender();
         });
     }
 
     function renderNotiList(notis) {
         let hasUnread = false;
         
-        // Update dữ liệu Global
+        // Update dữ liệu Global để truyền vào Modal Bự
         window.currentNotifications = notis;
 
         notiListBody.innerHTML = notis.map((n, idx) => {
@@ -416,6 +444,10 @@ export function initHeader(containerId) {
             if (n.type === 'reward') { iconClass = 'fa-gift'; iconColorClass = 'bg-yellow-100 text-yellow-600'; }
             if (n.type === 'welcome') { iconClass = 'fa-hand-sparkles'; iconColorClass = 'bg-orange-100 text-orange-500'; }
             
+            // Đánh dấu trực quan nếu là tin cá nhân
+            const isPersonal = n.path.startsWith('users');
+            const personalBadge = isPersonal ? `<i class="fas fa-user-circle text-blue-400 mr-1" title="Thông báo cá nhân"></i>` : '';
+
             // Format ngày giờ an toàn
             let timeStr = "Mới";
             if(n.createdAt && n.createdAt.toDate) {
@@ -430,7 +462,7 @@ export function initHeader(containerId) {
                 <div class="noti-icon ${iconColorClass}"><i class="fas ${iconClass}"></i></div>
                 <div class="flex-1 min-w-0">
                     <div class="flex justify-between items-start mb-1">
-                        <h5 class="text-xs font-black hopvan-text-dark truncate mr-2">${n.title}</h5>
+                        <h5 class="text-xs font-black hopvan-text-dark truncate mr-2">${personalBadge}${n.title}</h5>
                         <span class="text-[9px] font-bold text-gray-400 whitespace-nowrap">${timeStr}</span>
                     </div>
                     <p class="text-xs hopvan-text-muted font-medium leading-relaxed line-clamp-2">${n.body}</p>
