@@ -291,11 +291,11 @@ export function initHeader(containerId) {
                         
                         // Lời chào theo vai trò
                         if (uData.role === 'admin' || user.email === 'admin@hopvan.com') {
-                            document.getElementById('header-greeting').innerHTML = `<i class="fas fa-crown text-yellow-500 mr-1"></i> Chào ${rawName}`;
+                            document.getElementById('header-greeting').innerHTML = `<i class="fas fa-crown text-yellow-500 mr-1"></i> Xin Chào, ${rawName}`;
                             document.getElementById('header-user-role').innerText = 'Quản trị viên';
                             document.getElementById('header-user-role').style.color = '#FF8F50';
                         } else {
-                            document.getElementById('header-greeting').innerHTML = `<i class="fas fa-book-open text-orange-400 mr-1"></i> Chào ${rawName}`;
+                            document.getElementById('header-greeting').innerHTML = `<i class="fas fa-book-open text-orange-400 mr-1"></i> Xin Chào, ${rawName}`;
                             document.getElementById('header-user-role').innerText = 'Học Viên';
                         }
 
