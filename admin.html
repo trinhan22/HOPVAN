@@ -752,10 +752,10 @@
 
     <div class="stat-card card-subs group">
         <div class="stat-card-content">
-            <h3 id="stat-subs">0</h3>
-            <p>Lượt làm bài</p>
+            <h3 id="stat-feedbacks">0</h3>
+            <p>Góp ý & Phản hồi</p>
         </div>
-        <i class="fas fa-graduation-cap watermark-icon"></i>
+        <i class="fas fa-comment-dots watermark-icon"></i>
     </div>
 
     <div class="stat-card card-posts group">
@@ -2122,19 +2122,25 @@ const CAT_MAP = {
     }
 
     async function loadStats() {
-        const [u, e1, e2, e3, e4, sub, news] = await Promise.all([
-            safeCount("users"),
-            safeCount("fulltest_bank"),
-            safeCount("essay_bank"),
-            safeCount("reading_bank"),
-            safeCount("quiz_bank"),
-            safeCount("activities"),
-            safeCount("literary_news")
-        ]);
-        document.getElementById('stat-users').innerText = u;
-        document.getElementById('stat-exams').innerText = e1 + e2 + e3 + e4;
-        document.getElementById('stat-subs').innerText = sub;
-        document.getElementById('stat-levels').innerText = news;
+        try {
+            const [u, e1, e2, e3, e4, fbs, news] = await Promise.all([
+                safeCount("users"),
+                safeCount("fulltest_bank"),
+                safeCount("essay_bank"),
+                safeCount("reading_bank"),
+                safeCount("quiz_bank"),
+                safeCount("feedbacks"), // Đếm tổng số Góp ý trong hộp thư
+                safeCount("literary_news")
+            ]);
+            
+            document.getElementById('stat-users').innerText = u;
+            document.getElementById('stat-exams').innerText = e1 + e2 + e3 + e4;
+            document.getElementById('stat-feedbacks').innerText = fbs; // Gán số Góp ý vào thẻ
+            document.getElementById('stat-levels').innerText = news;
+        } catch (error) {
+            console.error("Lỗi loadStats:", error);
+            document.getElementById('stat-feedbacks').innerText = "Lỗi";
+        }
     }
 
     // 2. BANK LOGIC (ĐÃ BỎ LIMIT ĐỂ HIỆN FULL)
