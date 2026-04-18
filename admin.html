@@ -734,10 +734,18 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
     
-    <div class="stat-card card-users group">
-        <div class="stat-card-content">
+    <div class="stat-card card-users group relative">
+        <div class="absolute top-4 right-4 flex items-center gap-1.5 bg-green-50 px-2.5 py-1 rounded-full border border-green-100 shadow-sm z-10">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            <span class="text-[10px] font-bold text-green-600" id="stat-online">0 online</span>
+        </div>
+        
+        <div class="stat-card-content mt-1">
             <h3 id="stat-users">0</h3>
-            <p>Thành viên</p>
+            <p>Tổng Tài Khoản</p>
         </div>
         <i class="fas fa-users watermark-icon"></i>
     </div>
@@ -2094,6 +2102,51 @@ const CAT_MAP = {
         } else { window.location.href = "admin-login.html"; }
     });
     document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href = "admin-login.html");
+
+    // --- Lắng nghe Realtime số lượng User Online (SIÊU CHUẨN) ---
+    window.setupRealtimeUsersStat = () => {
+        const qOnline = query(
+            collection(db, "users"), 
+            orderBy("lastActive", "desc"),
+            limit(100) 
+        );
+        
+        onSnapshot(qOnline, (snapshot) => {
+            let onlineCount = 0;
+            const now = Date.now();
+            
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.lastActive) {
+                    // Convert an toàn mọi định dạng thời gian
+                    const lastActiveMillis = (typeof data.lastActive === 'number') 
+                        ? data.lastActive 
+                        : (data.lastActive.toMillis ? data.lastActive.toMillis() : 0);
+                    
+                    if (lastActiveMillis > 0 && (now - lastActiveMillis < 3 * 60 * 1000)) { 
+                        onlineCount++;
+                    }
+                }
+            });
+            
+            const onlineEl = document.getElementById('stat-online');
+            if (onlineEl) {
+                // Hiệu ứng nhấp nháy chữ mượt mà
+                onlineEl.style.transform = 'scale(1.1)';
+                onlineEl.style.color = '#f97316'; // Chớp màu cam
+                setTimeout(() => {
+                    onlineEl.style.transform = 'scale(1)';
+                    onlineEl.style.color = '#16a34a'; // Trả về màu xanh lá
+                }, 300);
+                
+                onlineEl.innerText = onlineCount + ' online';
+            }
+        }, (error) => {
+            console.error("Lỗi đếm Realtime:", error);
+            const onlineEl = document.getElementById('stat-online');
+            if(onlineEl) onlineEl.innerText = "Lỗi Rules";
+        });
+    };
 
     // Auth & Navigation
     window.switchView = (viewId, el) => {
