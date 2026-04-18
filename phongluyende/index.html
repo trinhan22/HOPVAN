@@ -428,8 +428,8 @@
                         <div class="exam-content font-light text-gray-800">${data.topic}</div>
                     </div>
                     ${data.text ? `<div class="passage-box"><span class="text-xs font-bold text-gray-400 uppercase block mb-2">Ngữ liệu</span><div class="exam-content font-light">${data.text}</div></div>` : ''}
-                    ${data.hint ? `<div class="mt-4 bg-yellow-50 p-4 rounded-xl border border-yellow-100 text-sm text-gray-600 italic font-light">Gợi ý: ${data.hint}</div>` : ''}
-                </div>`;
+                    
+                    </div>`;
         }
         setupHighlightEvent();
     }
@@ -640,7 +640,10 @@
                     .split('{{NLXH}}').join(safe(q.type === 'nlxh' ? q.topic : 'Không có'))
                     .split('{{NLVH}}').join(safe(q.type === 'nlvh' ? q.topic : 'Không có'))
                     .split('{{BAI_LAM}}').join(safe(content));
-                messages = `Học sinh gửi bài ${q.type === 'nlxh' ? 'NLXH' : 'NLVH'}. Hãy chấm theo thang 10.`;
+                
+                // --- THÊM LOGIC TRUYỀN NGẦM HINT CHO AI Ở ĐÂY ---
+                let adminHint = q.hint ? `\n\n[GỢI Ý CHẤM ĐIỂM (BAREM TỪ GIÁO VIÊN)]:\n${safe(q.hint)}` : "";
+                messages = `Học sinh gửi bài ${q.type === 'nlxh' ? 'NLXH' : 'NLVH'}. Hãy chấm theo thang 10.${adminHint}`;
             }
 
             const res = await fetch(API_URL, { 

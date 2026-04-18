@@ -399,25 +399,19 @@
         
         setupHighlightEvent();
         
+        // ĐÃ XÓA KHỐI CODE RENDER q.hint Ở ĐÂY
         document.getElementById('prompt-content').innerHTML = `
             <div id="reading-passage" class="relative pb-10">
                 <div class="passage-box bg-white p-6 rounded-2xl border border-orange-100 shadow-sm mb-4">
                     <span class="text-xs font-black text-orange-500 uppercase block mb-3 tracking-widest"><i class="fas fa-pen-nib mr-1"></i> Yêu cầu đề bài</span>
+                    
                     <div class="exam-content text-lg font-normal text-gray-800 leading-relaxed text-justify">${q.topic}</div>
                 </div>
 
                 ${q.text ? `
                 <div class="passage-box bg-gray-50 p-6 rounded-2xl border border-gray-200">
                     <span class="text-xs font-bold text-gray-400 uppercase block mb-3"><i class="fas fa-quote-left mr-1"></i> Trích đoạn / Tác phẩm</span>
-                    <div class="exam-content font-normal text-gray-700 leading-loose text-justify text-[1.05rem]">${q.text}</div>
-                </div>` : ''}
-
-                ${q.hint ? `
-                <div class="mt-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
-                    <div class="flex items-center gap-2 mb-2 text-blue-600">
-                        <i class="fas fa-lightbulb"></i> <span class="text-xs font-bold uppercase">Gợi ý AI</span>
-                    </div>
-                    <div class="text-sm text-blue-800 italic">${q.hint}</div>
+                    <div class="exam-content font-serif text-gray-700 leading-loose text-justify text-[1.05rem]">${q.text}</div>
                 </div>` : ''}
             </div>`;
             
@@ -596,6 +590,7 @@
             const promptData = await promptResponse.json();
             
             // Khử mã độc
+            // Khử mã độc
             const safe = (str) => {
                 if (!str) return 'Không có';
                 if (Array.isArray(str)) str = str.join(' | ');
@@ -607,15 +602,18 @@
             systemPrompt = systemPrompt
                 .split('{{TOPIC}}').join(safe(q.topic))
                 .split('{{DOC_HIEU}}').join(safe(q.text))
-                .split('{{HINT}}').join(safe(q.hint))
+                .split('{{HINT}}').join("Không có") // Ép HINT trong template thành "Không có"
                 .split('{{BAI_LAM}}').join(safe(content));
+
+            // --- THÊM LOGIC TRUYỀN NGẦM HINT CHO AI Ở ĐÂY ---
+            let adminHint = q.hint ? `\n\n[GỢI Ý CHẤM ĐIỂM TỪ ADMIN (KHÔNG CHO HỌC SINH THẤY)]:\n${safe(q.hint)}` : "";
 
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ 
                     systemPrompt: systemPrompt, 
-                    messages: `Học sinh gửi bài làm. Hãy chấm theo quy trình K12.`
+                    messages: `Học sinh gửi bài làm. Hãy chấm theo quy trình K12.${adminHint}`
                 }) 
             });
 

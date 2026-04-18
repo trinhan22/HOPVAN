@@ -415,14 +415,7 @@
                     <div class="exam-content font-serif text-gray-700 leading-loose text-justify text-[1.05rem]">${q.text}</div>
                 </div>` : ''}
 
-                ${q.hint ? `
-                <div class="mt-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
-                    <div class="flex items-center gap-2 mb-2 text-blue-600">
-                        <i class="fas fa-lightbulb"></i> <span class="text-xs font-bold uppercase">Gợi ý AI</span>
-                    </div>
-                    <div class="text-sm text-blue-800 italic">${q.hint}</div>
-                </div>` : ''}
-            </div>`;
+                </div>`;
             
         promptFontSize = 17;
         document.querySelector('.prompt-body').style.fontSize = `17px`;
@@ -610,15 +603,19 @@
             systemPrompt = systemPrompt
                 .split('{{TOPIC}}').join(safe(q.topic))
                 .split('{{DOC_HIEU}}').join(safe(q.text))
-                .split('{{HINT}}').join(safe(q.hint))
+                // Gán tạm HINT thành Không có ở systemPrompt, vì ta sẽ nhấn mạnh nó ở dưới
+                .split('{{HINT}}').join("Không có") 
                 .split('{{BAI_LAM}}').join(safe(content));
+
+            // --- THÊM LOGIC TRUYỀN NGẦM HINT CHO AI Ở ĐÂY ---
+            let adminHint = q.hint ? `\n\n[GỢI Ý CHẤM ĐIỂM TỪ ADMIN (KHÔNG CHO HỌC SINH THẤY)]:\n${safe(q.hint)}` : "";
 
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ 
                     systemPrompt: systemPrompt, 
-                    messages: `Học sinh gửi bài làm. Hãy chấm theo quy trình K12.`
+                    messages: `Học sinh gửi bài làm. Hãy chấm theo quy trình K12.${adminHint}`
                 }) 
             });
 
