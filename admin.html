@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -1409,13 +1407,13 @@
     </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, query, where, orderBy, limit, onSnapshot, getDocs, getCountFromServer, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // --- 1. CONFIG FIREBASE & BIẾN TOÀN CỤC ---
     const firebaseConfig = { apiKey: "AIzaSyAJ9C2biYeiLPmhakzLZ4mEqfO9_VgPSZE", authDomain: "hopvan-9a648.firebaseapp.com", projectId: "hopvan-9a648", storageBucket: "hopvan-9a648.appspot.com", messagingSenderId: "429347196227", appId: "1:429347196227:web:917b8d019f0efd0f7833f6", measurementId: "G-1BG8PSRG0R" };
-    const app = initializeApp(firebaseConfig);
+    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     const auth = getAuth(app);
     const db = getFirestore(app);
     const Parchment = Quill.import('parchment');
@@ -2169,24 +2167,41 @@ const CAT_MAP = {
         } catch (e) { return 0; }
     }
 
-    async function loadStats() {
+    // --- 1. STATS (ĐÃ NÂNG CẤP LÊN REALTIME & FIX LỖI SỐ 0) ---
+    function loadStats() {
         try {
-            const [u, e1, e2, e3, e4, fbs, news] = await Promise.all([
-                safeCount("users"),
-                safeCount("fulltest_bank"),
-                safeCount("essay_bank"),
-                safeCount("reading_bank"),
-                safeCount("quiz_bank"),
-                safeCount("feedbacks"), // Đếm tổng số Góp ý trong hộp thư
-                safeCount("literary_news")
-            ]);
-            
-            document.getElementById('stat-users').innerText = u;
-            document.getElementById('stat-exams').innerText = e1 + e2 + e3 + e4;
-            document.getElementById('stat-feedbacks').innerText = fbs; // Gán số Góp ý vào thẻ
-            document.getElementById('stat-levels').innerText = news;
+            // 1. Đếm tổng User (Realtime)
+            onSnapshot(collection(db, "users"), (snap) => {
+                const el = document.getElementById('stat-users');
+                if (el) el.innerText = snap.size;
+            });
+
+            // 2. Đếm tổng Góp ý & Phản hồi (Realtime)
+            onSnapshot(collection(db, "feedbacks"), (snap) => {
+                const el = document.getElementById('stat-feedbacks');
+                if (el) el.innerText = snap.size;
+            });
+
+            // 3. Đếm tổng Bài viết văn học (Realtime)
+            onSnapshot(collection(db, "literary_news"), (snap) => {
+                const el = document.getElementById('stat-levels');
+                if (el) el.innerText = snap.size;
+            });
+
+            // 4. Đếm tổng Đề thi từ 4 ngân hàng (Realtime gộp)
+            window.examCounts = { full: 0, essay: 0, read: 0, quiz: 0 };
+            const updateExamsCount = () => {
+                const el = document.getElementById('stat-exams');
+                if (el) el.innerText = window.examCounts.full + window.examCounts.essay + window.examCounts.read + window.examCounts.quiz;
+            };
+
+            onSnapshot(collection(db, "fulltest_bank"), (snap) => { window.examCounts.full = snap.size; updateExamsCount(); });
+            onSnapshot(collection(db, "essay_bank"), (snap) => { window.examCounts.essay = snap.size; updateExamsCount(); });
+            onSnapshot(collection(db, "reading_bank"), (snap) => { window.examCounts.read = snap.size; updateExamsCount(); });
+            onSnapshot(collection(db, "quiz_bank"), (snap) => { window.examCounts.quiz = snap.size; updateExamsCount(); });
+
         } catch (error) {
-            console.error("Lỗi loadStats:", error);
+            console.error("Lỗi khởi tạo thống kê:", error);
             document.getElementById('stat-feedbacks').innerText = "Lỗi";
         }
     }
