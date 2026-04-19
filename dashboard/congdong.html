@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HopVan - Cộng Đồng</title>
+    <title>HopVan - Cộng Đồng Discord</title>
     <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
     <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
     <meta property="og:image" content="https://hopvan.info.vn/panel.webp" />
@@ -87,13 +87,11 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* --- GIỚI HẠN CHIỀU RỘNG NỘI DUNG ĐỂ KHÔNG BỊ THÒI THỤT --- */
         .content-wrapper {
             width: 100%;
-            max-width: 1100px; /* GIỚI HẠN CHIỀU RỘNG CHUẨN ĐỂ KHÔNG BỊ BÈ RA */
-            margin: 0 auto;    /* CANH GIỮA MÀN HÌNH */
+            max-width: 1100px; 
+            margin: 0 auto;    
         }
-
 
         /* --- ĐỒNG BỘ DARK MODE CHO MENU.JS --- */
         html.dark #menu-placeholder aside, 
@@ -102,7 +100,6 @@
             border-color: var(--border-panel) !important;
         }
 
-        /* Ép trong suốt mọi thẻ div bọc ngoài có nền sáng để lộ nền tối của Sidebar */
         html.dark #menu-placeholder aside > div,
         html.dark #menu-placeholder .sidebar > div {
             background-color: transparent !important;
@@ -138,19 +135,23 @@
         html.dark #menu-placeholder .nav-item { color: var(--text-sub) !important; transition: 0.3s; }
         html.dark #menu-placeholder .nav-item:hover { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
 
-        /* --- DISCORD CARD --- */
-        .community-center { 
-            flex: 1; display: flex; justify-content: center; align-items: center; padding-bottom: 30px;
+        /* --- COMMUNITY GRID --- */
+        .community-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            padding-bottom: 50px;
         }
 
+        /* --- DISCORD CARD (MAIN) --- */
         .discord-card-pro {
-            width: 100%; max-width: 900px;
+            width: 100%; 
             background: var(--bg-panel);
             backdrop-filter: blur(24px);
             border: 1px solid var(--border-panel);
             border-radius: 40px;
-            padding: 50px 60px;
-            display: flex; align-items: center; gap: 50px;
+            padding: 40px 50px;
+            display: flex; align-items: center; gap: 40px;
             box-shadow: 0 20px 60px rgba(88, 101, 242, 0.12);
             position: relative; overflow: hidden;
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, background 0.4s ease;
@@ -164,79 +165,145 @@
         }
         html.dark .discord-card-pro:hover { box-shadow: 0 30px 70px rgba(88, 101, 242, 0.15); }
 
-        /* Ánh sáng mờ ảo bên trong Card */
+        /* Glow effects */
         .dc-glow { position: absolute; border-radius: 50%; filter: blur(60px); z-index: 0; pointer-events: none; }
         .blob-top { width: 300px; height: 300px; background: rgba(88, 101, 242, 0.15); top: -100px; left: -100px; animation: pulseGlow 6s infinite alternate; }
         .blob-bottom { width: 400px; height: 400px; background: rgba(255, 143, 80, 0.1); bottom: -150px; right: -150px; animation: pulseGlow 8s infinite alternate-reverse; }
         @keyframes pulseGlow { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(1.2); opacity: 1; } }
 
-        .dc-logo-side {
-            width: 120px; height: 120px; background: var(--discord-gradient);
-            border-radius: 35px; display: flex; justify-content: center; align-items: center;
-            font-size: 4.5rem; color: white; flex-shrink: 0;
-            box-shadow: 0 15px 35px rgba(88, 101, 242, 0.3);
-            animation: breathe 3s ease-in-out infinite;
-            position: relative; z-index: 2; transform: translateZ(40px);
-        }
-        @keyframes breathe { 0%, 100% { transform: scale(1) translateZ(40px); } 50% { transform: scale(1.05) translateZ(40px); } }
-
         .dc-watermark {
-            position: absolute; right: -40px; top: -30px; font-size: 28rem;
-            color: #5865F2; opacity: 0.03; z-index: 0; transform: rotate(-15deg);
+            position: absolute; right: -20px; top: -30px; font-size: 22rem;
+            color: #5865F2; opacity: 0.04; z-index: 0; transform: rotate(-15deg);
             pointer-events: none; transition: 0.5s ease;
         }
         html.dark .dc-watermark { opacity: 0.05; }
-        .discord-card-pro:hover .dc-watermark { transform: rotate(0) scale(1.05); opacity: 0.05; }
+        .discord-card-pro:hover .dc-watermark { transform: rotate(0) scale(1.05); opacity: 0.06; }
         html.dark .discord-card-pro:hover .dc-watermark { opacity: 0.08; }
         
         .dc-left { position: relative; z-index: 2; flex-shrink: 0; }
         .dc-icon-wrapper {
-            width: 150px; height: 150px;
+            width: 140px; height: 140px;
             background: var(--discord-gradient);
-            border-radius: 40px;
+            border-radius: 35px;
             display: flex; justify-content: center; align-items: center;
-            font-size: 6rem; color: white;
+            font-size: 5.5rem; color: white;
             box-shadow: 0 20px 40px rgba(88, 101, 242, 0.4), inset 0 5px 15px rgba(255,255,255,0.3);
             animation: floatLogo 4s ease-in-out infinite;
             border: 4px solid var(--bg-glass);
         }
-        @keyframes floatLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes floatLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-        /* Nội dung bên phải */
         .dc-right { position: relative; z-index: 2; flex: 1; }
 
         .dc-badge {
             display: inline-flex; padding: 6px 16px; background: rgba(88, 101, 242, 0.1); color: var(--discord-color);
             font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
-            border-radius: 20px; margin-bottom: 15px; border: 1px solid rgba(88, 101, 242, 0.2);
+            border-radius: 20px; margin-bottom: 12px; border: 1px solid rgba(88, 101, 242, 0.2);
             align-items: center; gap: 6px;
         }
 
-        .dc-title { font-size: 2.2rem; font-weight: 900; color: var(--text-heading); margin-bottom: 12px; letter-spacing: -1px; line-height: 1.2; }
-
-        .dc-features { list-style: none; margin-bottom: 30px; display: flex; flex-direction: column; gap: 10px; }
-        .dc-features li { display: flex; align-items: center; gap: 12px; font-weight: 700; color: var(--text-sub); font-size: 0.95rem; }
-        .dc-features i { color: var(--discord-color); font-size: 1.2rem; }
-
-        .dc-desc { font-size: 1.05rem; color: var(--text-sub); line-height: 1.6; margin-bottom: 20px; font-weight: 500; }
+        .dc-title { font-size: 2rem; font-weight: 900; color: var(--text-heading); margin-bottom: 10px; letter-spacing: -1px; line-height: 1.2; }
+        .dc-desc { font-size: 1rem; color: var(--text-sub); line-height: 1.5; margin-bottom: 20px; font-weight: 500; max-width: 600px;}
 
         .btn-join-discord-pro {
-            background: var(--discord-color); color: white; padding: 16px 35px;
-            border-radius: 20px; font-weight: 800; font-size: 1.1rem;
-            display: inline-flex; align-items: center; gap: 12px; border: none; cursor: pointer;
+            background: var(--discord-color); color: white; padding: 14px 30px;
+            border-radius: 20px; font-weight: 800; font-size: 1rem;
+            display: inline-flex; align-items: center; gap: 10px; border: none; cursor: pointer;
             box-shadow: 0 10px 25px rgba(88, 101, 242, 0.4); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative; overflow: hidden;
+            position: relative; overflow: hidden; text-decoration: none;
         }
         .btn-join-discord-pro::before {
             content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
             background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
             transform: skewX(-25deg); transition: 0s;
         }
-
-        .btn-join-discord-pro:hover { transform: translateY(-3px) scale(1.02); background: #4752C4; box-shadow: 0 15px 35px rgba(88, 101, 242, 0.5); }
+        .btn-join-discord-pro:hover { transform: translateY(-3px) scale(1.02); background: #4752C4; box-shadow: 0 15px 35px rgba(88, 101, 242, 0.5); color: white;}
         .btn-join-discord-pro:hover::before { left: 200%; transition: 0.6s ease; }
 
+        /* --- INFO & MAP CARDS (BENTO) --- */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 25px;
+            align-items: stretch; /* Đảm bảo 2 hộp luôn cao bằng nhau */
+        }
+
+        .bento-box {
+            background: var(--bg-panel);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-panel);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            display: flex;             /* Thêm Flexbox */
+            flex-direction: column;    /* Xếp dọc từ trên xuống */
+        }
+        html.dark .bento-box { box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .bento-box:hover { border-color: var(--primary); transform: translateY(-3px); }
+        
+        .bento-title {
+            font-size: 1.2rem; font-weight: 900; color: var(--text-heading);
+            margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+        }
+
+        /* Guide Steps */
+        .step-list { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            position: relative;
+            flex-grow: 1;            /* Ép danh sách giãn ra lấp đầy hộp */
+            justify-content: space-around; /* Chia đều khoảng cách giữa 3 bước */
+        }
+        
+        /* Chỉnh lại đường kẻ sọc cho khớp với độ giãn mới */
+        .step-list::before {
+            content: ''; position: absolute; top: 15px; bottom: 20px; left: 19px;
+            width: 2px; background: rgba(255, 143, 80, 0.2); z-index: 0;
+        }
+        
+        .step-item { display: flex; gap: 15px; position: relative; z-index: 1;}
+        .step-num {
+            width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
+            background: white; border: 2px solid var(--primary); color: var(--primary);
+            display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(255, 143, 80, 0.2);
+        }
+        html.dark .step-num { background: #1e293b; }
+        .step-item.highlight .step-num { background: var(--primary); color: white; animation: pulseTick 2s infinite; }
+        @keyframes pulseTick { 0% { box-shadow: 0 0 0 0 rgba(255, 143, 80, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 143, 80, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 143, 80, 0); } }
+        
+        .step-content h4 { font-weight: 800; color: var(--text-heading); font-size: 0.95rem; margin-bottom: 4px; margin-top: 2px;}
+        .step-content p { font-size: 0.85rem; color: var(--text-sub); line-height: 1.5; }
+        .tick-demo { display: inline-flex; align-items: center; gap: 5px; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #16a34a; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 0.75rem;}
+
+        /* Server Map */
+        .map-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .category-group { margin-bottom: 10px; }
+        .cat-title { font-size: 0.75rem; font-weight: 900; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;}
+        .cat-title::after { content: ''; flex: 1; height: 1px; background: rgba(0,0,0,0.05); }
+        html.dark .cat-title::after { background: rgba(255,255,255,0.05); }
+        
+        .channel-item {
+            display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;
+            padding: 8px 12px; border-radius: 10px; transition: 0.2s; cursor: default;
+        }
+        .channel-item:hover { background: rgba(0,0,0,0.03); }
+        html.dark .channel-item:hover { background: rgba(255,255,255,0.03); }
+        
+        .ch-icon { font-size: 1.1rem; color: var(--text-sub); margin-top: 2px; width: 20px; text-align: center;}
+        .ch-info h5 { font-weight: 800; font-size: 0.85rem; color: var(--text-heading); font-family: monospace; display: flex; align-items: center; gap: 5px;}
+        .ch-info h5::before { content: '#'; color: var(--text-sub); font-weight: normal;}
+        .ch-info.voice h5::before { content: ''; display: none;}
+        .ch-info p { font-size: 0.75rem; color: var(--text-sub); line-height: 1.4; margin-top: 2px;}
+
         /* --- MOBILE OPTIMIZATION --- */
+        @media (max-width: 1024px) {
+            .info-grid { grid-template-columns: 1fr; }
+        }
         @media (max-width: 768px) {
             .mobile-header { display: flex; z-index: 1000; }
             #menu-placeholder aside {
@@ -248,21 +315,22 @@
 
             .main-content { margin-left: 0 !important; width: 100% !important; padding: 80px 20px 30px !important; }
             
-            .discord-card-pro { flex-direction: column; padding: 40px 25px; text-align: center; gap: 30px; }
-            .dc-icon-wrapper { width: 110px; height: 110px; font-size: 4.5rem; margin: 0 auto; animation: none; transform: translateY(-10px);}
-            .dc-title { font-size: 1.7rem; }
-            .dc-features { align-items: center; }
-            .dc-features li { justify-content: center; }
+            .discord-card-pro { flex-direction: column; padding: 35px 25px; text-align: center; gap: 20px; border-radius: 30px;}
+            .dc-icon-wrapper { width: 100px; height: 100px; font-size: 4rem; margin: 0 auto; animation: none;}
+            .dc-title { font-size: 1.6rem; }
+            .dc-badge { margin: 0 auto 15px; }
             .btn-join-discord-pro { width: 100%; justify-content: center; }
             .dc-watermark { display: none; }
+
+            .map-grid { grid-template-columns: 1fr; gap: 10px;}
+            .bento-box { padding: 25px 20px; border-radius: 25px;}
         }
 
         /* --- GLOBAL SCROLLBAR STYLE --- */
-        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
-        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
-        ::-webkit-scrollbar-button { display: none; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; }
     </style>
 </head>
 <body>
@@ -299,7 +367,8 @@
                 
                 <div id="hopvan-header-container"></div>
 
-                <div class="community-center">
+                <div class="community-container">
+                    
                     <div class="discord-card-pro">
                         <div class="dc-glow blob-top"></div>
                         <div class="dc-glow blob-bottom"></div>
@@ -314,18 +383,104 @@
                         <div class="dc-right">
                             <div class="dc-badge"><i class="fas fa-fire"></i> Cộng đồng #1</div>
                             <h1 class="dc-title">Gia nhập Server HopVan</h1>
-                            <p class="dc-desc">Nơi hội tụ của các sĩ tử HopVan, cùng nhau bứt phá điểm số môn Ngữ Văn với vô vàn đặc quyền:</p>
+                            <p class="dc-desc">Nơi hội tụ của các sĩ tử HopVan, cùng nhau bứt phá điểm số môn Ngữ Văn, trao đổi tài liệu và giải đáp thắc mắc 24/7.</p>
                             
-                            <ul class="dc-features">
-                                <li><i class="fas fa-check-circle"></i> Trao đổi tài liệu thi cử, miễn phí, chất lượng</li>
-                                <li><i class="fas fa-check-circle"></i> Livestream chữa đề & thực chiến mỗi tuần</li>
-                                <li><i class="fas fa-check-circle"></i> Giải đáp thắc mắc 24/7 từ các Mentor</li>
-                            </ul>
-
-                            <button id="btn-discord-action" class="btn-join-discord-pro">
+                            <a href="https://discord.gg/EhsQyEAk2k" target="_blank" id="btn-discord-action" class="btn-join-discord-pro">
                                 <i class="fab fa-discord"></i> Tham gia Discord ngay
-                            </button>
+                            </a>
                         </div>
+                    </div>
+
+                    <div class="info-grid">
+                        
+                        <div class="bento-box">
+                            <h2 class="bento-title"><i class="fas fa-map-signs text-orange-500"></i> Hướng dẫn Tân Binh</h2>
+                            
+                            <div class="step-list">
+                                <div class="step-item">
+                                    <div class="step-num">1</div>
+                                    <div class="step-content">
+                                        <h4>Tham gia Server</h4>
+                                        <p>Bấm vào nút tham gia ở trên. Đăng nhập hoặc tạo tài khoản Discord nếu bạn chưa có.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="step-item highlight">
+                                    <div class="step-num"><i class="fas fa-unlock-alt"></i></div>
+                                    <div class="step-content">
+                                        <h4 class="text-orange-500">Mở khóa Server (Bắt buộc)</h4>
+                                        <p>Lúc mới vào, bạn sẽ chỉ thấy vài kênh cơ bản. Hãy vào kênh <b>#rules</b>, đọc kỹ nội quy và bấm vào biểu tượng <span class="tick-demo"><i class="fas fa-check"></i> (Tick Xanh)</span> ở dưới cùng bài viết.</p>
+                                    </div>
+                                </div>
+
+                                <div class="step-item">
+                                    <div class="step-num">3</div>
+                                    <div class="step-content">
+                                        <h4>Bắt đầu học tập</h4>
+                                        <p>Hệ thống sẽ tự động cấp quyền và mở khóa toàn bộ các kênh học tập, tài liệu và voice chat cho bạn!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bento-box">
+                            <h2 class="bento-title"><i class="fas fa-sitemap text-blue-500"></i> Bản đồ Server</h2>
+                            
+                            <div class="map-grid">
+                                <div>
+                                    <div class="category-group">
+                                        <div class="cat-title">INFORMATION</div>
+                                        <div class="channel-item">
+                                            <i class="fas fa-bullhorn ch-icon text-blue-400"></i>
+                                            <div class="ch-info"><h5>welcome</h5><p>Kênh đón tân binh gia nhập.</p></div>
+                                        </div>
+                                        <div class="channel-item">
+                                            <i class="fas fa-scroll ch-icon text-orange-400"></i>
+                                            <div class="ch-info"><h5>rules</h5><p>Nội quy & Xác nhận để mở khóa server.</p></div>
+                                        </div>
+                                        <div class="channel-item">
+                                            <i class="fas fa-ticket-alt ch-icon text-green-500"></i>
+                                            <div class="ch-info"><h5>create-ticket</h5><p>Mở phiên chat riêng để Admin hỗ trợ.</p></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="category-group mt-4">
+                                        <div class="cat-title">VOICE & STUDY</div>
+                                        <div class="channel-item">
+                                            <i class="fas fa-music ch-icon text-purple-400"></i>
+                                            <div class="ch-info"><h5>music-control</h5><p>Phòng gọi bot phát nhạc Lofi / Chill.</p></div>
+                                        </div>
+                                        <div class="channel-item">
+                                            <i class="fas fa-plus-square ch-icon text-gray-400"></i>
+                                            <div class="ch-info voice"><h5><i class="fas fa-volume-up text-[10px] mr-1 text-gray-400"></i> CREATE ROOM</h5><p>Tự động tạo phòng học nhóm Voice riêng tư.</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="category-group">
+                                        <div class="cat-title">CHAT ZONE</div>
+                                        <div class="channel-item">
+                                            <i class="fas fa-comments ch-icon text-gray-500"></i>
+                                            <div class="ch-info"><h5>general-chat</h5><p>Kênh chém gió, giao lưu mọi chủ đề.</p></div>
+                                        </div>
+                                        <div class="channel-item">
+                                            <i class="fas fa-book-open ch-icon text-yellow-500"></i>
+                                            <div class="ch-info"><h5>study-resources</h5><p>Kho chia sẻ tài liệu Ngữ Văn chất lượng.</p></div>
+                                        </div>
+                                        <div class="channel-item">
+                                            <i class="fas fa-hands-helping ch-icon text-emerald-500"></i>
+                                            <div class="ch-info"><h5>homework-help</h5><p>Nơi hỏi đáp, nhờ trợ giúp bài tập trên trường.</p></div>
+                                        </div>
+                                        <div class="channel-item">
+                                            <i class="fas fa-feather-alt ch-icon text-pink-400"></i>
+                                            <div class="ch-info"><h5>literary-forum</h5><p>Bàn luận tác phẩm, chia sẻ tản văn tâm đắc.</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
                 
@@ -333,6 +488,7 @@
         </main>
     </div>
 
+    <script src="../security.js"></script>
     <script type="module" src="../presence.js"></script>
     <script type="module" src="gam.js"></script>
     <script src="../chatbot.js"></script>
@@ -357,7 +513,7 @@
     </script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { initMenu } from "./menu.js";
@@ -384,7 +540,7 @@
         // Khởi tạo Menu (Active tab: community)
         initMenu(app, 'community');
 
-        // 3. KIỂM TRA ĐĂNG NHẬP VÀ ĐỒNG BỘ THEME (Rút gọn)
+        // 3. KIỂM TRA ĐĂNG NHẬP VÀ ĐỒNG BỘ THEME
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
@@ -400,7 +556,7 @@
             }
         });
 
-        // 4. XỬ LÝ LỆNH ĐĂNG XUẤT (KHỚP VỚI MENU.HTML)
+        // 4. XỬ LÝ LỆNH ĐĂNG XUẤT
         window.addEventListener('trigger-firebase-signout', async () => {
             try {
                 await signOut(auth);
@@ -422,38 +578,10 @@
                             action: "Gia nhập Cộng đồng Discord",
                             timestamp: serverTimestamp()
                         });
-                    } catch (e) { console.error("Lưu DB lỗi nhưng vẫn mở link:", e); }
+                    } catch (e) { console.error("Lưu DB lỗi:", e); }
                 }
-                window.open("https://discord.gg/EhsQyEAk2k", "_blank");
             });
         }
     </script>
-
-    <script type="text/javascript">
-    // 1. Chặn Chuột phải 
-    document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-
-    // 2. Chặn các phím tắt Developer Tools
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'F12' || e.keyCode === 123) {
-            e.preventDefault();
-            return false;
-        }
-        if (e.ctrlKey) {
-            switch (e.key.toLowerCase()) {
-                case 'u': case 's': case 'p': 
-                    e.preventDefault();
-                    return false;
-            }
-            if (e.shiftKey) {
-                switch (e.key.toLowerCase()) {
-                    case 'i': case 'j': case 'c': 
-                        e.preventDefault();
-                        return false;
-                }
-            }
-        }
-    });
-</script>
 </body>
 </html>

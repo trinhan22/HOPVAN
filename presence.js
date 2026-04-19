@@ -14,7 +14,7 @@ const firebaseConfig = {
 };
 
 // Khởi tạo an toàn (Nếu file HTML đã gọi app rồi thì xài lại, chưa thì tạo mới)
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
