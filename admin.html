@@ -2099,68 +2099,63 @@ const CAT_MAP = {
             document.getElementById('admin-email').innerText = user.email.split('@')[0];
             loadStats();
             loadNews('all');
+            setupRealtimeUsersStat(); // <--- THÊM DÒNG NÀY ĐỂ KÍCH HOẠT ĐẾM ONLINE
         } else { window.location.href = "admin-login.html"; }
     });
     document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href = "admin-login.html");
 
-    // --- Lắng nghe Realtime số lượng User Online (SIÊU CHUẨN) ---
+    // --- Lắng nghe Realtime số lượng User Online (CÁCH SIÊU ĐƠN GIẢN & CHÍNH XÁC) ---
     window.setupRealtimeUsersStat = () => {
-        const qOnline = query(
-            collection(db, "users"), 
-            orderBy("lastActive", "desc"),
-            limit(100) 
-        );
-        
-        onSnapshot(qOnline, (snapshot) => {
+        // Lấy thẳng bảng "users", Firebase sẽ tự đẩy dữ liệu mới về mỗi khi có thay đổi
+        onSnapshot(collection(db, "users"), (snapshot) => {
             let onlineCount = 0;
             const now = Date.now();
             
+            // Duyệt qua tất cả người dùng
             snapshot.forEach(doc => {
                 const data = doc.data();
-                if (data.lastActive) {
-                    // Convert an toàn mọi định dạng thời gian
-                    const lastActiveMillis = (typeof data.lastActive === 'number') 
-                        ? data.lastActive 
-                        : (data.lastActive.toMillis ? data.lastActive.toMillis() : 0);
-                    
-                    if (lastActiveMillis > 0 && (now - lastActiveMillis < 3 * 60 * 1000)) { 
-                        onlineCount++;
-                    }
+                // Nếu họ có timestamp 'lastActive' và timestamp đó cách hiện tại chưa tới 3 phút (180,000 ms)
+                // thì tính là người đó đang Online
+                if (data.lastActive && (now - data.lastActive < 180000)) { 
+                    onlineCount++;
                 }
             });
             
+            // Cập nhật con số lên giao diện HTML
             const onlineEl = document.getElementById('stat-online');
             if (onlineEl) {
-                // Hiệu ứng nhấp nháy chữ mượt mà
+                // Hiệu ứng chớp màu cam rùi về màu xanh cho đẹp mắt
                 onlineEl.style.transform = 'scale(1.1)';
-                onlineEl.style.color = '#f97316'; // Chớp màu cam
+                onlineEl.style.color = '#f97316'; 
                 setTimeout(() => {
                     onlineEl.style.transform = 'scale(1)';
-                    onlineEl.style.color = '#16a34a'; // Trả về màu xanh lá
+                    onlineEl.style.color = '#16a34a'; 
                 }, 300);
                 
                 onlineEl.innerText = onlineCount + ' online';
             }
-        }, (error) => {
-            console.error("Lỗi đếm Realtime:", error);
-            const onlineEl = document.getElementById('stat-online');
-            if(onlineEl) onlineEl.innerText = "Lỗi Rules";
         });
     };
 
-    // Auth & Navigation
+    // --- HÀM CHUYỂN MENU (ĐÃ SỬA CHUẨN 100%) ---
     window.switchView = (viewId, el) => {
+        // 1. Ẩn tất cả các tab, chỉ hiện tab được chọn
         document.querySelectorAll('.view-section').forEach(e => e.classList.add('hidden'));
         document.getElementById('view-' + viewId).classList.remove('hidden');
+        
+        // 2. Làm sáng cái nút Menu bên trái
         if(el) {
             document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
             el.classList.add('active');
         }
+        
+        // 3. Tải dữ liệu tương ứng với tab đang mở
         if(viewId === 'bank') loadBank(currentCollection);
         if(viewId === 'journal') loadLevelsList();
         if(viewId === 'history') loadUsers();
         if(viewId === 'news') loadNews(currentNewsFilter);
         if(viewId === 'feedbacks') loadFeedbacks();
+        if(viewId === 'maintenance') loadMaintenanceSettings(); // <--- ĐÂY NÈ! CHÍNH LÀ DÒNG BỊ THIẾU!
     };
 
     window.closeModal = () => document.querySelector('.modal-overlay').classList.remove('show');
