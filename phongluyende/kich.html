@@ -67,41 +67,12 @@
             scroll-behavior: smooth;
         }
 
-/* --- GLOBAL SCROLLBAR STYLE --- */
-
-/* 1. Thiết lập độ rộng/cao của thanh trượt */
-::-webkit-scrollbar {
-    width: 10px;  /* Độ rộng cho thanh dọc */
-    height: 10px; /* Độ cao cho thanh ngang */
-}
-
-/* 2. Thiết lập rãnh trượt (Track) - Nền chìm */
-::-webkit-scrollbar-track {
-    background: rgba(255, 143, 80, 0.05); /* Màu cam cực nhạt, gần như trong suốt */
-    border-radius: 10px;
-}
-
-/* 3. Thiết lập tay nắm (Thumb) - Phần di chuyển */
-::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 143, 80, 0.3); /* Mặc định là cam nhạt */
-    border-radius: 10px; /* Bo tròn mềm mại */
-    
-    /* Mẹo: Tạo viền trong suốt để thanh trượt trông nhỏ hơn và "lơ lửng" */
-    border: 2px solid transparent;
-    background-clip: content-box;
-    transition: background-color 0.3s ease;
-}
-
-/* 4. Hiệu ứng khi di chuột vào (Hover) */
-::-webkit-scrollbar-thumb:hover {
-    background-color: #FF8F50; /* Đổi sang màu cam chính thương hiệu */
-    border: 1px solid transparent; /* Làm thanh trượt to ra một chút khi hover */
-}
-
-/* 5. (Tùy chọn) Ẩn nút mũi tên 2 đầu (nếu trình duyệt hiển thị) */
-::-webkit-scrollbar-button {
-    display: none;
-}
+        /* --- GLOBAL SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
+        ::-webkit-scrollbar-button { display: none; }
 
 /* --- FULLSCREEN POPUP NEON SYNC --- */
         .fs-modal-box {
@@ -305,7 +276,7 @@
                         <div class="card-header bg-white">
                             <span class="font-black text-xs text-gray-400 uppercase tracking-widest">BÀI LÀM CỦA BẠN</span>
                             <div class="flex gap-2">
-                                <button onclick="document.getElementById('file-upload').click()" class="text-xs font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded hover:bg-blue-100 transition"><i class="fas fa-paperclip mr-1"></i> File</button>
+                                <button onclick="triggerFileUpload()" class="text-xs font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded hover:bg-blue-100 transition"><i class="fas fa-paperclip mr-1"></i> Tải file</button>
                                 <input type="file" id="file-upload" class="hidden" accept=".txt, .docx">
                                 <span id="word-count" class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">0 TỪ</span>
                             </div>
@@ -717,6 +688,32 @@
     document.getElementById('student-essay').oninput = function() { document.getElementById('word-count').innerText = `${this.value.trim().split(/\s+/).filter(x => x).length} TỪ`; };
 
 // --- FULLSCREEN LOGIC ---
+
+// --- FIX LỖI VĂNG TRÌNH DUYỆT KHI TẢI FILE TRONG FULLSCREEN ---
+    window.triggerFileUpload = () => {
+        // Kiểm tra xem trình duyệt có đang ở chế độ toàn màn hình không
+        if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+            
+            // 1. Chủ động thoát toàn màn hình một cách an toàn
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { 
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { 
+                document.msExitFullscreen();
+            }
+            
+            // 2. Đợi 400ms cho hiệu ứng thu nhỏ màn hình chạy xong rồi mới mở hộp thoại File
+            setTimeout(() => {
+                document.getElementById('file-upload').click();
+            }, 400);
+            
+        } else {
+            // Nếu không ở chế độ toàn màn hình thì mở bình thường
+            document.getElementById('file-upload').click();
+        }
+    };
+
     // Hàm kích hoạt toàn màn hình
     window.enableFullscreen = () => {
         const elem = document.documentElement;
