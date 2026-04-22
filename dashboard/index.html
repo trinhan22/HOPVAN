@@ -548,30 +548,48 @@
         if (user) {
             try {
                 const userDoc = await getDoc(doc(db, "users", user.uid));
+                let isDiagnosticCompleted = false; // Mặc định là false (Chưa làm test)
+
                 if (userDoc.exists()) {
                     const data = userDoc.data();
+                    
+                    // Xử lý Theme
                     if (data.theme) {
                         localStorage.setItem('theme', data.theme);
                         if (data.theme === 'dark') document.documentElement.classList.add('dark');
                         else document.documentElement.classList.remove('dark');
                     }
 
-                    // KIỂM TRA USER MỚI Ở ĐÂY
-                    if (!data.diagnosticCompleted && user.email !== 'admin@hopvan.com') {
-                        const overlay = document.getElementById('diagnostic-overlay');
-                        overlay.style.display = 'flex';
-                        document.body.style.overflow = 'hidden'; 
+                    // Nếu đã làm bài test thì gán thành true
+                    if (data.diagnosticCompleted === true) {
+                        isDiagnosticCompleted = true;
                     }
                 }
+
+                // =================================================================
+                // KIỂM TRA USER MỚI (CHƯA LÀM TEST) VÀ KHÔNG PHẢI ADMIN
+                // Chạy độc lập, không phụ thuộc vào việc userDoc đã tồn tại hay chưa
+                // =================================================================
+                if (!isDiagnosticCompleted && user.email !== 'admin@hopvan.com') {
+                    // Trỏ ĐÚNG TÊN ID CỦA IFRAME
+                    const overlay = document.getElementById('diagnostic-iframe-container');
+                    if (overlay) {
+                        overlay.style.display = 'block'; 
+                        document.body.style.overflow = 'hidden'; // Khóa cuộn dashboard
+                    }
+                }
+
             } catch(e) {
                 console.log("Lỗi tải data user: ", e);
             }
 
-            updateUserStreak(user);
+            // Gọi các hàm khởi tạo dữ liệu Dashboard
+            updateUserStreak(user); // Hàm này sẽ tạo Document cho user nếu chưa có
             setupRealtimeStats(user);
             setupLeaderboard(user);
             loadTheoryProgress();
 
+            // Hiệu ứng tắt màn hình Loading
             setTimeout(() => {
                 const loader = document.getElementById('global-loader');
                 if (loader) {

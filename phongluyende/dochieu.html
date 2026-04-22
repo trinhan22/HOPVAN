@@ -665,6 +665,12 @@
             rawText = rawText.replace(/[\u0000-\u0019]+/g,"");
             const result = JSON.parse(rawText);
 
+            if (result.is_valid === false) {
+                showPopup("Bài làm không hợp lệ", result.message || "Phát hiện nội dung chống phá, spam. Hệ thống từ chối chấm!", "error");
+                loading.style.display = 'none';
+                return; // Dừng lại ngay lập tức, không lưu vào Firebase.
+            }
+
             // Bắt lỗi điểm số thang 4.0
             let safeScore = parseFloat(result.reading_score);
             if (isNaN(safeScore)) safeScore = 0;

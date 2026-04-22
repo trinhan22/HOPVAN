@@ -720,6 +720,12 @@
 
             const result = JSON.parse(rawText);
 
+            if (result.is_valid === false) {
+                showPopup("Bài làm không hợp lệ", result.message || "Phát hiện nội dung chống phá, spam. Hệ thống từ chối chấm!", "error");
+                loading.style.display = 'none';
+                return; // Dừng lại ngay lập tức, không lưu vào Firebase.
+            }
+
             let safeScore = parseFloat(result.score);
             if (isNaN(safeScore)) safeScore = 0;
             if (safeScore > 10) safeScore = 10;
