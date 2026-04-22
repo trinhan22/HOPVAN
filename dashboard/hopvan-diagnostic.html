@@ -94,8 +94,6 @@
         .diag-box { padding: 20px; border-radius: 20px; }
         .diag-box.good { background: #F0FDF4; border: 1px solid #DCFCE7; }
         .diag-box.bad { background: #FEF2F2; border: 1px solid #FEE2E2; }
-        .timeline-item { position: relative; margin-bottom: 20px; padding-left: 25px; border-left: 2px solid #FFDBC7;}
-        .timeline-item::before { content: ''; position: absolute; left: -8px; top: 0; width: 14px; height: 14px; border-radius: 50%; background: white; border: 3px solid var(--primary); }
 
         /* DARK MODE */
         html.dark { --text-main: #F1F5F9; --text-light: #94A3B8; --bg-body: #0F172A; --card-bg: #1E293B; }
@@ -119,6 +117,7 @@
             .option-card { flex-direction: row; text-align: left; padding: 20px 25px; gap: 20px;}
             .option-icon { width: 55px; height: 55px; font-size: 1.5rem; flex-shrink: 0;}
             .wizard-card { padding: 25px; border-radius: 24px; }
+            .diagnosis-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -181,7 +180,7 @@
                         <h2 class="text-xl md:text-2xl font-black text-gray-800">Trắc Nghiệm & Tự Luận</h2>
                     </div>
                     <div class="text-xs font-bold text-white bg-gray-800 px-4 py-2 rounded-lg shadow-md flex items-center gap-2 font-mono text-sm transition-colors duration-300">
-                        <i class="fas fa-clock text-orange-400"></i> <span id="diag-timer">90:00</span>
+                        <i class="fas fa-clock text-orange-400"></i> <span id="diag-timer">45:00</span>
                     </div>
                 </div>
 
@@ -222,7 +221,7 @@
 
     </main>
 
-<script type="module">
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -245,36 +244,28 @@
         let diagTimeLeft = 2700; // 45 phút
         let isTakingTest = false;
 
-        // --- FIX LỖI BỊ GIAM Ở TRANG TRẮNG ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
                     const docRef = doc(db, "users_progress", user.uid);
                     const docSnap = await getDoc(docRef);
                     
-                    // NẾU ĐÃ LÀM BÀI TEST RỒI
                     if (docSnap.exists() && docSnap.data().diagnosticDone === true) {
-                        // Trường hợp 1: Chạy ngầm trong iframe của index.html -> Yêu cầu trang mẹ đóng iframe
                         if (window !== window.parent && typeof window.parent.closeDiagnosticOverlay === 'function') {
                             window.parent.closeDiagnosticOverlay();
-                        } 
-                        // Trường hợp 2: Lỡ gõ trực tiếp link trên trình duyệt -> Đá về trang index.html cùng thư mục
-                        else {
+                        } else {
                             window.location.href = "index.html"; 
                         }
-                        return; // Dừng tại đây, KHÔNG hiện UI bài test
+                        return;
                     } 
                     
-                    // NẾU CHƯA LÀM BÀI -> HIỆN GIAO DIỆN
                     document.getElementById('main-wrapper').style.display = 'flex';
                     
                 } catch (error) {
                     console.error("Lỗi kiểm tra DB:", error);
-                    // Nếu lỗi mạng, an toàn nhất là cứ hiện bài test lên
                     document.getElementById('main-wrapper').style.display = 'flex';
                 }
             } else {
-                // Chưa đăng nhập -> Đá về log.html
                 if (window !== window.parent) {
                     window.parent.location.href = "../log.html";
                 } else {
@@ -484,20 +475,16 @@
 
                 const result = JSON.parse(rawText);
 
-                // --- TÁCH KHỐI TRY...CATCH CHO FIREBASE ĐỂ KHÔNG CHẶN KẾT QUẢ AI ---
                 if (auth.currentUser) {
                     try {
                         const uid = auth.currentUser.uid;
                         
-                        // 1. CHUẨN HÓA TỔNG ĐIỂM (Đảm bảo là kiểu số)
                         let rawTotal = parseFloat(result.total_score);
                         if (isNaN(rawTotal)) {
-                            // Nếu AI trả về chuỗi kiểu "8.5/10", trích xuất số đầu tiên
                             const match = String(result.total_score).match(/[\d\.]+/);
                             rawTotal = match ? parseFloat(match[0]) : 0;
                         }
                         
-                        // 2. PHÂN LOẠI KHUNG NĂNG LỰC (5 LEVELS)
                         let competenceLevel = 1;
                         let competenceTag = "Khởi đầu";
                         
@@ -513,17 +500,15 @@
                         } else if (rawTotal >= 2.0) {
                             competenceLevel = 2;
                             competenceTag = "Xây nền";
-                        } // Dưới 2 là Level 1 (Khởi đầu)
+                        }
 
-                        // 3. LƯU DỮ LIỆU LÊN FIREBASE (Lưu vào users_progress để dùng toàn cục)
                         await setDoc(doc(db, "users_progress", uid), { 
                             diagnosticDone: true,
-                            competenceLevel: competenceLevel, // Số (1-5) để dễ query/code logic sau này
-                            competenceTag: competenceTag,     // Chữ để hiển thị
-                            startingScore: rawTotal           // Lưu điểm gốc để đo lường độ tiến bộ
+                            competenceLevel: competenceLevel,
+                            competenceTag: competenceTag,
+                            startingScore: rawTotal
                         }, { merge: true });
 
-                        // Lưu thêm vào bảng lịch sử test (nếu cần tracking nhiều lần test)
                         await setDoc(doc(db, "diagnostic_results", uid), {
                             total_score: rawTotal,
                             level_title: result.level_title,
@@ -533,7 +518,6 @@
 
                     } catch(dbError) {
                         console.error("Lỗi cấp quyền Firestore khi lưu kết quả bài test:", dbError);
-                        // Lỗi lưu Firebase sẽ bị chặn tại đây và ghi ra log, KHÔNG làm văng báo lỗi AI
                     }
                 }
 
@@ -563,14 +547,22 @@
 
             const renderTimeline = (arr) => {
                 if (!arr || !arr.length) return '';
-                return arr.map((item, idx) => `
-                <div class="timeline-item">
-                    <div class="bg-gray-50 border border-gray-100 p-4 rounded-xl" style="opacity: ${idx === 0 ? '1' : '0.6'}">
-                        <span class="text-[10px] font-black text-orange-500 uppercase bg-orange-100 px-2 py-1 rounded">${item.phase}</span>
-                        <h5 class="font-bold text-gray-800 mt-2 mb-1">${item.title}</h5>
-                        <p class="text-gray-500 text-sm">${item.desc}</p>
+                
+                let itemsHtml = arr.map((item, idx) => `
+                <div class="relative">
+                    <div class="absolute -left-[33px] top-5 w-4 h-4 rounded-full bg-white border-[3px] border-orange-400 z-10 dark:bg-gray-900 dark:border-orange-500"></div>
+                    <div class="bg-gray-50/50 border border-gray-100 shadow-sm rounded-2xl p-5 hover:shadow-md transition duration-300 dark:bg-gray-800 dark:border-gray-700">
+                        <span class="inline-block bg-orange-100 text-orange-600 text-[10px] font-black uppercase px-3 py-1 rounded-md mb-2 tracking-wide dark:bg-orange-900/30 dark:text-orange-400">${item.phase}</span>
+                        <h5 class="font-bold text-gray-800 text-lg mb-1 dark:text-gray-100">${item.title}</h5>
+                        <p class="text-gray-500 text-sm leading-relaxed dark:text-gray-400">${item.desc}</p>
                     </div>
                 </div>`).join('');
+
+                return `
+                <div class="relative pl-6 border-l-2 border-orange-200 ml-3 space-y-6 dark:border-orange-900/50 py-2">
+                    ${itemsHtml}
+                </div>
+                `;
             };
 
             container.innerHTML = `
@@ -596,9 +588,10 @@
                     ${renderTimeline(result.syllabus)}
                 </div>
 
-                <div class="mt-8 text-center flex justify-center gap-4">
-                    <button onclick="if(window!==window.parent){window.parent.closeDiagnosticOverlay();}else{window.location.href='index.html';}" class="btn-primary">
-                        Vào học ngay <i class="fas fa-arrow-right ml-1"></i>
+                <div class="mt-8 text-center flex justify-center">
+                    <button onclick="if(window!==window.parent){window.parent.closeDiagnosticOverlay();}else{window.location.href='index.html';}" 
+                            class="bg-gradient-to-r from-orange-400 to-red-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition duration-300 flex items-center gap-2">
+                        Vào học ngay <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
             `;
