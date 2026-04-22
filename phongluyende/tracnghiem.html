@@ -528,7 +528,7 @@
 
 
     // =========================================================
-    // GỌI GROQ AI ĐỂ GIẢI THÍCH CÂU HỎI TRẮC NGHIỆM (BẢN FIX LỖI)
+    // GỌI GROQ AI ĐỂ GIẢI THÍCH CÂU HỎI TRẮC NGHIỆM (BẢN FIX LỖI JSON 500)
     // =========================================================
     window.explainWithAI = async function(index) {
         try {
@@ -548,7 +548,7 @@
             btn.disabled = true;
             btn.style.opacity = '0.6';
 
-            // XỬ LÝ AN TOÀN TRÁNH SẬP CODE NẾU DỮ LIỆU FIREBASE BỊ THIẾU
+            // XỬ LÝ ĐÁP ÁN
             const optionsArray = q.options || [];
             const selectedIdx = userAnswers[index];
             const selectedText = (selectedIdx !== undefined && optionsArray[selectedIdx] !== undefined) 
@@ -568,8 +568,12 @@
                 }
             }
 
-            const systemPrompt = `Bạn là giáo viên Ngữ Văn. Dựa vào câu hỏi và đáp án học sinh chọn, hãy giải thích ngắn gọn, đi thẳng vào vấn đề (tối đa 3 câu) vì sao đáp án đúng là đáp án đó.
-            QUY TẮC: Trả lời TRỰC TIẾP. KHÔNG chào hỏi. Nhìn vào đáp án học sinh chọn, nếu sai, hãy chỉ ra điểm dễ gây nhầm lẫn.`;
+            // ÉP CỨNG CHUẨN JSON ĐỂ KHÔNG BỊ LỖI 500 TỪ GROQ
+            const systemPrompt = `Bạn là giáo viên Ngữ Văn. Dựa vào câu hỏi và đáp án học sinh chọn, hãy giải thích ngắn gọn, đi thẳng vào vấn đề (tối đa 3 câu) vì sao đáp án đúng là đáp án đó. Nhìn vào đáp án học sinh chọn, nếu sai, hãy chỉ ra điểm dễ gây nhầm lẫn.
+            BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON SAU:
+            {
+                "explanation": "Câu giải thích của bạn viết tại đây..."
+            }`;
             
             const messages = `Câu hỏi: ${q.question}\nCác đáp án: ${optionsArray.join(" | ")}\nHọc sinh chọn: ${selectedText}\nĐáp án đúng: ${correctText}`;
 
@@ -580,26 +584,29 @@
                 body: JSON.stringify({ systemPrompt: systemPrompt, messages: messages }) 
             });
 
-            // BẮT LỖI TỪ SERVER NETLIFY / GROQ VÀ IN RA
             if (!res.ok) {
-                const errText = await res.text(); // Lấy mã lỗi từ server
+                const errText = await res.text();
                 throw new Error(`Server báo lỗi HTTP ${res.status} - ${errText}`);
             }
             
             const data = await res.json();
             
             if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                throw new Error("Lỗi: Dữ liệu Groq trả về bị sai cấu trúc (Không có choices).");
+                throw new Error("Lỗi: Dữ liệu Groq trả về bị sai cấu trúc.");
             }
 
+            // LỘT VỎ JSON ĐỂ LẤY NỘI DUNG GIẢI THÍCH
             let rawText = data.choices[0].message.content;
-            
-            // Xóa rác Markdown
             rawText = rawText.replace(/```[a-zA-Z]*\n?/g, "").replace(/```/g, "").trim(); 
-            rawText = rawText.replace(/\*\*(.*?)\*\*/g, '<b class="text-orange-600">$1</b>'); 
+            
+            const resultObj = JSON.parse(rawText);
+            let finalExplanation = resultObj.explanation || "Không thể tải lời giải thích.";
+
+            // Highlight chữ in đậm
+            finalExplanation = finalExplanation.replace(/\*\*(.*?)\*\*/g, '<b class="text-orange-600">$1</b>'); 
 
             // In kết quả ra màn hình
-            contentBox.innerHTML = `<b><i class="fas fa-magic text-orange-500 mr-1"></i> AI Phân tích:</b><br><span class="text-gray-700 dark:text-gray-300 mt-2 block leading-relaxed">${rawText}</span>`;
+            contentBox.innerHTML = `<b><i class="fas fa-magic text-orange-500 mr-1"></i> AI Phân tích:</b><br><span class="text-gray-700 dark:text-gray-300 mt-2 block leading-relaxed">${finalExplanation}</span>`;
             
             btn.disabled = false;
             btn.style.opacity = '1';
@@ -612,8 +619,7 @@
             const btn = document.getElementById(`btn-ai-${index}`);
             
             if(contentBox) {
-                // IN CHI TIẾT MÃ LỖI RA MÀN HÌNH ĐỂ BẠN DỄ NHÌN THẤY MÀ KHÔNG CẦN F12
-                contentBox.innerHTML = `<span class="text-red-500 font-bold"><i class="fas fa-exclamation-triangle mr-1"></i> ${e.message}</span>`;
+                contentBox.innerHTML = `<span class="text-red-500 font-bold"><i class="fas fa-exclamation-triangle mr-1"></i> Không thể phân tích: Định dạng AI trả về chưa chính xác. Vui lòng bấm thử lại.</span>`;
             }
             if(btn) {
                 btn.disabled = false;
