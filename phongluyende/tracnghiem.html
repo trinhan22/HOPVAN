@@ -619,11 +619,21 @@
             const btn = document.getElementById(`btn-ai-${index}`);
             
             if(contentBox) {
-                contentBox.innerHTML = `<span class="text-red-500 font-bold"><i class="fas fa-exclamation-triangle mr-1"></i> Không thể phân tích: Định dạng AI trả về chưa chính xác. Vui lòng bấm thử lại.</span>`;
+                // Trích xuất trực tiếp thông báo lỗi từ đối tượng Error (e.message) để in ra màn hình
+                contentBox.innerHTML = `
+                    <div class="text-red-600 font-medium">
+                        <div class="font-bold mb-1"><i class="fas fa-exclamation-triangle mr-1"></i> Lỗi hệ thống AI:</div>
+                        <div class="text-sm bg-red-50 p-2 rounded border border-red-200 font-mono overflow-x-auto whitespace-pre-wrap">${e.message}</div>
+                        <div class="text-xs mt-2 text-red-400 italic">Vui lòng thử lại sau ít phút hoặc báo cáo lỗi này.</div>
+                    </div>`;
             }
             if(btn) {
                 btn.disabled = false;
                 btn.style.opacity = '1';
+                // Đổi nút thành màu đỏ cảnh báo để user biết bị lỗi
+                btn.innerHTML = `<i class="fas fa-redo"></i> Thử phân tích lại`;
+                btn.classList.remove('text-orange-600', 'border-orange-200');
+                btn.classList.add('bg-red-50', 'text-red-600', 'border-red-200');
             }
         }
     };
