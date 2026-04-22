@@ -527,62 +527,102 @@
     }
 
 
-// =========================================================
-    // GỌI GEMINI AI ĐỂ GIẢI THÍCH CÂU HỎI TRẮC NGHIỆM
+    // =========================================================
+    // GỌI GROQ AI ĐỂ GIẢI THÍCH CÂU HỎI TRẮC NGHIỆM
     // =========================================================
     window.explainWithAI = async function(index) {
-        const btn = document.getElementById(`btn-ai-${index}`);
-        const contentBox = document.getElementById(`ai-content-${index}`);
-        const q = allQuestions[index];
-        const selectedIdx = userAnswers[index];
-        const correctIdx = q.correct;
-
-        // Nếu đã giải thích rồi thì không gọi lại API nữa
-        if (contentBox.style.display === 'block' && !contentBox.innerHTML.includes('fa-spinner')) {
-            return;
-        }
-
-        // Hiển thị trạng thái Loading
-        contentBox.style.display = 'block';
-        contentBox.innerHTML = `<i class="fas fa-spinner fa-spin text-orange-500 mr-2"></i> Trợ lý AI đang soạn câu trả lời...`;
-        btn.disabled = true;
-        btn.style.opacity = '0.5';
-
-        const selectedText = selectedIdx !== undefined ? q.options[selectedIdx] : "Học sinh bỏ trống";
-        const correctText = q.options[correctIdx];
-
-        // Prompt truyền vào cho Gemini
-        const systemPrompt = `Bạn là một giáo viên Ngữ Văn tâm huyết. Hãy giải thích ngắn gọn, súc tích (khoảng 2-3 câu) vì sao đáp án đúng lại là đáp án đó. \nQuan trọng: Hãy nhìn vào đáp án mà học sinh đã chọn. Nếu học sinh chọn sai, hãy giải thích nhẹ nhàng vì sao đáp án học sinh chọn lại dễ bị nhầm lẫn và chưa chính xác. Không dùng format Markdown phức tạp.`;
-        const messages = `Câu hỏi: ${q.question}\nCác đáp án: ${q.options.join(" | ")}\nHọc sinh chọn: ${selectedText}\nĐáp án đúng: ${correctText}`;
-
         try {
-            const res = await fetch('/.netlify/functions/gemini-proxy', { 
+            const btn = document.getElementById(`btn-ai-${index}`);
+            const contentBox = document.getElementById(`ai-content-${index}`);
+            const q = allQuestions[index];
+            
+            if (!q) throw new Error("Không tìm thấy dữ liệu câu hỏi.");
+
+            // Chống spam click: Nếu đang loading thì không cho bấm gọi nữa
+            if (contentBox.style.display === 'block' && contentBox.innerHTML.includes('fa-spinner')) {
+                return;
+            }
+
+            // Hiển thị trạng thái Loading
+            contentBox.style.display = 'block';
+            contentBox.innerHTML = `<i class="fas fa-spinner fa-spin text-orange-500 mr-2"></i> Trợ lý AI đang phân tích câu trả lời...`;
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+
+            // 1. LẤY ĐÁP ÁN HỌC SINH CHỌN (Xử lý cả khi bỏ trống)
+            const selectedIdx = userAnswers[index];
+            const selectedText = (selectedIdx !== undefined && q.options[selectedIdx] !== undefined) 
+                                 ? q.options[selectedIdx] 
+                                 : "Học sinh bỏ trống không chọn";
+
+            // 2. LẤY ĐÁP ÁN ĐÚNG (Tự động nhận diện số 0,1,2,3 hoặc chữ A,B,C,D từ Firebase)
+            let correctText = "Không xác định";
+            if (typeof q.correct === 'number' && q.options[q.correct]) {
+                correctText = q.options[q.correct];
+            } else if (typeof q.correct === 'string') {
+                const match = q.correct.match(/^[A-D]$/i);
+                if (match) {
+                    const idx = match[0].toUpperCase().charCodeAt(0) - 65;
+                    correctText = q.options[idx] || q.correct;
+                } else {
+                    correctText = q.correct; // Nếu là chuỗi đáp án dài
+                }
+            }
+
+            // 3. GỌI API GROQ
+            // Prompt được ép cứng để Llama/Mixtral của Groq không nói vòng vo
+            const systemPrompt = `Bạn là giáo viên Ngữ Văn. Dựa vào câu hỏi và đáp án học sinh chọn, hãy giải thích ngắn gọn, đi thẳng vào vấn đề (tối đa 3 câu) vì sao đáp án đúng là đáp án đó.
+            QUY TẮC BẮT BUỘC: 
+            - Trả lời TRỰC TIẾP vào nội dung giải thích.
+            - KHÔNG chào hỏi, KHÔNG nói "Dạ vâng", KHÔNG nói "Dưới đây là giải thích".
+            - Nhìn vào đáp án học sinh chọn, nếu sai, hãy chỉ ra điểm dễ gây nhầm lẫn.`;
+            
+            const messages = `Câu hỏi: ${q.question}\nCác đáp án: ${q.options.join(" | ")}\nHọc sinh chọn: ${selectedText}\nĐáp án đúng: ${correctText}`;
+
+            const API_URL = `/.netlify/functions/gemini-proxy`; // Endpoint Proxy gọi sang Groq của bạn
+            const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ systemPrompt: systemPrompt, messages: messages }) 
             });
 
-            if (!res.ok) throw new Error("API_ERROR");
+            if (!res.ok) throw new Error("Lỗi Server API");
             const data = await res.json();
             
+            if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+                throw new Error("Lỗi cấu trúc trả về từ AI");
+            }
+
+            // 4. XỬ LÝ FORMAT TEXT TỪ GROQ CHO ĐẸP
             let rawText = data.choices[0].message.content;
             
-            // Xóa dấu nháy Markdown nếu có
-            rawText = rawText.replace(/```/g, "").trim();
-
-            contentBox.innerHTML = `<b><i class="fas fa-magic text-orange-500 mr-1"></i> AI Giải thích:</b><br><span class="text-gray-600 dark:text-gray-300 mt-1 block">${rawText}</span>`;
+            // Lột sạch các rác Markdown (như ```json, ```text) mà Groq hay sinh ra do "ảo giác"
+            rawText = rawText.replace(/```[a-zA-Z]*\n?/g, "").replace(/```/g, "").trim(); 
             
-            // Phục hồi nút bấm
+            // Biến chữ in đậm ** thành màu cam
+            rawText = rawText.replace(/\*\*(.*?)\*\*/g, '<b class="text-orange-600">$1</b>'); 
+
+            // In kết quả ra màn hình
+            contentBox.innerHTML = `<b><i class="fas fa-magic text-orange-500 mr-1"></i> AI Phân tích:</b><br><span class="text-gray-700 dark:text-gray-300 mt-2 block leading-relaxed">${rawText}</span>`;
+            
+            // Đổi trạng thái nút bấm thành màu xanh báo hoàn tất
             btn.disabled = false;
             btn.style.opacity = '1';
-            btn.innerHTML = `<i class="fas fa-check-circle"></i> Đã phân tích xong`;
-            btn.classList.add('bg-green-50', 'text-green-600', 'border-green-200');
+            btn.innerHTML = `<i class="fas fa-check-circle"></i> Phân tích hoàn tất`;
+            btn.classList.add('bg-green-50', 'text-green-700', 'border-green-200');
 
         } catch(e) {
             console.error("Lỗi AI Giải thích:", e);
-            contentBox.innerHTML = `<span class="text-red-500 font-bold"><i class="fas fa-exclamation-triangle"></i> Mạng đang bận. Vui lòng tắt đi bật lại!</span>`;
-            btn.disabled = false;
-            btn.style.opacity = '1';
+            const contentBox = document.getElementById(`ai-content-${index}`);
+            const btn = document.getElementById(`btn-ai-${index}`);
+            
+            if(contentBox) {
+                contentBox.innerHTML = `<span class="text-red-500 font-bold"><i class="fas fa-exclamation-triangle mr-1"></i> Trợ lý AI đang bận. Vui lòng bấm phân tích lại!</span>`;
+            }
+            if(btn) {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
         }
     };
 </script>
