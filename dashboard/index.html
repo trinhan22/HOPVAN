@@ -274,6 +274,10 @@
         <iframe src="../loading.html" style="width: 100%; height: 100%; border: none; pointer-events: none;"></iframe>
     </div>
     
+    <div id="diagnostic-iframe-container" style="display: none; position: fixed; inset: 0; z-index: 9999999; background: #FFF5EC; transition: opacity 0.4s ease;">
+        <iframe src="hopvan-diagnostic.html" style="width: 100%; height: 100%; border: none;"></iframe>
+    </div>
+
     <script>
         // Tự động nhận diện Dark Mode cho khung nền Loading
         if (localStorage.getItem('theme') === 'dark') { 
@@ -314,6 +318,10 @@
 
     <div id="menu-placeholder"></div>
 
+    <div id="diagnostic-iframe-container" style="display: none; position: fixed; inset: 0; z-index: 99999999; background: #FFF5EC; transition: opacity 0.4s ease;">
+        <iframe src="hopvan-diagnostic.html" style="width: 100%; height: 100%; border: none;"></iframe>
+    </div>
+    
     <main class="main-content">
         <div class="content-wrapper">
             <div id="hopvan-header-container"></div>
@@ -538,37 +546,66 @@
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            
             try {
                 const userDoc = await getDoc(doc(db, "users", user.uid));
-                if (userDoc.exists() && userDoc.data().theme) {
-                    const theme = userDoc.data().theme;
-                    localStorage.setItem('theme', theme);
-                    if (theme === 'dark') document.documentElement.classList.add('dark');
-                    else document.documentElement.classList.remove('dark');
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    if (data.theme) {
+                        localStorage.setItem('theme', data.theme);
+                        if (data.theme === 'dark') document.documentElement.classList.add('dark');
+                        else document.documentElement.classList.remove('dark');
+                    }
+
+                    // KIỂM TRA USER MỚI Ở ĐÂY
+                    if (!data.diagnosticCompleted && user.email !== 'admin@hopvan.com') {
+                        const overlay = document.getElementById('diagnostic-overlay');
+                        overlay.style.display = 'flex';
+                        document.body.style.overflow = 'hidden'; 
+                    }
                 }
             } catch(e) {
-                console.log("Lỗi tải theme: ", e);
+                console.log("Lỗi tải data user: ", e);
             }
 
             updateUserStreak(user);
             setupRealtimeStats(user);
             setupLeaderboard(user);
-            
-            // --- GỌI HÀM LẤY DỮ LIỆU LÝ THUYẾT Ở ĐÂY ---
             loadTheoryProgress();
 
-            // --- TẮT MÀN HÌNH LOADING SAU KHI DATA SẴN SÀNG ---
             setTimeout(() => {
                 const loader = document.getElementById('global-loader');
                 if (loader) {
-                    loader.style.opacity = '0'; // Hiệu ứng mờ dần
-                    setTimeout(() => loader.remove(), 600); // Xóa hẳn khỏi DOM sau khi mờ
+                    loader.style.opacity = '0'; 
+                    setTimeout(() => loader.remove(), 600); 
                 }
-            }, 1200); // Delay 1.2s để đảm bảo mọi animation và data đã chạy mượt
+            }, 1200); 
 
         } else { window.location.href = "../log.html"; }
     });
+
+    // HÀM CHO PHÉP TRANG IFRAME DIAGNOSTIC (TRANG CON) GỌI RA NGOÀI ĐỂ TẮT NÓ ĐI
+    window.closeDiagnosticOverlay = async function() {
+        const overlay = document.getElementById('diagnostic-iframe-container');
+        if (overlay) {
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Cho phép cuộn dashboard lại bình thường
+            }, 400);
+
+            // Cập nhật Firebase đánh dấu User đã hoàn thành Test
+            const currentUser = auth.currentUser;
+            if (currentUser) {
+                try {
+                    await updateDoc(doc(db, "users", currentUser.uid), {
+                        diagnosticCompleted: true
+                    });
+                } catch(e) {
+                    console.error("Lỗi cập nhật Firestore: ", e);
+                }
+            }
+        }
+    };
 
     function setupRealtimeStats(user) {
         const q = query(collection(db, "activities"), where("uid", "==", user.uid), orderBy("timestamp", "desc"));

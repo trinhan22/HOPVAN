@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HopVan - Phân Tích Năng Lực & Lộ Trình</title>
+    
+    <link rel="icon" href="https://hopvan.info.vn/LOGO.WEBP" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Merriweather:ital,wght@0,300;0,400;0,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --primary: #FF8F50;
+            --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
+            --text-main: #1E293B; /* Sậm hơn để tăng độ nét */
+            --text-light: #64748B;
+            --bg-body: #FFFBF8; /* Nền sáng rực rỡ */
+            --card-bg: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+        body { background-color: var(--bg-body); min-height: 100vh; overflow-x: hidden; display: flex; justify-content: center; align-items: center; position: relative; }
+
+        /* --- NỀN PHÁT SÁNG (GLOWING BLOBS) --- */
+        .background-blobs { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.45; animation: floatBlob 15s infinite alternate ease-in-out; }
+        .blob-1 { width: 500px; height: 500px; background: #FF5E62; top: -100px; left: -100px; }
+        .blob-2 { width: 600px; height: 600px; background: #FF8F50; bottom: -150px; right: -100px; animation-delay: -5s; }
+        .blob-3 { width: 400px; height: 400px; background: #FFD1D1; top: 40%; left: 20%; animation-delay: -2s; opacity: 0.6;}
+        @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 40px) scale(1.1); } }
+
+        /* --- LOGO --- */
+        .floating-logo { position: fixed; top: 25px; left: 30px; z-index: 50; display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .floating-logo img { width: 40px; height: 40px; border-radius: 50%; box-shadow: 0 4px 15px rgba(255,143,80,0.3); }
+        .floating-logo span { font-weight: 900; font-size: 1.3rem; color: var(--primary); letter-spacing: 0.5px; }
+
+        /* --- MAIN CONTAINER THU GỌN --- */
+        .main-content {
+            width: 100%; max-width: 780px; /* Thu gọn từ 950px xuống 780px */
+            padding: 20px;
+            display: flex; flex-direction: column; align-items: center;
+            position: relative; z-index: 10;
+        }
+
+        /* --- WIZARD STEPS ANIMATION --- */
+        .step-container { display: none; width: 100%; animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: scale(0.97) translateY(20px); }
+        .step-container.active { display: block; }
+        @keyframes popIn { to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        /* --- CARD STYLE (CLEAN & SHARP) --- */
+        .wizard-card {
+            background: var(--card-bg);
+            padding: 40px 45px; /* Giảm padding */
+            border-radius: 32px;
+            box-shadow: 0 20px 50px rgba(255, 143, 80, 0.08), 0 1px 3px rgba(0,0,0,0.02); /* Đổ bóng có viền cam nhạt */
+            border: 1px solid rgba(255, 143, 80, 0.1);
+            position: relative; overflow: hidden; width: 100%;
+        }
+
+        /* --- STEP 1: KHẢO SÁT --- */
+        .option-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 30px; }
+        .option-card {
+            background: #FAFAFA; border: 2px solid #F1F5F9; padding: 25px 20px; border-radius: 20px;
+            cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px;
+        }
+        .option-card:hover { transform: translateY(-4px); background: #FFFFFF; box-shadow: 0 12px 25px rgba(255, 143, 80, 0.12); border-color: rgba(255, 143, 80, 0.3); }
+        .option-card.selected { border-color: var(--primary); background: #FFF9F5; box-shadow: 0 12px 25px rgba(255, 143, 80, 0.15); }
+        
+        .option-icon { width: 56px; height: 56px; background: #FFF0E5; color: var(--primary); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
+        .option-card.selected .option-icon { background: var(--primary-gradient); color: white; box-shadow: 0 8px 15px rgba(255, 94, 98, 0.25); }
+        
+        .option-text h4 { font-weight: 800; color: var(--text-main); font-size: 1.05rem; margin-bottom: 4px; }
+        .option-text p { font-size: 0.85rem; color: var(--text-light); line-height: 1.5; }
+
+        /* --- STEP 2: VIẾT BÀI --- */
+        .test-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; }
+        .writing-area {
+            width: 100%; height: 200px; /* Thu gọn chiều cao */
+            padding: 20px; border-radius: 20px;
+            border: 2px solid #E2E8F0; outline: none; resize: none;
+            font-size: 1.05rem; line-height: 1.8; color: var(--text-main); background: #F8FAFC;
+            font-family: 'Merriweather', serif; transition: 0.25s;
+        }
+        .writing-area:focus { border-color: var(--primary); background: #FFFFFF; box-shadow: 0 0 0 4px rgba(255, 143, 80, 0.1); }
+        .word-count { font-size: 0.8rem; font-weight: 800; color: #94A3B8; text-align: right; margin-top: 8px; }
+
+        /* --- STEP 3: LOADING AI --- */
+        .ai-pulse-ring { width: 100px; height: 100px; border-radius: 50%; background: #FFF0E5; margin: 0 auto 25px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .ai-pulse-ring::before, .ai-pulse-ring::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--primary); animation: pulse 1.5s linear infinite; }
+        .ai-pulse-ring::after { animation-delay: 0.75s; }
+        @keyframes pulse { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
+
+        /* --- STEP 4: BÁO CÁO & LỘ TRÌNH --- */
+        .score-circle { width: 90px; height: 90px; background: var(--primary-gradient); border-radius: 50%; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 15px; font-weight: 900; font-size: 2.2rem; box-shadow: 0 10px 25px rgba(255, 94, 98, 0.35); border: 4px solid white; }
+        .score-circle span { font-size: 0.8rem; font-weight: 700; opacity: 0.9; margin-top: -5px; }
+        
+        .diagnosis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px; margin-bottom: 35px; }
+        .diag-box { padding: 20px; border-radius: 20px; }
+        .diag-box.good { background: #F0FDF4; border: 1px solid #DCFCE7; }
+        .diag-box.bad { background: #FEF2F2; border: 1px solid #FEE2E2; }
+        .diag-box h4 { font-weight: 800; margin-bottom: 12px; font-size: 1rem; display: flex; align-items: center; gap: 6px; }
+        .diag-box li { font-size: 0.9rem; color: var(--text-main); margin-bottom: 8px; display: flex; gap: 8px; line-height: 1.5; font-weight: 500;}
+        
+        .syllabus-timeline { position: relative; padding-left: 25px; margin-top: 20px; }
+        .syllabus-timeline::before { content: ''; position: absolute; left: 5px; top: 0; bottom: 0; width: 2px; background: #FFDBC7; }
+        .timeline-item { position: relative; margin-bottom: 25px; }
+        .timeline-item::before { content: ''; position: absolute; left: -25px; top: 6px; width: 14px; height: 14px; border-radius: 50%; background: white; border: 3px solid var(--primary); z-index: 2; box-shadow: 0 0 0 4px rgba(255,143,80,0.1); }
+        .timeline-content { background: #FFFFFF; padding: 20px; border-radius: 16px; border: 1px solid #F1F5F9; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .tl-badge { display: inline-block; padding: 4px 10px; background: #FFF1EB; color: var(--primary); border-radius: 8px; font-size: 0.7rem; font-weight: 900; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
+
+        /* --- NÚT BẤM --- */
+        .btn-primary { background: var(--primary-gradient); color: white; padding: 14px 30px; border-radius: 16px; font-weight: 800; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 1rem; box-shadow: 0 8px 20px rgba(255, 94, 98, 0.25); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(255, 94, 98, 0.35); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+        
+        .btn-outline { background: #FFFFFF; color: var(--text-main); border: 1px solid #E2E8F0; padding: 14px 25px; border-radius: 16px; font-weight: 700; cursor: pointer; }
+        .btn-outline:hover { background: #F8FAFC; border-color: #CBD5E1; }
+
+        /* --- DARK MODE (Tinh chỉnh sắc nét) --- */
+        html.dark { --text-main: #F1F5F9; --text-light: #94A3B8; --bg-body: #0F172A; --card-bg: #1E293B; }
+        html.dark body { background-color: var(--bg-body) !important; }
+        html.dark .blob { opacity: 0.15 !important; }
+        html.dark .wizard-card { border-color: #334155; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+        html.dark .option-card { background: #0F172A; border-color: #334155; }
+        html.dark .option-card:hover { background: #1E293B; border-color: var(--primary); }
+        html.dark .writing-area { background: #0F172A; border-color: #334155; color: var(--text-main); }
+        html.dark .writing-area:focus { background: #1E293B; border-color: var(--primary); }
+        html.dark .diag-box.good { background: rgba(22, 101, 52, 0.2); border-color: rgba(34, 197, 94, 0.2); }
+        html.dark .diag-box.bad { background: rgba(153, 27, 27, 0.2); border-color: rgba(239, 68, 68, 0.2); }
+        html.dark .timeline-content { background: #0F172A; border-color: #334155; }
+        html.dark .btn-outline { background: transparent; border-color: #334155; color: var(--text-main); }
+
+        /* --- BOX ĐỀ BÀI (Fix lỗi mờ chữ) --- */
+        .prompt-box {
+            background: #EFF6FF; /* Nền xanh dương rất nhạt */
+            border-left: 4px solid #3B82F6; /* Viền xanh nổi bật */
+            padding: 16px 20px;
+            border-radius: 0 16px 16px 0;
+            margin-bottom: 24px;
+        }
+        .prompt-box .prompt-title {
+            font-weight: 800;
+            color: #1E3A8A !important; /* Xanh Navy cực đậm cho tiêu đề */
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .prompt-box .prompt-content {
+            font-style: italic;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #1E40AF !important; /* Xanh đậm cho nội dung */
+        }
+
+        /* --- ĐỒNG BỘ DARK MODE CHO BOX ĐỀ BÀI --- */
+        html.dark .prompt-box {
+            background: rgba(30, 58, 138, 0.2); /* Nền xanh đen mờ sang trọng */
+            border-left-color: #60A5FA;
+        }
+        html.dark .prompt-box .prompt-title {
+            color: #DBEAFE !important; /* Trắng ngả xanh */
+        }
+        html.dark .prompt-box .prompt-content {
+            color: #BFDBFE !important; /* Xanh nhạt sáng */
+        }
+
+        /* --- MOBILE --- */
+        @media (max-width: 768px) {
+            .main-content { padding: 80px 15px 30px; }
+            .wizard-card { padding: 25px 20px; border-radius: 24px; }
+            .option-grid { grid-template-columns: 1fr; gap: 12px; }
+            .diagnosis-grid { grid-template-columns: 1fr; gap: 15px; }
+            .option-card { flex-direction: row; text-align: left; padding: 15px; }
+            .option-icon { width: 48px; height: 48px; flex-shrink: 0; font-size: 1.3rem; }
+            .btn-primary, .btn-outline { width: 100%; }
+            .flex-mobile-col { flex-direction: column-reverse; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <a href="../log.html" class="floating-logo hover:scale-105">
+        <img src="../LOGO.WEBP" alt="HopVan">
+        <span class="hidden md:inline-block">HOPVAN</span>
+    </a>
+
+    <main class="main-content">
+        
+        <div id="step-1" class="step-container active">
+            <div class="wizard-card text-center">
+                <div class="inline-flex items-center justify-center p-3 bg-white-50 rounded-2xl text-orange-500 mb-4 dark:bg-white-900/30">
+                </div>
+                <h2 class="text-2xl md:text-3xl font-black text-gray-800 mb-3">Xác định điểm bắt đầu</h2>
+                <p class="text-gray-500 text-sm md:text-base max-w-lg mx-auto">Chọn mô tả đúng nhất với năng lực Ngữ Văn hiện tại của bạn để HopVan thiết kế lộ trình chuẩn xác nhé.</p>
+
+                <div class="option-grid text-left md:text-center">
+                    <div class="option-card" onclick="selectOption(this, 'Mất gốc / Điểm dưới 5')">
+                        <div class="option-icon"><i class="fas fa-seedling"></i></div>
+                        <div class="option-text">
+                            <h4>Mất gốc / Bí từ</h4>
+                            <p>Không biết bắt đầu từ đâu, hay lạc đề, dưới 5đ.</p>
+                        </div>
+                    </div>
+                    <div class="option-card" onclick="selectOption(this, 'Viết lẹt đẹt / Điểm 6-7')">
+                        <div class="option-icon"><i class="fas fa-pencil-alt"></i></div>
+                        <div class="option-text">
+                            <h4>Viết lẹt đẹt</h4>
+                            <p>Hiểu bài nhưng viết lan man, thiếu sâu sắc, 6-7đ.</p>
+                        </div>
+                    </div>
+                    <div class="option-card" onclick="selectOption(this, 'Mục tiêu bứt phá 8+, 9+')">
+                        <div class="option-icon"><i class="fas fa-rocket"></i></div>
+                        <div class="option-text">
+                            <h4>Mục tiêu 8+, 9+</h4>
+                            <p>Nền tảng tốt, cần học lý luận để lấy điểm tối đa.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <button id="btn-next-1" onclick="goToStep(2)" class="btn-primary" disabled>Tiếp tục làm Test <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="step-2" class="step-container">
+            <div class="wizard-card">
+                <div class="test-header">
+                    <div>
+                        <span class="text-xs font-black text-orange-500 uppercase tracking-widest block mb-1">Kiểm tra đầu vào</span>
+                        <h2 class="text-xl md:text-2xl font-black text-gray-800">Đánh giá Văn phong</h2>
+                    </div>
+                    <div class="text-orange-600 bg-orange-50 text-xs font-bold px-3 py-1.5 rounded-lg border border-orange-100 hidden md:flex items-center gap-2 dark:bg-gray-800 dark:border-gray-700">
+                        <i class="fas fa-robot"></i> AI Check
+                    </div>
+                </div>
+
+                <div class="prompt-box">
+                    <p class="prompt-title"><i class="fas fa-pen-nib"></i> Đề bài:</p>
+                    <p class="prompt-content">"Viết đoạn văn ngắn (3-5 câu) chia sẻ khó khăn lớn nhất bạn đang gặp phải với môn Ngữ Văn."</p>
+                </div>
+
+                <textarea id="diagnostic-essay" class="writing-area custom-scrollbar" placeholder="Hãy gõ tự nhiên. AI sẽ phân tích cách bạn dùng từ, đặt câu..."></textarea>
+                <div id="word-count" class="word-count">0 từ</div>
+
+                <div class="flex justify-between items-center mt-6 flex-mobile-col">
+                    <button onclick="goToStep(1)" class="btn-outline"><i class="fas fa-arrow-left mr-2"></i> Quay lại</button>
+                    <button onclick="submitDiagnosticTest()" class="btn-primary w-full md:w-auto">Hoàn tất & Chấm <i class="fas fa-check-circle"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="step-3" class="step-container">
+            <div class="wizard-card text-center py-12">
+                <div class="ai-pulse-ring">
+                    <i class="fas fa-brain text-4xl text-orange-500"></i>
+                </div>
+                <h2 class="text-2xl font-black text-gray-800 mb-2">AI đang phân tích!</h2>
+                <p class="text-gray-500 text-sm md:text-base">Hệ thống đang đọc văn phong và tìm kiếm lỗ hổng...</p>
+                
+                <div class="w-full max-w-xs mx-auto bg-gray-100 rounded-full h-2 mt-8 overflow-hidden dark:bg-gray-800">
+                    <div class="bg-gradient-to-r from-orange-400 to-red-500 h-full rounded-full w-0 transition-all duration-[1000ms] ease-out" id="ai-progress-bar"></div>
+                </div>
+                <p class="text-xs text-orange-500 mt-3 font-bold uppercase tracking-widest" id="ai-status-text">Khởi tạo...</p>
+            </div>
+        </div>
+
+        <div id="step-4" class="step-container">
+            <div id="result-content"></div>
+        </div>
+
+    </main>
+
+    <script type="module">
+        let diagnosticData = { userLevel: "", essay: "" };
+
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+
+        window.selectOption = function(element, levelStr) {
+            document.querySelectorAll('.option-card').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            diagnosticData.userLevel = levelStr;
+            document.getElementById('btn-next-1').disabled = false;
+        }
+
+        const essayInput = document.getElementById('diagnostic-essay');
+        essayInput.addEventListener('input', function() {
+            const text = this.value.trim();
+            document.getElementById('word-count').innerText = `${text === "" ? 0 : text.split(/\s+/).length} từ`;
+        });
+
+        window.goToStep = function(stepNumber) {
+            document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+            document.getElementById('step-' + stepNumber).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.submitDiagnosticTest = async function() {
+            diagnosticData.essay = essayInput.value.trim();
+            const words = diagnosticData.essay.split(/\s+/).filter(x => x).length;
+
+            if (words < 10) {
+                alert("Hãy viết ít nhất 10 từ để AI có thể phân tích văn phong của bạn nhé!");
+                return;
+            }
+
+            goToStep(3);
+            const bar = document.getElementById('ai-progress-bar');
+            const status = document.getElementById('ai-status-text');
+            
+            bar.style.width = '20%'; status.innerText = "Đang đọc hiểu văn phong...";
+
+            try {
+                const systemPrompt = `Bạn là chuyên gia giáo dục môn Ngữ Văn của HopVan. Nhiệm vụ của bạn là đánh giá BÀI TEST ĐẦU VÀO để thiết kế lộ trình học tập cá nhân hóa.
+                Hãy chấm với tư duy sư phạm: khách quan, khích lệ nhưng phải bắt đúng "bệnh" cốt lõi. Không cần soi xét quá khắt khe cấu trúc như chấm thi Đại học.
+
+                DỮ LIỆU ĐẦU VÀO: 
+                (1) Tình trạng học sinh tự nhận: ${diagnosticData.userLevel} 
+                (2) Đoạn văn bài làm: "${diagnosticData.essay}"
+
+                HƯỚNG DẪN ĐÁNH GIÁ:
+                - Phân tích kĩ 2 yếu tố: 
+                  + Diễn đạt: Cách dùng từ (nghèo nàn hay phong phú), chính tả, cấu trúc câu (lủng củng hay mạch lạc).
+                  + Tư duy: Lập luận có trọng tâm không, hay bị lan man, bí ý.
+                - Đề xuất Syllabus 3 chặng phải khớp trực tiếp với lỗ hổng vừa phân tích được ở trên (Vd: Sai diễn đạt thì chặng 1 phải học cách viết câu).
+
+                TRẢ VỀ DUY NHẤT ĐỊNH DẠNG JSON SAU (Không giải thích thêm, không dùng ngoặc kép bên trong chuỗi):
+                {
+                    "score": [Điểm số khuyến khích trên thang 10, VD: 4.5],
+                    "level_title": "[Phân loại nhẹ nhàng, VD: Mất gốc cơ bản / Cần rèn luyện thêm / Có tiềm năng]",
+                    "strengths": ["[Điểm mạnh cụ thể về từ vựng/cảm xúc/tư duy 1]", "[Điểm mạnh 2]"],
+                    "weaknesses": ["[Lỗi cốt lõi về tư duy/diễn đạt 1]", "[Lỗi 2]"],
+                    "syllabus": [
+                        { "phase": "Chặng 1 - Lấp lỗ hổng", "title": "[Tên chuyên đề cần học ngay]", "desc": "[Mô tả lợi ích ngắn gọn]" },
+                        { "phase": "Chặng 2 - Rèn kĩ năng", "title": "[Tên chuyên đề nâng cấp]", "desc": "[Mô tả ngắn gọn]" },
+                        { "phase": "Chặng 3 - Thực chiến", "title": "[Tên chuyên đề thực hành]", "desc": "[Mô tả ngắn gọn]" }
+                    ]
+                }`;
+
+                setTimeout(() => { bar.style.width = '50%'; status.innerText = "Tổng hợp điểm mạnh/yếu..."; }, 1000);
+
+                const res = await fetch('/.netlify/functions/gemini-proxy', { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({ systemPrompt: systemPrompt, messages: "Tạo báo cáo JSON." }) 
+                });
+
+                if (!res.ok) throw new Error("API_ERROR");
+                const data = await res.json();
+                
+                bar.style.width = '80%'; status.innerText = "Xây dựng Syllabus...";
+
+                let rawText = data.choices[0].message.content;
+                rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+                const firstBrace = rawText.indexOf('{');
+                const lastBrace = rawText.lastIndexOf('}');
+                if (firstBrace !== -1 && lastBrace !== -1) rawText = rawText.substring(firstBrace, lastBrace + 1);
+                rawText = rawText.replace(/[\u0000-\u0019]+/g,"");
+
+                const result = JSON.parse(rawText);
+
+                bar.style.width = '100%'; status.innerText = "Hoàn tất!";
+                renderResult(result);
+                setTimeout(() => { goToStep(4); }, 600);
+
+            } catch (error) {
+                console.error(error);
+                alert("Có lỗi kết nối. Hãy bấm Nộp lại nhé!");
+                goToStep(2);
+            }
+        }
+
+        function renderResult(result) {
+            const container = document.getElementById('result-content');
+            
+            const renderList = (arr, icon, color) => {
+                if (!arr || !arr.length) return `<li><i class="${icon} ${color}"></i> <span>Không có dữ liệu</span></li>`;
+                return arr.map(i => `<li><i class="${icon} ${color}"></i> <span>${i}</span></li>`).join('');
+            };
+
+            const renderTimeline = (arr) => {
+                if (!arr || !arr.length) return '';
+                return arr.map((item, idx) => {
+                    const isFirst = idx === 0;
+                    return `
+                    <div class="timeline-item">
+                        <div class="timeline-content" style="opacity: ${isFirst ? '1' : '0.6'}">
+                            <span class="tl-badge ${!isFirst ? 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400' : ''}">${item.phase}</span>
+                            <div class="flex justify-between items-start flex-wrap gap-3">
+                                <div class="flex-1">
+                                    <h5 class="font-bold text-gray-800 dark:text-white mb-1 text-[1.05rem]">${item.title}</h5>
+                                    <p class="text-gray-500 dark:text-gray-400 text-[0.85rem] leading-relaxed">${item.desc}</p>
+                                </div>
+                                ${isFirst ? `<button class="bg-orange-50 text-orange-600 px-4 py-2 rounded-lg font-bold hover:bg-orange-500 hover:text-white transition text-sm whitespace-nowrap"><i class="fas fa-play text-xs mr-1"></i> Học ngay</button>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            };
+
+            container.innerHTML = `
+            <div class="wizard-card">
+                <div class="text-center mb-6 pb-6 border-b border-gray-100 dark:border-gray-800">
+                    <div class="score-circle">${result.score}<span>/10</span></div>
+                    <h2 class="text-2xl font-black text-gray-800 mb-1">Đánh giá: ${result.level_title}</h2>
+                    <p class="text-gray-500 text-sm">AI đã thiết kế lộ trình giúp bạn khắc phục hoàn toàn các lỗi hiện tại.</p>
+                </div>
+
+                <div class="diagnosis-grid">
+                    <div class="diag-box good">
+                        <h4 class="text-green-700 dark:text-green-400"><i class="fas fa-check-circle text-green-500"></i> Ưu điểm</h4>
+                        <ul>${renderList(result.strengths, 'fas fa-check', 'text-green-500')}</ul>
+                    </div>
+                    <div class="diag-box bad">
+                        <h4 class="text-red-700 dark:text-red-400"><i class="fas fa-exclamation-circle text-red-500"></i> Cần khắc phục</h4>
+                        <ul>${renderList(result.weaknesses, 'fas fa-times', 'text-red-500')}</ul>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-xl font-black text-gray-800 mb-1 flex items-center gap-2"><i class="fas fa-route text-orange-500"></i> Lộ trình cá nhân</h3>
+                    <p class="text-gray-500 text-sm mb-5">Hoàn thành Chặng 1 để mở khóa các chặng tiếp theo.</p>
+                    <div class="syllabus-timeline">${renderTimeline(result.syllabus)}</div>
+                </div>
+
+                <div class="mt-8 text-center flex flex-col items-center">
+                    <button onclick="finishDiagnostic()" class="btn-primary w-full md:w-auto px-10">
+                        <i class="fas fa-save mr-1"></i> Lưu lộ trình & Vào lớp
+                    </button>
+                    <button class="text-xs text-gray-400 mt-4 hover:text-orange-500 underline bg-transparent border-none cursor-pointer" onclick="goToStep(2)">Làm lại bài Test</button>
+                </div>
+            </div>`;
+        }
+
+        window.finishDiagnostic = function() {
+            // Khi làm xong, gọi hàm của trang cha (dashboard) để tắt khung Iframe
+            if (window.parent && typeof window.parent.closeDiagnosticOverlay === 'function') {
+                window.parent.closeDiagnosticOverlay();
+            } else {
+                window.location.href = 'dashboard.html';
+            }
+        }
+    </script>
+</body>
+</html>
