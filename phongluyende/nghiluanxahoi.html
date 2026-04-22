@@ -441,11 +441,11 @@
         const humanScore = parseInt(result.human_score) || 100;
         const barColor = humanScore > 75 ? '#22c55e' : (humanScore > 50 ? '#f59e0b' : '#ef4444');
 
-        // Hàm hỗ trợ render danh sách
+        // Hàm hỗ trợ render mảng thành list
         const renderList = (data, icon, colorClass, textClass) => {
-            if (!data || data.length === 0) return "Không có nhận xét.";
+            if (!data || data.length === 0) return `<div class="text-gray-400 italic text-sm">Không có ghi nhận.</div>`;
             let arr = Array.isArray(data) ? data : data.split('<br>').filter(x => x.trim() !== '');
-            return arr.map(item => `<div class="flex gap-2"><i class="fas ${icon} mt-1 ${colorClass} shrink-0"></i><span class="${textClass}">${item}</span></div>`).join('');
+            return arr.map(item => `<div class="flex gap-3 mb-3 items-start"><i class="fas ${icon} mt-1 ${colorClass} shrink-0"></i><span class="${textClass} leading-relaxed font-medium">${item}</span></div>`).join('');
         };
 
         const html = `
@@ -465,8 +465,9 @@
                             ${result.general_comment || 'Bài làm đã được AI chấm hoàn tất.'}
                         </p>
                         <div class="inline-block px-4 py-1.5 bg-orange-50 text-orange-600 rounded-full text-[11px] font-bold border border-orange-100 font-sans uppercase tracking-widest">
-                            Nghị Luận Xã Hội
+                            <i class="fas fa-globe-asia mr-1"></i> Nghị Luận Xã Hội
                         </div>
+                        ${result.confidence_level ? `<div class="mt-3 flex items-center px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-bold border border-gray-200 w-fit"><i class="fas fa-shield-alt text-orange-500 mr-2"></i> Độ tự tin AI: ${result.confidence_level}</div>` : ''}
                     </div>
                 </div>
 
@@ -482,48 +483,48 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl p-6 md:p-8 border border-green-100 shadow-sm relative overflow-hidden">
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl p-6 border border-green-100 shadow-sm relative overflow-hidden">
                         <div class="absolute -top-4 -right-4 p-4 opacity-10 text-8xl text-green-500"><i class="fas fa-check-circle"></i></div>
                         <h4 class="text-green-700 font-black text-sm uppercase tracking-wider mb-5 flex items-center gap-2 relative z-10">
                             <i class="fas fa-star text-green-500 text-lg"></i> Điểm tốt
                         </h4>
-                        <div class="text-[0.95rem] text-green-800 font-medium leading-relaxed relative z-10 space-y-3">
+                        <div class="text-[0.95rem] text-green-800 font-medium relative z-10">
                              ${renderList(result.strengths, 'fa-check', 'text-green-500', 'text-green-800')}
                         </div>
                     </div>
-                    <div class="bg-gradient-to-br from-red-50 to-rose-50 rounded-3xl p-6 md:p-8 border border-red-100 shadow-sm relative overflow-hidden">
+                    <div class="bg-gradient-to-br from-red-50 to-rose-50 rounded-3xl p-6 border border-red-100 shadow-sm relative overflow-hidden">
                         <div class="absolute -top-4 -right-4 p-4 opacity-10 text-8xl text-red-500"><i class="fas fa-exclamation-circle"></i></div>
                         <h4 class="text-red-700 font-black text-sm uppercase tracking-wider mb-5 flex items-center gap-2 relative z-10">
                             <i class="fas fa-tools text-red-500 text-lg"></i> Hạn chế
                         </h4>
-                        <div class="text-[0.95rem] text-red-800 font-medium leading-relaxed relative z-10 space-y-3">
+                        <div class="text-[0.95rem] text-red-800 font-medium relative z-10">
                              ${renderList(result.weaknesses, 'fa-times', 'text-red-500', 'text-red-800')}
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-8 bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
-                    <div class="bg-slate-50 border-b border-gray-100 p-5 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="bg-slate-50 border-b border-gray-100 p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <h3 class="text-slate-800 font-black text-sm uppercase tracking-wider flex items-center gap-3">
                             <div class="w-10 h-10 bg-orange-100 text-orange-500 rounded-xl flex items-center justify-center text-lg"><i class="fas fa-highlighter"></i></div> 
                             Sửa lỗi & Góp ý trực tiếp
                         </h3>
-                        <div class="flex flex-wrap gap-4 text-xs font-bold bg-white px-5 py-3 rounded-full shadow-sm border border-gray-100">
-                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-200 border border-red-400"></span> Lỗi sai</span>
-                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-100 border border-blue-400"></span> Đề xuất sửa</span>
-                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-200 border border-yellow-400"></span> Khen ngợi</span>
+                        <div class="flex flex-wrap gap-3 text-[11px] font-bold bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100">
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-red-100 border border-red-200"></span> Gạch bỏ / Lỗi sai</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-blue-100 border border-blue-200"></span> Đề xuất sửa</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-yellow-100 border border-yellow-200"></span> Khen ngợi</span>
                         </div>
                     </div>
                     <div class="p-6 md:p-10 bg-white">
-                        <div class="paper-edit-box" id="res-detailed-edit">
+                        <div class="paper-edit-box text-gray-800 text-[1.1rem] leading-[2.2rem]">
                             ${result.detailed_edit || result.correction_html || "AI đang tổng hợp bài chữa..."}
                         </div>
                     </div>
                 </div>
 
                 ${result.orientation ? `
-                <div class="bg-slate-900 text-white p-8 md:p-10 rounded-3xl shadow-xl relative overflow-hidden mt-8">
-                    <div class="absolute -right-10 -bottom-10 opacity-5 text-9xl text-white"><i class="fas fa-compass"></i></div>
+                <div class="bg-slate-900 text-white p-8 rounded-3xl shadow-xl relative overflow-hidden mt-8">
+                    <div class="absolute -right-5 -bottom-5 opacity-5 text-9xl text-white"><i class="fas fa-compass"></i></div>
                     <div class="flex items-center gap-3 mb-4">
                         <div class="w-10 h-10 bg-orange-500/20 text-orange-400 rounded-xl flex items-center justify-center text-xl"><i class="fas fa-lightbulb"></i></div>
                         <span class="text-sm font-black uppercase tracking-widest text-orange-400">Định hướng phát triển</span>
@@ -557,30 +558,29 @@
             const promptResponse = await fetch('prompts.json'); 
             const promptData = await promptResponse.json();
             
-            // Khử mã độc
             const safe = (str) => {
                 if (!str) return 'Không có';
                 if (Array.isArray(str)) str = str.join(' | ');
                 return String(str).replace(/"/g, "'").replace(/\n/g, '<br>').replace(/\\/g, "/");
             };
             
-            let systemPrompt = promptData.de_nlxh; // Gọi chuẩn xác Prompt de_nlxh
+            let systemPrompt = promptData.de_nlxh; // Gọi chuẩn xác Prompt Nghị Luận Xã Hội
             
             systemPrompt = systemPrompt
                 .split('{{TOPIC}}').join(safe(q.topic))
                 .split('{{DOC_HIEU}}').join(safe(q.text))
-                .split('{{HINT}}').join("Không có") // Ép HINT trong template thành "Không có"
+                .split('{{HINT}}').join(safe(q.hint || "Không có"))
                 .split('{{BAI_LAM}}').join(safe(content));
 
-            // --- THÊM LOGIC TRUYỀN NGẦM HINT CHO AI Ở ĐÂY ---
-            let adminHint = q.hint ? `\n\n[GỢI Ý CHẤM ĐIỂM TỪ ADMIN (KHÔNG CHO HỌC SINH THẤY)]:\n${safe(q.hint)}` : "";
+            // Logic truyền ngầm gợi ý chấm điểm nếu có
+            let adminHint = q.hint ? `\n\n[GỢI Ý CHẤM ĐIỂM TỪ GIÁO VIÊN]:\n${safe(q.hint)}` : "";
 
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ 
                     systemPrompt: systemPrompt, 
-                    messages: `Học sinh gửi bài làm. Hãy chấm theo quy trình K12.${adminHint}`
+                    messages: `[BÀI LÀM CỦA HỌC SINH]\n${safe(content)}${adminHint}`
                 }) 
             });
 
@@ -595,13 +595,13 @@
             if (firstBrace !== -1 && lastBrace !== -1) rawText = rawText.substring(firstBrace, lastBrace + 1);
             
             rawText = rawText.replace(/[\u0000-\u0019]+/g,"");
-
             const result = JSON.parse(rawText);
 
+            // BƯỚC 1: KIỂM TRA TÍNH HỢP LỆ (BẢO MẬT)
             if (result.is_valid === false) {
-                showPopup("Bài làm không hợp lệ", result.message || "Phát hiện nội dung chống phá, spam. Hệ thống từ chối chấm!", "error");
+                showPopup("Bài làm không hợp lệ", result.message || "Hệ thống phát hiện nội dung không phù hợp hoặc có dấu hiệu can thiệp quy tắc.", "error");
                 loading.style.display = 'none';
-                return; // Dừng lại ngay lập tức, không lưu vào Firebase.
+                return; // Dừng lại ngay lập tức, không lưu Firebase
             }
             
             let safeScore = parseFloat(result.score);
@@ -613,25 +613,25 @@
             
             renderAIResult(result);
 
-            // LƯU LỊCH SỬ CHUẨN CHỈ
+            // LƯU LỊCH SỬ CHI TIẾT LÊN FIREBASE
             if (auth.currentUser) {
                 await addDoc(collection(db, "exam_history"), {
                     userId: auth.currentUser.uid,
                     userName: auth.currentUser.displayName || auth.currentUser.email.split('@')[0],
                     examId: q.id || "NLXH_EXAM",
-                    prompt: q.title || "Nghị Luận Xã Hội", 
+                    prompt: "Nghị Luận Xã Hội",
                     essay: content,
                     
                     score: result.score, 
                     human_score: result.human_score,
                     general_comment: result.general_comment || "",
                     strengths: result.strengths || [],
-                    weaknesses: result.weaknesses || [],
+                    weaknesses: result.weaknesses || [], // Lưu mảng lỗi sai
                     
-                    // --- TRƯỜNG DỮ LIỆU IN-LINE EDITING ---
                     detailed_edit: result.detailed_edit || "", 
                     feedback: result.detailed_edit || result.correction_html || "", 
                     orientation: result.orientation || "",
+                    confidence_level: result.confidence_level || "Không xác định", // Lưu độ tự tin AI
                     
                     timestamp: serverTimestamp() 
                 });

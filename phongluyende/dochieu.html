@@ -491,16 +491,16 @@
 
         // Hàm hỗ trợ render mảng thành list
         const renderList = (data, icon, colorClass, textClass) => {
-            if (!data) return "Không có nhận xét.";
+            if (!data || data.length === 0) return `<div class="text-gray-400 italic text-sm">Không có ghi nhận.</div>`;
             let arr = Array.isArray(data) ? data : data.split('<br>').filter(x => x.trim() !== '');
-            return arr.map(item => `<div class="flex gap-2"><i class="fas ${icon} mt-1 ${colorClass} shrink-0"></i><span class="${textClass}">${item}</span></div>`).join('');
+            return arr.map(item => `<div class="flex gap-3 mb-3 items-start"><i class="fas ${icon} mt-1 ${colorClass} shrink-0"></i><span class="${textClass} leading-relaxed">${item}</span></div>`).join('');
         };
 
         const html = `
             <div class="result-container space-y-6 max-w-5xl mx-auto pb-12 w-full custom-scrollbar" style="font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px;">
                 
                 <div class="bg-white rounded-3xl p-6 md:p-8 border border-orange-100 shadow-[0_10px_40px_rgba(255,143,80,0.1)] flex flex-col md:flex-row gap-8 items-center mt-4">
-                    <div class="shrink-0 relative w-40 h-40 rounded-full bg-orange-50 border-[8px] border-orange-400 flex flex-col items-center justify-center shadow-inner">
+                    <div class="shrink-0 relative w-36 h-36 rounded-full bg-orange-50 border-[8px] border-orange-400 flex flex-col items-center justify-center shadow-inner">
                         <div class="text-center z-10 flex flex-col items-center">
                             <div class="text-5xl font-black bg-gradient-to-br from-orange-500 to-red-600 -webkit-background-clip-text text-transparent bg-clip-text leading-none flex items-baseline">
                                 ${result.reading_score}<span class="text-xl text-gray-400 ml-1">/4.0</span>
@@ -516,8 +516,11 @@
                         <p class="text-gray-600 text-[1.05rem] leading-relaxed font-medium">
                             ${result.general_comment || 'Bài làm đã được AI chấm hoàn tất.'}
                         </p>
-                        <div class="mt-3 inline-block px-4 py-1.5 bg-orange-50 text-orange-600 rounded-full text-[11px] font-bold border border-orange-100">
-                            ${result.detailed_breakdown || "Phân tích điểm thành phần"}
+                        <div class="mt-3 inline-block px-4 py-1.5 bg-blue-50 text-blue-700 rounded-xl text-[13px] font-bold border border-blue-100">
+                            <i class="fas fa-tasks mr-1"></i> ${result.detailed_breakdown || "Phân tích điểm thành phần"}
+                        </div>
+                        <div class="mt-2 block">
+                            ${result.confidence_level ? `<div class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-bold border border-gray-200 mt-2"><i class="fas fa-shield-alt text-orange-500 mr-2"></i> Độ tự tin AI: ${result.confidence_level}</div>` : ''}
                         </div>
                     </div>
                 </div>
@@ -530,7 +533,7 @@
                     <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
                         <div style="width:${humanScore}%; background:${barColor}" class="h-full"></div>
                     </div>
-                    ${result.ai_comment ? `<p class="text-xs text-gray-400 mt-3 italic font-light">${result.ai_comment}</p>` : ''}
+                    ${result.ai_comment ? `<p class="text-xs text-gray-400 mt-3 italic font-medium leading-relaxed">${result.ai_comment}</p>` : ''}
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -560,14 +563,14 @@
                             <div class="w-10 h-10 bg-orange-100 text-orange-500 rounded-xl flex items-center justify-center text-lg"><i class="fas fa-highlighter"></i></div> 
                             Bài chữa chi tiết
                         </h3>
-                        <div class="flex flex-wrap gap-4 text-xs font-bold bg-white px-5 py-3 rounded-full shadow-sm border border-gray-100">
-                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-200 border border-red-400"></span> Lỗi sai</span>
-                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-100 border border-blue-400"></span> Gợi ý sửa</span>
-                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-200 border border-yellow-400"></span> Khen ngợi</span>
+                        <div class="flex flex-wrap gap-3 text-[11px] font-bold bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100">
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-red-100 border border-red-200"></span> Gạch bỏ / Lỗi sai</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-blue-100 border border-blue-200"></span> Gợi ý sửa / Thêm ý</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-yellow-100 border border-yellow-200"></span> Khen ngợi</span>
                         </div>
                     </div>
                     <div class="p-6 md:p-10 bg-white">
-                        <div class="paper-edit-box" id="res-detailed-edit">
+                        <div class="paper-edit-box text-gray-800 text-[1.1rem] leading-[2.2rem]">
                             ${result.detailed_edit || result.correction_html || "Không có phản hồi chi tiết."}
                         </div>
                     </div>
@@ -647,7 +650,7 @@
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ 
                     systemPrompt: systemPrompt, 
-                    messages: `Học sinh gửi bài làm. Hãy chấm theo quy trình Đọc Hiểu.`
+                    messages: `[BÀI LÀM CỦA HỌC SINH]\n${safe(content)}`
                 }) 
             });
 
@@ -665,6 +668,7 @@
             rawText = rawText.replace(/[\u0000-\u0019]+/g,"");
             const result = JSON.parse(rawText);
 
+            // BƯỚC 1: KIỂM TRA HÀNG RÀO BẢO VỆ
             if (result.is_valid === false) {
                 showPopup("Bài làm không hợp lệ", result.message || "Phát hiện nội dung chống phá, spam. Hệ thống từ chối chấm!", "error");
                 loading.style.display = 'none';
@@ -696,12 +700,12 @@
                     ai_comment: result.ai_comment || "",
                     general_comment: result.general_comment || "",
                     strengths: result.strengths || [],
-                    weaknesses: result.weaknesses || [],
+                    weaknesses: result.weaknesses || [], // Lưu mảng lỗi
                     
-                    // --- BỔ SUNG TRƯỜNG DỮ LIỆU MỚI (IN-LINE EDITING) ---
                     detailed_edit: result.detailed_edit || "", 
                     feedback: result.detailed_edit || result.correction_html || "",
                     orientation: result.orientation || "",
+                    confidence_level: result.confidence_level || "Không xác định", // Lưu độ tự tin
                     
                     timestamp: serverTimestamp() 
                 });
