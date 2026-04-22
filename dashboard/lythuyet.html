@@ -304,7 +304,7 @@
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { initMenu } from "./menu.js";
         import { initHeader } from './header.js'; 
         
@@ -327,19 +327,19 @@
                     {
                         title: "Phần I: Đọc hiểu",
                         items: [
-                            { id: 'truyen-dh-nhanbiet', title: 'Nhận biết (0 - 4đ)', reqScore: 0, pdfUrl: '../data/lythuyet/nhanbiet-dochieu-truyen.pdf' },
-                            { id: 'truyen-dh-thonghieu', title: 'Thông hiểu (4 - 7đ)', reqScore: 4, pdfUrl: '../data/lythuyet/thonghieu-dochieu-truyen.pdf' },
-                            { id: 'truyen-dh-vandung', title: 'Vận dụng (7 - 10đ)', reqScore: 7, pdfUrl: '../data/lythuyet/vandung-dochieu-truyen.pdf' }
+                            { id: 'truyen-dh-nhanbiet', title: 'Nhận biết (0 - 4đ)', reqScore: 0, pdfUrl: '../data/lythuyet/truyen/nhanbiet-dochieu-truyen.pdf' },
+                            { id: 'truyen-dh-thonghieu', title: 'Thông hiểu (4 - 7đ)', reqScore: 4, pdfUrl: '../data/lythuyet/truyen/thonghieu-dochieu-truyen.pdf' },
+                            { id: 'truyen-dh-vandung', title: 'Vận dụng (7 - 10đ)', reqScore: 7, pdfUrl: '../data/lythuyet/truyen/vandung-dochieu-truyen.pdf' }
                         ]
                     },
                     {
                         title: "Phần II: Làm văn",
                         items: [
-                            { id: 'truyen-lv-khoidau', title: 'Khởi đầu (0 - 2đ)', reqScore: 0, pdfUrl: '../data/lythuyet/truyen_lv_khoidau.pdf' },
-                            { id: 'truyen-lv-xaynen', title: 'Xây nền (2 - 5đ)', reqScore: 2, pdfUrl: '../data/lythuyet/truyen_lv_xaynen.pdf' },
-                            { id: 'truyen-lv-cungco', title: 'Củng cố (5 - 7đ)', reqScore: 5, pdfUrl: '../data/lythuyet/truyen_lv_cungco.pdf' },
-                            { id: 'truyen-lv-ungdung', title: 'Ứng dụng (7 - 9đ)', reqScore: 7, pdfUrl: '../data/lythuyet/truyen_lv_ungdung.pdf' },
-                            { id: 'truyen-lv-nangcao', title: 'Nâng cao (9 - 10đ)', reqScore: 9, pdfUrl: '../data/lythuyet/truyen_lv_nangcao.pdf' }
+                            { id: 'truyen-lv-khoidau', title: 'Khởi đầu (0 - 2đ)', reqScore: 0, pdfUrl: '../data/lythuyet/truyen/khoidau-lamvan-truyen.pdf' },
+                            { id: 'truyen-lv-xaynen', title: 'Xây nền (2 - 5đ)', reqScore: 2, pdfUrl: '../data/lythuyet/truyen/xaynen-lamvan-truyen.pdf' },
+                            { id: 'truyen-lv-cungco', title: 'Củng cố (5 - 7đ)', reqScore: 5, pdfUrl: '../data/lythuyet/truyen/cungco-lamvan-truyen.pdf' },
+                            { id: 'truyen-lv-ungdung', title: 'Ứng dụng (7 - 9đ)', reqScore: 7, pdfUrl: '../data/lythuyet/truyen/ungdung-lamvan-truyen.pdf' },
+                            { id: 'truyen-lv-nangcao', title: 'Nâng cao (9 - 10đ)', reqScore: 9, pdfUrl: '../data/lythuyet/truyen/nangcao-lamvan-truyen.pdf' }
                         ]
                     }
                 ]
@@ -560,6 +560,62 @@
         let pdfDoc = null, pageNum = 1, pageIsRendering = false, pageNumPending = null;
         let currentLessonId = "", currentLessonTitle = "", currentPdfUrl = "";
 
+        // HÀM KIỂM TRA VÀ MỞ KHÓA BÀI TIẾP THEO
+        async function checkAndUnlockNextLevel() {
+            // Chỉ chạy khi đã load xong PDF và đang ở trang cuối cùng
+            if (!pdfDoc || pageNum !== pdfDoc.numPages) return; 
+
+            // Trải phẳng toàn bộ dữ liệu LESSON_DATA thành 1 mảng 1 chiều để dễ tìm bài tiếp theo
+            let allLessons = [];
+            LESSON_DATA.forEach(section => {
+                section.categories.forEach(cat => {
+                    cat.items.forEach(item => allLessons.push(item));
+                });
+            });
+
+            // Tìm vị trí bài học hiện tại
+            const currentIndex = allLessons.findIndex(item => item.id === currentLessonId);
+            
+            // Nếu có bài học tiếp theo
+            if (currentIndex !== -1 && currentIndex < allLessons.length - 1) {
+                const nextLesson = allLessons[currentIndex + 1];
+
+                // Nếu bài tiếp theo ĐANG BỊ KHÓA (điểm hiện tại < điểm yêu cầu)
+                if (userScore < nextLesson.reqScore) {
+                    // 1. Nâng điểm hiện tại lên bằng với điểm yêu cầu của bài mới
+                    userScore = nextLesson.reqScore; 
+                    
+                    // 2. Render lại Sidebar ngay lập tức để làm mất hình ổ khóa
+                    renderTOC(userScore);
+
+                    // 3. Hiển thị thông báo chúc mừng
+                    const toast = document.createElement('div');
+                    toast.className = 'fixed bottom-10 right-10 bg-green-500 text-white px-6 py-4 rounded-xl shadow-2xl z-[9999] font-bold flex items-center gap-3 animate-bounce';
+                    toast.innerHTML = `<i class="fas fa-unlock-alt text-xl"></i> Đã mở khóa bài: ${nextLesson.title}`;
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 4000);
+
+                    // 4. Highlight nút mới vừa được mở khóa
+                    const nextBtn = document.getElementById(nextLesson.id);
+                    if(nextBtn) {
+                        nextBtn.classList.add('ring-4', 'ring-orange-400', 'bg-orange-50');
+                        setTimeout(() => nextBtn.classList.remove('ring-4', 'ring-orange-400', 'bg-orange-50'), 3000);
+                    }
+
+                    // 5. Lưu tiến trình mới lên Firebase để lần sau vào vẫn được mở
+                    if (auth.currentUser) {
+                        try {
+                            await updateDoc(doc(db, "users_progress", auth.currentUser.uid), {
+                                startingScore: userScore 
+                            });
+                        } catch (error) {
+                            console.error("Lỗi cập nhật tiến trình lên DB:", error);
+                        }
+                    }
+                }
+            }
+        }
+
         const canvas = document.getElementById('pdf-render-canvas');
         const ctx = canvas.getContext('2d');
         const loadingOverlay = document.getElementById('loader-overlay');
@@ -585,6 +641,9 @@
                     pageIsRendering = false;
                     loadingOverlay.classList.remove('active'); 
                     if (pageNumPending !== null) { renderPage(pageNumPending); pageNumPending = null; }
+                    
+                    // KÍCH HOẠT KIỂM TRA MỞ KHÓA Ở ĐÂY
+                    checkAndUnlockNextLevel();
                 });
 
                 document.getElementById('page-num').textContent = num;
