@@ -528,7 +528,7 @@
 
 
     // =========================================================
-    // GỌI GROQ AI ĐỂ GIẢI THÍCH CÂU HỎI TRẮC NGHIỆM
+    // GỌI GROQ AI ĐỂ GIẢI THÍCH CÂU HỎI TRẮC NGHIỆM (BẢN FIX LỖI)
     // =========================================================
     window.explainWithAI = async function(index) {
         try {
@@ -536,76 +536,71 @@
             const contentBox = document.getElementById(`ai-content-${index}`);
             const q = allQuestions[index];
             
-            if (!q) throw new Error("Không tìm thấy dữ liệu câu hỏi.");
+            if (!q) throw new Error("Lỗi: Không tìm thấy dữ liệu câu hỏi trong bộ nhớ.");
 
-            // Chống spam click: Nếu đang loading thì không cho bấm gọi nữa
+            // Chống spam click
             if (contentBox.style.display === 'block' && contentBox.innerHTML.includes('fa-spinner')) {
                 return;
             }
 
-            // Hiển thị trạng thái Loading
             contentBox.style.display = 'block';
             contentBox.innerHTML = `<i class="fas fa-spinner fa-spin text-orange-500 mr-2"></i> Trợ lý AI đang phân tích câu trả lời...`;
             btn.disabled = true;
             btn.style.opacity = '0.6';
 
-            // 1. LẤY ĐÁP ÁN HỌC SINH CHỌN (Xử lý cả khi bỏ trống)
+            // XỬ LÝ AN TOÀN TRÁNH SẬP CODE NẾU DỮ LIỆU FIREBASE BỊ THIẾU
+            const optionsArray = q.options || [];
             const selectedIdx = userAnswers[index];
-            const selectedText = (selectedIdx !== undefined && q.options[selectedIdx] !== undefined) 
-                                 ? q.options[selectedIdx] 
-                                 : "Học sinh bỏ trống không chọn";
+            const selectedText = (selectedIdx !== undefined && optionsArray[selectedIdx] !== undefined) 
+                                 ? optionsArray[selectedIdx] 
+                                 : "Học sinh bỏ trống";
 
-            // 2. LẤY ĐÁP ÁN ĐÚNG (Tự động nhận diện số 0,1,2,3 hoặc chữ A,B,C,D từ Firebase)
             let correctText = "Không xác định";
-            if (typeof q.correct === 'number' && q.options[q.correct]) {
-                correctText = q.options[q.correct];
+            if (typeof q.correct === 'number' && optionsArray[q.correct]) {
+                correctText = optionsArray[q.correct];
             } else if (typeof q.correct === 'string') {
                 const match = q.correct.match(/^[A-D]$/i);
                 if (match) {
                     const idx = match[0].toUpperCase().charCodeAt(0) - 65;
-                    correctText = q.options[idx] || q.correct;
+                    correctText = optionsArray[idx] || q.correct;
                 } else {
-                    correctText = q.correct; // Nếu là chuỗi đáp án dài
+                    correctText = q.correct; 
                 }
             }
 
-            // 3. GỌI API GROQ
-            // Prompt được ép cứng để Llama/Mixtral của Groq không nói vòng vo
             const systemPrompt = `Bạn là giáo viên Ngữ Văn. Dựa vào câu hỏi và đáp án học sinh chọn, hãy giải thích ngắn gọn, đi thẳng vào vấn đề (tối đa 3 câu) vì sao đáp án đúng là đáp án đó.
-            QUY TẮC BẮT BUỘC: 
-            - Trả lời TRỰC TIẾP vào nội dung giải thích.
-            - KHÔNG chào hỏi, KHÔNG nói "Dạ vâng", KHÔNG nói "Dưới đây là giải thích".
-            - Nhìn vào đáp án học sinh chọn, nếu sai, hãy chỉ ra điểm dễ gây nhầm lẫn.`;
+            QUY TẮC: Trả lời TRỰC TIẾP. KHÔNG chào hỏi. Nhìn vào đáp án học sinh chọn, nếu sai, hãy chỉ ra điểm dễ gây nhầm lẫn.`;
             
-            const messages = `Câu hỏi: ${q.question}\nCác đáp án: ${q.options.join(" | ")}\nHọc sinh chọn: ${selectedText}\nĐáp án đúng: ${correctText}`;
+            const messages = `Câu hỏi: ${q.question}\nCác đáp án: ${optionsArray.join(" | ")}\nHọc sinh chọn: ${selectedText}\nĐáp án đúng: ${correctText}`;
 
-            const API_URL = `/.netlify/functions/gemini-proxy`; // Endpoint Proxy gọi sang Groq của bạn
+            const API_URL = `/.netlify/functions/gemini-proxy`;
             const res = await fetch(API_URL, { 
                 method: 'POST', 
                 headers: {'Content-Type': 'application/json'}, 
                 body: JSON.stringify({ systemPrompt: systemPrompt, messages: messages }) 
             });
 
-            if (!res.ok) throw new Error("Lỗi Server API");
+            // BẮT LỖI TỪ SERVER NETLIFY / GROQ VÀ IN RA
+            if (!res.ok) {
+                const errText = await res.text(); // Lấy mã lỗi từ server
+                throw new Error(`Server báo lỗi HTTP ${res.status} - ${errText}`);
+            }
+            
             const data = await res.json();
             
             if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-                throw new Error("Lỗi cấu trúc trả về từ AI");
+                throw new Error("Lỗi: Dữ liệu Groq trả về bị sai cấu trúc (Không có choices).");
             }
 
-            // 4. XỬ LÝ FORMAT TEXT TỪ GROQ CHO ĐẸP
             let rawText = data.choices[0].message.content;
             
-            // Lột sạch các rác Markdown (như ```json, ```text) mà Groq hay sinh ra do "ảo giác"
+            // Xóa rác Markdown
             rawText = rawText.replace(/```[a-zA-Z]*\n?/g, "").replace(/```/g, "").trim(); 
-            
-            // Biến chữ in đậm ** thành màu cam
             rawText = rawText.replace(/\*\*(.*?)\*\*/g, '<b class="text-orange-600">$1</b>'); 
 
             // In kết quả ra màn hình
             contentBox.innerHTML = `<b><i class="fas fa-magic text-orange-500 mr-1"></i> AI Phân tích:</b><br><span class="text-gray-700 dark:text-gray-300 mt-2 block leading-relaxed">${rawText}</span>`;
             
-            // Đổi trạng thái nút bấm thành màu xanh báo hoàn tất
             btn.disabled = false;
             btn.style.opacity = '1';
             btn.innerHTML = `<i class="fas fa-check-circle"></i> Phân tích hoàn tất`;
@@ -617,7 +612,8 @@
             const btn = document.getElementById(`btn-ai-${index}`);
             
             if(contentBox) {
-                contentBox.innerHTML = `<span class="text-red-500 font-bold"><i class="fas fa-exclamation-triangle mr-1"></i> Trợ lý AI đang bận. Vui lòng bấm phân tích lại!</span>`;
+                // IN CHI TIẾT MÃ LỖI RA MÀN HÌNH ĐỂ BẠN DỄ NHÌN THẤY MÀ KHÔNG CẦN F12
+                contentBox.innerHTML = `<span class="text-red-500 font-bold"><i class="fas fa-exclamation-triangle mr-1"></i> ${e.message}</span>`;
             }
             if(btn) {
                 btn.disabled = false;
