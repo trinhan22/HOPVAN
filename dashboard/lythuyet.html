@@ -5,16 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HopVan - Kiến Thức Nền</title>
     
-    <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
-    <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
-    <meta property="og:image" content="https://hopvan.info.vn/panel.webp" />
-    <meta property="og:url" content="https://hopvan.info.vn" />
-    <meta property="og:type" content="article" />
-
     <link rel="icon" href="https://hopvan.info.vn/LOGO.WEBP" />
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#FF8F50">
-
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -27,9 +18,7 @@
             --primary: #FF8F50; 
             --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
             --glass-bg: rgba(255, 255, 255, 0.6); 
-            
-            --sidebar-width: 280px; 
-            
+            --sidebar-width: 320px; 
             --bg-body: #FFF5EC; 
             --bg-card: rgba(255, 255, 255, 0.85); 
             --border-ui: rgba(255, 255, 255, 0.8);
@@ -37,11 +26,6 @@
             --text-light: #636E72;
             --bg-hover: white;
             --bg-active: #fff7ed;
-            
-            --shadow-sm: 0 4px 15px rgba(0,0,0,0.02);
-            --shadow-md: 0 10px 30px rgba(0,0,0,0.02);
-            --shadow-lg: 0 10px 40px -10px rgba(255, 143, 80, 0.15);
-            --shadow-floating: 0 15px 35px rgba(255, 143, 80, 0.2);
             --blur: 25px;
         }
 
@@ -54,97 +38,80 @@
             --text-light: #94a3b8;
             --bg-hover: #1e293b;
             --bg-active: rgba(255, 143, 80, 0.1);
-            --shadow-lg: 0 20px 50px -10px rgba(0,0,0,0.4);
-            --shadow-floating: 0 15px 35px rgba(0, 0, 0, 0.4);
         }
 
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); height: 100vh; overflow: hidden; transition: background-color 0.3s ease; color: var(--text-main); }
-        aside, .sidebar { z-index: 1000; }
-
-        /* --- BACKGROUND BLOBS --- */
+        
         .background-blobs { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
         .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatBlob 10s infinite alternate; }
         .blob-1 { width: 500px; height: 500px; background: #FCA96A; top: -100px; left: -100px; }
         .blob-2 { width: 400px; height: 400px; background: #FCD5B5; bottom: -50px; right: -50px; animation-delay: -5s; }
-        .blob-3 { width: 300px; height: 300px; background: #FFD1D1; top: 40%; left: 40%; animation-delay: -2s; }
         html.dark .blob { opacity: 0.1; }
         @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
 
-        /* --- MAIN LAYOUT --- */
         .main-content { 
-            width: calc(100% - var(--sidebar-width)); margin-left: var(--sidebar-width);
+            width: calc(100% - 280px); margin-left: 280px;
             height: 100vh; background: var(--glass-bg); backdrop-filter: blur(var(--blur));
             padding: 30px 40px; display: flex; flex-direction: column; transition: all 0.3s ease;
             position: relative; border-left: 1px solid var(--border-ui);
         }
 
-        .lythuyet-wrapper {
-            display: flex; gap: 25px; flex: 1; min-height: 0; width: 100%;
-            max-width: 1200px; margin: 0 auto; 
-        }
+        .lythuyet-wrapper { display: flex; gap: 25px; flex: 1; min-height: 0; width: 100%; max-width: 1200px; margin: 0 auto; }
 
         /* --- TOC SIDEBAR --- */
         .toc-sidebar {
-            width: 320px; background: var(--bg-card); border-radius: 32px;
-            border: 1px solid var(--border-ui); box-shadow: var(--shadow-lg);
+            width: var(--sidebar-width); background: var(--bg-card); border-radius: 32px;
+            border: 1px solid var(--border-ui); box-shadow: 0 10px 30px rgba(0,0,0,0.02);
             display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0;
             transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             position: relative; z-index: 30; backdrop-filter: blur(12px);
         }
-        
         .toc-sidebar.collapsed { width: 0; border: none; opacity: 0; margin-right: -25px; visibility: hidden; padding: 0; transform: translateX(-30px); }
-        
-        .toc-header {
-            padding: 24px 24px 20px; border-bottom: 1px solid var(--border-ui);
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255,255,255,0.4); backdrop-filter: blur(10px);
-        }
+        .toc-header { padding: 24px 24px 20px; border-bottom: 1px solid var(--border-ui); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.4); }
         html.dark .toc-header { background: rgba(0,0,0,0.1); }
-
-        .btn-toggle-toc {
-            width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--border-ui);
-            background: var(--bg-hover); color: var(--text-light); display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.3s ease; box-shadow: var(--shadow-sm);
-        }
-        .btn-toggle-toc:hover { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
-
+        
         .toc-body { flex: 1; overflow-y: auto; padding: 20px 16px; scroll-behavior: smooth; }
 
-        .chapter-group { margin-bottom: 16px; border-radius: 20px; overflow: hidden; border: 1px solid transparent; transition: all 0.3s ease; background: var(--bg-card);}
-        .chapter-group.open { border-color: var(--border-ui); background: var(--bg-hover); padding-bottom: 12px; box-shadow: var(--shadow-sm);}
+        .section-header { font-size: 0.75rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin: 25px 0 10px 15px; }
+        .section-header:first-child { margin-top: 0; }
+
+        .chapter-group { margin-bottom: 12px; border-radius: 20px; overflow: hidden; border: 1px solid transparent; transition: all 0.3s ease; background: var(--bg-card);}
+        .chapter-group.open { border-color: var(--border-ui); background: var(--bg-hover); padding-bottom: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
         
         .chapter-title {
             font-size: 0.95rem; font-weight: 900; color: var(--text-main); text-transform: uppercase;
-            letter-spacing: 0.5px; padding: 18px 20px; margin: 0; display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 20px; margin: 0; display: flex; align-items: center; justify-content: space-between;
             cursor: pointer; transition: 0.3s; user-select: none; background: white; border-radius: 16px; border: 1px solid var(--border-ui);
         }
         html.dark .chapter-title { background: #1e293b; }
         .chapter-group.open .chapter-title { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: none; background: var(--bg-active); color: var(--primary); }
         
-        .chapter-icon-wrap { display: flex; align-items: center; gap: 12px;}
-        .chapter-arrow { transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); color: var(--text-light); font-size: 1rem;}
-        .chapter-group.open .chapter-arrow { transform: rotate(180deg); color: var(--primary); }
-        
         .lesson-list { max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.4s ease-in-out, opacity 0.3s ease; padding: 0 16px; }
-        .chapter-group.open .lesson-list { max-height: 600px; opacity: 1; margin-top: 8px; }
+        .chapter-group.open .lesson-list { max-height: 1000px; opacity: 1; margin-top: 8px; }
 
         .lesson-item {
             display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
-            padding: 14px 16px; border-radius: 14px; color: var(--text-light); font-weight: 600; font-size: 0.9rem;
+            padding: 14px 16px; border-radius: 14px; color: var(--text-light); font-weight: 600; font-size: 0.85rem;
             cursor: pointer; transition: all 0.3s ease; border: 1px solid transparent; margin-bottom: 6px;
-            position: relative; overflow: hidden; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+            background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.01);
         }
         html.dark .lesson-item { background: transparent; box-shadow: none; }
-        .lesson-item i { font-size: 1.2rem; transition: 0.3s; width: 24px; text-align: center;}
+        .lesson-item i { font-size: 1.1rem; width: 24px; text-align: center;}
         
-        .lesson-item:hover { background: var(--bg-active); color: var(--primary); transform: translateX(4px); border-color: rgba(255,143,80,0.2); }
+        .lesson-item:hover:not(.locked) { background: var(--bg-active); color: var(--primary); transform: translateX(4px); border-color: rgba(255,143,80,0.2); }
         .lesson-item.active { background: var(--primary-gradient); border-color: transparent; color: white; box-shadow: 0 8px 20px rgba(255,143,80,0.3); font-weight: 800; transform: translateX(6px); }
         .lesson-item.active i { color: white; }
+
+        /* LỚP CSS CHO BÀI HỌC BỊ KHÓA */
+        .lesson-item.locked { opacity: 0.5; background: #f8fafc; cursor: not-allowed; border: 1px dashed #cbd5e1; }
+        html.dark .lesson-item.locked { background: #0f172a; border-color: #334155; }
+        .lesson-item.locked:hover { transform: none; }
+        .lesson-item.locked .lock-icon { color: #ef4444; margin-left: auto; }
 
         /* --- VIEWER AREA --- */
         .viewer-area {
             flex: 1; background: var(--bg-card); border-radius: 32px; backdrop-filter: blur(12px);
-            border: 1px solid var(--border-ui); box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-ui); box-shadow: 0 10px 40px -10px rgba(255, 143, 80, 0.15);
             display: flex; flex-direction: column; overflow: hidden;
             position: relative; z-index: 20; transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
@@ -153,176 +120,73 @@
             position: absolute; left: 0px; top: 24px; z-index: 100;
             height: 48px; padding: 0 20px 0 16px; border-radius: 0 16px 16px 0; border: none;
             background: var(--bg-card); color: var(--primary); border: 1px solid var(--border-ui); border-left: none; 
-            box-shadow: 10px 0 20px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 800; font-size: 0.9rem;
-            cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            opacity: 0; pointer-events: none; transform: translateX(-100%); 
+            box-shadow: 10px 0 20px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; font-weight: 800;
+            cursor: pointer; transition: all 0.4s; opacity: 0; pointer-events: none; transform: translateX(-100%); 
         }
         .toc-sidebar.collapsed + .viewer-area .btn-open-toc { opacity: 1; pointer-events: auto; transform: translateX(0); }
 
         .viewer-header { 
-            padding: 20px 30px 20px 65px; 
-            display: flex; flex-direction: row; 
-            justify-content: space-between; align-items: center; gap: 20px; 
-            border-bottom: 1px solid var(--border-ui); background: rgba(255,255,255,0.4); backdrop-filter: blur(10px);
+            padding: 20px 30px 20px 65px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 20px; 
+            border-bottom: 1px solid var(--border-ui); background: rgba(255,255,255,0.4);
         }
         html.dark .viewer-header { background: rgba(0,0,0,0.1); }
-        .lesson-title-main { font-size: 1.5rem; font-weight: 900; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.5px;}
+        .lesson-title-main { font-size: 1.3rem; font-weight: 900; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
 
-        /* --- VIEW TOGGLE (PDF / MINDMAP) --- */
-        .view-switch {
-            display: flex; background: var(--bg-body); padding: 4px; border-radius: 12px; border: 1px solid var(--border-ui); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-        }
-        .vs-btn {
-            padding: 8px 16px; border-radius: 10px; font-size: 0.85rem; font-weight: 800; border: none; background: transparent;
-            color: var(--text-light); transition: all 0.3s ease; display: flex; align-items: center; gap: 6px; cursor: pointer;
-        }
-        .vs-btn:hover { color: var(--text-main); }
-        .vs-btn.active {
-            background: white; color: var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-        html.dark .vs-btn.active { background: #1e293b; color: var(--primary); }
+        /* --- VIEW TOGGLE --- */
+        .view-switch { display: flex; background: var(--bg-body); padding: 4px; border-radius: 12px; border: 1px solid var(--border-ui); }
+        .vs-btn { padding: 8px 16px; border-radius: 10px; font-size: 0.85rem; font-weight: 800; border: none; background: transparent; color: var(--text-light); transition: all 0.3s ease; cursor: pointer; }
+        .vs-btn.active { background: white; color: var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        html.dark .vs-btn.active { background: #1e293b; }
 
         .view-panel { display: none; height: 100%; flex-direction: column; flex: 1; position: relative;}
         .view-panel.active { display: flex; animation: fadeInView 0.4s ease; }
         @keyframes fadeInView { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .viewer-content-wrapper { 
-            flex: 1; padding: 20px; display: flex; flex-direction: column; position: relative; background: #f8fafc; 
-            overflow: hidden; 
-        }
+        .viewer-content-wrapper { flex: 1; padding: 20px; display: flex; flex-direction: column; position: relative; background: #f8fafc; overflow: hidden; }
         html.dark .viewer-content-wrapper { background: #0f172a; }
 
-        /* Vùng chứa PDF */
-        .pdf-canvas-container {
-            flex: 1; position: relative; perspective: 2000px; 
-            display: flex; justify-content: center; align-items: center; overflow: hidden;
-            border-radius: 12px; padding-bottom: 60px; 
-        }
-
-        #pdf-render-canvas {
-            max-width: 100%; max-height: 100%; object-fit: contain;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15); border-radius: 6px;
-            background: white; border: 1px solid #e2e8f0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        html.dark #pdf-render-canvas { filter: brightness(0.9); border-color: #334155;}
-
-        /* Vùng chứa Mindmap */
-        .mindmap-img-container {
-            flex: 1; display: flex; justify-content: center; align-items: center;
-            background: white; border-radius: 16px; border: 1px solid var(--border-ui); padding: 20px; 
-            overflow: hidden; position: relative; padding-bottom: 70px; /* Nhường chỗ cho Toolbar */
-        }
+        .pdf-canvas-container { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden; border-radius: 12px; padding-bottom: 60px; }
+        #pdf-render-canvas { max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15); border-radius: 6px; background: white; border: 1px solid #e2e8f0; transition: opacity 0.3s ease, transform 0.3s ease; }
+        
+        .mindmap-img-container { flex: 1; display: flex; justify-content: center; align-items: center; background: white; border-radius: 16px; border: 1px solid var(--border-ui); padding: 20px; overflow: hidden; position: relative; padding-bottom: 70px; }
         html.dark .mindmap-img-container { background: transparent; }
 
-        /* --- Animation Chuyển Trang Tinh Tế (Slide & Fade) --- */
-        .slide-left-out { animation: slideLeftOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-        .slide-right-in { animation: slideRightIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-        .slide-right-out { animation: slideRightOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-        .slide-left-in { animation: slideLeftIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-
-        @keyframes slideLeftOut { 
-            0% { transform: translateX(0) scale(1); opacity: 1; } 
-            100% { transform: translateX(-30px) scale(0.98); opacity: 0; } 
-        }
-        @keyframes slideRightIn { 
-            0% { transform: translateX(30px) scale(0.98); opacity: 0; } 
-            100% { transform: translateX(0) scale(1); opacity: 1; } 
-        }
-        @keyframes slideRightOut { 
-            0% { transform: translateX(0) scale(1); opacity: 1; } 
-            100% { transform: translateX(30px) scale(0.98); opacity: 0; } 
-        }
-        @keyframes slideLeftIn { 
-            0% { transform: translateX(-30px) scale(0.98); opacity: 0; } 
-            100% { transform: translateX(0) scale(1); opacity: 1; } 
-        }
-
-        /* Controls Chung */
-        .pdf-controls {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(15px);
-            border: 1px solid var(--border-ui); padding: 8px 12px; border-radius: 50px;
-            display: flex; flex-direction: column; gap: 6px; width: max-content; min-width: 220px;
-            box-shadow: var(--shadow-floating); z-index: 40;
-        }
+        /* Controls */
+        .pdf-controls { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.98); border: 1px solid var(--border-ui); padding: 8px 12px; border-radius: 50px; display: flex; flex-direction: column; gap: 6px; width: max-content; min-width: 220px; box-shadow: 0 15px 35px rgba(255, 143, 80, 0.2); z-index: 40; }
         html.dark .pdf-controls { background: rgba(30, 41, 59, 0.95); }
-
         .control-buttons { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 20px;}
-        .btn-page {
-            width: 36px; height: 36px; background: var(--bg-body); color: var(--text-main);
-            border-radius: 50%; font-size: 1rem; border: 1px solid var(--border-ui); outline: none;
-            transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; cursor: pointer;
-        }
+        .btn-page { width: 36px; height: 36px; background: var(--bg-body); color: var(--text-main); border-radius: 50%; font-size: 1rem; border: 1px solid var(--border-ui); transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .btn-page:hover:not(:disabled) { background: var(--bg-hover); color: var(--primary); transform: scale(1.05); border-color: var(--primary);}
         .btn-page:disabled { opacity: 0.3; cursor: not-allowed; }
-
         .page-info { font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); font-size: 0.8rem;}
         #page-num { font-size: 1.1rem; color: var(--primary); margin: 0 2px; font-weight: 900;}
 
-        .progress-track { width: calc(100% - 20px); height: 4px; background: var(--border-ui); border-radius: 10px; overflow: hidden; margin: 0 auto 2px;}
-        .progress-fill { height: 100%; background: var(--primary-gradient); width: 0%; transition: width 0.3s ease; }
+        /* Popup Modal Khóa */
+        .hv-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 9999; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; cursor: pointer; }
+        .hv-modal.show { display: flex; opacity: 1; }
+        .hv-modal-box { background: var(--bg-card); padding: 40px; border-radius: 32px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.5); border: 1px solid var(--border-ui); transform: scale(0.9); transition: transform 0.3s; cursor: default; }
+        .hv-modal.show .hv-modal-box { transform: scale(1); }
+        .hv-btn-primary { width: 100%; padding: 15px; border-radius: 16px; font-weight: 800; font-size: 1rem; border: none; margin-top: 15px; cursor: pointer; background: var(--primary-gradient); color: white; box-shadow: 0 10px 20px rgba(255, 94, 98, 0.3); }
 
-        /* LOADING SKELETON */
+        /* Skeletons & Transitions */
         .loader-overlay { position: absolute; inset: 0; background: var(--bg-card); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; opacity: 0; pointer-events: none; transition: 0.3s; border-radius: 16px;}
         .loader-overlay.active { opacity: 1; pointer-events: auto; }
-        html.dark .loader-overlay { background: rgba(15, 23, 42, 0.95); }
-        
         .spinner { width: 50px; height: 50px; border: 4px solid #fed7aa; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;}
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: rgba(148, 163, 184, 0.4); border-radius: 10px; }
 
-        /* --- ĐỒNG BỘ DARK MODE CHO MENU.JS --- */
-        html.dark #menu-placeholder aside, 
-        html.dark #menu-placeholder .sidebar { background-color: var(--bg-card) !important; border-color: var(--border-ui) !important; }
-        html.dark #menu-placeholder aside > div,
-        html.dark #menu-placeholder .sidebar > div { background-color: transparent !important; border-color: var(--border-ui) !important; }
-        html.dark #menu-placeholder button { background-color: var(--bg-body) !important; border: 1px solid var(--border-ui) !important; color: var(--text-light) !important; box-shadow: none !important; }
-        html.dark #menu-placeholder button:hover { background-color: var(--bg-hover) !important; border-color: var(--primary) !important; color: var(--primary) !important; }
-        html.dark #menu-placeholder .nav-item.active { background: var(--primary-gradient) !important; color: white !important; border-color: transparent !important; box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4) !important; }
-        html.dark #menu-placeholder div[style*="background-color"] { background-color: var(--bg-body) !important; border-color: var(--border-ui) !important; }
-        html.dark #menu-placeholder [class*="border-"] { border-color: var(--border-ui) !important; }
-        html.dark #menu-placeholder .text-gray-800, html.dark #menu-placeholder h1 { color: var(--text-main) !important; }
-        html.dark #menu-placeholder .text-gray-500, html.dark #menu-placeholder .text-gray-400 { color: var(--text-light) !important; }
-        html.dark #menu-placeholder .nav-item { color: var(--text-light) !important; transition: 0.3s; }
-        html.dark #menu-placeholder .nav-item:hover:not(.active) { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
-
-        /* --- MOBILE OPTIMIZATION --- */
-        .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 65px; background: var(--bg-card); z-index: 100; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border-ui); backdrop-filter: blur(20px);}
-        #mobile-toc-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1001; opacity: 0; transition: 0.3s; }
-        #mobile-toc-overlay.active { opacity: 1; }
-
+        /* Mobile */
         @media (max-width: 1024px) {
-            body { overflow: auto; height: auto; }
-            .mobile-header { display: flex; justify-content: space-between;}
             .main-content { margin-left: 0; width: 100%; padding: 85px 15px 20px; height: 100vh; border: none;}
             .lythuyet-wrapper { gap: 0;}
-            
-            .toc-sidebar { position: fixed; left: -320px; top: 0; bottom: 0; z-index: 1002; height: 100vh; border-radius: 0; width: 300px; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); margin: 0;}
+            .toc-sidebar { position: fixed; left: -320px; top: 0; bottom: 0; z-index: 1002; height: 100vh; border-radius: 0; width: 300px; transition: transform 0.4s; margin: 0;}
             .toc-sidebar.open { transform: translateX(320px); }
-            #mobile-toc-overlay.active { display: block; }
-            
             .viewer-area { border-radius: 20px; max-width: 100%; margin: 0; flex: none; height: calc(100vh - 100px); }
             .viewer-header { padding: 15px; flex-direction: column; align-items: flex-start; gap: 12px;}
-            .lesson-title-main { font-size: 1.2rem; }
-            .view-switch { width: 100%; }
-            .vs-btn { flex: 1; justify-content: center; }
-            
-            .pdf-controls { bottom: 15px; padding: 8px 12px;}
-
-            #menu-placeholder aside {
-                position: fixed !important; left: 0 !important; top: 0 !important; bottom: 0 !important;
-                transform: translateX(-100%); z-index: 9999 !important; width: 280px !important; 
-                transition: transform 0.3s ease-in-out !important;
-            }
-            #menu-placeholder aside.open { transform: translateX(0) !important; box-shadow: 10px 0 50px rgba(0,0,0,0.5) !important; }
+            #menu-placeholder aside { transform: translateX(-100%); z-index: 9999 !important; width: 280px !important; position: fixed !important;}
         }
-
-        /* --- GLOBAL SCROLLBAR --- */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
-        ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
-        ::-webkit-scrollbar-button { display: none; }
     </style>
 </head>
 <body>
@@ -337,18 +201,6 @@
 
     <div id="menu-placeholder"></div>
 
-    <div class="mobile-header lg:hidden justify-between">
-        <div class="flex items-center gap-4">
-            <button onclick="toggleGlobalSidebar()" class="text-gray-700 dark:text-gray-300 text-2xl focus:outline-none hover:text-orange-500 transition"><i class="fas fa-bars"></i></button>
-        </div>
-        <div class="flex items-center gap-3">
-            <button onclick="toggleTOC()" class="w-9 h-9 rounded-xl bg-orange-50 dark:bg-gray-800 text-orange-500 flex items-center justify-center text-sm shadow-sm border border-orange-100 hover:scale-105 transition"><i class="fas fa-list-ul"></i></button>
-            <a href="../dashboard/phongluyende.html" class="w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 shadow-sm border border-gray-200 hover:text-red-500 transition"><i class="fas fa-times"></i></a>
-        </div>
-    </div>
-
-    <div id="mobile-toc-overlay" onclick="toggleTOC()"></div>
-
     <main class="main-content" id="main-layout">
         <div id="hopvan-header-container" style="margin-bottom: 0px;"></div>
         
@@ -360,42 +212,11 @@
                         <div class="w-10 h-10 rounded-xl bg-white text-orange-500 flex items-center justify-center text-lg shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700"><i class="fas fa-bookmark"></i></div>
                         Bài Giảng
                     </h2>
-                    <button class="hidden lg:flex btn-icon" onclick="toggleDesktopTOC()" title="Thu gọn"><i class="fas fa-chevron-left"></i></button>
-                    <button class="lg:hidden btn-icon" onclick="toggleTOC()"><i class="fas fa-times"></i></button>
+                    <button class="hidden lg:flex w-8 h-8 rounded-lg border border-gray-200 items-center justify-center text-gray-500 hover:bg-orange-50 hover:text-orange-500 transition" onclick="toggleDesktopTOC()" title="Thu gọn"><i class="fas fa-chevron-left"></i></button>
                 </div>
                 
-                <div class="toc-body custom-scrollbar">
-                    
-                    <div class="chapter-group open">
-                        <div class="chapter-title" onclick="toggleChapter(this)">
-                            <div class="chapter-icon-wrap"><i class="fas fa-graduation-cap text-orange-500 text-lg"></i> CHƯƠNG TRÌNH 12</div>
-                            <i class="fas fa-chevron-down chapter-arrow"></i>
-                        </div>
-                        <div class="lesson-list">
-                            
-                            <button id="ls-truyen-tieu-thuyet" class="lesson-item active" onclick="loadLesson('ls-truyen-tieu-thuyet', 'Truyện ngắn & Tiểu thuyết hiện đại', '../data/lythuyet/truyen.pdf')">
-                                <i class="fas fa-layer-group"></i> <span>Truyện & Tiểu thuyết</span>
-                            </button>
-                            
-                            <button id="ls-tho-tru-tinh" class="lesson-item" onclick="loadLesson('ls-tho-tru-tinh', 'Thơ trữ tình', '../data/lythuyet/tho.pdf')">
-                                <i class="fas fa-wind"></i> <span>Thơ trữ tình</span>
-                            </button>
-
-                            <button id="ls-vb-nghiluan" class="lesson-item" onclick="loadLesson('ls-vb-nghiluan', 'Văn bản nghị luận', '../data/lythuyet/vanbannghiluan.pdf')">
-                                <i class="fas fa-pen-nib"></i> <span>Văn bản nghị luận</span>
-                            </button>
-                            
-                            <button id="ls-hai-kich-nhat-ky" class="lesson-item" onclick="loadLesson('ls-hai-kich-nhat-ky', 'Hài kịch - Nhật ký - Hồi ký', '../data/lythuyet_default.pdf')">
-                                <i class="fas fa-theater-masks"></i> <span>Hài kịch - Nhật ký</span>
-                            </button>
-
-                            <button id="ls-vb-thongtin" class="lesson-item" onclick="loadLesson('ls-vb-thongtin', 'Văn bản thông tin', '../data/lythuyet/vanbanthongtin.pdf')">
-                                <i class="fas fa-newspaper"></i> <span>Văn bản thông tin</span>
-                            </button>
-                            
-                        </div>
-                    </div>
-
+                <div class="toc-body custom-scrollbar" id="toc-container">
+                    <div class="text-center text-gray-400 mt-10 text-sm font-bold"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tải lộ trình...</div>
                 </div>
             </aside>
 
@@ -406,7 +227,7 @@
                 
                 <div class="viewer-header">
                     <div class="viewer-title-row">
-                        <h1 class="lesson-title-main" id="display-title">Đang tải...</h1>
+                        <h1 class="lesson-title-main" id="display-title">Chọn bài học để bắt đầu</h1>
                     </div>
                     
                     <div class="view-switch">
@@ -420,33 +241,29 @@
                 </div>
 
                 <div class="viewer-content-wrapper">
-                    
                     <div id="loader-overlay" class="loader-overlay">
                         <div class="spinner"></div>
-                        <p class="font-bold text-gray-500 animate-pulse tracking-wide uppercase text-sm mt-2">Đang nạp dữ liệu...</p>
+                        <p class="font-bold text-gray-500 tracking-wide uppercase text-sm mt-2">Đang nạp dữ liệu...</p>
                     </div>
 
                     <div id="panel-pdf" class="view-panel active">
                         <div class="pdf-canvas-container">
                             <canvas id="pdf-render-canvas"></canvas>
                         </div>
-                        
-                        <div class="pdf-controls">
+                        <div class="pdf-controls" id="pdf-controls-box" style="display: none;">
                             <div class="control-buttons">
                                 <button onclick="onPrevPage()" id="btn-prev" class="btn-page" title="Trang trước"><i class="fas fa-chevron-left"></i></button>
                                 <span class="page-info">Trang <span id="page-num">0</span> / <span id="page-count">0</span></span>
                                 <button onclick="onNextPage()" id="btn-next" class="btn-page" title="Trang sau"><i class="fas fa-chevron-right"></i></button>
                             </div>
-                            <div class="progress-track">
-                                <div id="pdf-progress" class="progress-fill"></div>
-                            </div>
+                            <div class="w-full h-1 bg-gray-200 rounded-full mt-2 overflow-hidden"><div id="pdf-progress" class="h-full bg-orange-500 transition-all"></div></div>
                         </div>
                     </div>
 
                     <div id="panel-mindmap" class="view-panel">
                         <div class="mindmap-img-container" id="mindmap-container">
-                            </div>
-                        
+                            <div class="text-gray-400 text-center"><i class="fas fa-project-diagram text-4xl mb-3 opacity-50"></i><p>Chọn bài học để xem sơ đồ</p></div>
+                        </div>
                         <div class="pdf-controls" id="mindmap-controls" style="display: none;">
                             <div class="control-buttons" style="justify-content: center; gap: 15px;">
                                 <button onclick="window.open(window.currentMindmapUrl, '_blank')" class="btn-page" title="Xem ảnh gốc lớn hơn"><i class="fas fa-expand"></i></button>
@@ -454,17 +271,27 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </section>
-            
         </div>
     </main>
+
+    <div id="modal-locked" class="hv-modal" onclick="closeModal()">
+        <div class="hv-modal-box" onclick="event.stopPropagation()">
+            <div class="w-20 h-20 mx-auto bg-red-50 rounded-full flex items-center justify-center mb-5 border border-red-100">
+                <i class="fas fa-lock text-4xl text-red-400"></i>
+            </div>
+            <h3 class="text-2xl font-black text-gray-800 mb-2">Bài Học Bị Khóa</h3>
+            <p class="text-sm text-gray-500 mb-6 leading-relaxed">
+                Năng lực hiện tại của bạn chưa đủ để mở khóa bài học này.
+            </p>
+            <button class="hv-btn-primary" onclick="closeModal()">Đã hiểu</button>
+        </div>
+    </div>
 
     <script type="module" src="../presence.js"></script>
     <script type="module" src="gam.js"></script>
     <script src="../chatbot.js"></script>
-    <script type="module" src="../check-maintenance.js"></script>
     
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -481,26 +308,121 @@
         
         initMenu(app, 'lythuyet');
 
+        // ==========================================
+        // DỮ LIỆU BÀI HỌC VÀ ĐIỀU KIỆN MỞ KHÓA (CẤU TRÚC MỚI)
+        // ==========================================
+        const LESSON_DATA = [
+            {
+                section: "PHẦN 1: ĐỌC HIỂU",
+                icon: "fa-book-reader text-blue-500",
+                items: [
+                    { id: 'ls-nhan-biet', title: 'Nhận biết', reqScore: 0, pdfUrl: '../data/lythuyet/nhanbiet.pdf' },
+                    { id: 'ls-thong-hieu', title: 'Thông hiểu', reqScore: 4, pdfUrl: '../data/lythuyet/thonghieu.pdf' },
+                    { id: 'ls-van-dung', title: 'Vận dụng', reqScore: 7, pdfUrl: '../data/lythuyet/vandung.pdf' }
+                ]
+            },
+            {
+                section: "PHẦN 2: LÀM VĂN",
+                icon: "fa-pen-nib text-green-500",
+                items: [
+                    { id: 'ls-khoi-dau', title: 'Khởi đầu', reqScore: 0, pdfUrl: '../data/lythuyet/khoidau.pdf' },
+                    { id: 'ls-xay-nen', title: 'Xây nền', reqScore: 2, pdfUrl: '../data/lythuyet/xaynen.pdf' },
+                    { id: 'ls-cung-co', title: 'Củng cố', reqScore: 5, pdfUrl: '../data/lythuyet/cungco.pdf' },
+                    { id: 'ls-ung-dung', title: 'Ứng dụng', reqScore: 7, pdfUrl: '../data/lythuyet/ungdung.pdf' },
+                    { id: 'ls-nang-cao', title: 'Nâng cao', reqScore: 9, pdfUrl: '../data/lythuyet/nangcao.pdf' }
+                ]
+            }
+        ];
+
+        let userScore = 0; // Điểm Test mặc định
+
         onAuthStateChanged(auth, async (user) => { 
             if(user) {
                 try {
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
-                    if (userDoc.exists() && userDoc.data().theme === 'dark') {
-                        document.documentElement.classList.add('dark');
+                    // Lấy dữ liệu điểm Test từ Database
+                    const progDoc = await getDoc(doc(db, "users_progress", user.uid));
+                    if (progDoc.exists()) {
+                        const progData = progDoc.data();
+                        userScore = parseFloat(progData.startingScore) || 0;
                     }
-                } catch (error) {}
+                    
+                    // Render Thanh điều hướng (TOC) dựa trên Điểm của User
+                    renderTOC(userScore);
+
+                } catch (error) {
+                    console.error("Lỗi tải data:", error);
+                    renderTOC(0); // Lỗi mạng thì cho phép học level thấp nhất
+                }
             } else {
                 window.location.href="../log.html"; 
             }
         });
 
-        // ----------------------------------------------------
-        // UI TOGGLES
-        // ----------------------------------------------------
+        // HÀM RENDER SIDEBAR ĐỘNG TỪ JAVASCRIPT
+        function renderTOC(score) {
+            const container = document.getElementById('toc-container');
+            let html = '';
+
+            LESSON_DATA.forEach((section, secIdx) => {
+                const defaultOpen = secIdx === 0 ? 'open' : ''; // Mở sẵn Tab đầu tiên
+                
+                let itemsHtml = section.items.map(item => {
+                    const isUnlocked = score >= item.reqScore;
+                    if (isUnlocked) {
+                        return `
+                        <button id="${item.id}" class="lesson-item" onclick="loadLesson('${item.id}', '${item.title}', '${item.pdfUrl}')">
+                            <i class="fas fa-file-alt"></i> <span>${item.title}</span>
+                        </button>`;
+                    } else {
+                        return `
+                        <div class="lesson-item locked" onclick="showLockModal()">
+                            <i class="fas fa-file-alt"></i> <span>${item.title}</span>
+                            <i class="fas fa-lock lock-icon"></i>
+                        </div>`;
+                    }
+                }).join('');
+
+                html += `
+                <div class="chapter-group ${defaultOpen}">
+                    <div class="chapter-title" onclick="toggleChapter(this)">
+                        <div class="chapter-icon-wrap">
+                            <i class="fas ${section.icon} text-lg"></i> 
+                            ${section.section}
+                        </div>
+                        <i class="fas fa-chevron-down chapter-arrow"></i>
+                    </div>
+                    <div class="lesson-list">
+                        ${itemsHtml}
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+
+            // Khôi phục bài cũ hoặc chọn bài đầu tiên
+            const savedData = localStorage.getItem('hopvan_theory_progress');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    const btn = document.getElementById(data.id);
+                    if (btn && !btn.classList.contains('locked')) {
+                        loadLesson(data.id, data.title, data.pdfUrl, data.currentPage);
+                    } else {
+                        document.querySelector('.lesson-item:not(.locked)').click();
+                    }
+                } catch(e) { document.querySelector('.lesson-item:not(.locked)').click(); }
+            } else {
+                const firstValidLesson = document.querySelector('.lesson-item:not(.locked)');
+                if (firstValidLesson) firstValidLesson.click();
+            }
+        }
+
+        // ====================================================
+        // GIAO DIỆN & RENDER PDF
+        // ====================================================
         window.switchViewMode = (mode, btn) => {
             document.querySelectorAll('.vs-btn').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
-            
             document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
             document.getElementById(`panel-${mode}`).classList.add('active');
         };
@@ -512,49 +434,25 @@
             if (!isOpen) group.classList.add('open');
         };
 
-        window.toggleGlobalSidebar = () => {
-            const sidebar = document.querySelector('.sidebar') || document.querySelector('aside:not(#toc-sidebar)');
-            if(sidebar) sidebar.classList.toggle('-translate-x-full');
-        };
+        window.toggleDesktopTOC = () => document.getElementById('toc-sidebar').classList.toggle('collapsed');
+        window.showLockModal = () => document.getElementById('modal-locked').classList.add('show');
+        window.closeModal = () => document.getElementById('modal-locked').classList.remove('show');
 
-        window.toggleTOC = () => {
-            const toc = document.getElementById('toc-sidebar');
-            const overlay = document.getElementById('mobile-toc-overlay');
-            toc.classList.toggle('open');
-            overlay.classList.toggle('active');
-        };
-
-        window.toggleDesktopTOC = () => {
-            const tocSidebar = document.getElementById('toc-sidebar');
-            if (tocSidebar) tocSidebar.classList.toggle('collapsed');
-        };
-
-        // ==========================================
-        // LOGIC LẬT TRANG PDF & MINDMAP
-        // ==========================================
+        // PDF.js Logic
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-        let pdfDoc = null,
-            pageNum = 1,
-            pageIsRendering = false,
-            pageNumPending = null,
-            currentLessonId = "", 
-            currentLessonTitle = "", 
-            currentPdfUrl = "";
+        let pdfDoc = null, pageNum = 1, pageIsRendering = false, pageNumPending = null;
+        let currentLessonId = "", currentLessonTitle = "", currentPdfUrl = "";
 
         const canvas = document.getElementById('pdf-render-canvas');
         const ctx = canvas.getContext('2d');
         const loadingOverlay = document.getElementById('loader-overlay');
-        const btnPrev = document.getElementById('btn-prev');
-        const btnNext = document.getElementById('btn-next');
 
         const updateProgressData = () => {
             if (!currentLessonId || !pdfDoc) return;
-            const progressData = {
+            localStorage.setItem('hopvan_theory_progress', JSON.stringify({
                 id: currentLessonId, title: currentLessonTitle, pdfUrl: currentPdfUrl,
-                currentPage: pageNum, totalPages: pdfDoc.numPages, lastAccessed: new Date().getTime()
-            };
-            localStorage.setItem('hopvan_theory_progress', JSON.stringify(progressData));
+                currentPage: pageNum, totalPages: pdfDoc.numPages, lastAccessed: Date.now()
+            }));
         };
 
         const renderPage = num => {
@@ -564,155 +462,61 @@
 
             pdfDoc.getPage(num).then(page => {
                 const viewport = page.getViewport({ scale: 1.5 });
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
+                canvas.height = viewport.height; canvas.width = viewport.width;
 
-                const renderCtx = { canvasContext: ctx, viewport: viewport };
-
-                page.render(renderCtx).promise.then(() => {
+                page.render({ canvasContext: ctx, viewport: viewport }).promise.then(() => {
                     pageIsRendering = false;
                     loadingOverlay.classList.remove('active'); 
-                    
-                    if (pageNumPending !== null) {
-                        renderPage(pageNumPending);
-                        pageNumPending = null;
-                    }
-                }).catch(err => {
-                    console.log("Render bị huỷ:", err);
-                    pageIsRendering = false;
                     if (pageNumPending !== null) { renderPage(pageNumPending); pageNumPending = null; }
                 });
 
                 document.getElementById('page-num').textContent = num;
                 document.getElementById('pdf-progress').style.width = `${(num / pdfDoc.numPages) * 100}%`;
-                
-                btnPrev.disabled = (num <= 1);
-                btnNext.disabled = (num >= pdfDoc.numPages);
+                document.getElementById('btn-prev').disabled = (num <= 1);
+                document.getElementById('btn-next').disabled = (num >= pdfDoc.numPages);
                 updateProgressData();
-
-            }).catch(err => {
-                pageIsRendering = false;
-                loadingOverlay.classList.remove('active');
             });
         };
 
-        const queueRenderPage = num => {
-            if (pageIsRendering) pageNumPending = num; else renderPage(num);
-        };
-
-        // NÚT LẬT TRANG TRƯỚC (Slide từ trái qua)
-        window.onPrevPage = () => {
-            if (!pdfDoc || pageNum <= 1) return;
-            pageNum--;
-            
-            // Xóa sạch các class cũ
-            canvas.classList.remove('slide-left-out', 'slide-right-in', 'slide-right-out', 'slide-left-in');
-            
-            // Hiệu ứng trang cũ bay ra phải
-            canvas.classList.add('slide-right-out');
-            
-            // Đợi trang cũ mờ đi rồi mới render trang mới
-            setTimeout(() => {
-                queueRenderPage(pageNum);
-                
-                // Mẹo: Khởi tạo lại một listener 'render' trong PDF.js thì hơi rườm rà, 
-                // nên ta dùng Timeout đồng bộ với thời gian CSS (300ms) để gọi hiệu ứng bay vào.
-                canvas.classList.remove('slide-right-out');
-                void canvas.offsetWidth; // Ép reflow
-                canvas.classList.add('slide-left-in');
-            }, 300); 
-        };
-
-        // NÚT LẬT TRANG SAU (Slide từ phải qua)
-        window.onNextPage = () => {
-            if (!pdfDoc || pageNum >= pdfDoc.numPages) return;
-            pageNum++;
-            
-            // Xóa sạch các class cũ
-            canvas.classList.remove('slide-left-out', 'slide-right-in', 'slide-right-out', 'slide-left-in');
-            
-            // Hiệu ứng trang cũ bay ra trái
-            canvas.classList.add('slide-left-out');
-            
-            // Đợi trang cũ mờ đi rồi mới render trang mới
-            setTimeout(() => {
-                queueRenderPage(pageNum);
-                
-                canvas.classList.remove('slide-left-out');
-                void canvas.offsetWidth; // Ép reflow
-                canvas.classList.add('slide-right-in');
-            }, 300);
-        };
+        window.onPrevPage = () => { if (pdfDoc && pageNum > 1) { pageNum--; renderPage(pageNum); } };
+        window.onNextPage = () => { if (pdfDoc && pageNum < pdfDoc.numPages) { pageNum++; renderPage(pageNum); } };
 
         window.loadLesson = (id, title, pdfUrl, startPage = 1) => {
             const btnElement = document.getElementById(id);
-            if(!btnElement) return;
+            if(!btnElement || btnElement.classList.contains('locked')) return;
 
-            // Reset UI View về PDF
-            const pdfViewBtn = document.querySelector('.vs-btn[onclick*="pdf"]');
-            if(pdfViewBtn) switchViewMode('pdf', pdfViewBtn);
-
+            document.querySelector('.vs-btn[onclick*="pdf"]')?.click();
             currentLessonId = id; currentLessonTitle = title; currentPdfUrl = pdfUrl;
 
-            // Xử lý nạp Mindmap
+            // Xử lý Mindmap
             window.currentMindmapUrl = `../data/mindmap/${id}.png`;
-            const mindmapContainer = document.getElementById('mindmap-container');
-            if (mindmapContainer) {
-                mindmapContainer.innerHTML = `
-                    <div class="w-full h-full flex flex-col items-center justify-center p-4">
-                        <img src="${window.currentMindmapUrl}" 
-                             alt="Sơ đồ tư duy ${title}" 
-                             class="max-w-full max-h-full object-contain rounded-xl drop-shadow-md transition-transform duration-300 hover:scale-105 cursor-pointer"
-                             onclick="window.open('${window.currentMindmapUrl}', '_blank')"
-                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'flex flex-col items-center justify-center text-gray-400 opacity-60\\'><div class=\\'w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4 shadow-inner\\'><i class=\\'fas fa-project-diagram text-4xl text-gray-300\\'></i></div><p class=\\'font-bold text-sm tracking-wide uppercase\\'>Sơ đồ đang được biên soạn</p></div>'; document.getElementById('mindmap-controls').style.display='none';">
-                    </div>
-                `;
-                document.getElementById('mindmap-controls').style.display = 'flex';
-                document.getElementById('btn-download-mindmap').href = window.currentMindmapUrl;
-            }
+            document.getElementById('mindmap-container').innerHTML = `
+                <div class="w-full h-full flex flex-col items-center justify-center p-4">
+                    <img src="${window.currentMindmapUrl}" alt="Sơ đồ tư duy ${title}" class="max-w-full max-h-full object-contain rounded-xl drop-shadow-md transition-transform hover:scale-105 cursor-pointer" onclick="window.open('${window.currentMindmapUrl}', '_blank')" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'text-gray-400 opacity-60 text-center\\'><i class=\\'fas fa-project-diagram text-4xl mb-4\\'></i><p class=\\'font-bold text-sm uppercase\\'>Sơ đồ đang biên soạn</p></div>'; document.getElementById('mindmap-controls').style.display='none';">
+                </div>`;
+            document.getElementById('mindmap-controls').style.display = 'flex';
+            document.getElementById('btn-download-mindmap').href = window.currentMindmapUrl;
 
-            // Xử lý Active Class Sidebar
+            // Active UI
             document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
             btnElement.classList.add('active');
             document.getElementById('display-title').innerText = title;
 
             // Load PDF
+            document.getElementById('pdf-controls-box').style.display = 'none';
             loadingOverlay.classList.add('active');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             pdfjsLib.getDocument(pdfUrl).promise.then(pdfDoc_ => {
                 pdfDoc = pdfDoc_;
                 document.getElementById('page-count').textContent = pdfDoc.numPages;
-                pageNum = (startPage && startPage <= pdfDoc.numPages) ? startPage : 1; 
+                pageNum = (startPage <= pdfDoc.numPages) ? startPage : 1; 
+                document.getElementById('pdf-controls-box').style.display = 'flex';
                 renderPage(pageNum);
             }).catch(err => {
                 loadingOverlay.innerHTML = `<div class="text-red-500 font-bold p-4 text-center bg-red-50 rounded-xl"><i class="fas fa-exclamation-triangle mb-2 text-2xl"></i><br>Tài liệu đang được cập nhật!</div>`;
             });
-
-            if(window.innerWidth <= 1024 && document.getElementById('toc-sidebar').classList.contains('open')) {
-                toggleTOC();
-            }
         };
-
-        // Khôi phục bài cũ khi load trang
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedData = localStorage.getItem('hopvan_theory_progress');
-            if (savedData) {
-                try {
-                    const data = JSON.parse(savedData);
-                    loadLesson(data.id, data.title, data.pdfUrl, data.currentPage);
-                    setTimeout(() => {
-                        const activeBtn = document.getElementById(data.id);
-                        if(activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 500);
-                } catch(e) {
-                    document.getElementById('ls-truyen-tieu-thuyet')?.click();
-                }
-            } else {
-                document.getElementById('ls-truyen-tieu-thuyet')?.click();
-            }
-        });
-
     </script>
 </body>
 </html>

@@ -181,7 +181,7 @@
                         <h2 class="text-xl md:text-2xl font-black text-gray-800">Trắc Nghiệm & Tự Luận</h2>
                     </div>
                     <div class="text-xs font-bold text-white bg-gray-800 px-4 py-2 rounded-lg shadow-md flex items-center gap-2 font-mono text-sm transition-colors duration-300">
-                        <i class="fas fa-clock text-orange-400"></i> <span id="diag-timer">45:00</span>
+                        <i class="fas fa-clock text-orange-400"></i> <span id="diag-timer">90:00</span>
                     </div>
                 </div>
 
@@ -222,7 +222,7 @@
 
     </main>
 
-    <script type="module">
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -242,21 +242,44 @@
 
         let diagnosticData = { userLevel: "", mcAnswers: {}, essay: "" };
         let diagTimerInterval;
-        let diagTimeLeft = 2700; // Thay đổi thành 45 phút (45 * 60)
+        let diagTimeLeft = 2700; // 45 phút
         let isTakingTest = false;
 
+        // --- FIX LỖI BỊ GIAM Ở TRANG TRẮNG ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const docRef = doc(db, "users_progress", user.uid);
-                const docSnap = await getDoc(docRef);
-                
-                if (docSnap.exists() && docSnap.data().diagnosticDone === true) {
-                    window.location.href = "../index.html"; 
-                } else {
+                try {
+                    const docRef = doc(db, "users_progress", user.uid);
+                    const docSnap = await getDoc(docRef);
+                    
+                    // NẾU ĐÃ LÀM BÀI TEST RỒI
+                    if (docSnap.exists() && docSnap.data().diagnosticDone === true) {
+                        // Trường hợp 1: Chạy ngầm trong iframe của index.html -> Yêu cầu trang mẹ đóng iframe
+                        if (window !== window.parent && typeof window.parent.closeDiagnosticOverlay === 'function') {
+                            window.parent.closeDiagnosticOverlay();
+                        } 
+                        // Trường hợp 2: Lỡ gõ trực tiếp link trên trình duyệt -> Đá về trang index.html cùng thư mục
+                        else {
+                            window.location.href = "index.html"; 
+                        }
+                        return; // Dừng tại đây, KHÔNG hiện UI bài test
+                    } 
+                    
+                    // NẾU CHƯA LÀM BÀI -> HIỆN GIAO DIỆN
+                    document.getElementById('main-wrapper').style.display = 'flex';
+                    
+                } catch (error) {
+                    console.error("Lỗi kiểm tra DB:", error);
+                    // Nếu lỗi mạng, an toàn nhất là cứ hiện bài test lên
                     document.getElementById('main-wrapper').style.display = 'flex';
                 }
             } else {
-                window.location.href = "../log.html";
+                // Chưa đăng nhập -> Đá về log.html
+                if (window !== window.parent) {
+                    window.parent.location.href = "../log.html";
+                } else {
+                    window.location.href = "../log.html";
+                }
             }
         });
 
@@ -343,7 +366,7 @@
 
         function startDiagTimer() {
             clearInterval(diagTimerInterval);
-            diagTimeLeft = 2700; // Thay đổi thành 45 phút
+            diagTimeLeft = 2700; // 45 phút
             const timerEl = document.getElementById('diag-timer');
             
             diagTimerInterval = setInterval(() => {
@@ -372,7 +395,11 @@
                 isTakingTest = false;
                 clearInterval(diagTimerInterval);
                 alert("⛔ CẢNH BÁO GIAN LẬN: Bạn đã chuyển tab hoặc thu nhỏ trình duyệt trong lúc làm bài thi.\n\nBài thi của bạn đã bị HỦY BỎ kết quả!");
-                window.location.href = "../index.html"; 
+                if (window !== window.parent) {
+                    window.parent.location.href = "index.html";
+                } else {
+                    window.location.href = "index.html"; 
+                }
             }
         });
 
@@ -404,7 +431,6 @@
             setTimeout(() => { bar.style.width = '50%'; status.innerText = "AI đang đọc và chấm điểm bài luận..."; }, 1000);
 
             try {
-                // Đã thay đổi Prompt yêu cầu chấm theo barem cực kỳ chi tiết
                 const systemPrompt = `Bạn là Giám khảo chấm thi môn Ngữ Văn của nền tảng HopVan.
                 [DỮ LIỆU BÀI LÀM]
                 - Học sinh tự nhận định: ${diagnosticData.userLevel}
@@ -458,22 +484,65 @@
 
                 const result = JSON.parse(rawText);
 
+                // --- TÁCH KHỐI TRY...CATCH CHO FIREBASE ĐỂ KHÔNG CHẶN KẾT QUẢ AI ---
                 if (auth.currentUser) {
-                    const uid = auth.currentUser.uid;
-                    await setDoc(doc(db, "users_progress", uid), { diagnosticDone: true }, { merge: true });
-                    await setDoc(doc(db, "diagnostic_results", uid), {
-                        total_score: result.total_score,
-                        level_title: result.level_title,
-                        timestamp: new Date()
-                    }, { merge: true });
+                    try {
+                        const uid = auth.currentUser.uid;
+                        
+                        // 1. CHUẨN HÓA TỔNG ĐIỂM (Đảm bảo là kiểu số)
+                        let rawTotal = parseFloat(result.total_score);
+                        if (isNaN(rawTotal)) {
+                            // Nếu AI trả về chuỗi kiểu "8.5/10", trích xuất số đầu tiên
+                            const match = String(result.total_score).match(/[\d\.]+/);
+                            rawTotal = match ? parseFloat(match[0]) : 0;
+                        }
+                        
+                        // 2. PHÂN LOẠI KHUNG NĂNG LỰC (5 LEVELS)
+                        let competenceLevel = 1;
+                        let competenceTag = "Khởi đầu";
+                        
+                        if (rawTotal >= 9.0) {
+                            competenceLevel = 5;
+                            competenceTag = "Nâng cao";
+                        } else if (rawTotal >= 7.0) {
+                            competenceLevel = 4;
+                            competenceTag = "Ứng dụng";
+                        } else if (rawTotal >= 5.0) {
+                            competenceLevel = 3;
+                            competenceTag = "Củng cố";
+                        } else if (rawTotal >= 2.0) {
+                            competenceLevel = 2;
+                            competenceTag = "Xây nền";
+                        } // Dưới 2 là Level 1 (Khởi đầu)
+
+                        // 3. LƯU DỮ LIỆU LÊN FIREBASE (Lưu vào users_progress để dùng toàn cục)
+                        await setDoc(doc(db, "users_progress", uid), { 
+                            diagnosticDone: true,
+                            competenceLevel: competenceLevel, // Số (1-5) để dễ query/code logic sau này
+                            competenceTag: competenceTag,     // Chữ để hiển thị
+                            startingScore: rawTotal           // Lưu điểm gốc để đo lường độ tiến bộ
+                        }, { merge: true });
+
+                        // Lưu thêm vào bảng lịch sử test (nếu cần tracking nhiều lần test)
+                        await setDoc(doc(db, "diagnostic_results", uid), {
+                            total_score: rawTotal,
+                            level_title: result.level_title,
+                            competenceLevel: competenceLevel,
+                            timestamp: new Date()
+                        }, { merge: true });
+
+                    } catch(dbError) {
+                        console.error("Lỗi cấp quyền Firestore khi lưu kết quả bài test:", dbError);
+                        // Lỗi lưu Firebase sẽ bị chặn tại đây và ghi ra log, KHÔNG làm văng báo lỗi AI
+                    }
                 }
 
                 bar.style.width = '100%'; status.innerText = "Hoàn tất!";
                 renderResult(result);
                 setTimeout(() => { goToStep(4); }, 600);
-
+                
             } catch (error) {
-                console.error(error);
+                console.error("Lỗi AI sinh mã:", error);
                 alert("Lỗi máy chủ AI. Vui lòng bấm Nộp lại bài!");
                 goToStep(2);
             }
@@ -528,7 +597,7 @@
                 </div>
 
                 <div class="mt-8 text-center flex justify-center gap-4">
-                    <button onclick="window.parent.closeDiagnosticOverlay()" class="btn-primary">
+                    <button onclick="if(window!==window.parent){window.parent.closeDiagnosticOverlay();}else{window.location.href='index.html';}" class="btn-primary">
                         Vào học ngay <i class="fas fa-arrow-right ml-1"></i>
                     </button>
                 </div>
