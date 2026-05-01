@@ -41,7 +41,7 @@
         .modal-content { background: white; padding: 30px; border-radius: 24px; text-align: center; transform: scale(0.9); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 60px rgba(0,0,0,0.1); max-width: 400px; width: 90%; }
         .modal-overlay.show .modal-content { transform: scale(1); }
 
-                /* --- GLOBAL SCROLLBAR --- */
+        /* --- GLOBAL SCROLLBAR --- */
         ::-webkit-scrollbar { width: 10px; height: 10px; }
         ::-webkit-scrollbar-track { background: rgba(255, 143, 80, 0.05); border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background-color: rgba(255, 143, 80, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; transition: background-color 0.3s ease; }
@@ -548,7 +548,10 @@
         document.getElementById("google-login-btn").addEventListener("click", async () => {
             const provider = new GoogleAuthProvider();
             try {
-                await setPersistence(auth, browserLocalPersistence);
+                // ĐÃ THÊM LOGIC ĐỒNG BỘ "NHỚ TÀI KHOẢN" CHO GOOGLE LOGIN
+                const rememberMe = document.getElementById("remember-me").checked;
+                await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+                
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
                 
