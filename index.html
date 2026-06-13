@@ -1075,6 +1075,62 @@
         html.dark .faq-item.active .faq-a-content { border-top-color: #334155; }
         html.dark .contact-card { background: #0F172A; border-color: #334155; }
         html.dark .contact-card:hover { background: #1E293B; border-color: var(--primary); }
+
+
+        /* =========================================
+           PROMO BANNER (POPUP QUẢNG CÁO ĐẦU TRANG)
+           ========================================= */
+        .promo-overlay {
+            position: fixed; inset: 0; z-index: 999999; /* Nằm trên cùng mọi thứ */
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center;
+            opacity: 0; padding: 20px; transition: opacity 0.5s ease;
+        }
+        .promo-overlay.show { display: flex; opacity: 1; }
+        
+        .promo-box {
+            position: relative;
+            width: 100%; max-width: 500px; /* Mức max-width chuẩn đẹp cho Desktop */
+            background: transparent;
+            border-radius: 24px;
+            transform: scale(0.9) translateY(30px);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.2);
+        }
+        .promo-overlay.show .promo-box { transform: scale(1) translateY(0); }
+        
+        /* Chốt tỷ lệ khung hình 1000x995 theo yêu cầu */
+        .promo-img {
+            width: 100%; height: auto; aspect-ratio: 1000 / 995;
+            object-fit: cover; border-radius: 24px; display: block;
+            cursor: pointer; transition: transform 0.3s ease;
+        }
+        
+        /* Hiệu ứng viền sáng chạy xung quanh (Tùy chọn cho độ Premium) */
+        .promo-box::before {
+            content: ''; position: absolute; inset: -3px; border-radius: 26px;
+            background: linear-gradient(135deg, #0D9488 0%, #10B981 100%);
+            background-size: 300% 300%; animation: gradientGlow 4s ease infinite;
+            z-index: -1; filter: blur(8px); opacity: 0.7;
+        }
+        @keyframes gradientGlow { 0% {background-position: 0% 50%} 50% {background-position: 100% 50%} 100% {background-position: 0% 50%} }
+
+        /* Nút Close lơ lửng */
+        .btn-promo-close {
+            position: absolute; top: -15px; right: -15px;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: white; color: #64748b; border: none; font-size: 1.2rem; 
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); cursor: pointer; z-index: 10;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-promo-close:hover { background: #0D9488; color: white; transform: rotate(90deg) scale(1.1); }
+
+        /* Responsive cho điện thoại (nút Close thụt vào trong để không bị kẹt mép màn hình) */
+        @media (max-width: 768px) {
+            .btn-promo-close { top: 12px; right: 12px; width: 36px; height: 36px; background: rgba(255,255,255,0.9); }
+        }
+
     </style>
 </head>
 <body>
@@ -1757,6 +1813,16 @@
         </div>
     </div>
 
+    <div id="promo-modal" class="promo-overlay">
+        <div class="promo-box">
+            <button class="btn-promo-close" onclick="closePromoModal()"><i class="fas fa-times"></i></button>
+            
+            <a href="https://aigeo.info.vn">
+                <img src="IMG/anh-quang-cao.png" alt="Sự kiện HopVan" class="promo-img" onerror="this.src='https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop'">
+            </a>
+        </div>
+    </div>
+
     <script type="module" src="/presence.js"></script>
     <script type="module" src="/check-maintenance.js"></script>
 
@@ -2076,6 +2142,42 @@
             }
         }
     </script>   
+
+    <script>
+        // Logic điều khiển Popup Quảng Cáo
+        document.addEventListener("DOMContentLoaded", () => {
+            const promoModal = document.getElementById('promo-modal');
+            // Kiểm tra xem User đã thấy quảng cáo trong phiên làm việc này chưa (tránh spam)
+            const hasSeenPromo = sessionStorage.getItem('hopvan_promo_shown');
+            
+            if (!hasSeenPromo && promoModal) {
+                // Đợi 1.5 giây sau khi load trang web xong mới hiện lên cho mượt
+                setTimeout(() => {
+                    promoModal.classList.add('show');
+                    document.body.style.overflow = 'hidden'; // Khóa cuộn trang nền
+                }, 1500); 
+            }
+        });
+
+        // Hàm đóng Popup
+        function closePromoModal() {
+            const promoModal = document.getElementById('promo-modal');
+            if(promoModal) {
+                promoModal.classList.remove('show');
+                document.body.style.overflow = 'auto'; // Mở lại cuộn trang
+                // Ghi nhớ vào Session: "Tôi đã xem rồi, đừng hiện nữa"
+                sessionStorage.setItem('hopvan_promo_shown', 'true');
+            }
+        }
+
+        // Bấm ra ngoài vùng tối cũng tự đóng
+        window.addEventListener('click', (e) => {
+            const promoModal = document.getElementById('promo-modal');
+            if (e.target === promoModal) {
+                closePromoModal();
+            }
+        });
+    </script>
 
 <script type="text/javascript">
     // 1. Chặn Chuột phải (Để ẩn menu "Inspect/Kiểm tra" và "View Source/Xem nguồn")
