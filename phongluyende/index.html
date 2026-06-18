@@ -601,6 +601,33 @@
         document.getElementById('ai-correction-box').innerHTML = html;
     };
 
+    // --- HÀM LẤY API KEY TỪ FIRESTORE ĐỂ LUÂN PHIÊN (ROTATION) ---
+    async function getRandomGroqKey() {
+        try {
+            const url = `https://firestore.googleapis.com/v1/projects/hopvan-9a648/databases/(default)/documents/system_settings/api_keys?t=${Date.now()}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.error) {
+                console.error("Firebase REST Error:", data.error.message);
+                if (data.error.code === 403) throw new Error("Chưa cấp quyền Đọc (read) cho bảng api_keys trong Firestore Rules.");
+                return null;
+            }
+
+            const keysArray = data?.fields?.groq_keys?.arrayValue?.values;
+            if (keysArray && keysArray.length > 0) {
+                const keys = keysArray.map(k => k.stringValue).filter(Boolean);
+                if (keys.length > 0) {
+                    return keys[Math.floor(Math.random() * keys.length)];
+                }
+            }
+            return null;
+        } catch (error) {
+            console.error("Lỗi khi lấy Groq API Key:", error);
+            throw error;
+        }
+    }
+
     // --- 2. XỬ LÝ NỘP BÀI VÀ LƯU DATABASE ---
     window.handleAISubmission = async () => {
         const content = document.getElementById('student-essay').value.trim();
@@ -619,6 +646,7 @@
         }
 
         try {
+            // Lấy Prompt hệ thống
             const promptResponse = await fetch('prompts.json'); 
             const promptData = await promptResponse.json();
             
@@ -639,7 +667,6 @@
                     .split('{{BAI_LAM}}').join(safe(content));
                 messages = "Học sinh gửi bài làm Đọc Hiểu. Hãy chấm theo Barem 4.0.";
             } else {
-                // Sử dụng prompt cá nhân hóa cho NLXH/NLVH
                 systemPrompt = promptData.de_ca_nhan
                     .split('{{DOC_HIEU}}').join(safe(q.text))
                     .split('{{CAU_HOI}}').join(safe("Không có"))
@@ -651,23 +678,51 @@
                 messages = `Học sinh gửi bài ${q.type === 'nlxh' ? 'NLXH' : 'NLVH'}. Hãy chấm theo thang 10.${adminHint}`;
             }
 
-            const res = await fetch(API_URL, { 
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify({ systemPrompt: systemPrompt, messages: messages }) 
+            // 1. LẤY API KEY ĐỘNG TỪ FIREBASE
+            const apiKey = await getRandomGroqKey();
+            if (!apiKey) {
+                throw new Error("Hệ thống chưa được cấu hình API Key. Vui lòng liên hệ Admin.");
+            }
+
+            // 2. GỌI TRỰC TIẾP API GROQ VỚI MODEL LLAMA 3.3 70B
+            const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: { 
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify({ 
+                    model: "llama-3.3-70b-versatile",
+                    messages: [
+                        { role: "system", content: systemPrompt },
+                        { role: "user", content: messages }
+                    ],
+                    temperature: 0.3, // Hạ temperature xuống để AI chấm điểm chuẩn xác, bớt ngẫu hứng
+                    max_tokens: 3000, // Đủ dài cho một bài phân tích sâu
+                    response_format: { type: "json_object" } 
+                })
             });
 
-            if (!res.ok) throw new Error("SERVER_ERROR");
+            if (!res.ok) {
+                const errData = await res.json();
+                console.error("Groq Error:", errData);
+                if (res.status === 429) throw new Error("Hệ thống đang quá tải request, vui lòng thử lại sau giây lát.");
+                if (res.status === 401) throw new Error("API Key không hợp lệ hoặc đã bị khóa.");
+                throw new Error("Lỗi kết nối máy chủ AI.");
+            }
+
             const data = await res.json();
             if (!data.choices || !data.choices[0] || !data.choices[0].message) throw new Error("NO_CONTENT");
 
             let rawText = data.choices[0].message.content;
-            rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+            
+            // Dọn dẹp JSON an toàn không làm lỗi VS Code
+            rawText = rawText.replace(/[`]{3}json/g, "").replace(/[`]{3}/g, "").trim();
             const firstBrace = rawText.indexOf('{');
             const lastBrace = rawText.lastIndexOf('}');
             if (firstBrace !== -1 && lastBrace !== -1) rawText = rawText.substring(firstBrace, lastBrace + 1);
             
-            rawText = rawText.replace(/[\u0000-\u0019]+/g,"");
+            rawText = rawText.replace(/[\u0000-\u0019]+/g,""); // Xóa ký tự vô hình
 
             const result = JSON.parse(rawText);
 
@@ -733,7 +788,7 @@
         } catch(e) { 
             console.error(e); 
             let msg = "Có lỗi xảy ra, vui lòng thử lại!";
-            if (e.message === "SERVER_ERROR") msg = "Server đang bận. Bạn hãy bấm nộp lại nhé!";
+            if (e.message.includes("Hệ thống đang quá tải")) msg = e.message;
             if (e.name === "SyntaxError") msg = "Dữ liệu AI trả về bị lỗi cấu trúc. Vui lòng bấm nộp lại!";
             showPopup("Lỗi AI", msg, "error");
         } finally { 

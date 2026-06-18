@@ -528,8 +528,36 @@
 
 
     // =========================================================
-    // GỌI GROQ AI ĐỂ GIẢI THÍCH CÂU HỎI TRẮC NGHIỆM (BẢN FIX LỖI JSON 500)
+    // GỌI GROQ AI ĐỂ GIẢI THÍCH CÂU HỎI TRẮC NGHIỆM
     // =========================================================
+    
+    // --- HÀM LẤY API KEY TỪ FIRESTORE ĐỂ LUÂN PHIÊN (ROTATION) ---
+    async function getRandomGroqKey() {
+        try {
+            const url = `https://firestore.googleapis.com/v1/projects/hopvan-9a648/databases/(default)/documents/system_settings/api_keys?t=${Date.now()}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.error) {
+                console.error("Firebase REST Error:", data.error.message);
+                if (data.error.code === 403) throw new Error("Chưa cấp quyền Đọc (read) cho bảng api_keys trong Firebase.");
+                return null;
+            }
+
+            const keysArray = data?.fields?.groq_keys?.arrayValue?.values;
+            if (keysArray && keysArray.length > 0) {
+                const keys = keysArray.map(k => k.stringValue).filter(Boolean);
+                if (keys.length > 0) {
+                    return keys[Math.floor(Math.random() * keys.length)];
+                }
+            }
+            return null;
+        } catch (error) {
+            console.error("Lỗi khi lấy Groq API Key:", error);
+            throw error;
+        }
+    }
+
     window.explainWithAI = async function(index) {
         try {
             const btn = document.getElementById(`btn-ai-${index}`);
@@ -568,25 +596,47 @@
                 }
             }
 
-            // ÉP CỨNG CHUẨN JSON ĐỂ KHÔNG BỊ LỖI 500 TỪ GROQ
+            // ÉP CỨNG CHUẨN JSON ĐỂ KHÔNG BỊ LỖI
             const systemPrompt = `Bạn là giáo viên Ngữ Văn. Dựa vào câu hỏi và đáp án học sinh chọn, hãy giải thích ngắn gọn, đi thẳng vào vấn đề (tối đa 3 câu) vì sao đáp án đúng là đáp án đó. Nhìn vào đáp án học sinh chọn, nếu sai, hãy chỉ ra điểm dễ gây nhầm lẫn.
-            BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON SAU:
+            
+            [LƯU Ý QUAN TRỌNG]: BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON SAU ĐÂY VÀ KHÔNG KÈM BẤT KỲ VĂN BẢN NÀO KHÁC:
             {
                 "explanation": "Câu giải thích của bạn viết tại đây..."
             }`;
             
             const messages = `Câu hỏi: ${q.question}\nCác đáp án: ${optionsArray.join(" | ")}\nHọc sinh chọn: ${selectedText}\nĐáp án đúng: ${correctText}`;
 
-            const API_URL = `/.netlify/functions/gemini-proxy`;
-            const res = await fetch(API_URL, { 
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify({ systemPrompt: systemPrompt, messages: messages }) 
+            // 1. LẤY API KEY ĐỘNG TỪ FIREBASE
+            const apiKey = await getRandomGroqKey();
+            if (!apiKey) {
+                throw new Error("Hệ thống chưa được cấu hình API Key. Vui lòng liên hệ Admin.");
+            }
+
+            // 2. GỌI TRỰC TIẾP API GROQ (Mô hình Llama 3.3 70B)
+            const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: { 
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify({ 
+                    model: "llama-3.3-70b-versatile",
+                    messages: [
+                        { role: "system", content: systemPrompt },
+                        { role: "user", content: messages }
+                    ],
+                    temperature: 0.3,
+                    max_tokens: 800, 
+                    response_format: { type: "json_object" } 
+                }) 
             });
 
             if (!res.ok) {
-                const errText = await res.text();
-                throw new Error(`Server báo lỗi HTTP ${res.status} - ${errText}`);
+                const errData = await res.json();
+                console.error("Groq Error:", errData);
+                if (res.status === 429) throw new Error("Hệ thống đang quá tải request, vui lòng thử lại sau giây lát.");
+                if (res.status === 401) throw new Error("API Key không hợp lệ hoặc đã bị khóa.");
+                throw new Error("Lỗi kết nối máy chủ AI.");
             }
             
             const data = await res.json();
@@ -597,12 +647,19 @@
 
             // LỘT VỎ JSON ĐỂ LẤY NỘI DUNG GIẢI THÍCH
             let rawText = data.choices[0].message.content;
-            rawText = rawText.replace(/```[a-zA-Z]*\n?/g, "").replace(/```/g, "").trim(); 
+            
+            rawText = rawText.replace(/[`]{3}json/g, "").replace(/[`]{3}/g, "").trim(); 
+            const firstBrace = rawText.indexOf('{');
+            const lastBrace = rawText.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1) {
+                rawText = rawText.substring(firstBrace, lastBrace + 1);
+            }
+            rawText = rawText.replace(/[\u0000-\u0019]+/g,"");
             
             const resultObj = JSON.parse(rawText);
             let finalExplanation = resultObj.explanation || "Không thể tải lời giải thích.";
 
-            // Highlight chữ in đậm
+            // Highlight chữ in đậm (Chuyển Markdown sang HTML)
             finalExplanation = finalExplanation.replace(/\*\*(.*?)\*\*/g, '<b class="text-orange-600">$1</b>'); 
 
             // In kết quả ra màn hình

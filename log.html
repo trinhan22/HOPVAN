@@ -121,7 +121,19 @@
                     </div>
                 </div>
                 <div class="flex justify-between items-center text-xs font-bold text-gray-500 pl-1 pt-1">
-                    <label class="flex items-center gap-2 cursor-pointer hover:text-orange-500 transition"><input type="checkbox" id="remember-me" class="accent-orange-500 w-4 h-4 rounded-md"> Ghi nhớ</label>
+                    <label class="flex items-center gap-2 cursor-pointer group">
+                        <div class="relative flex items-center justify-center w-[18px] h-[18px]">
+                            <!-- Nút checkbox gốc (peer) -->
+                            <input type="checkbox" id="remember-me" class="peer sr-only">
+                            
+                            <!-- Ô vuông nền -->
+                            <div class="absolute inset-0 rounded-[6px] border-2 border-gray-300 bg-white transition-all duration-300 peer-checked:bg-gradient-to-br peer-checked:from-[#FF8F50] peer-checked:to-[#FF6B6B] peer-checked:border-transparent group-hover:border-[#FF8F50] shadow-sm"></div>
+                            
+                            <!-- Dấu check đè lên trên (Bây giờ đã cùng cấp với input) -->
+                            <i class="fas fa-check absolute text-white text-[10px] opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-300 pointer-events-none z-10"></i>
+                        </div>
+                        <span class="group-hover:text-[#FF8F50] transition-colors">Ghi nhớ đăng nhập</span>
+                    </label>
                     <a href="#" id="btn-forgot" class="text-orange-500 hover:underline">Quên mật khẩu?</a>
                 </div>
                 <button type="submit" class="w-full py-3.5 rounded-xl text-white font-bold btn-gradient flex justify-center items-center gap-2 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/40 mt-2"><span>Đăng nhập</span></button>

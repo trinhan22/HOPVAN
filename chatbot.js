@@ -270,7 +270,37 @@ function initChatbot() {
         });
     };
 
-    // --- LOGIC GỬI TIN NHẮN (FIXED) ---
+    // --- HÀM LẤY API KEY TỪ FIRESTORE ĐỂ LUÂN PHIÊN (ROTATION) ---
+    async function getRandomGroqKey() {
+        try {
+            // Thêm tham số chống cache (?t=...) để luôn lấy key mới nhất từ server
+            const url = `https://firestore.googleapis.com/v1/projects/hopvan-9a648/databases/(default)/documents/system_settings/api_keys?t=${Date.now()}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            // Xử lý trường hợp bị chặn quyền bởi Firestore Rules
+            if (data.error) {
+                console.error("Firebase REST Error:", data.error.message);
+                if (data.error.code === 403) throw new Error("Chưa cấp quyền Đọc (read) cho bảng api_keys trong Firestore Rules.");
+                return null;
+            }
+
+            // Truy xuất an toàn bằng Optional Chaining (?.) để không bị crash nếu mảng rỗng
+            const keysArray = data?.fields?.groq_keys?.arrayValue?.values;
+            
+            if (keysArray && keysArray.length > 0) {
+                const keys = keysArray.map(k => k.stringValue).filter(Boolean); // Lọc bỏ các key rỗng
+                if (keys.length > 0) {
+                    return keys[Math.floor(Math.random() * keys.length)]; // Bốc ngẫu nhiên 1 key
+                }
+            }
+            return null;
+        } catch (error) {
+            console.error("Lỗi khi lấy Groq API Key:", error);
+            throw error; // Ném lỗi ra để hiển thị thẳng lên khung chat
+        }
+    }
+    
     async function sendMessage() {
         const text = inputEl.value.trim();
         if (!text && !currentFile) return;
@@ -281,7 +311,6 @@ function initChatbot() {
         if (currentFile) {
             userHtml += `<br><small>📎 <em>${currentFile.name}</em></small>`;
             try {
-                // Đọc nội dung file text
                 const fileContent = await readTextFile(currentFile);
                 contentToSend += `\n\n[Nội dung file đính kèm ${currentFile.name}]:\n${fileContent}`;
             } catch(e) {
@@ -300,7 +329,6 @@ function initChatbot() {
         const loadingId = showLoading();
 
         try {
-            // CẤU TRÚC PROMPT PRO CHO GIA SƯ VĂN HỌC (HOPVAN AI - CHUẨN GDPT 2018)
             const systemPrompt = `
             [VAI TRÒ VÀ ĐỊNH DANH]
             - Bạn tên là "HopVan AI" - Một gia sư Ngữ Văn thông minh, tận tâm và uyên bác.
@@ -308,35 +336,55 @@ function initChatbot() {
             - Văn phong: Thân thiện, xưng hô "Mình - Bạn", truyền cảm hứng, dùng ngôn từ trong sáng, chuẩn mực. Đôi khi dùng biểu tượng cảm xúc (emoji) để tạo sự gần gũi.
 
             [PHƯƠNG PHÁP SƯ PHẠM - QUAN TRỌNG NHẤT]
-            1. BÁM SÁT GDPT 2018: Trọng tâm là đánh giá năng lực Đọc - Viết - Nói - Nghe, KHÔNG học vẹt. Luôn hướng dẫn học sinh tiếp cận văn bản theo ĐẶC TRƯNG THỂ LOẠI (Thơ, Truyện, Kịch, Ký, Văn bản thông tin, Văn bản nghị luận).
-            2. KHÔNG VIẾT BÀI HỘ: Tuyệt đối KHÔNG viết sẵn nguyên một bài văn hay đoạn văn dài khi học sinh yêu cầu "Viết cho tôi...". Thay vào đó, hãy CUNG CẤP DÀN Ý, GỢI Ý LUẬN ĐIỂM, TỪ KHÓA hoặc phân tích mẫu một khía cạnh nhỏ.
-            3. KHÔNG BỊA ĐẶT THÔNG TIN: Nếu được hỏi về một tác phẩm, tác giả hoặc khái niệm lý luận văn học mà bạn không biết hoặc nằm ngoài sách giáo khoa, hãy thẳng thắn thừa nhận: "Câu hỏi này hiện tại nằm ngoài cơ sở dữ liệu của mình, nhưng mình có thể cùng bạn phân tích dựa trên văn bản nếu bạn cung cấp đoạn trích nhé!". Tuyệt đối không tự sáng tác thơ, tự bịa cốt truyện hay sai lệch kiến thức lịch sử văn học.
-
-            [HƯỚNG DẪN TRẢ LỜI TỪNG DẠNG CÂU HỎI]
-            - Trắc nghiệm / Hỏi đáp ngắn: Trả lời đi thẳng vào vấn đề, giải thích ngắn gọn lý do vì sao chọn đáp án đó.
-            - Đọc hiểu: Hướng dẫn học sinh tìm từ khóa trong đoạn trích, nhận diện biện pháp tu từ và tác dụng, chỉ ra chủ đề/thông điệp.
-            - Nghị luận xã hội (NLXH): Cung cấp hướng đi (Giải thích -> Bàn luận -> Dẫn chứng -> Phản đề -> Bài học). Gợi ý 1-2 dẫn chứng thực tế, mới mẻ.
-            - Nghị luận văn học (NLVH): Nhắc nhở học sinh bám sát phương thức biểu đạt, ngôi kể, điểm nhìn, biện pháp nghệ thuật thay vì chỉ diễn xuôi nội dung.
+            1. BÁM SÁT GDPT 2018: Trọng tâm là đánh giá năng lực Đọc - Viết - Nói - Nghe, KHÔNG học vẹt. Luôn hướng dẫn học sinh tiếp cận văn bản theo ĐẶC TRƯNG THỂ LOẠI.
+            2. KHÔNG VIẾT BÀI HỘ: Tuyệt đối KHÔNG viết sẵn nguyên một bài văn hay đoạn văn dài khi học sinh yêu cầu "Viết cho tôi...". Thay vào đó, hãy CUNG CẤP DÀN Ý, GỢI Ý LUẬN ĐIỂM, TỪ KHÓA.
+            3. KHÔNG BỊA ĐẶT THÔNG TIN: Nếu nằm ngoài kiến thức, hãy thẳng thắn thừa nhận và yêu cầu học sinh cung cấp trích đoạn.
 
             [QUY TẮC ĐẦU RA - BẮT BUỘC TUÂN THỦ 100%]
-            Do hệ thống kỹ thuật yêu cầu output JSON, bạn BẮT BUỘC phải trả lời theo ĐÚNG định dạng JSON sau. 
-            KHÔNG được in ra bất kỳ chữ nào, dấu markdown nào (như \`\`\`json) nằm ngoài dấu ngoặc nhọn {}.
-            Định dạng bắt buộc:
+            Bạn BẮT BUỘC phải trả lời theo ĐÚNG định dạng JSON sau. KHÔNG được in ra ký tự markdown \`\`\`json.
             { 
-              "reply": "Nội dung câu trả lời của bạn viết ở đây. Sử dụng thẻ <br> để xuống dòng thay vì ký tự xuông dòng (enter). Dùng <b>chữ đậm</b> để nhấn mạnh từ khóa." 
+              "reply": "Nội dung câu trả lời ở đây. Dùng thẻ <br> để xuống dòng. Dùng <b>chữ đậm</b> để nhấn mạnh." 
             }
             `;
 
-            const res = await fetch('/.netlify/functions/gemini-proxy', {
+            // 1. LẤY API KEY ĐỘNG TỪ FIREBASE (ĐÃ FIX ERROR CATCHING)
+            let apiKey;
+            try {
+                apiKey = await getRandomGroqKey();
+            } catch (e) {
+                throw new Error(e.message);
+            }
+
+            if (!apiKey) {
+                throw new Error("Chưa có API Key nào được lưu trên Admin Panel. Vui lòng thêm key!");
+            }
+
+            // 2. GỌI TRỰC TIẾP API GROQ VỚI MODEL LLAMA 3.3 70B
+            const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json' 
+                },
                 body: JSON.stringify({ 
-                    systemPrompt: systemPrompt,  // Gửi riêng systemPrompt
-                    messages: contentToSend      // Gửi nội dung user (Text + File Content)
+                    model: "llama-3.3-70b-versatile",
+                    messages: [
+                        { role: "system", content: systemPrompt },
+                        { role: "user", content: contentToSend }
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 2000,
+                    response_format: { type: "json_object" } 
                 })
             });
 
-            if(!res.ok) throw new Error("SERVER_ERROR");
+            if(!res.ok) {
+                const errData = await res.json();
+                console.error("Groq Error:", errData);
+                if (res.status === 429) throw new Error("Hệ thống đang quá tải request, vui lòng thử lại sau giây lát.");
+                if (res.status === 401) throw new Error("API Key không hợp lệ hoặc đã bị khóa.");
+                throw new Error("Lỗi kết nối máy chủ AI.");
+            }
 
             const data = await res.json();
             removeLoading(loadingId);
@@ -344,10 +392,8 @@ function initChatbot() {
             if (data.choices && data.choices.length > 0) {
                 let rawText = data.choices[0].message.content;
                 
-                // Parse JSON từ phản hồi của AI
                 try {
-                    // Dọn dẹp Markdown thừa
-                    rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+                    rawText = rawText.replace(/[`]{3}json/g, "").replace(/[`]{3}/g, "").trim();
                     const firstBrace = rawText.indexOf('{');
                     const lastBrace = rawText.lastIndexOf('}');
                     if (firstBrace !== -1 && lastBrace !== -1) {
@@ -355,28 +401,22 @@ function initChatbot() {
                     }
                     
                     const jsonRes = JSON.parse(rawText);
-                    
-                    // Chỉ lấy phần 'reply' để hiển thị
                     let reply = jsonRes.reply || "Xin lỗi, mình chưa hiểu ý bạn lắm.";
-                    
-                    // Format Markdown cơ bản sang HTML
                     reply = reply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                    // Không cần replace \n thành <br> nữa vì prompt đã ép AI dùng <br>
                     
                     appendMessage(reply, 'bot');
                 } catch(e) {
-                    console.error("Lỗi parse JSON chatbot: ", e);
-                    // Fallback nếu AI lỡ quên format JSON (hiện text thô)
-                    appendMessage("Mình đang gặp chút trục trặc trong việc định dạng câu trả lời. Bạn hỏi lại nhé!", 'bot');
+                    console.error("Lỗi parse JSON chatbot: ", e, rawText);
+                    appendMessage("Mình đang gặp trục trặc định dạng câu trả lời. Bạn hỏi lại nhé!", 'bot');
                 }
             } else {
                 appendMessage("AI đang bận, thử lại sau nhé!", 'bot');
             }
 
         } catch (error) {
-            console.error(error);
+            console.error("Chatbot Error:", error);
             removeLoading(loadingId);
-            appendMessage("Lỗi kết nối. Vui lòng thử lại!", 'bot');
+            appendMessage(`Lỗi: ${error.message}`, 'bot');
         }
     }
 

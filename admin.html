@@ -668,12 +668,12 @@
                 <i class="fas fa-th-large"></i> Tổng Quan
             </div>
             
-            <div class="px-7 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Quản Lý Ngân Hàng</div>
+            <div class="px-7 mt-4 mb-1 text-[10px] font-black text-gray-400 uppercase tracking-widest">Quản Lý Ngân Hàng</div>
             <div class="nav-item" onclick="switchView('bank', this)">
                 <i class="fas fa-layer-group"></i> Kho Đề Thi
             </div>
 
-            <div class="px-7 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Nội Dung</div>
+            <div class="px-7 mt-4 mb-1 text-[10px] font-black text-gray-400 uppercase tracking-widest">Nội Dung</div>
             <div class="nav-item" onclick="switchView('news', this)">
                 <i class="fas fa-feather-alt"></i> Bản Tin Văn Học
             </div>
@@ -681,7 +681,7 @@
                 <i class="fas fa-road"></i> Nhật Ký Học Tập
             </div>
 
-            <div class="px-7 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Dữ Liệu</div>
+            <div class="px-7 mt-4 mb-1 text-[10px] font-black text-gray-400 uppercase tracking-widest">Dữ Liệu</div>
             <div class="nav-item" onclick="switchView('history', this)">
                 <i class="fas fa-users"></i> Quản Lý Tài Khoản
             </div>
@@ -689,7 +689,12 @@
                 <i class="fas fa-comment-dots"></i> Góp Ý & Phản Hồi
             </div>
 
-            <div class="px-7 mt-6 mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Hệ Thống</div>
+            <div class="px-7 mt-4 mb-1 text-[10px] font-black text-gray-400 uppercase tracking-widest">Hệ Thống</div>
+            
+            <div class="nav-item" onclick="switchView('ai-config', this)">
+                <i class="fas fa-robot"></i> Quản Lý API
+            </div>
+
             <div class="nav-item" onclick="switchView('maintenance', this)">
                 <i class="fas fa-tools"></i> Bảo Trì Website
             </div>
@@ -1149,6 +1154,71 @@
                     
                     <div id="feedback-list" class="fb-grid">
                         </div>
+                </div>
+            </div>
+
+            <div id="view-ai-config" class="view-section hidden">
+                <div class="glass-panel rounded-3xl p-8 max-w-5xl mx-auto mt-4 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-400 to-red-500"></div>
+
+                    <div class="mb-8">
+                        <h3 class="font-black text-3xl text-gray-800 flex items-center gap-3">
+                            <i class="fas fa-robot text-orange-500"></i> Quản Lý Khóa API
+                        </h3>
+                        <p class="text-sm text-gray-500 font-medium mt-2">Cấu hình API Keys cho Trí tuệ nhân tạo (Groq) và Lưu trữ ảnh (ImgBB).</p>
+                    </div>
+
+                    <div class="bg-gray-50/80 rounded-2xl border border-gray-100 p-6 mb-6">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-500 flex items-center justify-center text-xl shadow-sm">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-black text-gray-800">Groq API Keys (Llama 3.3 70B)</h2>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500 font-medium mb-6 ml-13">
+                            Khóa này dùng cho <b class="text-orange-500">TẤT CẢ</b> các tính năng AI của HopVan (Chấm bài, Gợi ý, Phân tích đề). Hệ thống sẽ luân phiên sử dụng các khóa này để tối ưu hạn mức (Rate limit).
+                        </p>
+                        
+                        <div id="groq-keys-container" class="space-y-4 mb-5">
+                            <div id="groq-loader" class="text-center py-4">
+                                <i class="fas fa-circle-notch fa-spin text-orange-400 text-2xl"></i>
+                            </div>
+                        </div>
+                        
+                        <button id="add-groq-key-btn" class="px-5 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 font-bold hover:bg-orange-50 hover:text-orange-500 hover:border-orange-200 transition-all text-sm flex items-center gap-2 shadow-sm">
+                            <i class="fas fa-plus"></i> Thêm Key Groq mới
+                        </button>
+                    </div>
+
+                    <div class="bg-gray-50/80 rounded-2xl border border-gray-100 p-6">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-500 flex items-center justify-center text-xl shadow-sm">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-black text-gray-800">ImgBB API Keys</h2>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500 font-medium mb-6 ml-13">Các khóa này dùng để tải ảnh lưu trữ lên đám mây của ImgBB.</p>
+                        
+                        <div id="imgbb-keys-container" class="space-y-4 mb-5">
+                            <div id="imgbb-loader" class="text-center py-4">
+                                <i class="fas fa-circle-notch fa-spin text-blue-400 text-2xl"></i>
+                            </div>
+                        </div>
+                        
+                        <button id="add-imgbb-key-btn" class="px-5 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 font-bold hover:bg-blue-50 hover:text-blue-500 hover:border-blue-200 transition-all text-sm flex items-center gap-2 shadow-sm">
+                            <i class="fas fa-plus"></i> Thêm Key ImgBB mới
+                        </button>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end">
+                        <button id="save-keys-btn" class="px-8 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold shadow-lg shadow-orange-500/30 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 flex items-center gap-2">
+                            <i class="fas fa-save"></i> <span>Lưu Tất Cả Cấu Hình</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -2098,6 +2168,7 @@ const CAT_MAP = {
             loadStats();
             loadNews('all');
             setupRealtimeUsersStat(); // <--- THÊM DÒNG NÀY ĐỂ KÍCH HOẠT ĐẾM ONLINE
+            loadApiKeysData();
         } else { window.location.href = "admin-login.html"; }
     });
     document.getElementById('logout-btn').onclick = () => signOut(auth).then(() => window.location.href = "admin-login.html");
@@ -2135,7 +2206,7 @@ const CAT_MAP = {
         });
     };
 
-    // --- HÀM CHUYỂN MENU (ĐÃ SỬA CHUẨN 100%) ---
+    // --- HÀM CHUYỂN MENU ---
     window.switchView = (viewId, el) => {
         // 1. Ẩn tất cả các tab, chỉ hiện tab được chọn
         document.querySelectorAll('.view-section').forEach(e => e.classList.add('hidden'));
@@ -2153,7 +2224,10 @@ const CAT_MAP = {
         if(viewId === 'history') loadUsers();
         if(viewId === 'news') loadNews(currentNewsFilter);
         if(viewId === 'feedbacks') loadFeedbacks();
-        if(viewId === 'maintenance') loadMaintenanceSettings(); // <--- ĐÂY NÈ! CHÍNH LÀ DÒNG BỊ THIẾU!
+        if(viewId === 'maintenance') loadMaintenanceSettings(); 
+        
+        // DÒNG MỚI THÊM VÀO:
+        if(viewId === 'ai-config') loadApiKeysData(); 
     };
 
     window.closeModal = () => document.querySelector('.modal-overlay').classList.remove('show');
@@ -3693,6 +3767,166 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
         btn.classList.add('active', 'bg-gray-800', 'text-white', 'shadow-md');
         loadUsers(role);
     };
+
+    // ========================================================
+    // QUẢN LÝ API KEYS (GROQ & IMGBB)
+    // ========================================================
+    
+    // Tạo ô nhập liệu API Key theo chuẩn UI của HopVan
+    function createKeyInputHTML(keyValue = '', type) {
+        const container = document.getElementById(`${type}-keys-container`);
+        const div = document.createElement('div');
+        div.className = 'key-item flex items-center gap-3 animate-fade-in';
+        
+        const inputColor = type === 'groq' ? 'focus:border-orange-500 focus:ring-orange-100' : 'focus:border-blue-500 focus:ring-blue-100';
+        
+        div.innerHTML = `
+            <div class="relative w-full">
+                <i class="fas fa-key absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="password" class="glass-input pl-11 pr-12 py-3 font-mono text-sm w-full ${inputColor}" data-key-type="${type}" placeholder="Dán khóa API của bạn vào đây..." value="${keyValue}">
+                
+                <button type="button" class="toggle-visibility-btn absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <button type="button" class="delete-key-btn w-12 h-[46px] rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center shadow-sm flex-shrink-0">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        `;
+        container.appendChild(div);
+    }
+
+    // Tải dữ liệu từ Firestore
+    window.loadApiKeysData = async () => {
+        const groqLoader = document.getElementById('groq-loader');
+        const imgbbLoader = document.getElementById('imgbb-loader');
+        const docRef = doc(db, "system_settings", "api_keys");
+
+        try {
+            const docSnap = await getDoc(docRef);
+            
+            // Xóa hiệu ứng xoay vòng vòng
+            if (groqLoader) groqLoader.remove();
+            if (imgbbLoader) imgbbLoader.remove();
+
+            // Clear container trước khi nhét data vào để tránh bị trùng lặp khi bấm qua lại các tab
+            document.getElementById('groq-keys-container').innerHTML = '';
+            document.getElementById('imgbb-keys-container').innerHTML = '';
+
+            const data = docSnap.exists() ? docSnap.data() : {};
+            
+            // Render Groq Keys
+            const groqKeys = data.groq_keys || [];
+            if (groqKeys.length > 0) {
+                groqKeys.forEach(key => createKeyInputHTML(key, 'groq'));
+            } else { 
+                createKeyInputHTML('', 'groq'); 
+            }
+
+            // Render ImgBB Keys
+            const imgbbKeys = data.imgbb_keys || [];
+            if (imgbbKeys.length > 0) {
+                imgbbKeys.forEach(key => createKeyInputHTML(key, 'imgbb'));
+            } else { 
+                createKeyInputHTML('', 'imgbb'); 
+            }
+
+        } catch (error) {
+            console.error("Lỗi tải API keys:", error);
+            showToast("Lỗi tải API keys.", "error");
+        }
+    };
+    
+    // Sự kiện Thêm dòng Key mới
+    ['groq', 'imgbb'].forEach(type => {
+        document.getElementById(`add-${type}-key-btn`).addEventListener('click', () => {
+            const container = document.getElementById(`${type}-keys-container`);
+            const inputs = container.querySelectorAll('input');
+            const lastInput = inputs[inputs.length - 1];
+
+            if (inputs.length === 0 || lastInput.value.trim() !== '') {
+                createKeyInputHTML('', type);
+            } else {
+                showToast("Vui lòng điền key hiện tại trước khi thêm mới.", "error");
+            }
+        });
+    });
+
+    // Sự kiện Ẩn/Hiện password và Xóa dòng
+    document.addEventListener('click', (e) => {
+        // Toggle Mật khẩu
+        const toggleBtn = e.target.closest('.toggle-visibility-btn');
+        if (toggleBtn) {
+            const input = toggleBtn.closest('.relative').querySelector('input');
+            const icon = toggleBtn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash text-gray-600';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye text-gray-400';
+            }
+        }
+
+        // Xóa Key
+        const deleteBtn = e.target.closest('.delete-key-btn');
+        if (deleteBtn) {
+            const item = deleteBtn.closest('.key-item');
+            const container = item.parentElement;
+            const input = item.querySelector('input');
+            const type = input.getAttribute('data-key-type');
+
+            if (container.querySelectorAll('.key-item').length === 1) {
+                if (input.value.trim() !== '') {
+                    item.remove();
+                    createKeyInputHTML('', type); // Giữ lại ít nhất 1 dòng trống
+                } else {
+                    showToast("Không thể xóa ô trống cuối cùng.", "error");
+                }
+            } else {
+                item.remove();
+            }
+        }
+    });
+
+    // Sự kiện Lưu thay đổi
+    document.getElementById('save-keys-btn').addEventListener('click', async () => {
+        const btn = document.getElementById('save-keys-btn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+        btn.disabled = true;
+
+        const keysToSave = {
+            groq_keys: Array.from(document.getElementById('groq-keys-container').querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean),
+            imgbb_keys: Array.from(document.getElementById('imgbb-keys-container').querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean)
+        };
+
+        // Dọn dẹp ô trống trên UI
+        ['groq', 'imgbb'].forEach(type => {
+            const container = document.getElementById(`${type}-keys-container`);
+            const inputs = container.querySelectorAll('input');
+            if (inputs.length > 1) {
+                inputs.forEach(input => {
+                    if (input.value.trim() === '') input.closest('.key-item').remove();
+                });
+            }
+        });
+
+        try {
+            await setDoc(doc(db, "system_settings", "api_keys"), keysToSave, { merge: true });
+            showToast("Đã lưu API Keys thành công!");
+        } catch (error) {
+            console.error("Error saving API keys:", error);
+            showToast("Lỗi khi lưu API keys.", "error");
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            
+            // Đảm bảo luôn có 1 ô trống nếu xóa sạch
+            if (keysToSave.groq_keys.length === 0) createKeyInputHTML('', 'groq');
+            if (keysToSave.imgbb_keys.length === 0) createKeyInputHTML('', 'imgbb');
+        }
+    });
 </script>
 
 
