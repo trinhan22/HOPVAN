@@ -1,0 +1,23 @@
+# ==========================================
+# ROBOTS.TXT DÀNH CHO HOPVAN.INFO.VN
+# ==========================================
+
+User-agent: *
+
+# 1. CHẶN CÁC TRANG CÁ NHÂN HÓA (Yêu cầu đăng nhập)
+Disallow: /dashboard/account.html
+Disallow: /dashboard/nhatkyhoctap.html
+Disallow: /dashboard/read.html
+Disallow: /phongluyende/lichsulambai.html
+Disallow: /phongluyende/decanhan.html
+
+# 2. CHẶN CÁC FILE TEMPLATE RỖNG (Tránh lỗi Soft 404 trên Google Search Console)
+Disallow: /bantinvanhoc/view.html
+Disallow: /bantinvanhoc/view2.html
+
+# 3. CHẶN TRUY CẬP TRỰC TIẾP VÀO API / BACKEND (Bảo mật & Tránh lãng phí request)
+Disallow: /.netlify/
+Disallow: /.netlify/functions/
+
+# 4. CHỈ ĐỊNH RÕ ĐƯỜNG DẪN SITEMAP ĐỂ GOOGLE DỄ TÌM THẤY
+Sitemap: https://hopvan.info.vn/sitemap.xml
