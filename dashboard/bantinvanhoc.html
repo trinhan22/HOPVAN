@@ -6,7 +6,7 @@
     <title>HopVan - Bản Tin Văn Học</title>
     <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
     <meta property="og:description" content="Nền tảng học tập Ngữ Văn tích hợp AI – hỗ trợ tự học thông minh, phân tích tác phẩm, luyện viết hiệu quả." />
-    <meta property="og:image" content="https://hopvan.info.vn/panel.webp" />
+    <meta property="og:image" content="https://hopvan.info.vn/panel-final.webp" />
     <meta property="og:url" content="https://hopvan.info.vn" />
     <meta property="og:type" content="article" />
     <link rel="icon" href="https://hopvan.info.vn/LOGO.WEBP" />
@@ -841,7 +841,7 @@
                         title: data.title || "Chưa có tiêu đề",
                         category: data.type || "diahat", 
                         summary: data.summary || (data.intro ? data.intro.replace(/<[^>]*>?/gm, '').slice(0, 150) + "..." : ""),
-                        img: data.img || "../panel.webp", 
+                        img: data.img || "../panel-final.webp", 
                         date: data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('vi-VN') : 'Mới cập nhật'
                     };
                 });
@@ -1004,7 +1004,7 @@
             top3.forEach((m, index) => {
                 const active = index === 0 ? 'active' : '';
                 const catName = getCatInfo(m.category).name;
-                const finalImage = m.img || 'https://hopvan.netlify.app/panel.webp';
+                const finalImage = m.img || 'https://hopvan.netlify.app/panel-final.webp';
                 
                 // Xác định link đọc bài
                 const view2Categories = ['maicau', 'cuango', 'khoinguon'];
