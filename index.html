@@ -1611,31 +1611,62 @@
             </div>
         </div>
 
-        <div class="footer-bottom" style="margin-top: 60px; padding-top: 30px; border-top: 1px solid rgba(0,0,0,0.05); width: 100%;">
-            <div class="container" style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+        <!-- CHỈ SỬA PHẦN FOOTER BOTTOM (BADGE) NÀY -->
+        <div class="footer-bottom" style="margin-top: 60px; padding: 25px 0; border-top: 1px solid rgba(0,0,0,0.05); width: 100%; background-color: #fff;">
+            <div class="container" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
                 
-                <p style="color: #94a3b8; font-size: 0.9rem; margin: 0; text-align: center;">
-                    &copy; 2026 HopVan. All Rights Reserved.
-                </p>
-                
-                <div style="display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                <!-- NHÓM BÊN TRÁI: Copyright & Version (Dóng hàng với bên trái) -->
+                <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <p style="color: #94a3b8; font-size: 13px; margin: 0; font-weight: 500;">
+                        &copy; 2026 <span style="color: #64748b; font-weight: 700;">HopVan</span>. All Rights Reserved.
+                    </p>
                     
-                    <div style="display: flex; align-items: center; gap: 6px; padding: 0 12px; height: 26px; border-radius: 999px; background-color: rgba(249, 250, 251, 0.8); border: 1px solid #f3f4f6; cursor: default;">
+                    <!-- Vạch ngăn cách dọc mờ -->
+                    <div style="width: 1px; height: 14px; background-color: #e2e8f0;" class="hidden-mobile"></div>
+
+                    <!-- Badge Version kiểu cũ của HopVan (Giữ nguyên màu cam/xanh của bạn) -->
+                    <div style="display: flex; align-items: center; gap: 6px; padding: 0 12px; height: 26px; border-radius: 999px; background-color: #f8fafc; border: 1px solid #f1f3f5; cursor: default;">
                         <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; line-height: 1;">HopVan Platform</span>
                         <span style="width: 4px; height: 4px; border-radius: 50%; background-color: #22c55e;"></span>
                         <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace; line-height: 1;">v1.3.6</span>
                     </div>
-
-                    <div style="width: 1px; height: 16px; background-color: #d1d5db;"></div>
-
-                    <a href="//www.dmca.com/Protection/Status.aspx?ID=3d40c767-7a34-4719-83bd-aca993e7b16d" title="DMCA.com Protection Status" class="dmca-badge" style="display: flex; align-items: center; justify-content: center; height: 26px; opacity: 0.8; filter: grayscale(20%); transition: all 0.3s ease;" onmouseover="this.style.opacity='1'; this.style.filter='grayscale(0%)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='0.8'; this.style.filter='grayscale(20%)'; this.style.transform='translateY(0)'" target="_blank"> 
-                         <img src ="https://images.dmca.com/Badges/dmca_copyright_protected150b.png?ID=3d40c767-7a34-4719-83bd-aca993e7b16d"  alt="DMCA.com Protection Status" style="height: 24px; width: auto; border-radius: 4px; display: block; margin: 0;" />
-                    </a>
-                    <script src="https://images.dmca.com/Badges/DMCABadgeHelper.min.js"> </script>
-
                 </div>
+
+                <!-- NHÓM BÊN PHẢI: Badge uy tín (DMCA & J2TEAM theo kiểu AIGEO) -->
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <!-- DMCA Badge - Luôn rõ nét, trồi lên khi hover -->
+                    <a href="//www.dmca.com/Protection/Status.aspx?ID=3d40c767-7a34-4719-83bd-aca993e7b16d" 
+                       title="DMCA" 
+                       style="display: flex; align-items: center; justify-content: center; height: 28px; transition: all 0.3s ease;" 
+                       onmouseover="this.style.transform='translateY(-2px)'" 
+                       onmouseout="this.style.transform='translateY(0)'" 
+                       target="_blank"> 
+                        <img src ="https://images.dmca.com/Badges/dmca-badge-w250-5x1-06.png?ID=3d40c767-7a34-4719-83bd-aca993e7b16d" 
+                             alt="DMCA" 
+                             style="height: 28px; width: auto; display: block;" />
+                    </a>
+
+                    <!-- Vạch ngăn cách dọc giữa 2 Badge -->
+                    <div style="width: 1px; height: 20px; background-color: #e2e8f0;"></div>
+
+                    <!-- J2TEAM Launch Badge (Nếu HopVan chưa có badge này, bạn có thể xóa đoạn <a> này) -->
+                    <a href="https://launch.j2team.dev/products/aigeo?utm_source=badge-launched&utm_medium=badge&utm_campaign=badge-aigeo"  
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       style="display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;" 
+                       onmouseover="this.style.transform='translateY(-2px)'" 
+                       onmouseout="this.style.transform='translateY(0)'">
+                        <img src="https://launch.j2team.dev/badge/aigeo/light" 
+                             alt="HopVan - J2TEAM Launch" 
+                             style="height: 38px; width: auto; border-radius: 6px;" 
+                             loading="lazy" />
+                    </a>
+                </div>
+
             </div>
         </div>
+        <!-- Script DMCA Helper -->
+        <script src="https://images.dmca.com/Badges/DMCABadgeHelper.min.js"></script>
     </footer>
 
     <div id="faq-modal" class="support-modal">
