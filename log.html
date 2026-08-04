@@ -605,13 +605,17 @@
         // --- 4. LOGIN LOGIC ---
         loginForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            setLoading(true);
+            document.getElementById('fullscreen-splash').classList.remove('hidden');
+            const iframe = document.getElementById('splash-iframe');
+            if (iframe) iframe.src = 'loading.html';
+            window.isSplashActive = true;
             try {
                 await setPersistence(auth, document.getElementById("remember-me").checked ? browserLocalPersistence : browserSessionPersistence);
                 await signInWithEmailAndPassword(auth, document.getElementById("login-email").value, document.getElementById("login-password").value);
                 // Sau khi đăng nhập thành công, onAuthStateChanged sẽ tự động xử lý chuyển hướng.
             } catch (err) {
-                setLoading(false);
+                document.getElementById('fullscreen-splash').classList.add('hidden');
+                window.isSplashActive = false;
                 showAlert("Email hoặc mật khẩu không chính xác. Vui lòng thử lại!", "error");
             }
         });
@@ -628,9 +632,12 @@
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     if (userDoc.exists()) {
                         const role = userDoc.data().role;
-                        if (role === 'teacher') window.location.replace("dashboard/");
-                        else if (role === 'admin') window.location.replace("admin/");
-                        else window.location.replace("dashboard/");
+                        const targetUrl = role === 'admin' ? "admin/" : "dashboard/";
+                        if (window.isSplashActive) {
+                            window.pendingRedirectUrl = targetUrl;
+                        } else {
+                            window.location.replace(targetUrl);
+                        }
                     } else {
                         console.warn("Không tìm thấy user document.");
                         setLoading(false);
@@ -690,5 +697,17 @@
         }
     });
 </script>
+
+    <div id="fullscreen-splash" class="fixed inset-0 z-[999999] hidden bg-white">
+        <iframe id="splash-iframe" src="loading.html" style="width: 100%; height: 100%; border: none;"></iframe>
+    </div>
+    <script>
+        window.pendingRedirectUrl = null;
+        window.addEventListener("message", (event) => {
+            if (event.data === "splashComplete" && window.pendingRedirectUrl) {
+                window.location.replace(window.pendingRedirectUrl);
+            }
+        });
+    </script>
 </body>
 </html>

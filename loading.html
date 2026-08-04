@@ -112,6 +112,7 @@
                     
                     // KIỂM TRA IFRAME: Nếu đang chạy dưới dạng loading nền của Dashboard thì không tự chuyển trang
                     if (window.self !== window.top) {
+                        window.parent.postMessage("splashComplete", "*");
                         return; // Dừng lại, để Dashboard tự làm mờ và tắt Iframe
                     } 
                     // Nếu chạy độc lập như trang splash screen bình thường thì chuyển hướng
