@@ -90,14 +90,12 @@
             <div class="scene" id="s2">
                 <div class="badge" style="background: rgba(234, 88, 12, 0.1); color: #ea580c; border: 1px solid rgba(234, 88, 12, 0.2); letter-spacing: 1px; font-size: 0.65rem; margin-bottom: 15px;">Đơn Vị Chủ Quản</div>
                 <img src="fpt.png" style="width: 150px; margin-bottom: 5px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));" alt="FPT Logo">
-                <h1 class="headline" style="font-size: 1.8rem;">DỰ ÁN TRỰC THUỘC<br><span style="background: linear-gradient(135deg, #f97316, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; margin-top: 4px; font-size: 2.6rem;">TỔ NGỮ VĂN</span></h1>
+                <h1 class="headline" style="font-size: 1.6rem;">DỰ ÁN TRỰC THUỘC<br><span style="background: linear-gradient(135deg, #f97316, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; margin-top: 4px; font-size: 2.4rem;">BỘ MÔN NGỮ VĂN</span></h1>
                 <p style="font-size: 1rem; font-weight: 800; color: #334155; margin-top: 2px; letter-spacing: 0.5px;">TRƯỜNG THPT FPT CẦN THƠ</p>
             </div>
         </div>
 
-        <div class="loader-wrap">
-            <div class="loader-bar" id="bar"></div>
-        </div>
+        
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -108,10 +106,7 @@
         // Timeline chính
         const tl = gsap.timeline({ 
             paused: true,
-            onUpdate: function() {
-                // ĐỒNG BỘ THỰC TẾ: Thanh tiến độ chạy chính xác theo % hoàn thành của Timeline chữ
-                document.getElementById('bar').style.width = (this.progress() * 100) + "%";
-            },
+            
             onComplete: () => { 
                 gsap.to("body", { opacity: 0, duration: 0.4, onComplete: () => {
                     
@@ -121,7 +116,9 @@
                     } 
                     // Nếu chạy độc lập như trang splash screen bình thường thì chuyển hướng
                     else {
-                        window.location.href = 'dashboard/'; 
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const target = urlParams.get('target') || 'dashboard/';
+                        window.location.href = target; 
                     }
 
                 }});
