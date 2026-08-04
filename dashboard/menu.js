@@ -147,7 +147,7 @@ const menuStyles = `
     .fb-empty i { font-size: 2.5rem; margin-bottom: 15px; display: block; opacity: 0.5; }
 
     /* DARK MODE */
-    html.dark .sidebar-comp { background: var(--bg-panel) !important; border-color: var(--border-ui) !important; }
+    html.dark .sidebar-comp { background: #111827 !important; border-color: #1F2937 !important; }
     html.dark .sb-logo-link h1 { color: #f8fafc; }
     html.dark .logo-card-box { background: transparent !important; border-color: #334155 !important; }
     html.dark .sb-link { color: #94a3b8; }
@@ -203,9 +203,6 @@ const menuHTML = `
 
             <div class="sb-section-title">Khám Phá</div>
             
-            <a href="tacpham.html" class="sb-link" data-page="tacpham">
-                <i class="fas fa-swatchbook"></i> Tác phẩm Văn học
-            </a>
             <a href="bantinvanhoc.html" class="sb-link" data-page="bantinvanhoc">
                 <i class="fas fa-newspaper"></i> Bản tin Văn học
             </a>
@@ -240,7 +237,7 @@ const menuHTML = `
             ">
                 <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px;">HopVan Platform</span>
                 <span style="width: 4px; height: 4px; border-radius: 50%; background-color: #22c55e;"></span>
-                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.3.6</span>
+                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.3.7</span>
             </div>
         </div>
     </div>

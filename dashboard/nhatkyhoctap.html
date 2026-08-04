@@ -145,17 +145,17 @@
         /* --- THỐNG KÊ --- */
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
         .stat-card {
-            background: rgba(255, 255, 255, 0.85); padding: 25px; border-radius: 28px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.02); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid rgba(255, 255, 255, 1); display: flex; flex-direction: column; justify-content: space-between;
+            background: var(--bg-card); padding: 25px; border-radius: 28px;
+            box-shadow: var(--shadow-card); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid var(--border-ui); display: flex; flex-direction: column; justify-content: space-between;
             position: relative; overflow: hidden; z-index: 1;
         }
         .stat-card:hover { 
-            transform: translateY(-8px) scale(1.02); background: white;
-            box-shadow: 0 20px 40px rgba(255, 143, 80, 0.15); border-color: var(--primary); z-index: 10;
+            transform: translateY(-8px) scale(1.02); background: var(--bg-card-hover);
+            box-shadow: var(--shadow-hover); border-color: var(--primary); z-index: 10;
         }
-        .stat-card h3 { font-size: 0.95rem; color: var(--text-light); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; position: relative; z-index: 2;}
-        .stat-card .value { font-size: 2.5rem; font-weight: 900; color: var(--text-main); line-height: 1; position: relative; z-index: 2;}
+        .stat-card h3 { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; position: relative; z-index: 2;}
+        .stat-card .value { font-size: 2.5rem; font-weight: 900; color: var(--text-heading); line-height: 1; position: relative; z-index: 2;}
         .stat-card .unit { font-size: 0.9rem; color: var(--primary); font-weight: 700; margin-top: 8px; position: relative; z-index: 2;}
         .stat-watermark {
             position: absolute; right: -20px; bottom: -20px; font-size: 8rem;
@@ -335,6 +335,27 @@
     </style>
 </head>
 <body class="custom-scrollbar">
+    <!-- Global Loader -->
+    <div id="global-loader" style="position: fixed; inset: 0; background: #fff; z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease;">
+        <div id="global-spinner" style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #FF8F50; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+    </div>
+    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+    <script>
+        try {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.getElementById('global-loader').style.background = '#0f172a';
+                document.getElementById('global-spinner').style.borderColor = '#1e293b';
+                document.getElementById('global-spinner').style.borderTopColor = '#FF8F50';
+            }
+        } catch(e) {}
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('global-loader');
+            if(loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.remove(), 500);
+            }
+        });
+    </script>
 
     <script>
         if (localStorage.getItem('theme') === 'dark') {
@@ -435,56 +456,8 @@
                     </div>
                 </div>
             </div>
-
-            <h3 class="section-title"><i class="fas fa-map-signs text-orange-500"></i> HÀNH TRÌNH VĂN CHƯƠNG</h3>
-            <p class="text-gray-500 font-medium mb-8">Hoàn thành bài học để mở khóa chặng tiếp theo.</p>
-            <div class="map-container">
-                <div class="map-line"></div>
-                <div class="map-scroll-area" id="journey-container"></div>
-            </div>
         </div>
     </main>
-
-    <div id="modal-unlock" class="hv-modal">
-        <div class="hv-modal-box">
-            <div class="w-20 h-20 mx-auto bg-orange-100 rounded-full flex items-center justify-center mb-5 shadow-sm">
-                <i class="fas fa-lock-open text-4xl text-orange-500"></i>
-            </div>
-            <h3 class="text-xl font-black text-gray-800 mb-2">Mở khóa bài học?</h3>
-            <p class="text-sm text-gray-500 mb-6 leading-relaxed">
-                Sử dụng <b class="text-orange-500">5 Keys</b> để vào học.<br>
-                Phần thưởng hoàn thành<b class="text-orange-500"> 10 Keys</b>
-            </p>
-            <div class="flex gap-3">
-                <button class="hv-btn hv-btn-gray flex-1" onclick="closeModal()">Để sau</button>
-                <button class="hv-btn hv-btn-primary flex-1 shadow-lg shadow-orange-200" id="btn-unlock-confirm">Mở ngay</button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="modal-alert" class="hv-modal">
-        <div class="hv-modal-box">
-            <div class="w-20 h-20 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-5 shadow-sm">
-                <i class="fas fa-key text-4xl text-red-500"></i>
-            </div>
-            <h3 class="text-xl font-black text-gray-800 mb-2">Thiếu Keys rồi!</h3>
-            <p class="text-sm text-gray-500 mb-6 leading-relaxed">Bạn không đủ Keys để mở bài này.<br>Hãy điểm danh hoặc làm bài tập khác để kiếm thêm nhé.</p>
-            <button class="hv-btn hv-btn-primary w-full" onclick="closeModal()">Đã hiểu</button>
-        </div>
-    </div>
-
-    <div id="modal-locked" class="hv-modal">
-        <div class="hv-modal-box">
-            <div class="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-5 shadow-inner">
-                <i class="fas fa-lock text-4xl text-gray-400"></i>
-            </div>
-            <h3 class="text-xl font-black text-gray-800 mb-2">Chưa đến lúc!</h3>
-            <p class="text-sm text-gray-500 mb-6 leading-relaxed" id="locked-msg">
-                Bạn cần hoàn thành Level X trước khi mở khoá level này nhé.
-            </p>
-            <button class="hv-btn hv-btn-primary w-full" onclick="closeModal()">Đã hiểu</button>
-        </div>
-    </div>
 
     <div id="modal-skill" class="modal-skill" onclick="closeSkillModal(event)">
         <div class="modal-skill-box custom-scrollbar" onclick="event.stopPropagation()">
@@ -545,20 +518,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-
-    const JOURNEY_DATA = [
-        { id: 1, file: '1.html', title: 'Bước vào chữ nghĩa', icon: 'fas fa-shoe-prints' },
-        { id: 2, file: '2.html', title: 'Học cách đọc', icon: 'fas fa-book-reader' },
-        { id: 3, file: '3.html', title: 'Học cách nghĩ', icon: 'fas fa-lightbulb' },
-        { id: 4, file: '4.html', title: 'Học cách viết', icon: 'fas fa-pen-nib' },
-        { id: 5, file: '5.html', title: 'Đi qua nỗi ngược', icon: 'fas fa-mountain' },
-        { id: 6, file: '6.html', title: 'Tìm tiếng nói riêng', icon: 'fas fa-microphone-alt' },
-        { id: 7, file: '7.html', title: 'Ở lại với văn chương', icon: 'fas fa-heart' },
-    ];
-
     let userKeys = 0;
-    let currentLevel = 1; 
-    let paidLevel = 0; 
     let myChart = null;
     let categoryData = { reading: [], nlxh: [], nlvh: [], lang: [] };
 
@@ -600,19 +560,6 @@
                         avatarEl.style.background = 'var(--primary-gradient)';
                     }
                 }
-            });
-
-            onSnapshot(doc(db, "users_progress", user.uid), (progSnap) => {
-                if (progSnap.exists()) {
-                    const d = progSnap.data();
-                    currentLevel = Number(d.currentLevel) || 1; 
-                    paidLevel = Number(d.paidLevel) || 0;
-                } else {
-                    setDoc(doc(db, "users_progress", user.uid), { currentLevel: 1, paidLevel: 0 }, { merge: true });
-                    currentLevel = 1;
-                    paidLevel = 0;
-                }
-                renderMap(); 
             });
 
             renderSkillTree(user.uid); 
@@ -807,93 +754,6 @@
         document.getElementById('modal-summary').innerHTML = summaryHTML;
     }
 
-    // --- HÀNH TRÌNH VĂN CHƯƠNG ---
-    function renderMap() {
-        const container = document.getElementById('journey-container');
-        container.innerHTML = "";
-
-        const currLv = Number(currentLevel) || 1;
-        const pLv = Number(paidLevel) || 0;
-
-        JOURNEY_DATA.forEach((item, index) => {
-            let statusClass = 'locked';
-            let iconHtml = '<i class="fas fa-lock"></i>';
-            const itemId = Number(item.id);
-            
-            if (itemId < currLv) {
-                statusClass = 'completed';
-                iconHtml = `<i class="fas ${item.icon}"></i>`;
-            } 
-            else if (itemId === currLv) {
-                statusClass = 'active';
-                iconHtml = itemId <= pLv ? '<i class="fas fa-play"></i>' : '<i class="fas fa-key text-orange-500 animate-pulse"></i>';
-            } 
-
-            const div = document.createElement('div');
-            div.className = `map-node ${statusClass}`;
-            div.innerHTML = `<div class="node-icon">${iconHtml}</div><div class="node-title">${item.title}</div>`;
-            div.onclick = () => handleMapClick(item);
-            container.appendChild(div);
-        });
-    }
-
-    window.isDraggingMap = false; 
-    function initDragToScroll() {
-        const slider = document.getElementById('journey-container');
-        if (!slider) return;
-        let isDown = false, startX, scrollLeft;
-
-        slider.addEventListener('mousedown', (e) => {
-            isDown = true; window.isDraggingMap = false; slider.classList.add('active-drag');
-            startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft;
-        });
-        slider.addEventListener('mouseleave', () => { isDown = false; slider.classList.remove('active-drag'); });
-        slider.addEventListener('mouseup', () => { isDown = false; slider.classList.remove('active-drag'); });
-        slider.addEventListener('mousemove', (e) => {
-            if (!isDown) return; e.preventDefault();
-            const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 1.5; 
-            if (Math.abs(walk) > 5) window.isDraggingMap = true; 
-            slider.scrollLeft = scrollLeft - walk;
-        });
-    }
-    initDragToScroll();
-
-    window.handleMapClick = (item) => {
-        if (window.isDraggingMap) return;
-
-        const targetId = Number(item.id);
-        const currLv = Number(currentLevel) || 1;
-        const pLv = Number(paidLevel) || 0;
-
-        if (targetId < currLv || (targetId === currLv && targetId <= pLv)) {
-            window.location.href = `../nhatkyhoctap/${item.file}`;
-        } else if (targetId === currLv) {
-            window.pendingLevelId = targetId;
-            document.getElementById('modal-unlock').classList.add('show');
-        } else {
-            document.getElementById('locked-msg').innerHTML = `Bạn cần hoàn thành <b class="text-orange-500">Level ${currLv}</b> trước khi mở khoá level này nhé!`;
-            document.getElementById('modal-locked').classList.add('show');
-        }
-    };
-
-    document.getElementById('btn-unlock-confirm').onclick = async () => {
-        if (userKeys >= 5) {
-            const uid = auth.currentUser.uid;
-            await setDoc(doc(db, "users", uid), { keys: increment(-5) }, { merge: true });
-            await setDoc(doc(db, "users_progress", uid), { paidLevel: window.pendingLevelId }, { merge: true });
-            closeModal();
-        } else {
-            closeModal();
-            document.getElementById('modal-alert').classList.add('show');
-        }
-    };
-
-    window.closeModal = () => document.querySelectorAll('.hv-modal').forEach(m => m.classList.remove('show'));
-    
-    window.addEventListener('click', (e) => {
-        if (e.target.classList.contains('hv-modal')) window.closeModal();
-    });
-    
     window.toggleSidebar = () => {
         const sidebar = document.querySelector('aside');
         const overlay = document.getElementById('sidebar-overlay');

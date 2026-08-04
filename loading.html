@@ -63,8 +63,8 @@
             will-change: opacity;
         }
 
-        .headline { font-size: 2.8rem; font-weight: 900; line-height: 1.2; color: var(--text); text-transform: uppercase; letter-spacing: -1px; }
-        .gradient-text { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; }
+        .headline { font-size: 2.8rem; font-weight: 900; line-height: 1.35; color: var(--text); text-transform: uppercase; letter-spacing: -1px; }
+        .gradient-text { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; padding-top: 4px; }
         
         .icon-box { font-size: 4.5rem; margin-bottom: 20px; color: var(--primary); }
         .badge { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--secondary); margin-bottom: 12px; background: rgba(255, 94, 98, 0.08); padding: 5px 22px; border-radius: 50px; letter-spacing: 2px; }
@@ -82,26 +82,16 @@
         
         <div class="scene-container">
             <div class="scene" id="s1">
-                <img src="LOGO.WEBP" style="width: 130px; margin-bottom: 15px; opacity: 0.9;">
-                <h1 class="headline" style="font-size: 3.2rem;">HOPVAN</h1>
+                <img src="LOGO.WEBP" style="width: 140px; margin-bottom: 12px; border-radius: 35px; box-shadow: 0 15px 40px rgba(255, 143, 80, 0.3);">
+                <h1 class="headline" style="font-size: 3.5rem; font-weight: 900; letter-spacing: 0.5px; color: #1e293b; line-height: 1.1; margin-bottom: 5px;">HOPVAN</h1>
+                <p style="font-size: 0.85rem; font-weight: 800; color: #64748b; margin-top: 0px; letter-spacing: 0.5px;">Nền Tảng Học & Luyện Thi Ngữ Văn</p>
             </div>
             
             <div class="scene" id="s2">
-                <div class="badge">Nội dung</div>
-                <i class="fa-solid fa-book-open icon-box"></i>
-                <h1 class="headline">HỆ THỐNG<br><span class="gradient-text">GDPT 2018</span></h1>
-            </div>
-
-            <div class="scene" id="s3">
-                <div class="badge">Công nghệ</div>
-                <i class="fa-solid fa-microchip icon-box"></i>
-                <h1 class="headline">AI CHẤM BÀI<br><span class="gradient-text">SIÊU TỐC</span></h1>
-            </div>
-
-            <div class="scene" id="s4">
-                <div class="badge">Dữ liệu</div>
-                <i class="fa-solid fa-layer-group icon-box"></i>
-                <h1 class="headline">KHO HỌC LIỆU<br><span class="gradient-text">ĐA DẠNG</span></h1>
+                <div class="badge" style="background: rgba(234, 88, 12, 0.1); color: #ea580c; border: 1px solid rgba(234, 88, 12, 0.2); letter-spacing: 1px; font-size: 0.65rem; margin-bottom: 15px;">Đơn Vị Chủ Quản</div>
+                <img src="fpt.png" style="width: 150px; margin-bottom: 5px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));" alt="FPT Logo">
+                <h1 class="headline" style="font-size: 1.8rem;">DỰ ÁN TRỰC THUỘC<br><span style="background: linear-gradient(135deg, #f97316, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; margin-top: 4px; font-size: 2.6rem;">TỔ NGỮ VĂN</span></h1>
+                <p style="font-size: 1rem; font-weight: 800; color: #334155; margin-top: 2px; letter-spacing: 0.5px;">TRƯỜNG THPT FPT CẦN THƠ</p>
             </div>
         </div>
 
@@ -139,33 +129,14 @@
         });
 
         function initAnimation() {
-            // (ĐÃ XÓA dòng code set cứng 3s của thanh Progress cũ ở đây)
-
-            // 2. SCENES: Cấu hình thời gian xuất hiện của các cảnh
-            const ids = ['#s1', '#s2', '#s3', '#s4'];
-            
-            const fadeTime = 0.3; // Thời gian mờ vào/ra
-            const stayTime = 0.35; // Thời gian giữ lại đọc chữ
-            const overlap = "-=0.15"; // Gối đầu lên nhau để mượt
-
-            ids.forEach((id, index) => {
-                // Fade In
-                tl.to(id, { 
-                    autoAlpha: 1, 
-                    duration: fadeTime, 
-                    visibility: 'visible',
-                    ease: "sine.inOut" 
-                }, index === 0 ? 0 : overlap);
-                
-                // Fade Out (Trừ cảnh cuối cùng s4 để nó giữ lại lúc chuyển trang)
-                if (index < ids.length - 1) {
-                    tl.to(id, { 
-                        autoAlpha: 0, 
-                        duration: fadeTime,
-                        ease: "sine.inOut"
-                    }, `+=${stayTime}`);
-                }
-            });
+            // Thiết lập chính xác 3 giây cho toàn bộ timeline loading
+            // S1 hiện từ 0s -> 1.3s
+            tl.fromTo('#s1', { autoAlpha: 0 }, { autoAlpha: 1, visibility: 'visible', duration: 0.5, ease: "power2.out" }, 0)
+              .to('#s1', { autoAlpha: 0, duration: 0.5, ease: "power2.inOut" }, 1.0);
+              
+            // S2 hiện từ 1.3s -> 3.0s
+            tl.fromTo('#s2', { autoAlpha: 0 }, { autoAlpha: 1, visibility: 'visible', duration: 0.5, ease: "power2.out" }, 1.3)
+              .set({}, {}, 3.0); 
         }
 
         window.addEventListener('load', () => {
@@ -176,6 +147,23 @@
             } catch(e) {}
             tl.play();
         });
+        
+        // --- DARK MODE LOGIC ---
+        try {
+            const theme = localStorage.getItem('theme');
+            if (theme === 'dark') {
+                const darkStyle = document.createElement('style');
+                darkStyle.innerHTML = `
+                    body, html { background: #0B1120 !important; }
+                    #viewport-container { background: radial-gradient(circle at center, #0f172a 0%, #020617 100%) !important; }
+                    .grid-floor { background-image: linear-gradient(rgba(255, 94, 98, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 94, 98, 0.1) 1px, transparent 1px) !important; }
+                    .text-gradient { background: linear-gradient(135deg, #FFB380, #FF8F50) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; }
+                    h1, p, span { color: #f8fafc !important; }
+                    .progress-bar-container { background: #1e293b !important; }
+                `;
+                document.head.appendChild(darkStyle);
+            }
+        } catch(e) {}
     </script>
 
 <script type="text/javascript">

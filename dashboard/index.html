@@ -14,6 +14,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -159,8 +161,8 @@
         .quote-card:hover .quote-watermark { transform: rotate(0deg) scale(1.1); opacity: 0.1; }
         .quote-content { position: relative; z-index: 2; }
         .quote-icon-wrap { width: 45px; height: 45px; border-radius: 14px; background: rgba(255,143,80,0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 20px; }
-        .quote-text { font-size: 1.15rem; font-weight: 700; color: var(--text-main); line-height: 1.6; font-style: italic; margin-bottom: 20px; }
-        .quote-author { font-size: 0.9rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
+        .quote-text { font-size: 1.15rem; font-weight: 700; color: var(--text-main); line-height: 1.6; font-style: italic; margin-bottom: 20px; transition: opacity 0.5s ease; }
+        .quote-author { font-size: 0.9rem; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; transition: opacity 0.5s ease; }
 
         /* --- CÁC THÀNH PHẦN KHÁC --- */
         .activity-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid rgba(0,0,0,0.03); transition: 0.3s; }
@@ -408,8 +410,8 @@
                     <i class="fas fa-quote-left quote-watermark"></i>
                     <div class="quote-content">
                         <div class="quote-icon-wrap"><i class="fas fa-quote-left"></i></div>
-                        <p class="quote-text">"Văn học, nghệ thuật là công cụ để hiểu biết, để khám phá, để sáng tạo thực tại xã hội."</p>
-                        <span class="quote-author">- Phạm Văn Đồng -</span>
+                        <p id="dash-quote-text" class="quote-text">"Văn học, nghệ thuật là công cụ để hiểu biết, để khám phá, để sáng tạo thực tại xã hội."</p>
+                        <span id="dash-quote-author" class="quote-author">- Phạm Văn Đồng -</span>
                     </div>
                 </div>
             </div>
@@ -539,7 +541,6 @@
         'quiz': { name: 'Trắc Nghiệm', icon: 'fas fa-check-circle', color: '#8b5cf6' }, 
         'dochieu': { name: 'Đọc Hiểu', icon: 'fas fa-book-reader', color: '#3b82f6' }, 
         'doc_hieu': { name: 'Đọc Hiểu', icon: 'fas fa-book-reader', color: '#3b82f6' },
-        'journal': { name: 'Vượt Ải Hành Trình', icon: 'fas fa-flag-checkered', color: '#06b6d4' }, 
         'level': { name: 'Nhiệm Vụ Cấp Độ', icon: 'fas fa-shoe-prints', color: '#ec4899' } 
     };
 
@@ -595,7 +596,7 @@
                     loader.style.opacity = '0'; 
                     setTimeout(() => loader.remove(), 600); 
                 }
-            }, 1200); 
+            }, 3000); // Đợi đủ 3 giây để GSAP trong iframe loading.html chạy xong
 
         } else { window.location.href = "../log.html"; }
     });
@@ -743,29 +744,10 @@
                 
                 let chapterName = "Lý thuyết Ngữ Văn"; 
                 const id = data.id;
-
-                // Match đúng ID từ trang lythuyet.html
-                if (['ls-truyen-ngan-hien-dai', 'ls-diem-nhin', 'ls-tieu-thuyet', 'ls-dac-diem-tt', 'ls-truyen-tieu-thuyet'].includes(id)) {
-                    chapterName = "Truyện Ngắn & Tiểu Thuyết";
-                } 
-                else if (['ls-vb-nghiluan-kn', 'ls-cautruc-vbnl', 'ls-yeuto-botro', 'ls-thaotac-nl', 'ls-vb-thongtin', 'ls-dulieu-vbtt', 'ls-dotincay', 'ls-vb-nghiluan-thongtin'].includes(id)) {
-                    chapterName = "VB Nghị Luận & VB Thông Tin";
-                } 
-                else if (['ls-hai-kich', 'ls-dacdiem-haikich', 'ls-nhatki-phongsu', 'ls-phihucau', 'ls-hai-kich-nhat-ky'].includes(id)) {
-                    chapterName = "Hài Kịch – Nhật Kí – Hồi Kí";
-                } 
-                else if (['ls-tuy-but', 'ls-tan-van', 'ls-but-ki', 'ls-diem-chung', 'ls-tuy-but-tan-van'].includes(id)) {
-                    chapterName = "Tùy Bút – Tản Văn – Bút Kí";
-                } 
-                else if (['ls-kn-tho', 'ls-chuthe-trutinh', 'ls-camxuc', 'ls-nghethuat-tho', 'ls-tho-hiendai', 'ls-tho-tru-tinh'].includes(id)) {
-                    chapterName = "Thơ Trữ Tình";
-                } 
-                else if (['ls-nghiluan-xh', 'ls-dang-nlxh', 'ls-vietdoan-nlxh', 'ls-nghiluan-vh', 'ls-dang1', 'ls-dang2', 'ls-dang3', 'ls-cac-dang-de'].includes(id)) {
-                    chapterName = "Các Dạng Đề Nghị Luận";
-                } 
-                else if (['ls-ngonngu-trangtrong', 'ls-kethop-phongcach', 'ls-loi-logich', 'ls-cau-moho', 'ls-nghichngu', 'ls-sohuutritue', 'ls-noimia', 'ls-phingonngu', 'ls-tri-thuc-tieng-viet'].includes(id)) {
-                    chapterName = "Tri Thức Tiếng Việt";
-                } 
+                // Match Category Name from saved data
+                if (data.categoryName) {
+                    chapterName = data.categoryName;
+                }
 
                 chapterEl.textContent = chapterName;
 
@@ -975,6 +957,15 @@
         }
     };
 
+    window.addEventListener('themeChanged', (e) => {
+        if (typeof drawMiniChart === 'function' && window.allActivities) {
+            drawMiniChart(window.allActivities);
+        }
+        if (typeof openStatsModal === 'function' && document.getElementById('statsFullModal') && document.getElementById('statsFullModal').classList.contains('active')) {
+            openStatsModal(); 
+        }
+    });
+
     initMenu(app);
 </script>
 
@@ -993,6 +984,53 @@
             }
         }
     });
+
+    // Add CSS transition for smooth fading
+    const style = document.createElement('style');
+    style.innerHTML = `
+        #dash-quote-text, #dash-quote-author {
+            transition: opacity 0.5s ease-in-out;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // ==========================================
+    // QUOTE ROTATOR
+    // ==========================================
+    const quotes = [
+        { text: "Văn học, nghệ thuật là công cụ để hiểu biết, để khám phá, để sáng tạo thực tại xã hội.", author: "Phạm Văn Đồng" },
+        { text: "Nhà văn phải là người đi tìm những hạt ngọc ẩn giấu trong bề sâu tâm hồn của con người.", author: "Nguyễn Minh Châu" },
+        { text: "Nghệ thuật không phải là ánh trăng lừa dối, nghệ thuật không nên là ánh trăng lừa dối.", author: "Nam Cao" },
+        { text: "Mỗi tác phẩm nghệ thuật là một tiếng gọi yêu thương, là sự khát khao giao cảm với đời.", author: "Lê Ngọc Trà" },
+        { text: "Tác phẩm nghệ thuật sẽ chết nếu nó miêu tả cuộc sống chỉ để miêu tả.", author: "Biê-lin-xki" },
+        { text: "Văn học làm cho con người thêm phong phú, tạo khả năng cho con người lớn lên.", author: "M. Gorki" },
+        { text: "Sứ mệnh của nhà văn là ca ngợi sự sống, ca ngợi vẻ đẹp của con người.", author: "Nguyễn Minh Châu" }
+    ];
+
+    let currentQuoteIndex = 0;
+    const quoteTextEl = document.getElementById('dash-quote-text');
+    const quoteAuthorEl = document.getElementById('dash-quote-author');
+
+    setInterval(() => {
+        currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+        const quote = quotes[currentQuoteIndex];
+        
+        // Fade out
+        if(quoteTextEl && quoteAuthorEl) {
+            quoteTextEl.style.opacity = 0;
+            quoteAuthorEl.style.opacity = 0;
+            
+            setTimeout(() => {
+                quoteTextEl.textContent = `"${quote.text}"`;
+                quoteAuthorEl.textContent = `- ${quote.author} -`;
+                
+                // Fade in
+                quoteTextEl.style.opacity = 1;
+                quoteAuthorEl.style.opacity = 1;
+            }, 500); 
+        }
+    }, 8000); 
+
 </script>
 </body>
 </html>

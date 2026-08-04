@@ -109,9 +109,12 @@ const headerStyles = `
        ========================================= */
     .noti-detail-modal {
         position: fixed; inset: 0; z-index: 9999999; /* Đẩy max z-index để không bị menu đè */
-        background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+        background: rgba(0, 0, 0, 0.25); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
         display: none; align-items: center; justify-content: center;
         opacity: 0; transition: opacity 0.3s ease; padding: 20px;
+    }
+    html.dark .noti-detail-modal {
+        background: rgba(11, 17, 32, 0.7);
     }
     .noti-detail-modal.show { display: flex; opacity: 1; }
     
@@ -171,6 +174,10 @@ const headerHTML = `
             <i class="far fa-moon" id="icon-theme"></i>
         </button>
 
+        <button class="header-icon-btn ml-1" id="btn-show-credits" title="Credits & Về Chúng Tôi">
+            <i class="fas fa-info-circle"></i>
+        </button>
+
         <div onclick="window.location.href='account.html'" class="header-user-btn flex items-center gap-3 pl-4 py-1 cursor-pointer group border-l border-gray-200 dark:border-gray-700 ml-1">
             <div class="text-right hidden md:block">
                 <div class="text-sm font-black transition-colors hopvan-text-dark group-hover:text-orange-500" id="header-user-name">Đang tải...</div>
@@ -208,10 +215,223 @@ const modalHTML = `
         </div>
     </div>
 </div>
+
+<!-- Modal Credits -->
+<div id="credits-modal" class="noti-detail-modal" onclick="closeCreditsModal()">
+    <div class="noti-detail-box" style="max-width: 650px; background: transparent; box-shadow: none;" onclick="event.stopPropagation()">
+        
+        <div class="bg-white dark:bg-slate-900 rounded-[28px] overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-100 dark:border-slate-800">
+            <!-- Header có nền Gradient -->
+            <div class="relative overflow-hidden bg-gradient-to-br from-orange-50 to-orange-100 dark:from-slate-800 dark:to-slate-900 px-8 py-6 border-b border-orange-100 dark:border-slate-700">
+                <div class="absolute -right-6 -top-6 opacity-10"><i class="fas fa-users text-[100px] text-orange-500"></i></div>
+                <div class="flex justify-between items-center relative z-10">
+                    <div class="flex items-center gap-3">
+                        <button id="credits-back-btn" onclick="showCreditsOverview()" class="hidden w-8 h-8 rounded-full bg-white/60 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-orange-500 flex items-center justify-center transition-all shadow-sm mr-2">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div>
+                            <h3 id="credits-modal-title" class="font-black text-2xl text-orange-600 dark:text-orange-400 tracking-tight mb-0.5">Đội ngũ phát triển</h3>
+                            <p id="credits-modal-subtitle" class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">HopVan Platform Team</p>
+                        </div>
+                    </div>
+                    <button onclick="closeCreditsModal()" class="w-10 h-10 rounded-full bg-white/60 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 flex items-center justify-center transition-all shadow-sm">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div style="overflow: hidden; position: relative;">
+                <div id="credits-slider" style="display: flex; width: 200%; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);">
+                    
+                    <!-- TỜ 1: DANH SÁCH -->
+                    <div style="width: 50%; padding: 30px; max-height: 70vh; overflow-y: auto;">
+                        
+                        <!-- NHÓM SÁNG LẬP -->
+                        <div class="mb-8">
+                            <div class="flex items-center gap-3 mb-5">
+                                <div class="h-[2px] flex-1 bg-gray-100 dark:bg-slate-700"></div>
+                                <span class="font-black text-gray-400 text-[11px] uppercase tracking-widest"><i class="fas fa-code text-orange-400 mr-2"></i>Nhóm Sáng Lập</span>
+                                <div class="h-[2px] flex-1 bg-gray-100 dark:bg-slate-700"></div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div onclick="showCreditDetail('trinhan')" class="cursor-pointer bg-gray-50 dark:bg-slate-800 rounded-2xl p-4 text-center transition-transform hover:-translate-y-1 hover:shadow-md border border-gray-100 dark:border-slate-700">
+                                    <div class="relative w-20 h-20 mx-auto mb-3">
+                                        <img src="../IMG/trinhan.png" onerror="this.src='../LOGO.WEBP'" class="w-full h-full rounded-full object-cover border-[3px] border-white dark:border-slate-700 shadow-sm">
+                                        <div class="absolute -bottom-1 -right-1 w-7 h-7 bg-blue-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center text-white text-[11px]" title="Developer"><i class="fas fa-laptop-code"></i></div>
+                                    </div>
+                                    <p class="font-black text-[15px] text-gray-900 dark:text-white mb-0.5">Trí Nhân</p>
+                                    <p class="text-[10px] uppercase font-bold text-blue-500">Dev & Design</p>
+                                </div>
+                                <div onclick="showCreditDetail('cattuong')" class="cursor-pointer bg-gray-50 dark:bg-slate-800 rounded-2xl p-4 text-center transition-transform hover:-translate-y-1 hover:shadow-md border border-gray-100 dark:border-slate-700">
+                                    <div class="relative w-20 h-20 mx-auto mb-3">
+                                        <img src="../IMG/cattuong.png" onerror="this.src='../LOGO.WEBP'" class="w-full h-full rounded-full object-cover border-[3px] border-white dark:border-slate-700 shadow-sm">
+                                        <div class="absolute -bottom-1 -right-1 w-7 h-7 bg-pink-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center text-white text-[11px]" title="Content"><i class="fas fa-pen-nib"></i></div>
+                                    </div>
+                                    <p class="font-black text-[15px] text-gray-900 dark:text-white mb-0.5">Cát Tường</p>
+                                    <p class="text-[10px] uppercase font-bold text-pink-500">Content Dev</p>
+                                </div>
+                                <div onclick="showCreditDetail('dangkhoa')" class="cursor-pointer bg-gray-50 dark:bg-slate-800 rounded-2xl p-4 text-center transition-transform hover:-translate-y-1 hover:shadow-md border border-gray-100 dark:border-slate-700">
+                                    <div class="relative w-20 h-20 mx-auto mb-3">
+                                        <img src="../IMG/dangkhoa.png" onerror="this.src='../LOGO.WEBP'" class="w-full h-full rounded-full object-cover border-[3px] border-white dark:border-slate-700 shadow-sm">
+                                        <div class="absolute -bottom-1 -right-1 w-7 h-7 bg-green-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center text-white text-[11px]" title="Content"><i class="fas fa-book-open"></i></div>
+                                    </div>
+                                    <p class="font-black text-[15px] text-gray-900 dark:text-white mb-0.5">Đăng Khoa</p>
+                                    <p class="text-[10px] uppercase font-bold text-green-500">Content Dev</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GIÁO VIÊN HƯỚNG DẪN -->
+                        <div class="mb-4">
+                            <div class="flex items-center gap-3 mb-5">
+                                <div class="h-[2px] flex-1 bg-gray-100 dark:bg-slate-700"></div>
+                                <span class="font-black text-gray-400 text-[11px] uppercase tracking-widest"><i class="fas fa-chalkboard-teacher text-purple-400 mr-2"></i>Giáo Viên Cố Vấn</span>
+                                <div class="h-[2px] flex-1 bg-gray-100 dark:bg-slate-700"></div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div onclick="showCreditDetail('thaythien')" class="cursor-pointer flex items-center gap-4 bg-gray-50 dark:bg-slate-800 rounded-2xl p-4 border border-gray-100 dark:border-slate-700 transition-transform hover:-translate-y-1 hover:shadow-md">
+                                    <img src="../IMG/minhthien.png" onerror="this.src='../LOGO.WEBP'" class="w-14 h-14 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-sm">
+                                    <div>
+                                        <p class="font-black text-sm text-gray-900 dark:text-white leading-tight mb-1">Trang Minh Thiên</p>
+                                        <p class="text-[10px] uppercase font-bold text-purple-500">GV Cố vấn</p>
+                                    </div>
+                                </div>
+                                <div onclick="showCreditDetail('cobinh')" class="cursor-pointer flex items-center gap-4 bg-gray-50 dark:bg-slate-800 rounded-2xl p-4 border border-gray-100 dark:border-slate-700 transition-transform hover:-translate-y-1 hover:shadow-md">
+                                    <img src="../IMG/thanhbinh.png" onerror="this.src='../LOGO.WEBP'" class="w-14 h-14 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-sm">
+                                    <div>
+                                        <p class="font-black text-sm text-gray-900 dark:text-white leading-tight mb-1">Mai Thị Thanh Bình</p>
+                                        <p class="text-[10px] uppercase font-bold text-pink-500">GV Cố vấn</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- FOOTER -->
+                        <div class="flex items-center justify-center gap-6 mt-5 pt-5 mb-4 border-t border-gray-100 dark:border-slate-800">
+                            <img src="../LOGO.WEBP" alt="HopVan" class="h-8 opacity-70 hover:opacity-100 transition-opacity">
+                            <div class="h-6 w-px bg-gray-200 dark:bg-slate-700"></div>
+                            <img src="../fpt.png" alt="FPT High School" class="h-8 opacity-70 hover:opacity-100 transition-opacity">
+                        </div>
+                    </div>
+                    
+                    <!-- TỜ 2: CHI TIẾT -->
+                    <div style="width: 50%; padding: 30px; max-height: 70vh; overflow-y: auto;">
+                        <div class="flex flex-col items-center text-center pt-4">
+                            <div class="relative w-28 h-28 mx-auto mb-5">
+                                <img id="detail-avatar" src="" class="w-full h-full rounded-full object-cover border-4 border-orange-200 dark:border-slate-700 shadow-lg">
+                                <div id="detail-badge" class="absolute -bottom-1 -right-1 w-9 h-9 rounded-full border-[3px] border-white dark:border-slate-900 flex items-center justify-center text-white text-sm shadow-md"></div>
+                            </div>
+                            
+                            <h4 id="detail-name" class="font-black text-2xl text-gray-900 dark:text-white mb-1"></h4>
+                            <p id="detail-role" class="text-[11px] uppercase font-bold text-orange-500 mb-1.5 tracking-widest"></p>
+                            
+                            <div id="detail-socials" class="flex items-center justify-center gap-2 mb-4"></div>
+                            
+                            <div class="bg-gray-50 dark:bg-slate-800 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 w-full text-left relative overflow-hidden">
+                                <i class="fas fa-quote-right absolute -bottom-4 -right-2 text-[80px] text-gray-100 dark:text-slate-700 opacity-50 pointer-events-none"></i>
+                                <h5 class="font-black text-gray-400 uppercase text-[11px] tracking-widest mb-3 border-b border-gray-200 dark:border-slate-600 pb-2 relative z-10"><i class="fas fa-info-circle mr-1 text-orange-400"></i> Giới thiệu chi tiết</h5>
+                                <p id="detail-bio" class="text-sm leading-relaxed text-gray-600 dark:text-gray-300 relative z-10 font-medium"></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 `;
 
 // --- ĐƯA CÁC HÀM XỬ LÝ RA WINDOW ĐỂ HOẠT ĐỘNG ĐƯỢC KHI CLICK ---
 window.currentNotifications = [];
+
+const creditData = {
+    'trinhan': {
+        name: 'Nguyễn Trí Nhân', role: 'Visual & Web Developer',
+        avatar: '../IMG/trinhan.png', fallback: '../LOGO.WEBP',
+        badgeColor: 'bg-blue-500', icon: 'fa-laptop-code',
+        bio: 'Học sinh K5A8 – Trường THPT FPT Cần Thơ, phụ trách thiết kế, lập trình và phát triển hệ thống cho website HOPVAN.',
+        socials: { fb: 'https://www.facebook.com/tris.nhaan', email: 'mailto:nhanntfct30802@gmail.com', portfolio: 'https://trisnhaan.com' }
+    },
+    'cattuong': {
+        name: 'Châu Ngọc Cát Tường', role: 'Content Developer',
+        avatar: '../IMG/cattuong.png', fallback: '../LOGO.WEBP',
+        badgeColor: 'bg-pink-500', icon: 'fa-pen-nib',
+        bio: 'Học sinh K5A8 – Trường THPT FPT Cần Thơ, phụ trách nội dung, ý tưởng và truyền thông của HOPVAN.',
+        socials: { fb: 'https://www.facebook.com/cat.tuong.708243', email: 'mailto:tuongcncfct30670@gmail.com' }
+    },
+    'dangkhoa': {
+        name: 'Nguyễn H. Đăng Khoa', role: 'Content Developer',
+        avatar: '../IMG/dangkhoa.png', fallback: '../LOGO.WEBP',
+        badgeColor: 'bg-green-500', icon: 'fa-book-open',
+        bio: 'Học sinh K5A8 – Trường THPT FPT Cần Thơ, phụ trách nội dung và kiến thức Ngữ văn trên HOPVAN.',
+        socials: { fb: 'https://www.facebook.com/ven.ste.351', email: 'mailto:khoanhdfct30731@gmail.com' }
+    },
+    'thaythien': {
+        name: 'Thầy Trang Minh Thiên', role: 'Giáo Viên Cố Vấn',
+        avatar: '../IMG/minhthien.png', fallback: '../LOGO.WEBP',
+        badgeColor: 'bg-purple-500', icon: 'fa-chalkboard-teacher',
+        bio: 'Giáo viên Công nghệ & Robotics hiện đang công tác tại Trường THPT Nguyễn Việt Dũng và Trường THPT FPT Cần Thơ, đồng thời là người phụ trách kỹ thuật của dự án HOPVAN.',
+        socials: { fb: 'https://www.facebook.com/thien.trangminh', email: 'mailto:contact@hopvan.info.vn' }
+    },
+    'cobinh': {
+        name: 'Cô Mai Thị Thanh Bình', role: 'Giáo Viên Cố Vấn',
+        avatar: '../IMG/thanhbinh.png', fallback: '../LOGO.WEBP',
+        badgeColor: 'bg-pink-500', icon: 'fa-chalkboard-teacher',
+        bio: 'Giáo viên bộ môn Ngữ văn – Trường THPT FPT Cần Thơ, đồng thời là người phụ trách học thuật của HOPVAN.',
+        socials: { fb: 'https://www.facebook.com/thanhbinh.rain', email: 'mailto:contact@hopvan.info.vn' }
+    }
+};
+
+window.showCreditDetail = (id) => {
+    const data = creditData[id];
+    if(!data) return;
+    
+    // Cập nhật giao diện trang 2
+    const imgObj = document.getElementById('detail-avatar');
+    imgObj.src = data.avatar;
+    imgObj.onerror = () => { imgObj.src = data.fallback; };
+    
+    document.getElementById('detail-name').innerText = data.name;
+    document.getElementById('detail-role').innerText = data.role;
+    document.getElementById('detail-role').className = `text-[11px] uppercase font-bold mb-6 tracking-widest ${data.badgeColor.replace('bg-', 'text-')}`;
+    document.getElementById('detail-bio').innerText = data.bio;
+    
+    document.getElementById('detail-badge').className = `absolute -bottom-1 -right-1 w-9 h-9 rounded-full border-[3px] border-white flex items-center justify-center text-white text-sm shadow-md ${data.badgeColor}`;
+    document.getElementById('detail-badge').innerHTML = `<i class="fas ${data.icon}"></i>`;
+    
+    // Render Socials
+    const socialsContainer = document.getElementById('detail-socials');
+    socialsContainer.innerHTML = '';
+    if(data.socials) {
+        if(data.socials.fb) {
+            socialsContainer.innerHTML += `<a href="${data.socials.fb}" target="_blank" class="w-8 h-8 text-xs rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-all shadow-sm"><i class="fab fa-facebook-f"></i></a>`;
+        }
+        if(data.socials.email) {
+            socialsContainer.innerHTML += `<a href="${data.socials.email}" class="w-8 h-8 text-xs rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center transition-all shadow-sm"><i class="fas fa-envelope"></i></a>`;
+        }
+        if(data.socials.portfolio) {
+            socialsContainer.innerHTML += `<a href="${data.socials.portfolio}" target="_blank" class="px-3 h-8 text-[11px] font-bold tracking-wide rounded-full bg-orange-50 text-orange-600 hover:bg-orange-500 hover:text-white flex items-center justify-center transition-all shadow-sm border border-orange-100"><i class="fas fa-globe mr-1.5"></i>Portfolio</a>`;
+        }
+    }
+    
+    // Trượt qua
+    document.getElementById('credits-slider').style.transform = 'translateX(-50%)';
+    
+    // Đổi Header
+    document.getElementById('credits-back-btn').classList.remove('hidden');
+    document.getElementById('credits-modal-title').innerText = 'Chi tiết thành viên';
+    document.getElementById('credits-modal-subtitle').innerText = 'Profile Info';
+};
+
+window.showCreditsOverview = () => {
+    document.getElementById('credits-slider').style.transform = 'translateX(0)';
+    document.getElementById('credits-back-btn').classList.add('hidden');
+    document.getElementById('credits-modal-title').innerText = 'Đội ngũ phát triển';
+    document.getElementById('credits-modal-subtitle').innerText = 'HopVan Platform Team';
+};
 
 window.openNotiDetail = (idx, iconColorClass, iconClass) => {
     const data = window.currentNotifications[idx];
@@ -246,6 +466,10 @@ window.closeNotiDetailModal = () => {
     document.getElementById('noti-detail-modal').classList.remove('show');
 };
 
+window.closeCreditsModal = () => {
+    document.getElementById('credits-modal').classList.remove('show');
+};
+
 
 export function initHeader(containerId) {
     const container = document.getElementById(containerId);
@@ -271,6 +495,13 @@ export function initHeader(containerId) {
     const notiListBody = document.getElementById('noti-list-body');
     const notiBadge = document.getElementById('noti-badge');
     const btnReadAll = document.getElementById('btn-read-all');
+    const btnCredits = document.getElementById('btn-show-credits');
+
+    if (btnCredits) {
+        btnCredits.addEventListener('click', () => {
+            document.getElementById('credits-modal').classList.add('show');
+        });
+    }
 
     // --- 1. FIREBASE LẤY THÔNG TIN USER (AVATAR & TÊN THẬT) ---
     try {
@@ -310,6 +541,12 @@ export function initHeader(containerId) {
                             avatarBox.innerHTML = rawName.charAt(0).toUpperCase();
                             avatarBox.style.background = 'linear-gradient(135deg, #FF8F50, #FF5E62)';
                         }
+                        
+                        // Đồng bộ theme từ Firebase xuống LocalStorage và UI
+                        if (uData.theme && uData.theme !== localStorage.getItem('theme')) {
+                            localStorage.setItem('theme', uData.theme);
+                            if (typeof window.applyTheme === 'function') window.applyTheme(uData.theme);
+                        }
                     }
                 });
 
@@ -326,8 +563,28 @@ export function initHeader(containerId) {
         console.warn("Lỗi khởi tạo Auth Header:", e);
     }
 
-    // --- 3. LOGIC XỬ LÝ THEME (SÁNG / TỐI) ĐỒNG BỘ LOCALSTORAGE ---
+    // --- 3. LOGIC XỬ LÝ THEME (SÁNG / TỐI) ĐỒNG BỘ LOCALSTORAGE VÀ TAB ---
+    window.applyTheme = function(theme) {
+        if (!theme) return;
+        const isDark = theme === 'dark';
+        
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        
+        updateThemeUI();
+        
+        const loader = document.getElementById('global-loader');
+        if(loader) loader.style.background = isDark ? '#0B1120' : '#FFF5EC';
+        
+        // Trigger event so other components (like charts) can react
+        window.dispatchEvent(new CustomEvent('themeChanged', { detail: { isDark } }));
+    };
+
     function updateThemeUI() {
+        if (!iconTheme || !btnTheme) return;
         const isDark = document.documentElement.classList.contains('dark');
         if (isDark) {
             iconTheme.className = "fas fa-sun"; // Hiện mặt trời
@@ -341,25 +598,27 @@ export function initHeader(containerId) {
     updateThemeUI();
 
     btnTheme.addEventListener('click', async () => {
-        const htmlEl = document.documentElement;
-        htmlEl.classList.toggle('dark');
-        const isDarkNow = htmlEl.classList.contains('dark');
+        const isDarkNow = !document.documentElement.classList.contains('dark');
+        const newTheme = isDarkNow ? 'dark' : 'light';
         
-        localStorage.setItem('theme', isDarkNow ? 'dark' : 'light');
-        updateThemeUI();
-
-        // Đổi màu nền loading
-        const loader = document.getElementById('global-loader');
-        if(loader) loader.style.background = isDarkNow ? '#0B1120' : '#FFF5EC';
+        localStorage.setItem('theme', newTheme);
+        window.applyTheme(newTheme);
 
         // Lưu Firebase
         try {
             const auth = getAuth();
             if (auth.currentUser) {
                 const db = getFirestore();
-                await updateDoc(doc(db, "users", auth.currentUser.uid), { theme: isDarkNow ? 'dark' : 'light' });
+                await updateDoc(doc(db, "users", auth.currentUser.uid), { theme: newTheme });
             }
         } catch (e) {}
+    });
+
+    // --- 3.5 CROSS-TAB SYNC LẮNG NGHE SỰ KIỆN STORAGE ---
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'theme') {
+            window.applyTheme(e.newValue);
+        }
     });
 
     // --- 4. LOGIC DROPDOWN THÔNG BÁO ---

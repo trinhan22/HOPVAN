@@ -197,6 +197,27 @@
     </style>
 </head>
 <body>
+    <!-- Global Loader -->
+    <div id="global-loader" style="position: fixed; inset: 0; background: #fff; z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease;">
+        <div id="global-spinner" style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #FF8F50; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+    </div>
+    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+    <script>
+        try {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.getElementById('global-loader').style.background = '#0f172a';
+                document.getElementById('global-spinner').style.borderColor = '#1e293b';
+                document.getElementById('global-spinner').style.borderTopColor = '#FF8F50';
+            }
+        } catch(e) {}
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('global-loader');
+            if(loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.remove(), 500);
+            }
+        });
+    </script>
 
     <script>if (localStorage.getItem('theme') === 'dark') { document.documentElement.classList.add('dark'); }</script>
 
@@ -238,10 +259,13 @@
                     </div>
                     
                     <div class="view-switch">
-                        <button class="vs-btn active" onclick="switchViewMode('pdf', this)">
+                        <button class="vs-btn active" id="btn-tab-pdf" onclick="switchViewMode('pdf', this)">
                             <i class="fas fa-file-pdf"></i> Lý thuyết
                         </button>
-                        <button class="vs-btn" onclick="switchViewMode('mindmap', this)">
+                        <button class="vs-btn" id="btn-tab-article" onclick="switchViewMode('article', this)" style="display:none;">
+                            <i class="fas fa-file-alt"></i> Bài Viết
+                        </button>
+                        <button class="vs-btn" id="btn-tab-mindmap" onclick="switchViewMode('mindmap', this)">
                             <i class="fas fa-project-diagram"></i> Sơ đồ
                         </button>
                     </div>
@@ -255,7 +279,14 @@
 
                     <div id="panel-pdf" class="view-panel active">
                         <div class="pdf-canvas-container">
-                            <canvas id="pdf-render-canvas"></canvas>
+                            <div id="pdf-empty-state" class="text-center text-gray-400 opacity-60 absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
+                                <div class="w-24 h-24 mb-4 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+                                    <i class="fas fa-book-reader text-4xl text-gray-300"></i>
+                                </div>
+                                <h3 class="text-xl font-black text-gray-500 mb-2">Chưa chọn bài học</h3>
+                                <p class="text-sm font-bold max-w-xs">Vui lòng chọn một bài học từ danh sách bên trái để bắt đầu học nhé!</p>
+                            </div>
+                            <canvas id="pdf-render-canvas" style="display: none;"></canvas>
                         </div>
                         <div class="pdf-controls" id="pdf-controls-box" style="display: none;">
                             <div class="control-buttons">
@@ -267,9 +298,29 @@
                         </div>
                     </div>
 
+                    <div id="panel-article" class="view-panel">
+                        <div class="w-full h-full bg-white dark:bg-gray-800 rounded-xl p-8 overflow-y-auto border border-gray-200 dark:border-gray-700 custom-scrollbar shadow-sm">
+                            <div id="article-content" class="prose max-w-none dark:prose-invert">
+                                <div class="text-center text-gray-400 opacity-60 flex flex-col items-center justify-center h-full pointer-events-none mt-20">
+                                    <div class="w-24 h-24 mb-4 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+                                        <i class="fas fa-file-alt text-4xl text-gray-300"></i>
+                                    </div>
+                                    <h3 class="text-xl font-black text-gray-500 mb-2">Chưa chọn bài học</h3>
+                                    <p class="text-sm font-bold max-w-xs">Vui lòng chọn một bài học từ danh sách bên trái để bắt đầu học nhé!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="panel-mindmap" class="view-panel">
                         <div class="mindmap-img-container" id="mindmap-container">
-                            <div class="text-gray-400 text-center"><i class="fas fa-project-diagram text-4xl mb-3 opacity-50"></i><p>Chọn bài học để xem sơ đồ</p></div>
+                            <div class="text-center text-gray-400 opacity-60 flex flex-col items-center justify-center h-full pointer-events-none mt-10">
+                                <div class="w-24 h-24 mb-4 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+                                    <i class="fas fa-project-diagram text-4xl text-gray-300"></i>
+                                </div>
+                                <h3 class="text-xl font-black text-gray-500 mb-2">Chưa chọn bài học</h3>
+                                <p class="text-sm font-bold max-w-xs">Vui lòng chọn một bài học từ danh sách bên trái để xem sơ đồ tư duy!</p>
+                            </div>
                         </div>
                         <div class="pdf-controls" id="mindmap-controls" style="display: none;">
                             <div class="control-buttons" style="justify-content: center; gap: 15px;">
@@ -304,7 +355,7 @@
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, updateDoc, collection, query, getDocs, orderBy, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { initMenu } from "./menu.js";
         import { initHeader } from './header.js'; 
         
@@ -317,136 +368,59 @@
         initMenu(app, 'lythuyet');
 
         // ==========================================
-        // DỮ LIỆU BÀI HỌC THEO THỂ LOẠI (CẤU TRÚC 3 TẦNG)
+        // DỮ LIỆU BÀI HỌC TỪ FIREBASE
         // ==========================================
-        const LESSON_DATA = [
-            {
-                section: "Truyện ngắn & Tiểu thuyết",
-                icon: "fa-book text-blue-500",
-                categories: [
-                    {
-                        title: "Phần I: Đọc hiểu",
-                        items: [
-                            { id: 'truyen-dh-nhanbiet', title: 'Nhận biết', reqScore: 0, pdfUrl: '../data/lythuyet/truyen/truyen_dh_nhanbiet.pdf' },
-                            { id: 'truyen-dh-thonghieu', title: 'Thông hiểu', reqScore: 4, pdfUrl: '../data/lythuyet/truyen/truyen_dh_thonghieu.pdf' },
-                            { id: 'truyen-dh-vandung', title: 'Vận dụng', reqScore: 7, pdfUrl: '../data/lythuyet/truyen/truyen_dh_vandung.pdf' }
-                        ]
-                    },
-                    {
-                        title: "Phần II: Làm văn",
-                        items: [
-                            { id: 'truyen-lv-khoidau', title: 'Khởi đầu', reqScore: 0, pdfUrl: '../data/lythuyet/truyen/truyen_lv_khoidau.pdf' },
-                            { id: 'truyen-lv-xaynen', title: 'Xây nền', reqScore: 2, pdfUrl: '../data/lythuyet/truyen/truyen_lv_xaynen.pdf' },
-                            { id: 'truyen-lv-cungco', title: 'Củng cố', reqScore: 5, pdfUrl: '../data/lythuyet/truyen/truyen_lv_cungco.pdf' },
-                            { id: 'truyen-lv-ungdung', title: 'Ứng dụng', reqScore: 7, pdfUrl: '../data/lythuyet/truyen/truyen_lv_ungdung.pdf' },
-                            { id: 'truyen-lv-nangcao', title: 'Nâng cao', reqScore: 9, pdfUrl: '../data/lythuyet/truyen/truyen_lv_nangcao.pdf' }
-                        ]
-                    }
-                ]
-            },
-            {
-                section: "Thơ trữ tình",
-                icon: "fa-wind text-indigo-500",
-                categories: [
-                    {
-                        title: "Phần I: Đọc hiểu",
-                        items: [
-                            { id: 'tho-dh-nhanbiet', title: 'Nhận biết', reqScore: 0, pdfUrl: '../data/lythuyet/tho_dh_nhanbiet.pdf' },
-                            { id: 'tho-dh-thonghieu', title: 'Thông hiểu', reqScore: 4, pdfUrl: '../data/lythuyet/tho_dh_thonghieu.pdf' },
-                            { id: 'tho-dh-vandung', title: 'Vận dụng', reqScore: 7, pdfUrl: '../data/lythuyet/tho_dh_vandung.pdf' }
-                        ]
-                    },
-                    {
-                        title: "Phần II: Làm văn",
-                        items: [
-                            { id: 'tho-lv-khoidau', title: 'Khởi đầu', reqScore: 0, pdfUrl: '../data/lythuyet/tho_lv_khoidau.pdf' },
-                            { id: 'tho-lv-xaynen', title: 'Xây nền', reqScore: 2, pdfUrl: '../data/lythuyet/tho_lv_xaynen.pdf' },
-                            { id: 'tho-lv-cungco', title: 'Củng cố', reqScore: 5, pdfUrl: '../data/lythuyet/tho_lv_cungco.pdf' },
-                            { id: 'tho-lv-ungdung', title: 'Ứng dụng', reqScore: 7, pdfUrl: '../data/lythuyet/tho_lv_ungdung.pdf' },
-                            { id: 'tho-lv-nangcao', title: 'Nâng cao', reqScore: 9, pdfUrl: '../data/lythuyet/tho_lv_nangcao.pdf' }
-                        ]
-                    }
-                ]
-            },
-            {
-                section: "Văn bản nghị luận",
-                icon: "fa-pen-nib text-green-500",
-                categories: [
-                    {
-                        title: "Phần I: Đọc hiểu",
-                        items: [
-                            { id: 'nl-dh-nhanbiet', title: 'Nhận biết', reqScore: 0, pdfUrl: '../data/lythuyet/nl_dh_nhanbiet.pdf' },
-                            { id: 'nl-dh-thonghieu', title: 'Thông hiểu', reqScore: 4, pdfUrl: '../data/lythuyet/nl_dh_thonghieu.pdf' },
-                            { id: 'nl-dh-vandung', title: 'Vận dụng', reqScore: 7, pdfUrl: '../data/lythuyet/nl_dh_vandung.pdf' }
-                        ]
-                    },
-                    {
-                        title: "Phần II: Làm văn",
-                        items: [
-                            { id: 'nl-lv-khoidau', title: 'Khởi đầu', reqScore: 0, pdfUrl: '../data/lythuyet/nl_lv_khoidau.pdf' },
-                            { id: 'nl-lv-xaynen', title: 'Xây nền', reqScore: 2, pdfUrl: '../data/lythuyet/nl_lv_xaynen.pdf' },
-                            { id: 'nl-lv-cungco', title: 'Củng cố', reqScore: 5, pdfUrl: '../data/lythuyet/nl_lv_cungco.pdf' },
-                            { id: 'nl-lv-ungdung', title: 'Ứng dụng', reqScore: 7, pdfUrl: '../data/lythuyet/nl_lv_ungdung.pdf' },
-                            { id: 'nl-lv-nangcao', title: 'Nâng cao', reqScore: 9, pdfUrl: '../data/lythuyet/nl_lv_nangcao.pdf' }
-                        ]
-                    }
-                ]
-            },
-            {
-                section: "Hài kịch - Nhật kí - Hồi kí",
-                icon: "fa-theater-masks text-red-500",
-                categories: [
-                    {
-                        title: "Phần I: Đọc hiểu",
-                        items: [
-                            { id: 'hk-dh-nhanbiet', title: 'Nhận biết', reqScore: 0, pdfUrl: '../data/lythuyet/hk_dh_nhanbiet.pdf' },
-                            { id: 'hk-dh-thonghieu', title: 'Thông hiểu', reqScore: 4, pdfUrl: '../data/lythuyet/hk_dh_thonghieu.pdf' },
-                            { id: 'hk-dh-vandung', title: 'Vận dụng', reqScore: 7, pdfUrl: '../data/lythuyet/hk_dh_vandung.pdf' }
-                        ]
-                    },
-                    {
-                        title: "Phần II: Làm văn",
-                        items: [
-                            { id: 'hk-lv-khoidau', title: 'Khởi đầu', reqScore: 0, pdfUrl: '../data/lythuyet/hk_lv_khoidau.pdf' },
-                            { id: 'hk-lv-xaynen', title: 'Xây nền', reqScore: 2, pdfUrl: '../data/lythuyet/hk_lv_xaynen.pdf' },
-                            { id: 'hk-lv-cungco', title: 'Củng cố', reqScore: 5, pdfUrl: '../data/lythuyet/hk_lv_cungco.pdf' },
-                            { id: 'hk-lv-ungdung', title: 'Ứng dụng', reqScore: 7, pdfUrl: '../data/lythuyet/hk_lv_ungdung.pdf' },
-                            { id: 'hk-lv-nangcao', title: 'Nâng cao', reqScore: 9, pdfUrl: '../data/lythuyet/hk_lv_nangcao.pdf' }
-                        ]
-                    }
-                ]
-            },
-            {
-                section: "Văn bản thông tin",
-                icon: "fa-newspaper text-orange-400",
-                categories: [
-                    {
-                        title: "Phần I: Đọc hiểu",
-                        items: [
-                            { id: 'tt-dh-nhanbiet', title: 'Nhận biết', reqScore: 0, pdfUrl: '../data/lythuyet/tt_dh_nhanbiet.pdf' },
-                            { id: 'tt-dh-thonghieu', title: 'Thông hiểu', reqScore: 4, pdfUrl: '../data/lythuyet/tt_dh_thonghieu.pdf' },
-                            { id: 'tt-dh-vandung', title: 'Vận dụng', reqScore: 7, pdfUrl: '../data/lythuyet/tt_dh_vandung.pdf' }
-                        ]
-                    },
-                    {
-                        title: "Phần II: Làm văn",
-                        items: [
-                            { id: 'tt-lv-khoidau', title: 'Khởi đầu', reqScore: 0, pdfUrl: '../data/lythuyet/tt_lv_khoidau.pdf' },
-                            { id: 'tt-lv-xaynen', title: 'Xây nền', reqScore: 2, pdfUrl: '../data/lythuyet/tt_lv_xaynen.pdf' },
-                            { id: 'tt-lv-cungco', title: 'Củng cố', reqScore: 5, pdfUrl: '../data/lythuyet/tt_lv_cungco.pdf' },
-                            { id: 'tt-lv-ungdung', title: 'Ứng dụng', reqScore: 7, pdfUrl: '../data/lythuyet/tt_lv_ungdung.pdf' },
-                            { id: 'tt-lv-nangcao', title: 'Nâng cao', reqScore: 9, pdfUrl: '../data/lythuyet/tt_lv_nangcao.pdf' }
-                        ]
-                    }
-                ]
-            }
-        ];
-
+        let LESSON_DATA = [];
         let userScore = 0; // Điểm Test mặc định
+
+        async function fetchKnowledgeData() {
+            try {
+                const catSnap = await getDocs(query(collection(db, "knowledge_categories"), orderBy("order", "asc")));
+                const conSnap = await getDocs(query(collection(db, "knowledge_content")));
+                
+                const contentsByCat = {};
+                conSnap.forEach(doc => {
+                    const data = doc.data();
+                    if(!contentsByCat[data.categoryId]) contentsByCat[data.categoryId] = [];
+                    contentsByCat[data.categoryId].push({id: doc.id, ...data});
+                });
+                
+                let dynamicData = [];
+                catSnap.forEach(doc => {
+                    const data = doc.data();
+                    const itemsForCat = contentsByCat[doc.id] || [];
+                    
+                    // Nhóm theo subCategory
+                    const groupedSubCats = {};
+                    itemsForCat.forEach(item => {
+                        const sub = item.subCategory || "Tài liệu & Bài viết";
+                        if(!groupedSubCats[sub]) groupedSubCats[sub] = [];
+                        groupedSubCats[sub].push(item);
+                    });
+                    
+                    const categoriesArr = [];
+                    for(const subName in groupedSubCats) {
+                        categoriesArr.push({
+                            title: subName,
+                            items: groupedSubCats[subName]
+                        });
+                    }
+
+                    dynamicData.push({
+                        section: data.name,
+                        icon: "fa-book-open text-orange-500",
+                        categories: categoriesArr
+                    });
+                });
+                
+                LESSON_DATA = dynamicData;
+            } catch (e) { console.error("Lỗi fetch Knowledge:", e); }
+        }
 
         onAuthStateChanged(auth, async (user) => { 
             if(user) {
                 try {
+                    await fetchKnowledgeData();
                     // Lấy dữ liệu điểm Test từ Database
                     const progDoc = await getDoc(doc(db, "users_progress", user.uid));
                     if (progDoc.exists()) {
@@ -482,16 +456,19 @@
                     
                     // Các bài học bên trong
                     cat.items.forEach(item => {
-                        const isUnlocked = score >= item.reqScore;
+                        const reqScore = item.reqScore || 0;
+                        const isUnlocked = score >= reqScore;
+                        const icon = item.type === 'pdf' ? 'fa-file-pdf' : 'fa-file-alt';
+                        
                         if (isUnlocked) {
                             categoriesHtml += `
-                            <button id="${item.id}" class="lesson-item" onclick="loadLesson('${item.id}', '${item.title}', '${item.pdfUrl}')">
-                                <i class="fas fa-file-alt"></i> <span>${item.title}</span>
+                            <button id="${item.id}" class="lesson-item" onclick="loadLesson('${item.id}')">
+                                <i class="fas ${icon}"></i> <span>${item.title}</span>
                             </button>`;
                         } else {
                             categoriesHtml += `
                             <div class="lesson-item locked" onclick="showLockModal()">
-                                <i class="fas fa-file-alt"></i> <span>${item.title}</span>
+                                <i class="fas ${icon}"></i> <span>${item.title}</span>
                                 <i class="fas fa-lock lock-icon"></i>
                             </div>`;
                         }
@@ -516,21 +493,16 @@
 
             container.innerHTML = html;
 
-            // Khôi phục bài cũ hoặc chọn bài đầu tiên
+            // Khôi phục bài cũ
             const savedData = localStorage.getItem('hopvan_theory_progress');
             if (savedData) {
                 try {
                     const data = JSON.parse(savedData);
                     const btn = document.getElementById(data.id);
                     if (btn && !btn.classList.contains('locked')) {
-                        loadLesson(data.id, data.title, data.pdfUrl, data.currentPage);
-                    } else {
-                        document.querySelector('.lesson-item:not(.locked)').click();
+                        loadLesson(data.id, data.currentPage);
                     }
-                } catch(e) { document.querySelector('.lesson-item:not(.locked)').click(); }
-            } else {
-                const firstValidLesson = document.querySelector('.lesson-item:not(.locked)');
-                if (firstValidLesson) firstValidLesson.click();
+                } catch(e) {}
             }
         }
 
@@ -558,12 +530,12 @@
         // PDF.js Logic
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         let pdfDoc = null, pageNum = 1, pageIsRendering = false, pageNumPending = null;
-        let currentLessonId = "", currentLessonTitle = "", currentPdfUrl = "";
+        let currentLessonId = "", currentLessonTitle = "", currentPdfUrl = "", currentCategoryName = "Lý thuyết Ngữ Văn";
 
         // HÀM KIỂM TRA VÀ MỞ KHÓA BÀI TIẾP THEO
-        async function checkAndUnlockNextLevel() {
+        async function checkAndUnlockNextLevel(forceUnlock = false) {
             // Chỉ chạy khi đã load xong PDF và đang ở trang cuối cùng
-            if (!pdfDoc || pageNum !== pdfDoc.numPages) return; 
+            if (!forceUnlock && (!pdfDoc || pageNum !== pdfDoc.numPages)) return; 
 
             // Trải phẳng toàn bộ dữ liệu LESSON_DATA thành 1 mảng 1 chiều để dễ tìm bài tiếp theo
             let allLessons = [];
@@ -581,9 +553,9 @@
                 const nextLesson = allLessons[currentIndex + 1];
 
                 // Nếu bài tiếp theo ĐANG BỊ KHÓA (điểm hiện tại < điểm yêu cầu)
-                if (userScore < nextLesson.reqScore) {
+                if (userScore < (nextLesson.reqScore || 0)) {
                     // 1. Nâng điểm hiện tại lên bằng với điểm yêu cầu của bài mới
-                    userScore = nextLesson.reqScore; 
+                    userScore = nextLesson.reqScore || 0; 
                     
                     // 2. Render lại Sidebar ngay lập tức để làm mất hình ổ khóa
                     renderTOC(userScore);
@@ -621,10 +593,17 @@
         const loadingOverlay = document.getElementById('loader-overlay');
 
         const updateProgressData = () => {
-            if (!currentLessonId || !pdfDoc) return;
+            if (!currentLessonId) return;
+            if (currentPdfUrl && !pdfDoc) return; // Nếu là PDF thì phải chờ render xong mới update
+            
             localStorage.setItem('hopvan_theory_progress', JSON.stringify({
-                id: currentLessonId, title: currentLessonTitle, pdfUrl: currentPdfUrl,
-                currentPage: pageNum, totalPages: pdfDoc.numPages, lastAccessed: Date.now()
+                id: currentLessonId, 
+                title: currentLessonTitle, 
+                pdfUrl: currentPdfUrl,
+                categoryName: currentCategoryName,
+                currentPage: pageNum || 1, 
+                totalPages: (pdfDoc ? pdfDoc.numPages : 1), 
+                lastAccessed: Date.now()
             }));
         };
 
@@ -657,18 +636,52 @@
         window.onPrevPage = () => { if (pdfDoc && pageNum > 1) { pageNum--; renderPage(pageNum); } };
         window.onNextPage = () => { if (pdfDoc && pageNum < pdfDoc.numPages) { pageNum++; renderPage(pageNum); } };
 
-        window.loadLesson = (id, title, pdfUrl, startPage = 1) => {
+        window.loadLesson = (id, startPage = 1) => {
             const btnElement = document.getElementById(id);
             if(!btnElement || btnElement.classList.contains('locked')) return;
 
-            document.querySelector('.vs-btn[onclick*="pdf"]')?.click();
-            currentLessonId = id; currentLessonTitle = title; currentPdfUrl = pdfUrl;
+            // Tìm data của item và chuyên mục
+            let itemData = null;
+            currentCategoryName = "Lý thuyết Ngữ Văn";
+            LESSON_DATA.forEach(section => {
+                section.categories.forEach(cat => {
+                    cat.items.forEach(item => { 
+                        if(item.id === id) {
+                            itemData = item; 
+                            currentCategoryName = section.section;
+                        }
+                    });
+                });
+            });
+            if(!itemData) return;
+
+            currentLessonId = id; 
+            currentLessonTitle = itemData.title; 
+            currentPdfUrl = itemData.type === 'pdf' ? itemData.content : '';
+
+            // Ẩn/hiện Tab tùy theo type
+            const btnPdf = document.getElementById('btn-tab-pdf');
+            const btnArticle = document.getElementById('btn-tab-article');
+            if(itemData.type === 'pdf') {
+                btnPdf.style.display = 'block';
+                btnArticle.style.display = 'none';
+                document.querySelector('.vs-btn[onclick*="pdf"]')?.click();
+            } else {
+                btnPdf.style.display = 'none';
+                btnArticle.style.display = 'block';
+                document.querySelector('.vs-btn[onclick*="article"]')?.click();
+                document.getElementById('article-content').innerHTML = itemData.content || '<p>Nội dung đang cập nhật...</p>';
+                setTimeout(() => {
+                    checkAndUnlockNextLevel(true); // Check unlock for article
+                    updateProgressData(); // Lưu progress cho article
+                }, 1000); 
+            }
 
             // Xử lý Mindmap
             window.currentMindmapUrl = `../data/mindmap/${id}.png`;
             document.getElementById('mindmap-container').innerHTML = `
                 <div class="w-full h-full flex flex-col items-center justify-center p-4">
-                    <img src="${window.currentMindmapUrl}" alt="Sơ đồ tư duy ${title}" class="max-w-full max-h-full object-contain rounded-xl drop-shadow-md transition-transform hover:scale-105 cursor-pointer" onclick="window.open('${window.currentMindmapUrl}', '_blank')" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'text-gray-400 opacity-60 text-center\\'><i class=\\'fas fa-project-diagram text-4xl mb-4\\'></i><p class=\\'font-bold text-sm uppercase\\'>Sơ đồ đang biên soạn</p></div>'; document.getElementById('mindmap-controls').style.display='none';">
+                    <img src="${window.currentMindmapUrl}" alt="Sơ đồ tư duy ${currentLessonTitle}" class="max-w-full max-h-full object-contain rounded-xl drop-shadow-md transition-transform hover:scale-105 cursor-pointer" onclick="window.open('${window.currentMindmapUrl}', '_blank')" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'text-gray-400 opacity-60 text-center\\'><i class=\\'fas fa-project-diagram text-4xl mb-4\\'></i><p class=\\'font-bold text-sm uppercase\\'>Sơ đồ đang biên soạn</p></div>'; document.getElementById('mindmap-controls').style.display='none';">
                 </div>`;
             document.getElementById('mindmap-controls').style.display = 'flex';
             document.getElementById('btn-download-mindmap').href = window.currentMindmapUrl;
@@ -676,22 +689,26 @@
             // Active UI
             document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
             btnElement.classList.add('active');
-            document.getElementById('display-title').innerText = title;
+            document.getElementById('display-title').innerText = currentLessonTitle;
 
-            // Load PDF
-            document.getElementById('pdf-controls-box').style.display = 'none';
-            loadingOverlay.classList.add('active');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Load PDF (chỉ nạp nếu là loại PDF)
+            if(itemData.type === 'pdf') {
+                document.getElementById('pdf-empty-state').style.display = 'none';
+                document.getElementById('pdf-render-canvas').style.display = 'block';
+                document.getElementById('pdf-controls-box').style.display = 'none';
+                loadingOverlay.classList.add('active');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            pdfjsLib.getDocument(pdfUrl).promise.then(pdfDoc_ => {
-                pdfDoc = pdfDoc_;
-                document.getElementById('page-count').textContent = pdfDoc.numPages;
-                pageNum = (startPage <= pdfDoc.numPages) ? startPage : 1; 
-                document.getElementById('pdf-controls-box').style.display = 'flex';
-                renderPage(pageNum);
-            }).catch(err => {
-                loadingOverlay.innerHTML = `<div class="text-red-500 font-bold p-4 text-center bg-red-50 rounded-xl"><i class="fas fa-exclamation-triangle mb-2 text-2xl"></i><br>Tài liệu đang được cập nhật!</div>`;
-            });
+                pdfjsLib.getDocument(currentPdfUrl).promise.then(pdfDoc_ => {
+                    pdfDoc = pdfDoc_;
+                    document.getElementById('page-count').textContent = pdfDoc.numPages;
+                    pageNum = (startPage <= pdfDoc.numPages) ? startPage : 1; 
+                    document.getElementById('pdf-controls-box').style.display = 'flex';
+                    renderPage(pageNum);
+                }).catch(err => {
+                    loadingOverlay.innerHTML = `<div class="text-red-500 font-bold p-4 text-center bg-red-50 rounded-xl"><i class="fas fa-exclamation-triangle mb-2 text-2xl"></i><br>Tài liệu đang được cập nhật!</div>`;
+                });
+            }
         };
     </script>
 

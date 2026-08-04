@@ -9,6 +9,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Merriweather:ital,wght@0,300;0,400;0,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
 
     <style>
         :root {
@@ -108,6 +113,22 @@
         html.dark .btn-outline { background: transparent; border-color: #334155; color: var(--text-main); }
         html.dark .q-content { color: #F1F5F9; }
 
+        /* --- POPUPS --- */
+        .custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 20000; justify-content: center; align-items: center; animation: fadeIn 0.2s; }
+        .modal-box { background: white; padding: 30px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: scale(0.9); animation: zoomIn 0.2s forwards; }
+        .modal-icon { font-size: 3rem; margin-bottom: 15px; }
+        .modal-actions { margin-top: 25px; display: flex; gap: 10px; justify-content: center; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 12px; font-weight: 700; transition: 0.2s; }
+        .popup-error .modal-icon { color: #ef4444; } .popup-error button { background: #ef4444; color: white; } .popup-error h3 { color: #ef4444 !important; }
+        .popup-warning .modal-icon { color: #f59e0b; } .popup-warning button { background: #f59e0b; color: white; } .popup-warning h3 { color: #f59e0b !important; }
+        .popup-info .modal-icon { color: #3b82f6; } .popup-info button { background: #3b82f6; color: white; } .popup-info h3 { color: #3b82f6 !important; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomIn { from { transform: scale(0.9); } to { transform: scale(1); } }
+        
+        /* Dark mode popups */
+        html.dark .custom-modal .modal-box { background: var(--card-bg); color: var(--text-main); }
+        html.dark .custom-modal #popup-message { color: var(--text-light); }
+
         /* SCROLLBAR */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -123,17 +144,54 @@
     </style>
 </head>
 <body>
+    <!-- Global Loader -->
+    <div id="global-loader" style="position: fixed; inset: 0; background: #fff; z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease;">
+        <div id="global-spinner" style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #FF8F50; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+    </div>
+    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+    <script>
+        try {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.getElementById('global-loader').style.background = '#0f172a';
+                document.getElementById('global-spinner').style.borderColor = '#1e293b';
+                document.getElementById('global-spinner').style.borderTopColor = '#FF8F50';
+            }
+        } catch(e) {}
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('global-loader');
+            if(loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.remove(), 500);
+            }
+        });
+    </script>
+
+    <div id="generic-popup" class="custom-modal">
+        <div class="modal-box">
+            <div id="popup-icon" class="modal-icon"><i class="fas fa-info-circle"></i></div>
+            <h3 id="popup-title" class="font-bold text-xl mb-2 text-gray-800 dark:text-gray-100">Thông báo</h3>
+            <p id="popup-message" class="text-gray-600 dark:text-gray-400">Nội dung thông báo...</p>
+            <div class="modal-actions"><button onclick="closePopup()" class="modal-btn hover:opacity-90">Đã hiểu</button></div>
+        </div>
+    </div>
+
+    <div id="confirm-popup" class="custom-modal">
+        <div class="modal-box popup-warning">
+            <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3 id="confirm-title" class="font-bold text-xl mb-2 text-gray-800 dark:text-gray-100">Xác nhận</h3>
+            <p id="confirm-message" class="text-red-600 font-bold dark:text-red-400">Nội dung xác nhận...</p>
+            <div class="modal-actions">
+                <button onclick="document.getElementById('confirm-popup').style.display='none'" class="modal-btn bg-gray-200 text-gray-800 hover:bg-gray-300">Hủy</button>
+                <button id="confirm-btn-yes" class="modal-btn bg-red-600 text-white hover:bg-red-700">Đồng ý</button>
+            </div>
+        </div>
+    </div>
 
     <div class="background-blobs">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
         <div class="blob blob-3"></div>
     </div>
-
-    <a href="../log.html" class="floating-logo hover:scale-105">
-        <img src="../LOGO.WEBP" alt="HopVan">
-        <span class="hidden md:inline-block">HOPVAN</span>
-    </a>
 
     <main class="main-content" id="main-wrapper" style="display: none;">
         
@@ -218,7 +276,7 @@
         </div>
 
         <div id="step-4" class="step-container">
-            <div class="wizard-card" id="result-content" style="overflow-y: auto;"></div>
+            <div class="wizard-card custom-scrollbar" id="result-content" style="overflow-y: auto;"></div>
         </div>
 
     </main>
@@ -240,6 +298,20 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+        window.showPopup = (title, message, type = 'info') => {
+            const modal = document.getElementById('generic-popup');
+            const box = modal.querySelector('.modal-box');
+            const icon = document.getElementById('popup-icon');
+            box.classList.remove('popup-error', 'popup-warning', 'popup-info');
+            document.getElementById('popup-title').innerText = title;
+            document.getElementById('popup-message').innerText = message;
+            if (type === 'error') { box.classList.add('popup-error'); icon.innerHTML = '<i class="fas fa-exclamation-circle"></i>'; } 
+            else if (type === 'warning') { box.classList.add('popup-warning'); icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>'; } 
+            else { box.classList.add('popup-info'); icon.innerHTML = '<i class="fas fa-info-circle"></i>'; }
+            modal.style.display = 'flex';
+        };
+        window.closePopup = () => document.getElementById('generic-popup').style.display = 'none';
 
         let diagnosticData = { userLevel: "", mcAnswers: {}, essay: "" };
         let diagTimerInterval;
@@ -365,7 +437,7 @@
             diagTimerInterval = setInterval(() => {
                 if (diagTimeLeft <= 0) {
                     clearInterval(diagTimerInterval);
-                    alert("⏳ Đã hết 45 phút làm bài! Hệ thống tự động nộp bài.");
+                    showPopup("Hết giờ", "⏳ Đã hết 45 phút làm bài! Hệ thống tự động nộp bài.", "warning");
                     submitDiagnosticTest();
                 } else {
                     diagTimeLeft--;
@@ -387,24 +459,61 @@
             if (document.hidden && isTakingTest) {
                 isTakingTest = false;
                 clearInterval(diagTimerInterval);
-                alert("⛔ CẢNH BÁO GIAN LẬN: Bạn đã chuyển tab hoặc thu nhỏ trình duyệt trong lúc làm bài thi.\n\nBài thi của bạn đã bị HỦY BỎ kết quả!");
-                if (window !== window.parent) {
-                    window.parent.location.href = "index.html";
-                } else {
-                    window.location.href = "index.html"; 
-                }
+                showPopup("CẢNH BÁO GIAN LẬN", "Bạn đã chuyển tab hoặc thu nhỏ trình duyệt trong lúc làm bài thi.\n\nBài thi của bạn đã bị HỦY BỎ kết quả!", "error");
+                setTimeout(() => {
+                    if (window !== window.parent) {
+                        window.parent.location.href = "index.html";
+                    } else {
+                        window.location.href = "index.html"; 
+                    }
+                }, 3000);
             }
         });
 
-        window.submitDiagnosticTest = async function() {
+        // --- HÀM LẤY API KEY TỪ FIRESTORE ĐỂ LUÂN PHIÊN (ROTATION) ---
+        async function getRandomGroqKey() {
+            try {
+                const url = `https://firestore.googleapis.com/v1/projects/hopvan-9a648/databases/(default)/documents/system_settings/api_keys?t=${Date.now()}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error("Firebase REST Error:", data.error.message);
+                    if (data.error.code === 403) throw new Error("Chưa cấp quyền Đọc (read) cho bảng api_keys trong Firestore Rules.");
+                    return null;
+                }
+
+                const keysArray = data?.fields?.groq_keys?.arrayValue?.values;
+                if (keysArray && keysArray.length > 0) {
+                    const keys = keysArray.map(k => k.stringValue).filter(Boolean);
+                    if (keys.length > 0) {
+                        return keys[Math.floor(Math.random() * keys.length)];
+                    }
+                }
+                return null;
+            } catch (error) {
+                console.error("Lỗi khi lấy Groq API Key:", error);
+                throw error;
+            }
+        }
+
+        window.submitDiagnosticTest = async function(force = false) {
             const answeredCount = Object.keys(diagnosticData.mcAnswers).length;
-            if (answeredCount < 30) {
-                if (!confirm(`Bạn mới làm ${answeredCount}/30 câu trắc nghiệm. Bạn có chắc chắn muốn nộp bài?`)) return;
+            if (answeredCount < 30 && !force) {
+                const modal = document.getElementById('confirm-popup');
+                document.getElementById('confirm-title').innerText = "Cảnh Báo Nộp Bài";
+                document.getElementById('confirm-message').innerText = `Bạn mới làm ${answeredCount}/30 câu trắc nghiệm. Việc nộp bài sớm có thể ảnh hưởng đến kết quả đánh giá năng lực của bạn. Bạn có chắc chắn muốn nộp bài?`;
+                document.getElementById('confirm-btn-yes').onclick = () => {
+                    modal.style.display = 'none';
+                    submitDiagnosticTest(true);
+                };
+                modal.style.display = 'flex';
+                return;
             }
 
             diagnosticData.essay = essayInput.value.trim();
             if (diagnosticData.essay.split(/\s+/).filter(x => x).length < 20) {
-                alert("Phần tự luận quá ngắn! Hãy viết ít nhất 20 từ để AI có thể đánh giá tư duy nhé.");
+                showPopup("Bài Quá Ngắn", "Phần tự luận quá ngắn! Hãy viết ít nhất 20 từ để AI có thể đánh giá tư duy nhé.", "warning");
                 return;
             }
 
@@ -424,7 +533,7 @@
             setTimeout(() => { bar.style.width = '50%'; status.innerText = "AI đang đọc và chấm điểm bài luận..."; }, 1000);
 
             try {
-                const systemPrompt = `Bạn là Giám khảo chấm thi môn Ngữ Văn của nền tảng HopVan.
+                let systemPrompt = `Bạn là Giám khảo chấm thi môn Ngữ Văn của nền tảng HopVan.
                 [DỮ LIỆU BÀI LÀM]
                 - Học sinh tự nhận định: ${diagnosticData.userLevel}
                 - Điểm Trắc nghiệm: ${mcScore}/7.5 điểm.
@@ -458,13 +567,43 @@
                     ]
                 }`;
 
-                const res = await fetch('/.netlify/functions/gemini-proxy', { 
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({ systemPrompt: systemPrompt, messages: "Bắt đầu chấm bài" }) 
+                systemPrompt += "\n\n[LƯU Ý KỸ THUẬT QUAN TRỌNG]: Bắt buộc trả về kết quả dưới định dạng JSON hợp lệ.";
+
+                // 1. LẤY API KEY ĐỘNG TỪ FIREBASE
+                const apiKey = await getRandomGroqKey();
+                if (!apiKey) {
+                    throw new Error("Hệ thống chưa được cấu hình API Key. Vui lòng liên hệ Admin.");
+                }
+
+                // 2. GỌI TRỰC TIẾP API GROQ
+                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify({ 
+                        model: "llama-3.3-70b-versatile",
+                        messages: [
+                            { role: "system", content: systemPrompt },
+                            { role: "user", content: `Bắt đầu chấm bài` }
+                        ],
+                        temperature: 0.3,
+                        max_tokens: 3000, 
+                        response_format: { type: "json_object" } 
+                    })
                 });
 
-                if (!res.ok) throw new Error("API_ERROR");
+                if (!res.ok) {
+                    const errData = await res.json();
+                    console.error("Groq Error:", errData);
+                    if (res.status === 429) throw new Error("Hệ thống đang quá tải request, vui lòng thử lại sau giây lát.");
+                    if (res.status === 401) throw new Error("API Key không hợp lệ hoặc đã bị khóa.");
+                    throw new Error("Lỗi kết nối máy chủ AI.");
+                }
+
                 const data = await res.json();
+                if (!data.choices || !data.choices[0] || !data.choices[0].message) throw new Error("NO_CONTENT");
                 
                 bar.style.width = '80%'; status.innerText = "Đang tổng hợp Báo cáo Lộ trình...";
 
@@ -529,7 +668,10 @@
 
             } catch (error) {
                 console.error("Lỗi AI sinh mã:", error);
-                alert("Lỗi máy chủ AI. Vui lòng bấm Nộp lại bài!");
+                let msg = "Lỗi máy chủ AI. Vui lòng bấm Nộp lại bài!";
+                if (error.message.includes("Hệ thống đang quá tải") || error.message.includes("API Key")) msg = error.message;
+                if (error.name === "SyntaxError" || error.message === "NO_CONTENT") msg = "Dữ liệu AI trả về bị lỗi cấu trúc. Vui lòng bấm nộp lại!";
+                showPopup("Lỗi AI", msg, "error");
                 goToStep(2);
             }
         }
@@ -567,10 +709,16 @@
                 `;
             };
 
+            let displayScore = parseFloat(result.total_score);
+            if (isNaN(displayScore)) {
+                const match = String(result.total_score).match(/[\d\.]+/);
+                displayScore = match ? parseFloat(match[0]) : 0;
+            }
+
             container.innerHTML = `
                 <div class="text-center border-b pb-6 border-gray-100 dark:border-gray-700">
-                    <div class="score-circle">${result.total_score}<span></span></div>
-                    <h2 class="text-2xl font-black text-gray-800 dark:text-white mb-1">Xếp loại: ${result.level_title}</h2>
+                    <div class="score-circle">${displayScore}<span>/10</span></div>
+                    <h2 class="text-2xl font-black text-orange-500 mb-1">Xếp loại: ${result.level_title}</h2>
                     <div class="flex justify-center gap-4 mt-3">
                         <span class="bg-blue-50 text-blue-700 font-bold px-3 py-1 rounded-lg text-sm">Trắc nghiệm: ${result.mc_score}</span>
                         <span class="bg-purple-50 text-purple-700 font-bold px-3 py-1 rounded-lg text-sm">Tự luận: ${result.essay_score}</span>

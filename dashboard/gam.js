@@ -294,6 +294,29 @@ const styles = `
         flex-shrink: 0 !important;           /* Chống bị bóp hẹp */
     }
 
+    /* --- DARK MODE CHO REWARDS MODAL --- */
+    html.dark #hv-gam-panel { background: #0f172a; border-color: #334155; }
+    html.dark .gam-stats { background: #1e293b; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+    html.dark .gs-col:first-child { border-color: #334155; }
+    html.dark .gs-val { color: #f8fafc; }
+    html.dark .gs-lbl { color: #94a3b8; }
+    html.dark .gam-tabs { background: #1e293b; }
+    html.dark .gt-btn { color: #64748b; }
+    html.dark .gt-btn.active { background: #334155; color: var(--hv-orange); box-shadow: none; }
+    html.dark .daily-note { color: #cbd5e1; }
+    html.dark .fire-ring { background: rgba(255,143,80,0.1); }
+    html.dark .q-card { background: #1e293b; border-color: #334155; }
+    html.dark .q-title { color: #f8fafc; }
+    html.dark .q-desc { color: #94a3b8; }
+    html.dark .q-icon-neo { background: #334155; }
+    html.dark .info-item { background: #1e293b; }
+    html.dark .info-icon { background: #334155; }
+    html.dark .info-txt h5 { color: #f8fafc; }
+    html.dark .info-txt p { color: #94a3b8; }
+    html.dark .reward-toast { background: rgba(30,41,59,0.95); border-color: #334155; }
+    html.dark .rt-msg { color: #f8fafc; }
+    html.dark .btn-q-claim:disabled { background: #334155; color: #64748b; }
+
     `;
 
 // --- 3. LOGIC ---
@@ -700,14 +723,14 @@ class Gamification {
                                 <div class="info-icon"><i class="fas fa-key"></i></div>
                                 <div class="info-txt">
                                     <h5>Keys dùng để làm gì?</h5>
-                                    <p>Đua Top Keys nhận quà khủng và mở khóa các Level trong Nhật Ký Học Tập tại HopVan.</p>
+                                    <p>Đua Top Keys nhận quà khủng từ hệ thống HopVan.</p>
                                 </div>
                             </div>
                             <div class="info-item">
                                 <div class="info-icon"><i class="fas fa-star"></i></div>
                                 <div class="info-txt">
                                     <h5>Cách kiếm thêm Keys?</h5>
-                                    <p>Điểm danh mỗi ngày (+4), hoàn thành nhiệm vụ ngày (+1 đến +25) và Vượt Level Nhật Ký Học Tập (+5).</p>
+                                    <p>Điểm danh mỗi ngày (+4) và hoàn thành nhiệm vụ ngày (+1 đến +25).</p>
                                 </div>
                             </div>
                             <div class="info-item">

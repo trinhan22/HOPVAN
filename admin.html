@@ -677,9 +677,10 @@
             <div class="nav-item" onclick="switchView('news', this)">
                 <i class="fas fa-feather-alt"></i> Bản Tin Văn Học
             </div>
-            <div class="nav-item" onclick="switchView('journal', this)">
-                <i class="fas fa-road"></i> Nhật Ký Học Tập
+            <div class="nav-item" onclick="switchView('knowledge', this)">
+                <i class="fas fa-book-open"></i> Kiến Thức Nền
             </div>
+
 
             <div class="px-7 mt-4 mb-1 text-[10px] font-black text-gray-400 uppercase tracking-widest">Dữ Liệu</div>
             <div class="nav-item" onclick="switchView('history', this)">
@@ -709,7 +710,7 @@
                 <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-100 cursor-default">
                     <span class="text-[8px] font-black text-gray-400 uppercase tracking-wider">HopVan Platform</span>
                     <span class="w-1 h-1 rounded-full bg-green-500"></span>
-                    <span class="text-[9px] font-bold text-orange-500 font-mono">v1.3.6</span>
+                    <span class="text-[9px] font-bold text-orange-500 font-mono">v1.3.7</span>
                 </div>
             </div>
         </div>
@@ -771,7 +772,7 @@
 
     <div class="stat-card card-posts group">
         <div class="stat-card-content">
-            <h3 id="stat-levels">0</h3>
+            <h3 id="stat-news">0</h3>
             <p>Bài viết văn học</p>
         </div>
         <i class="fas fa-pen-nib watermark-icon"></i>
@@ -941,135 +942,51 @@
     </div>
 </div>
 
-            <div id="view-journal" class="view-section hidden h-full">
-                <div class="flex gap-6 h-[calc(100vh-140px)]"> <div class="w-1/3 min-w-[300px] glass-panel rounded-3xl flex flex-col overflow-hidden bg-white/50 border border-white/60">
+            <div id="view-knowledge" class="view-section hidden h-full">
+                <div class="flex gap-6 h-[calc(100vh-140px)]"> 
+                    <!-- CATEGORY PANEL -->
+                    <div class="w-1/3 min-w-[300px] glass-panel rounded-3xl flex flex-col overflow-hidden bg-white/50 border border-white/60">
                         <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white/60 backdrop-blur-md sticky top-0 z-10">
-                            <h3 class="font-black text-gray-800 text-lg">Danh sách Bài học</h3>
-                            <button onclick="resetLevelForm()" class="w-9 h-9 rounded-xl bg-orange-100 text-orange-500 hover:bg-orange-500 hover:text-white transition flex items-center justify-center shadow-sm" title="Thêm mới">
+                            <h3 class="font-black text-gray-800 text-lg">Chuyên Mục</h3>
+                            <button onclick="openKnowledgeCategoryModal()" class="w-9 h-9 rounded-xl bg-orange-100 text-orange-500 hover:bg-orange-500 hover:text-white transition flex items-center justify-center shadow-sm" title="Thêm chuyên mục">
                                 <i class="fas fa-plus"></i>
                             </button>
                         </div>
-                        <div id="level-list" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-                            </div>
+                        <div id="knowledge-cat-list" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                            <!-- Danh sách category load ở đây -->
+                        </div>
                     </div>
                     
+                    <!-- CONTENT PANEL -->
                     <div class="flex-1 glass-panel rounded-3xl flex flex-col overflow-hidden bg-white/80 border border-white/80 shadow-xl">
                         <div class="px-8 py-5 border-b border-gray-100 flex items-center justify-between bg-white/50 backdrop-blur-md z-10 flex-shrink-0">
                             <div>
-                                <h3 class="text-xl font-black text-gray-800 flex items-center gap-2" id="lvl-form-title">
-                                    <i class="fas fa-edit text-orange-500"></i> Tạo Level Mới
+                                <h3 class="text-xl font-black text-gray-800 flex items-center gap-2" id="knowledge-content-title">
+                                    <i class="fas fa-folder-open text-orange-500"></i> Chọn chuyên mục
                                 </h3>
                             </div>
-                            <div class="px-3 py-1 bg-gray-100 text-gray-500 rounded-lg text-xs font-bold uppercase tracking-wider border border-gray-200">Editor Mode</div>
+                            <button onclick="openKnowledgeContentModal()" id="btn-add-knowledge-content" class="px-4 py-2 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition flex items-center gap-2 hidden">
+                                <i class="fas fa-plus"></i> Thêm Tài Liệu
+                            </button>
                         </div>
                         
-                        <div class="flex-1 overflow-y-auto p-8 custom-scrollbar relative">
-                            <form id="level-form" class="space-y-6 pb-20"> <input type="hidden" id="lvl-id">
-                                
-                                <div class="grid grid-cols-12 gap-6">
-                                    <div class="col-span-3">
-                                        <label class="label-custom">Level số</label>
-                                        <input type="number" id="lvl-num" class="glass-input font-bold text-center text-lg" placeholder="1">
-                                    </div>
-                                    <div class="col-span-9">
-                                        <label class="label-custom">Loại bài tập</label>
-                                        <select id="lvl-type" class="glass-input font-bold cursor-pointer" onchange="toggleLevelFields()">
-                                            <option value="tracnghiem">Trắc nghiệm (4 đáp án)</option>
-                                            <option value="dochieu">Đọc hiểu (Tự luận)</option>
-                                            <option value="nlxh">Nghị luận Xã hội</option>
-                                            <option value="nlvh">Nghị luận Văn học</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="label-custom">Tiêu đề bài học</label>
-                                    <input id="lvl-title" class="glass-input font-bold" placeholder="VD: Vợ chồng A Phủ" onkeyup="generateSlug(this.value)">
-                                </div>
-
-                                <div class="mt-4">
-                                    <label class="label-custom text-orange-500">Slug (Đường dẫn định danh)</label>
-                                    <div class="relative">
-                                        <input id="lvl-slug" class="glass-input font-mono text-sm bg-orange-50 text-orange-600 pl-10" placeholder="vo-chong-a-phu">
-                                        <i class="fas fa-link absolute left-4 top-1/2 -translate-y-1/2 text-orange-300"></i>
-                                    </div>
-                                    <p class="text-[10px] text-gray-400 mt-1">Dùng để tạo link: .../nhatkyhoctap/slug.html?id=<b>slug-cua-ban</b></p>
-                                </div>
-
-                                <div>
-                                    <label class="label-custom">Mô tả ngắn (Sub-title)</label>
-                                    <input id="lvl-desc" class="glass-input" placeholder="VD: Phân tích sức sống tiềm tàng...">
-                                </div>
-
-                                <div class="border-t-2 border-dashed border-gray-200 my-6"></div>
-
-                                <div id="lvl-field-tracnghiem" class="hidden animate-fade-in">
-                                    <div class="flex justify-between items-center mb-4">
-                                        <label class="label-custom text-orange-600 flex items-center gap-2"><i class="fas fa-list-ul"></i> Danh sách câu hỏi</label>
-                                        <span class="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded border border-gray-200">Auto-shuffle</span>
-                                    </div>
-                                    <div id="quiz-list" class="space-y-6 mb-6"></div>
-                                    <button type="button" onclick="addQuizQuestion()" class="w-full py-4 border-2 border-dashed border-orange-200 text-orange-500 rounded-2xl font-bold hover:bg-orange-50 hover:border-orange-400 transition flex items-center justify-center gap-2 group bg-orange-50/30">
-                                        <i class="fas fa-plus-circle group-hover:scale-110 transition"></i> Thêm câu hỏi
-                                    </button>
-                                </div>
-
-                                <div id="lvl-field-reading" class="hidden space-y-6 animate-fade-in">
-                                    <div>
-                                        <label class="label-custom text-blue-600">Tiêu đề văn bản</label>
-                                        <input id="lvl-read-title" class="glass-input font-bold" placeholder="VD: Mùa xuân nho nhỏ">
-                                    </div>
-                                    
-                                    <div>
-                                        <label class="label-custom text-blue-600 mb-2 block">Ngữ liệu Đọc hiểu (Văn bản/Thơ)</label>
-                                        <div class="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
-                                            <div id="editor-read-text" style="height: 300px; font-family: 'Merriweather', serif;"></div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="bg-blue-50/50 p-5 rounded-2xl border border-blue-100">
-                                        <label class="label-custom text-blue-600">Câu hỏi tự luận</label>
-                                        <p class="text-[10px] text-gray-400 mb-2 font-medium flex items-center gap-1"><i class="fas fa-info-circle"></i> Dùng thẻ <b>[NEXT]</b> để ngăn cách các câu hỏi.</p>
-                                        <textarea id="lvl-read-qs" class="glass-input h-32 bg-white resize-none" placeholder="Câu 1: ...? [NEXT] Câu 2: ...?"></textarea>
-                                    </div>
-                                </div>
-
-                                <div id="lvl-field-essay" class="hidden space-y-6 animate-fade-in">
-                                    <div>
-                                        <label class="label-custom text-green-600 mb-2 block">Yêu cầu Đề bài</label>
-                                        <div class="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
-                                            <div id="editor-essay-topic" style="height: 120px;"></div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div>
-                                        <label class="label-custom text-green-600 mb-2 block">Ngữ liệu phụ / Trích dẫn (Nếu có)</label>
-                                        <div class="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
-                                            <div id="editor-essay-text" style="height: 150px; font-family: 'Merriweather', serif;"></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="bg-green-50/50 p-5 rounded-2xl border border-green-100">
-                                        <label class="label-custom text-green-600 mb-2 block flex items-center gap-2"><i class="fas fa-robot"></i> Gợi ý chấm điểm (AI Prompt)</label>
-                                        <div class="bg-white rounded-xl overflow-hidden border border-gray-200">
-                                            <div id="editor-essay-hint" style="height: 150px;"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
+                        <div class="flex-1 overflow-y-auto p-4 custom-scrollbar relative">
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs text-gray-400 uppercase bg-gray-50/50">
+                                    <tr>
+                                        <th class="px-4 py-3 rounded-l-xl">Loại</th>
+                                        <th class="px-4 py-3">Tiêu đề</th>
+                                        <th class="px-4 py-3 text-right rounded-r-xl">Tác vụ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="knowledge-content-list">
+                                    <tr><td colspan="3" class="text-center text-gray-400 font-bold py-10">Chọn chuyên mục bên trái để xem nội dung.</td></tr>
+                                </tbody>
+                            </table>
                         </div>
-
-            <div class="sticky bottom-0 px-8 py-5 bg-white/90 backdrop-blur-xl border-t border-gray-200 flex justify-end gap-3 z-30">
-                <button type="button" onclick="deleteLevel()" id="btn-del-lvl" class="hidden px-5 py-3 text-red-500 font-bold hover:bg-red-50 rounded-xl text-sm transition flex items-center gap-2">
-                    <i class="fas fa-trash-alt"></i> <span>Xóa</span>
-                </button>
-                <button type="button" onclick="saveLevel()" class="px-8 py-3 bg-gray-900 text-white rounded-xl font-bold shadow-lg shadow-gray-500/20 hover:bg-black hover:-translate-y-1 hover:shadow-xl transition-all duration-300 text-sm flex items-center gap-2">
-                    <i class="fas fa-save"></i> <span>Lưu Thay Đổi</span>
-                </button>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-</div>
 
             <div id="view-history" class="view-section hidden">
                 <div class="glass-panel rounded-3xl p-8 min-h-[600px] flex flex-col">
@@ -1390,6 +1307,73 @@
             </div>
         </div>
     </div>
+
+<div id="modal-knowledge-category" class="custom-modal-overlay" style="display: none;">
+    <div class="custom-modal-box" style="max-width: 400px; text-align: left;">
+        <h3 class="text-xl font-black text-gray-800 mb-4 border-b pb-3 border-gray-100">Quản Lý Chuyên Mục</h3>
+        <input type="hidden" id="kc-id">
+        <div class="space-y-4">
+            <div>
+                <label class="label-custom block mb-1">Tên chuyên mục</label>
+                <input id="kc-name" type="text" class="glass-input font-bold w-full" placeholder="VD: Lý luận văn học">
+            </div>
+            <div>
+                <label class="label-custom block mb-1">Số thứ tự hiển thị</label>
+                <input id="kc-order" type="number" class="glass-input w-full" placeholder="1">
+            </div>
+        </div>
+        <div class="modal-btn-group mt-6">
+            <button class="modal-btn btn-cancel" onclick="closeKnowledgeCategoryModal()">Hủy</button>
+            <button class="modal-btn bg-orange-500 text-white shadow-lg shadow-orange-500/30 hover:bg-orange-600 transition" onclick="saveKnowledgeCategory()">Lưu</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-knowledge-content" class="custom-modal-overlay" style="display: none;">
+    <div class="custom-modal-box" style="max-width: 800px; text-align: left; height: 90vh; display: flex; flex-direction: column;">
+        <h3 class="text-xl font-black text-gray-800 mb-4 border-b pb-3 border-gray-100 flex-shrink-0">Thêm Nội Dung</h3>
+        <form id="kcnt-form" class="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-4">
+            <input type="hidden" id="kcnt-id">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="label-custom block mb-1">Loại nội dung</label>
+                    <select id="kcnt-type" class="glass-input w-full font-bold" onchange="toggleKnowledgeTypeFields()">
+                        <option value="article">Bài viết (Văn bản)</option>
+                        <option value="pdf">Tệp PDF</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="label-custom block mb-1">Tiêu đề bài học</label>
+                    <input id="kcnt-title" type="text" class="glass-input font-bold w-full" placeholder="VD: Nhận biết">
+                </div>
+                <div>
+                    <label class="label-custom block mb-1">Tên nhóm (Phần I, Phần II...)</label>
+                    <input id="kcnt-sub-category" type="text" class="glass-input w-full" placeholder="VD: PHẦN I: ĐỌC HIỂU">
+                </div>
+                <div>
+                    <label class="label-custom block mb-1 text-orange-500">Điểm yêu cầu mở khóa</label>
+                    <input id="kcnt-req-score" type="number" class="glass-input font-mono text-orange-500 font-bold w-full" placeholder="0" value="0">
+                </div>
+            </div>
+
+            <div id="kcnt-field-article">
+                <label class="label-custom block mb-1">Nội dung bài viết</label>
+                <div class="bg-white rounded-xl overflow-hidden border border-gray-200">
+                    <div id="editor-knowledge-content" style="height: 350px;"></div>
+                </div>
+            </div>
+
+            <div id="kcnt-field-pdf" class="hidden">
+                <label class="label-custom block mb-1 text-red-500">Link File PDF (Google Drive, Cloudinary...)</label>
+                <input id="kcnt-pdf-url" type="text" class="glass-input font-mono w-full" placeholder="https://...">
+            </div>
+        </form>
+        <div class="modal-btn-group mt-6 flex-shrink-0">
+            <button class="modal-btn btn-cancel" onclick="closeKnowledgeContentModal()">Hủy</button>
+            <button id="btn-save-kcnt" class="modal-btn bg-gray-900 text-white shadow-lg shadow-gray-500/30 hover:bg-black transition" onclick="saveKnowledgeContent()">Lưu Nội Dung</button>
+        </div>
+    </div>
+</div>
 
 <div id="notification-modal" class="custom-modal-overlay" style="display: none;">
     <div class="custom-modal-box" style="max-width: 500px; text-align: left;">
@@ -2220,10 +2204,10 @@ const CAT_MAP = {
         
         // 3. Tải dữ liệu tương ứng với tab đang mở
         if(viewId === 'bank') loadBank(currentCollection);
-        if(viewId === 'journal') loadLevelsList();
         if(viewId === 'history') loadUsers();
         if(viewId === 'news') loadNews(currentNewsFilter);
         if(viewId === 'feedbacks') loadFeedbacks();
+        if(viewId === 'knowledge') loadKnowledgeCategories();
         if(viewId === 'maintenance') loadMaintenanceSettings(); 
         
         // DÒNG MỚI THÊM VÀO:
@@ -2258,7 +2242,7 @@ const CAT_MAP = {
 
             // 3. Đếm tổng Bài viết văn học (Realtime)
             onSnapshot(collection(db, "literary_news"), (snap) => {
-                const el = document.getElementById('stat-levels');
+                const el = document.getElementById('stat-news');
                 if (el) el.innerText = snap.size;
             });
 
@@ -2950,279 +2934,8 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
         } 
     };
 
-    // 6. LEVEL & JOURNAL LOGIC
-    window.addQuizQuestion = (data = {}) => {
-        const container = document.getElementById('quiz-list');
-        const uniqueId = Date.now() + Math.random().toString(36).substr(2, 9);
-        const div = document.createElement('div');
-        div.className = "quiz-item p-5 bg-white rounded-2xl border border-gray-200 shadow-sm relative group hover:border-orange-300 transition-all";
-        
-        const qVal = data.question || "";
-        const opts = data.options || ["", "", "", ""];
-        const corr = data.correct !== undefined ? data.correct : 0;
 
-        div.innerHTML = `
-            <div class="flex justify-between items-center mb-3">
-                <span class="text-xs font-black text-orange-500 uppercase tracking-wider bg-orange-50 px-2 py-1 rounded">Câu hỏi</span>
-                <button type="button" onclick="this.closest('.quiz-item').remove()" class="text-gray-300 hover:text-red-500 transition px-2" title="Xóa câu này">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            </div>
-            
-            <textarea class="glass-input h-20 mb-4 font-medium q-input bg-gray-50 focus:bg-white" placeholder="Nhập nội dung câu hỏi...">${qVal}</textarea>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                ${[0, 1, 2, 3].map((i) => `
-                    <div class="flex items-center gap-3 bg-white p-2 rounded-xl border border-gray-100 hover:border-orange-300 transition-colors shadow-sm">
-                        <div class="relative flex items-center justify-center w-8 h-8">
-                            <input type="radio" name="correct-${uniqueId}" value="${i}" class="peer w-5 h-5 accent-orange-500 cursor-pointer z-10" ${corr === i ? 'checked' : ''}>
-                            <div class="absolute inset-0 rounded-full bg-orange-100 scale-0 peer-checked:scale-100 transition-transform"></div>
-                        </div>
-                        <span class="font-black text-gray-400 text-sm">${String.fromCharCode(65 + i)}</span>
-                        <input class="bg-transparent border-none outline-none flex-1 text-sm font-medium text-gray-700 placeholder-gray-300 opt-input" placeholder="Đáp án ${String.fromCharCode(65 + i)}" value="${opts[i]}">
-                    </div>
-                `).join('')}
-            </div>
-        `;
-        container.appendChild(div);
-        div.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    };
 
-    window.toggleLevelFields = () => {
-        const type = document.getElementById('lvl-type').value;
-        ['lvl-field-tracnghiem', 'lvl-field-reading', 'lvl-field-essay'].forEach(id => {
-            document.getElementById(id).classList.add('hidden');
-        });
-        
-        if(type === 'tracnghiem') {
-            document.getElementById('lvl-field-tracnghiem').classList.remove('hidden');
-            if(document.getElementById('quiz-list').children.length === 0) addQuizQuestion();
-        } else if(type === 'dochieu') {
-            document.getElementById('lvl-field-reading').classList.remove('hidden');
-        } else {
-            document.getElementById('lvl-field-essay').classList.remove('hidden');
-        }
-    };
-
-    window.loadLevelsList = async () => {
-        const listEl = document.getElementById('level-list');
-        listEl.innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin text-gray-400"></i></div>';
-        
-        try {
-            const q = query(collection(db, "study_levels"), orderBy("level", "asc"));
-            const snap = await getDocs(q);
-            listEl.innerHTML = "";
-            
-            if(snap.empty) {
-                listEl.innerHTML = '<p class="text-center text-gray-400 text-sm py-10 font-bold">Chưa có level nào được tạo.</p>';
-                return;
-            }
-
-            snap.forEach(d => {
-                const data = d.data();
-                const div = document.createElement('div');
-                div.className = "p-4 bg-white border border-gray-100 rounded-xl hover:bg-orange-50 cursor-pointer transition flex items-center justify-between group shadow-sm";
-                div.onclick = () => fillLevelForm(d.id, data);
-                div.innerHTML = `
-                    <div class="flex items-center gap-3 w-full">
-                        <span class="text-[10px] font-black bg-gray-100 px-2 py-1 rounded text-gray-500 group-hover:bg-orange-500 group-hover:text-white transition flex-shrink-0">LV ${data.level}</span>
-                        <div class="min-w-0 flex-1">
-                            <div class="font-bold text-gray-700 text-sm truncate">${data.title}</div>
-                            <div class="text-[10px] text-gray-400 font-mono truncate">/${data.slug}</div> </div>
-                    </div>
-                    <i class="fas fa-chevron-right text-gray-300 text-xs group-hover:translate-x-1 transition flex-shrink-0"></i>
-                `;
-                listEl.appendChild(div);
-            });
-        } catch(e) { console.error("Lỗi load level:", e); }
-    };
-
-    // --- KHỞI TẠO EDITOR CHO JOURNAL ---
-    let journalEditors = {};
-
-    function initJournalEditors() {
-        if (journalEditors.readText) return; // Đã tạo rồi thì không tạo lại
-
-        // Toolbar đầy đủ hơn: Có Căn lề, Header, List
-        const toolbarOptions = [
-            ['bold', 'italic', 'underline', 'strike'],        // In đậm, nghiêng, gạch chân
-            [{ 'header': [1, 2, 3, false] }],                 // Tiêu đề H1, H2...
-            [{ 'align': [] }],                                // Căn lề (Trái, Giữa, Phải, Đều)
-            [{ 'list': 'ordered'}, { 'list': 'bullet' }],     // Danh sách
-            [{ 'color': [] }, { 'background': [] }],          // Màu chữ
-            ['clean']                                         // Xóa định dạng
-        ];
-
-        // Khởi tạo 4 editor cho 4 ô nhập liệu
-        journalEditors.readText = new Quill('#editor-read-text', { 
-            theme: 'snow', 
-            modules: { toolbar: toolbarOptions }, 
-            placeholder: 'Nhập văn bản/thơ vào đây (hỗ trợ in đậm, căn giữa...)' 
-        });
-        
-        journalEditors.essayTopic = new Quill('#editor-essay-topic', { 
-            theme: 'snow', 
-            modules: { toolbar: toolbarOptions }, 
-            placeholder: 'Nhập yêu cầu đề bài...' 
-        });
-        
-        journalEditors.essayText = new Quill('#editor-essay-text', { 
-            theme: 'snow', 
-            modules: { toolbar: toolbarOptions }, 
-            placeholder: 'Nhập đoạn trích dẫn hoặc ngữ liệu...' 
-        });
-        
-        journalEditors.essayHint = new Quill('#editor-essay-hint', { 
-            theme: 'snow', 
-            modules: { toolbar: [['bold', 'italic'], ['clean']] }, // Hint chỉ cần đơn giản
-            placeholder: 'Gợi ý cho AI: Cần chấm ý A, ý B...' 
-        });
-    }
-
-    initJournalEditors();
-
-// --- HÀM TẠO SLUG TỰ ĐỘNG ---
-    window.generateSlug = (str) => {
-        const slug = str.toLowerCase()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-            .replace(/[đĐ]/g, "d")
-            .replace(/([^0-9a-z-\s])/g, "")
-            .replace(/(\s+)/g, "-")
-            .replace(/-+/g, "-")
-            .replace(/^-+|-+$/g, "");
-        document.getElementById('lvl-slug').value = slug;
-    };
-
-    window.fillLevelForm = (id, data) => {
-        resetLevelForm();
-        
-        document.getElementById('lvl-id').value = id;
-        document.getElementById('lvl-num').value = data.level;
-        document.getElementById('lvl-type').value = data.type;
-        document.getElementById('lvl-title').value = data.title;
-        
-        // --- CẬP NHẬT: Gán Slug ---
-        document.getElementById('lvl-slug').value = data.slug || ''; 
-        // --------------------------
-
-        document.getElementById('lvl-desc').value = data.desc;
-        document.getElementById('lvl-form-title').innerText = `Sửa Level ${data.level}`;
-        document.getElementById('btn-del-lvl').classList.remove('hidden');
-        
-        toggleLevelFields(); 
-
-        if(data.type === 'tracnghiem') {
-            const content = data.content;
-            if (Array.isArray(content)) content.forEach(q => addQuizQuestion(q));
-            else if (content && typeof content === 'object') addQuizQuestion(content);
-            else addQuizQuestion();
-        } 
-        else if(data.type === 'dochieu') {
-            document.getElementById('lvl-read-title').value = data.content.title || '';
-            document.getElementById('lvl-read-qs').value = data.content.questions ? data.content.questions.map(x => x.q).join(' [NEXT] ') : '';
-            journalEditors.readText.root.innerHTML = data.content.text || '';
-            // Load Hint nếu có
-            if(data.content.hint) journalEditors.essayHint.root.innerHTML = data.content.hint;
-        } 
-        else {
-            journalEditors.essayTopic.root.innerHTML = data.content.topic || '';
-            journalEditors.essayText.root.innerHTML = data.content.text || '';
-            journalEditors.essayHint.root.innerHTML = data.content.hint || '';
-        }
-    };
-
-    window.resetLevelForm = () => {
-        document.getElementById('level-form').reset();
-        document.getElementById('lvl-id').value = "";
-        document.getElementById('lvl-form-title').innerText = "Tạo Level Mới";
-        document.getElementById('btn-del-lvl').classList.add('hidden');
-        document.getElementById('quiz-list').innerHTML = "";
-        
-        // --- CẬP NHẬT: Reset Slug ---
-        document.getElementById('lvl-slug').value = "";
-        // ---------------------------
-
-        journalEditors.readText.setText('');
-        journalEditors.essayTopic.setText('');
-        journalEditors.essayText.setText('');
-        journalEditors.essayHint.setText('');
-
-        toggleLevelFields();
-        if(document.getElementById('lvl-type').value === 'tracnghiem') addQuizQuestion();
-    };
-
-    window.saveLevel = async () => {
-        const id = document.getElementById('lvl-id').value;
-        const type = document.getElementById('lvl-type').value;
-        const levelNum = parseInt(document.getElementById('lvl-num').value);
-        
-        // --- CẬP NHẬT: Lấy Slug ---
-        const slug = document.getElementById('lvl-slug').value;
-        if (!slug) { alert("Vui lòng nhập tiêu đề để tạo Slug!"); return; }
-        // --------------------------
-
-        let content = {};
-        
-        try {
-            if(type === 'tracnghiem') {
-                const quizItems = document.querySelectorAll('.quiz-item');
-                if (quizItems.length === 0) throw new Error("Cần ít nhất 1 câu hỏi!");
-                content = Array.from(quizItems).map(item => {
-                    const questionText = item.querySelector('.q-input').value;
-                    const optionInputs = item.querySelectorAll('.opt-input');
-                    const options = Array.from(optionInputs).map(opt => opt.value);
-                    const checkedRadio = item.querySelector('input[type="radio"]:checked');
-                    const correct = checkedRadio ? parseInt(checkedRadio.value) : 0;
-                    return { question: questionText, options: options, correct: correct };
-                });
-            } 
-            else if(type === 'dochieu') {
-                content.title = document.getElementById('lvl-read-title').value;
-                content.text = journalEditors.readText.root.innerHTML; 
-                const qsRaw = document.getElementById('lvl-read-qs').value;
-                content.questions = qsRaw.split('[NEXT]').map(q => ({ q: q.trim() })).filter(x => x.q !== "");
-                // Lưu Hint
-                content.hint = journalEditors.essayHint.root.innerHTML;
-            } 
-            else {
-                content.topic = journalEditors.essayTopic.root.innerHTML;
-                content.text = journalEditors.essayText.root.innerHTML;
-                content.hint = journalEditors.essayHint.root.innerHTML;
-            }
-
-            const finalData = {
-                level: levelNum, 
-                type: type, 
-                title: document.getElementById('lvl-title').value,
-                slug: slug, // <--- Đã thêm trường SLUG vào đây
-                desc: document.getElementById('lvl-desc').value, 
-                content: content, 
-                updatedAt: serverTimestamp()
-            };
-
-            if(id) {
-                await updateDoc(doc(db, "study_levels", id), finalData);
-                showToast("Đã cập nhật level!");
-            } else {
-                finalData.createdAt = serverTimestamp();
-                await addDoc(collection(db, "study_levels"), finalData);
-                showToast("Đã tạo level mới!");
-            }
-            loadLevelsList(); resetLevelForm(); loadStats();
-        } catch(e) { console.error(e); alert("Lỗi: " + e.message); }
-    };
-
-    window.deleteLevel = async () => {
-        const id = document.getElementById('lvl-id').value;
-        if(!id) return;
-        if(confirm("Bạn có chắc chắn muốn xóa Level này vĩnh viễn không?")) {
-            await deleteDoc(doc(db, "study_levels", id));
-            showToast("Đã xóa level!");
-            loadLevelsList();
-            resetLevelForm();
-            loadStats();
-        }
-    };
 
     // --- 7. QUẢN LÝ THÀNH VIÊN VÀ THÔNG BÁO ---
     window.usersData = {}; // Biến toàn cục để lưu tạm dữ liệu user tránh lỗi chuỗi JSON
@@ -3927,6 +3640,244 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
             if (keysToSave.imgbb_keys.length === 0) createKeyInputHTML('', 'imgbb');
         }
     });
+    // =========================================
+    // KHO KIẾN THỨC (KNOWLEDGE BASE) LOGIC
+    // =========================================
+    let currentKnowledgeCategory = null;
+
+    window.loadKnowledgeCategories = async () => {
+        const listEl = document.getElementById('knowledge-cat-list');
+        listEl.innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin text-gray-400"></i></div>';
+        
+        try {
+            const q = query(collection(db, "knowledge_categories"), orderBy("order", "asc"));
+            const snap = await getDocs(q);
+            listEl.innerHTML = "";
+            
+            if(snap.empty) {
+                listEl.innerHTML = '<p class="text-center text-gray-400 text-sm py-10 font-bold">Chưa có chuyên mục nào.</p>';
+                return;
+            }
+
+            let isFirst = true;
+            snap.forEach(d => {
+                const data = d.data();
+                const div = document.createElement('div');
+                div.className = `p-4 bg-white border border-gray-100 rounded-xl cursor-pointer transition flex items-center justify-between group shadow-sm ${currentKnowledgeCategory === d.id ? 'border-orange-500 bg-orange-50' : 'hover:bg-orange-50'}`;
+                
+                div.onclick = () => {
+                    currentKnowledgeCategory = d.id;
+                    document.getElementById('knowledge-content-title').innerHTML = `<i class="fas fa-folder-open text-orange-500"></i> ${data.name}`;
+                    document.getElementById('btn-add-knowledge-content').classList.remove('hidden');
+                    loadKnowledgeContent(d.id);
+                    loadKnowledgeCategories(); // re-render to update active state
+                };
+
+                div.innerHTML = `
+                    <div class="flex items-center gap-3 min-w-0">
+                        <span class="text-[10px] font-black bg-gray-100 px-2 py-1 rounded text-gray-500 flex-shrink-0">#${data.order || 0}</span>
+                        <div class="font-bold text-gray-700 text-sm truncate">${data.name}</div>
+                    </div>
+                    <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition">
+                        <button onclick="event.stopPropagation(); openKnowledgeCategoryModal('${d.id}', '${data.name}', ${data.order||0})" class="text-gray-400 hover:text-blue-500"><i class="fas fa-edit"></i></button>
+                        <button onclick="event.stopPropagation(); deleteKnowledgeCategory('${d.id}')" class="text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                listEl.appendChild(div);
+
+                if(isFirst && !currentKnowledgeCategory) {
+                    div.click();
+                    isFirst = false;
+                }
+            });
+        } catch(e) { console.error("Lỗi load category:", e); }
+    };
+
+    window.openKnowledgeCategoryModal = (id = '', name = '', order = 0) => {
+        document.getElementById('kc-id').value = id;
+        document.getElementById('kc-name').value = name;
+        document.getElementById('kc-order').value = order;
+        document.getElementById('modal-knowledge-category').classList.add('open');
+    };
+    
+    window.closeKnowledgeCategoryModal = () => document.getElementById('modal-knowledge-category').classList.remove('open');
+
+    window.saveKnowledgeCategory = async () => {
+        const id = document.getElementById('kc-id').value;
+        const name = document.getElementById('kc-name').value;
+        const order = parseInt(document.getElementById('kc-order').value) || 0;
+        
+        if(!name) { alert('Nhập tên chuyên mục!'); return; }
+        
+        try {
+            if(id) {
+                await updateDoc(doc(db, "knowledge_categories", id), { name, order });
+                showToast("Cập nhật thành công!");
+            } else {
+                await addDoc(collection(db, "knowledge_categories"), { name, order, createdAt: serverTimestamp() });
+                showToast("Thêm mới thành công!");
+            }
+            closeKnowledgeCategoryModal();
+            loadKnowledgeCategories();
+        } catch(e) { alert("Lỗi: " + e.message); }
+    };
+
+    window.deleteKnowledgeCategory = async (id) => {
+        if(confirm("Xóa chuyên mục này? Các bài viết bên trong có thể bị mồ côi!")) {
+            await deleteDoc(doc(db, "knowledge_categories", id));
+            if(currentKnowledgeCategory === id) currentKnowledgeCategory = null;
+            loadKnowledgeCategories();
+        }
+    };
+
+    // --- LOGIC CHO NỘI DUNG (ARTICLE / PDF) ---
+    let knowledgeContentEditor = null;
+    function initKnowledgeEditor() {
+        if(knowledgeContentEditor) return;
+        knowledgeContentEditor = new Quill('#editor-knowledge-content', { 
+            theme: 'snow', 
+            modules: { toolbar: [
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'header': [1, 2, 3, false] }],
+                [{ 'align': [] }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'color': [] }, { 'background': [] }],
+                ['link', 'image', 'video'],
+                ['clean']
+            ]}, 
+            placeholder: 'Nhập nội dung bài viết...' 
+        });
+    }
+
+    window.loadKnowledgeContent = async (categoryId) => {
+        const listEl = document.getElementById('knowledge-content-list');
+        listEl.innerHTML = '<tr><td colspan="3" class="text-center py-4"><i class="fas fa-spinner fa-spin text-gray-400"></i></td></tr>';
+        
+        try {
+            const q = query(collection(db, "knowledge_content"), where("categoryId", "==", categoryId), orderBy("createdAt", "desc"));
+            const snap = await getDocs(q);
+            listEl.innerHTML = "";
+            
+            if(snap.empty) {
+                listEl.innerHTML = '<tr><td colspan="3" class="text-center text-gray-400 font-bold py-6">Chưa có nội dung nào.</td></tr>';
+                return;
+            }
+
+            snap.forEach(d => {
+                const data = d.data();
+                const isPdf = data.type === 'pdf';
+                const typeBadge = isPdf ? '<span class="px-2 py-1 bg-red-100 text-red-600 rounded text-[10px] font-black uppercase"><i class="fas fa-file-pdf"></i> PDF</span>' : '<span class="px-2 py-1 bg-blue-100 text-blue-600 rounded text-[10px] font-black uppercase"><i class="fas fa-file-alt"></i> BÀI VIẾT</span>';
+                const subCatBadge = data.subCategory ? `<span class="px-2 py-1 bg-orange-100 text-orange-600 rounded text-[10px] font-black ml-2">${data.subCategory}</span>` : '';
+                const reqScoreBadge = (data.reqScore > 0) ? `<span class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-[10px] font-black ml-2"><i class="fas fa-lock"></i> ${data.reqScore}đ</span>` : '';
+                
+                const safeData = encodeURIComponent(JSON.stringify({...data, id: d.id}));
+
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-gray-100 hover:bg-gray-50 transition";
+                tr.innerHTML = `
+                    <td class="px-4 py-3">${typeBadge}</td>
+                    <td class="px-4 py-3 font-bold text-gray-800">${data.title} ${subCatBadge} ${reqScoreBadge}</td>
+                    <td class="px-4 py-3 text-right">
+                        <button onclick="editKnowledgeContent('${safeData}')" class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-blue-100 text-gray-500 hover:text-blue-500 transition mr-1"><i class="fas fa-edit text-xs"></i></button>
+                        <button onclick="deleteKnowledgeContent('${d.id}')" class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-500 transition"><i class="fas fa-trash text-xs"></i></button>
+                    </td>
+                `;
+                listEl.appendChild(tr);
+            });
+        } catch(e) { console.error("Lỗi load content:", e); }
+    };
+
+    window.toggleKnowledgeTypeFields = () => {
+        const type = document.getElementById('kcnt-type').value;
+        if(type === 'article') {
+            document.getElementById('kcnt-field-article').classList.remove('hidden');
+            document.getElementById('kcnt-field-pdf').classList.add('hidden');
+        } else {
+            document.getElementById('kcnt-field-article').classList.add('hidden');
+            document.getElementById('kcnt-field-pdf').classList.remove('hidden');
+        }
+    };
+
+    window.openKnowledgeContentModal = () => {
+        if(!currentKnowledgeCategory) { alert("Vui lòng chọn chuyên mục trước!"); return; }
+        initKnowledgeEditor();
+        document.getElementById('kcnt-form').reset();
+        document.getElementById('kcnt-id').value = "";
+        document.getElementById('kcnt-sub-category').value = "";
+        document.getElementById('kcnt-req-score').value = "0";
+        knowledgeContentEditor.setContents([]);
+        toggleKnowledgeTypeFields();
+        document.getElementById('modal-knowledge-content').classList.add('open');
+    };
+    
+    window.closeKnowledgeContentModal = () => document.getElementById('modal-knowledge-content').classList.remove('open');
+
+    window.editKnowledgeContent = (safeData) => {
+        initKnowledgeEditor();
+        const data = JSON.parse(decodeURIComponent(safeData));
+        document.getElementById('kcnt-id').value = data.id;
+        document.getElementById('kcnt-title').value = data.title;
+        document.getElementById('kcnt-sub-category').value = data.subCategory || "";
+        document.getElementById('kcnt-req-score').value = data.reqScore || 0;
+        document.getElementById('kcnt-type').value = data.type;
+        toggleKnowledgeTypeFields();
+        
+        if(data.type === 'pdf') {
+            document.getElementById('kcnt-pdf-url').value = data.content || '';
+        } else {
+            knowledgeContentEditor.root.innerHTML = data.content || '';
+        }
+        document.getElementById('modal-knowledge-content').classList.add('open');
+    };
+
+    window.saveKnowledgeContent = async () => {
+        const id = document.getElementById('kcnt-id').value;
+        const type = document.getElementById('kcnt-type').value;
+        const title = document.getElementById('kcnt-title').value;
+        const subCategory = document.getElementById('kcnt-sub-category').value;
+        const reqScore = parseFloat(document.getElementById('kcnt-req-score').value) || 0;
+        
+        if(!title) { alert("Vui lòng nhập tiêu đề!"); return; }
+        
+        let content = "";
+        if(type === 'pdf') {
+            content = document.getElementById('kcnt-pdf-url').value;
+            if(!content) { alert("Vui lòng nhập Link PDF!"); return; }
+        } else {
+            content = knowledgeContentEditor.root.innerHTML;
+        }
+
+        try {
+            const btn = document.getElementById('btn-save-kcnt');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+            btn.disabled = true;
+
+            const finalData = { categoryId: currentKnowledgeCategory, type, title, content, subCategory, reqScore };
+
+            if(id) {
+                finalData.updatedAt = serverTimestamp();
+                await updateDoc(doc(db, "knowledge_content", id), finalData);
+                showToast("Cập nhật thành công!");
+            } else {
+                finalData.createdAt = serverTimestamp();
+                await addDoc(collection(db, "knowledge_content"), finalData);
+                showToast("Thêm mới thành công!");
+            }
+            
+            closeKnowledgeContentModal();
+            loadKnowledgeContent(currentKnowledgeCategory);
+        } catch(e) { alert("Lỗi: " + e.message); } finally {
+            const btn = document.getElementById('btn-save-kcnt');
+            btn.innerHTML = 'Lưu Nội Dung'; btn.disabled = false;
+        }
+    };
+
+    window.deleteKnowledgeContent = async (id) => {
+        if(confirm("Bạn chắc chắn muốn xóa bài này?")) {
+            await deleteDoc(doc(db, "knowledge_content", id));
+            loadKnowledgeContent(currentKnowledgeCategory);
+        }
+    };
 </script>
 
 
