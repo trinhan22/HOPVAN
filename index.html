@@ -1107,15 +1107,6 @@
             cursor: pointer; transition: transform 0.3s ease;
         }
         
-        /* Hiệu ứng viền sáng chạy xung quanh (Tùy chọn cho độ Premium) */
-        .promo-box::before {
-            content: ''; position: absolute; inset: -3px; border-radius: 26px;
-            background: linear-gradient(135deg, #0D9488 0%, #10B981 100%);
-            background-size: 300% 300%; animation: gradientGlow 4s ease infinite;
-            z-index: -1; filter: blur(8px); opacity: 0.7;
-        }
-        @keyframes gradientGlow { 0% {background-position: 0% 50%} 50% {background-position: 100% 50%} 100% {background-position: 0% 50%} }
-
         /* Nút Close lơ lửng */
         .btn-promo-close {
             position: absolute; top: -15px; right: -15px;
