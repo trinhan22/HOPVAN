@@ -363,7 +363,7 @@ const creditData = {
         socials: { fb: 'https://www.facebook.com/cat.tuong.708243', email: 'mailto:tuongcncfct30670@gmail.com' }
     },
     'dangkhoa': {
-        name: 'Nguyễn H. Đăng Khoa', role: 'Content Developer',
+        name: 'Nguyễn Hoàng Đăng Khoa', role: 'Content Developer',
         avatar: '../IMG/dangkhoa.png', fallback: '../LOGO.WEBP',
         badgeColor: 'bg-green-500', icon: 'fa-book-open',
         bio: 'Học sinh K5A8 – Trường THPT FPT Cần Thơ, phụ trách nội dung và kiến thức Ngữ văn trên HOPVAN.',
