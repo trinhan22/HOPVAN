@@ -374,14 +374,14 @@ const creditData = {
         avatar: '../IMG/minhthien.png', fallback: '../LOGO.WEBP',
         badgeColor: 'bg-purple-500', icon: 'fa-chalkboard-teacher',
         bio: 'Giáo viên Công nghệ & Robotics hiện đang công tác tại Trường THPT Nguyễn Việt Dũng và Trường THPT FPT Cần Thơ, đồng thời là người phụ trách kỹ thuật của dự án HOPVAN.',
-        socials: { fb: 'https://www.facebook.com/thien.trangminh', email: 'mailto:contact@hopvan.info.vn' }
+        socials: { fb: 'https://www.facebook.com/thien.trangminh', email: 'mailto:' }
     },
     'cobinh': {
         name: 'Cô Mai Thị Thanh Bình', role: 'Giáo Viên Cố Vấn',
         avatar: '../IMG/thanhbinh.png', fallback: '../LOGO.WEBP',
         badgeColor: 'bg-pink-500', icon: 'fa-chalkboard-teacher',
         bio: 'Giáo viên bộ môn Ngữ văn – Trường THPT FPT Cần Thơ, đồng thời là người phụ trách học thuật của HOPVAN.',
-        socials: { fb: 'https://www.facebook.com/thanhbinh.rain', email: 'mailto:contact@hopvan.info.vn' }
+        socials: { fb: 'https://www.facebook.com/thanhbinh.rain', email: 'mailto:' }
     }
 };
 
