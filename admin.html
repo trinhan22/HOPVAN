@@ -1286,10 +1286,15 @@
                 </div>
 
                 <div class="flex gap-3 pt-4 border-t border-gray-100">
-                    <div class="flex-1 p-3 bg-orange-50 rounded-xl text-center border border-orange-100">
+                    <div class="flex-1 p-3 bg-orange-50 rounded-xl text-center border border-orange-100 relative group">
                         <i class="fas fa-key text-orange-500 mb-1"></i>
                         <div class="text-xs text-gray-500 font-bold">KEYS</div>
-                        <div id="ud-keys" class="font-black text-orange-600 text-lg">0</div>
+                        <div class="flex items-center justify-center gap-2 mt-1">
+                            <div id="ud-keys" class="font-black text-orange-600 text-lg">0</div>
+                            <button onclick="window.promptAddKeys()" class="w-5 h-5 rounded-full bg-orange-200 text-orange-600 hover:bg-orange-500 hover:text-white flex items-center justify-center transition shadow-sm" title="Cộng thêm keys">
+                                <i class="fas fa-plus text-[10px]"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="flex-1 p-3 bg-red-50 rounded-xl text-center border border-red-100">
                         <i class="fas fa-fire text-red-500 mb-1"></i>
@@ -2148,6 +2153,19 @@ const CAT_MAP = {
     // AUTH CHECK
     onAuthStateChanged(auth, (user) => {
         if (user && user.email === "admin@hopvan.com") {
+            // RECOVER ORIGINAL KEYS
+            if (!sessionStorage.getItem('keysRecoveredAdmin')) {
+                sessionStorage.setItem('keysRecoveredAdmin', 'true');
+                getDocs(collection(db, "users")).then(snapshot => {
+                    snapshot.forEach(docSnap => {
+                        const d = docSnap.data();
+                        if (d.name === "Nguyễn Trí Nhân") { updateDoc(doc(db, "users", docSnap.id), { keys: 200 }); }
+                        if (d.name === "cattuongchau867" || (d.email && d.email.includes("cattuongchau"))) { updateDoc(doc(db, "users", docSnap.id), { keys: 150 }); }
+                        if (d.name === "Nguyễn Hoàng Đăng Khoa" || (d.email && d.email.includes("dangkhoa"))) { updateDoc(doc(db, "users", docSnap.id), { keys: 100 }); }
+                        if (d.email === "admin@hopvan.com") { updateDoc(doc(db, "users", docSnap.id), { keys: 0 }); }
+                    });
+                });
+            }
             document.getElementById('admin-email').innerText = user.email.split('@')[0];
             loadStats();
             loadNews('all');
@@ -2999,7 +3017,7 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
                             <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wide">Login: ${u.lastLoginDate || 'N/A'}</span>
                             <div class="flex items-center gap-3 text-xs font-bold text-gray-600">
                                 <span title="Streak"><i class="fas fa-fire text-red-400"></i> ${u.streak||0}</span>
-                                <span title="Keys"><i class="fas fa-key text-yellow-400"></i> ${u.keys||0}</span>
+                                <span title="Keys"><i class="fas fa-key text-yellow-400"></i> ${u.keys || 0}</span>
                             </div>
                         </div>
                     </td>
@@ -3020,6 +3038,7 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
 
     // Hàm mở Modal Chi Tiết
     window.openUserDetail = (uid) => {
+        window.currentUserDetailUid = uid;
         const u = window.usersData[uid]; // Lấy dữ liệu qua UID để tránh lỗi Parse JSON
         if(!u) return;
 
@@ -3062,6 +3081,63 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
     // =========================================
     // LOGIC THÔNG BÁO (NOTIFICATION & HISTORY)
     // =========================================
+
+
+    // =========================================
+    // THÊM KEYS CHO HỌC VIÊN
+    // =========================================
+    window.promptAddKeys = async () => {
+        const uid = window.currentUserDetailUid;
+        if (!uid) return;
+        const u = window.usersData[uid];
+        const name = u.name || u.email || "học viên này";
+        
+        const amountStr = prompt(`Nhập số Keys muốn cộng thêm cho ${name} (ví dụ: 10):`);
+        if (amountStr === null || amountStr.trim() === "") return;
+        
+        const amount = parseInt(amountStr);
+        if (isNaN(amount) || amount <= 0) {
+            alert("Số keys không hợp lệ!");
+            return;
+        }
+
+        try {
+            const userRef = doc(db, "users", uid);
+            const userDoc = await getDoc(userRef);
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                const currentMonth = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
+                
+                let currentKeys = data.keys || 0;
+                
+                const newTotal = currentKeys + amount;
+                await updateDoc(userRef, { keys: newTotal });
+                
+                // Cập nhật giao diện nội bộ cache
+                if (window.usersData[uid]) {
+                    window.usersData[uid].keys = newTotal;
+                }
+                
+                // Cập nhật giao diện Modal
+                document.getElementById('ud-keys').innerText = newTotal;
+                alert(`Đã cộng thành công ${amount} keys cho ${name}!`);
+                
+                // Gửi thông báo cho học viên
+                const notiRef = collection(db, "notifications");
+                await addDoc(notiRef, {
+                    title: "🎁 Bạn vừa được tặng Keys!",
+                    body: `Ban quản trị Hopvan vừa cộng ${amount} keys vào tài khoản của bạn. Chúc bạn học tốt!`,
+                    type: "personal",
+                    targetUid: uid,
+                    createdAt: serverTimestamp(),
+                    isRead: false
+                });
+            }
+        } catch(e) {
+            console.error(e);
+            alert("Đã xảy ra lỗi khi cộng keys.");
+        }
+    };
 
     window.resetNotiForm = () => {
         document.getElementById('noti-input-title').value = "";

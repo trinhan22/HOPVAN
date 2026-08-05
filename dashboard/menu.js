@@ -466,6 +466,7 @@ function startMenuLogic(auth, db) {
     // 5. ĐĂNG XUẤT
     document.getElementById('btn-confirm-logout').onclick = async () => {
         try {
+            sessionStorage.removeItem('rankingPopupShown');
             await signOut(auth);
             window.location.href = "../";
         } catch (e) { console.error(e); }

@@ -110,13 +110,13 @@ const headerStyles = `
     .noti-detail-modal {
         position: fixed; inset: 0; z-index: 9999999; /* Đẩy max z-index để không bị menu đè */
         background: rgba(0, 0, 0, 0.25); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-        display: none; align-items: center; justify-content: center;
-        opacity: 0; transition: opacity 0.3s ease; padding: 20px;
+        display: flex; align-items: center; justify-content: center;
+        opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease, visibility 0.3s ease; padding: 20px;
     }
     html.dark .noti-detail-modal {
         background: rgba(11, 17, 32, 0.7);
     }
-    .noti-detail-modal.show { display: flex; opacity: 1; }
+    .noti-detail-modal.show { opacity: 1; visibility: visible; pointer-events: auto; }
     
     .noti-detail-box {
         background: #ffffff; border-radius: 28px;

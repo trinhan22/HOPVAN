@@ -273,38 +273,36 @@
 </head>
 <body>
 
-    <div id="global-loader" style="position: fixed; inset: 0; z-index: 999999; transition: opacity 0.6s ease-out; background: #FFF5EC;">
-        <iframe src="../loading.html" style="width: 100%; height: 100%; border: none; pointer-events: none;"></iframe>
+    <div id="global-loader" style="position: fixed; inset: 0; background: #FFF5EC; z-index: 999999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease;">
+        <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+            <div style="position: relative; width: 70px; height: 70px; margin-bottom: 20px;">
+                <img src="../LOGO.WEBP" style="width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2; animation: hopvanPulse 1.5s ease-in-out infinite alternate;">
+                <div id="global-glow" style="position: absolute; inset: -15px; background: #FF8F50; filter: blur(20px); opacity: 0.5; border-radius: 50%; z-index: 1; animation: hopvanPulse 1.5s ease-in-out infinite alternate;"></div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <div class="hopvan-dot" style="width: 10px; height: 10px; background: #FF8F50; border-radius: 50%; animation: hopvanBounce 1.4s infinite ease-in-out both;"></div>
+                <div class="hopvan-dot" style="width: 10px; height: 10px; background: #FF5E62; border-radius: 50%; animation: hopvanBounce 1.4s infinite ease-in-out both; animation-delay: 0.16s;"></div>
+                <div class="hopvan-dot" style="width: 10px; height: 10px; background: #FF8F50; border-radius: 50%; animation: hopvanBounce 1.4s infinite ease-in-out both; animation-delay: 0.32s;"></div>
+            </div>
+        </div>
     </div>
+    <style>
+        @keyframes hopvanPulse { 0% { transform: scale(0.9); } 100% { transform: scale(1.1); } }
+        @keyframes hopvanBounce { 0%, 80%, 100% { transform: translateY(0); opacity: 0.35; } 40% { transform: translateY(-8px); opacity: 0.7; } }
+    </style>
     
     <div id="diagnostic-iframe-container" style="display: none; position: fixed; inset: 0; z-index: 9999999; background: #FFF5EC; transition: opacity 0.4s ease;">
         <iframe src="hopvan-diagnostic.html" style="width: 100%; height: 100%; border: none;"></iframe>
     </div>
 
     <script>
-        // Tự động nhận diện Dark Mode cho khung nền Loading
-        if (localStorage.getItem('theme') === 'dark') { 
-            document.documentElement.classList.add('dark'); 
-            document.getElementById('global-loader').style.background = '#0B1120';
-        }
-
-        // TỐI ƯU UX: Phân biệt F5 / Đăng nhập / Chuyển trang Menu
-        window.addEventListener('DOMContentLoaded', () => {
-            const loader = document.getElementById('global-loader');
-            const navEntry = performance.getEntriesByType("navigation")[0];
-            const navType = navEntry ? navEntry.type : '';
-            const referrer = document.referrer;
-
-            // Nếu user chuyển trang từ Menu (Không phải F5, không phải từ trang login)
-            // -> Xóa ngay màn hình loading để vào thẳng Dashboard mượt mà
-            if (navType === 'navigate' && referrer && !referrer.includes('log.html') && referrer.includes(window.location.hostname)) {
-                if (loader) {
-                    loader.style.display = 'none';
-                    loader.remove();
-                }
+        try {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.getElementById('global-loader').style.background = '#0f172a';
+                document.getElementById('global-glow').style.background = '#FF5E62';
             }
-            // Ngược lại: Nếu F5 (navType === 'reload') hoặc từ log.html qua -> Cứ để Loading chạy bình thường
-        });
+        } catch(e) {}
     </script>
     
     <div class="background-blobs">
@@ -479,7 +477,7 @@
     </div>
 
     <div id="leaderboardModal" class="modal">
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content" style="max-width: 700px;">
             <button onclick="closeLeaderboardModal()" class="close-btn"><i class="fas fa-times"></i></button>
             <div style="text-align: center; margin-bottom: 25px;">
                 <h2 style="font-size: 1.8rem; font-weight: 900; color: var(--text-main);">Bảng xếp hạng Keys</h2>
@@ -561,6 +559,7 @@
                         else document.documentElement.classList.remove('dark');
                     }
 
+
                     // Nếu đã làm bài test thì gán thành true
                     if (data.diagnosticCompleted === true) {
                         isDiagnosticCompleted = true;
@@ -591,13 +590,11 @@
             loadTheoryProgress();
 
             // Hiệu ứng tắt màn hình Loading
-            setTimeout(() => {
-                const loader = document.getElementById('global-loader');
-                if (loader) {
-                    loader.style.opacity = '0'; 
-                    setTimeout(() => loader.remove(), 600); 
-                }
-            }, 3000); // Đợi đủ 3 giây để GSAP trong iframe loading.html chạy xong
+            const loader = document.getElementById('global-loader');
+            if (loader) {
+                loader.style.opacity = '0'; 
+                setTimeout(() => loader.remove(), 500); 
+            }
 
         } else { window.location.href = "../log.html"; }
     });
@@ -871,12 +868,41 @@
 
     function setupLeaderboard(currentUser) {
         const usersRef = collection(db, "users");
+        
+        // RECOVER ORIGINAL KEYS
+        if (!sessionStorage.getItem('keysRecovered')) {
+            sessionStorage.setItem('keysRecovered', 'true');
+            getDocs(usersRef).then(snapshot => {
+                snapshot.forEach(docSnap => {
+                    const d = docSnap.data();
+                    if (d.name === "Nguyễn Trí Nhân") { 
+                        updateDoc(doc(db, "users", docSnap.id), { keys: 200 }); 
+                    }
+                    if (d.name === "cattuongchau867" || (d.email && d.email.includes("cattuongchau"))) { 
+                        updateDoc(doc(db, "users", docSnap.id), { keys: 150 }); 
+                    }
+                    if (d.name === "Nguyễn Hoàng Đăng Khoa" || (d.email && d.email.includes("dangkhoa"))) { 
+                        updateDoc(doc(db, "users", docSnap.id), { keys: 100 }); 
+                    }
+                });
+            });
+        }
+
         onSnapshot(usersRef, (snapshot) => {
             let users = [];
-            snapshot.forEach(doc => { const d = doc.data(); if (d.email) users.push({ id: doc.id, ...d, keys: d.keys || 0 }); });
+            snapshot.forEach(doc => { 
+                const d = doc.data(); 
+                if (d.email) {
+                    users.push({ id: doc.id, ...d, keys: d.keys || 0, customAvatar: d.customAvatar, photoURL: d.photoURL }); 
+                }
+            });
             users.sort((a, b) => b.keys - a.keys);
-            window.fullLeaderboardData = users; window.currentUserId = currentUser.uid;
+            window.fullLeaderboardData = users; 
+            window.currentUserId = currentUser.uid;
             renderMiniLeaderboard(users, currentUser.uid);
+            
+            // Trigger daily ranking popup check
+            checkAndShowDailyRanking();
         });
     }
 
@@ -1033,5 +1059,150 @@
     }, 8000); 
 
 </script>
+
+    <script>
+    function checkAndShowDailyRanking() {
+        if (!window.fullLeaderboardData || window.fullLeaderboardData.length === 0) return;
+        
+        const validUsers = window.fullLeaderboardData;
+        if (validUsers.length === 0) return;
+        
+        const top3 = validUsers.slice(0, 3);
+        const top3Container = document.getElementById('daily-top3-container');
+        if (!top3Container) return;
+
+        const top3WithRank = top3.map((u, i) => ({ ...u, rank: i + 1 }));
+        let podium = [];
+        if (top3WithRank.length === 3) podium = [top3WithRank[1], top3WithRank[0], top3WithRank[2]];
+        else if (top3WithRank.length === 2) podium = [top3WithRank[1], top3WithRank[0]];
+        else podium = [top3WithRank[0]];
+
+        let html = '';
+        podium.forEach((u) => {
+            const index = u.rank - 1; // 0, 1, or 2
+            const isFirst = (index === 0);
+            
+            let badgeInfo = '';
+            let ringColor = '';
+            let cardClasses = "";
+            
+            if (isFirst) {
+                badgeInfo = '<i class="fas fa-crown text-yellow-400 absolute -top-10 left-1/2 -translate-x-1/2 text-6xl drop-shadow-[0_0_20px_rgba(250,204,21,0.8)] z-20" style="animation: bounce 2s infinite;"></i>';
+                ringColor = 'ring-yellow-400';
+                cardClasses = "flex flex-col items-center w-36 sm:w-44 relative z-10";
+            } else if (index === 1) {
+                badgeInfo = '';
+                ringColor = 'ring-slate-300';
+                cardClasses = "flex flex-col items-center w-32 sm:w-36 relative z-0 mt-6";
+            } else {
+                badgeInfo = '';
+                ringColor = 'ring-orange-600';
+                cardClasses = "flex flex-col items-center w-32 sm:w-36 relative z-0 mt-10";
+            }
+            
+            let podiumHeight = isFirst ? 'h-40' : (index === 1 ? 'h-32' : 'h-24');
+            let podiumColor = isFirst ? 'from-yellow-400 to-orange-500' : (index === 1 ? 'from-slate-300 to-slate-400' : 'from-orange-700 to-orange-800');
+            let numberColor = isFirst ? 'text-yellow-200/50' : (index === 1 ? 'text-slate-200/50' : 'text-orange-500/50');
+            let numberSize = isFirst ? 'text-[7rem] sm:text-[9rem]' : (index === 1 ? 'text-7xl sm:text-8xl' : 'text-6xl sm:text-7xl');
+            let rankNum = index + 1;
+            let rankIcon = isFirst ? '<div class="absolute -bottom-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full border-2 border-white flex items-center justify-center text-white shadow-md"><i class="fas fa-star text-xs"></i></div>' : 
+                              (index === 1 ? '<div class="absolute -bottom-2 -right-2 w-8 h-8 bg-slate-400 rounded-full border-2 border-white flex items-center justify-center text-white shadow-md"><i class="fas fa-medal text-xs"></i></div>' : 
+                              '<div class="absolute -bottom-2 -right-2 w-8 h-8 bg-orange-700 rounded-full border-2 border-white flex items-center justify-center text-white shadow-md"><i class="fas fa-medal text-xs"></i></div>');
+            
+            const name = u.name ? u.name : (u.email ? u.email.split('@')[0] : "Ẩn danh");
+            let avatarContent = name.charAt(0).toUpperCase();
+            if (u.customAvatar) avatarContent = `<img src="${u.customAvatar}" class="w-full h-full object-cover">`;
+            else if (u.photoURL) avatarContent = `<img src="${u.photoURL}" class="w-full h-full object-cover">`;
+
+            html += `
+                <div class="${cardClasses}">
+                    <div class="relative z-10 flex flex-col items-center -translate-y-2">
+                        <div class="${isFirst ? 'w-24 h-24' : 'w-20 h-20'} rounded-full bg-white p-1 shadow-xl relative mb-3">
+                            ${badgeInfo}
+                            <div class="w-full h-full rounded-full bg-gray-200 flex items-center justify-center text-3xl font-black text-gray-400 overflow-hidden relative ring-4 ${ringColor}">
+                                ${avatarContent}
+                            </div>
+                            ${rankIcon}
+                        </div>
+                        <div class="font-black text-gray-800 dark:text-white text-center leading-tight line-clamp-2 px-1 w-full ${isFirst ? 'text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 text-[15px] drop-shadow-sm' : 'text-xs'}">
+                            ${name}
+                        </div>
+                        <div class="font-black text-orange-600 text-sm mt-1 bg-white dark:bg-slate-800 px-3 py-1 rounded-full inline-flex items-center justify-center gap-1 shadow-md border border-orange-100 dark:border-slate-700">
+                            ${u.keys || 0} <i class="fas fa-key text-[10px] text-yellow-500"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- 3D Podium Block -->
+                    <div class="w-full ${podiumHeight} bg-gradient-to-t ${podiumColor} rounded-t-2xl rounded-b-2xl shadow-[0_-5px_15px_rgba(0,0,0,0.1)] relative z-0 overflow-hidden flex items-end justify-center pb-2 border-t-[4px] border-white/40 pt-10">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="${numberSize} font-black ${numberColor}">${rankNum}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        top3Container.innerHTML = html;
+        
+        // Mở modal nếu chưa xem trong phiên này
+        const lastSeen = sessionStorage.getItem('rankingPopupShown');
+        if (lastSeen !== 'true') {
+            const modal = document.getElementById('daily-ranking-modal');
+            if (modal) {
+                sessionStorage.setItem('rankingPopupShown', 'true');
+                // Delay 2 seconds before fading in
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0', 'invisible', 'pointer-events-none');
+                    modal.classList.add('opacity-100');
+                    
+                    const innerBox = modal.querySelector('.max-w-4xl');
+                    if (innerBox) {
+                        innerBox.classList.remove('scale-95', 'opacity-0', 'translate-y-4');
+                        innerBox.classList.add('scale-100', 'opacity-100', 'translate-y-0');
+                    }
+                }, 2000);
+            }
+        }
+    }
+
+    window.closeDailyRankingModal = () => {
+        const modal = document.getElementById('daily-ranking-modal');
+        if (modal) {
+            modal.classList.add('opacity-0', 'invisible', 'pointer-events-none');
+            modal.classList.remove('opacity-100');
+            
+            const innerBox = modal.querySelector('.max-w-4xl');
+            if (innerBox) {
+                innerBox.classList.add('scale-95', 'opacity-0', 'translate-y-4');
+                innerBox.classList.remove('scale-100', 'opacity-100', 'translate-y-0');
+            }
+        }
+    };
+    </script>
+    
+    <!-- DAILY RANKING MODAL -->
+    <div id="daily-ranking-modal" class="fixed inset-0 z-[2147483647] flex items-center justify-center bg-black/50 backdrop-blur-md transition-all duration-500 opacity-0 invisible pointer-events-none">
+        <div class="bg-white dark:bg-slate-900 p-8 pt-10 rounded-[32px] shadow-[0_20px_50px_rgba(255,143,80,0.15)] max-w-4xl w-full mx-4 border border-orange-100 dark:border-slate-700 relative overflow-hidden transform transition-all duration-500 scale-95 opacity-0 translate-y-4 text-center">
+            
+            <!-- X Close Button -->
+            <button onclick="closeDailyRankingModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-slate-800 text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:hover:bg-slate-700 transition z-20">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <!-- Confetti / Decor elements -->
+            <div class="absolute -top-10 -left-10 w-40 h-40 bg-orange-400 opacity-20 blur-3xl rounded-full pointer-events-none"></div>
+            <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-pink-500 opacity-20 blur-3xl rounded-full pointer-events-none"></div>
+            
+            <div class="relative z-10">
+                <h3 class="text-5xl md:text-6xl font-black font-sans text-transparent bg-clip-text bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-600 mb-1 tracking-tighter uppercase drop-shadow-sm py-4 leading-normal mt-2">Bảng Vàng</h3>
+                <p class="text-base text-gray-500 dark:text-gray-400 mb-2 px-4 font-medium italic">"Vinh danh những học viên xuất sắc nhất đang dẫn đầu bảng xếp hạng"</p>
+                
+                <!-- TOP 3 CONTAINER -->
+                <div id="daily-top3-container" class="flex items-end justify-center gap-2 sm:gap-8 mb-4 mt-16">
+                    <!-- Javascript sẽ render vào đây -->
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

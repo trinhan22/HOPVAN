@@ -280,8 +280,8 @@
         .hv-btn-gray:hover { background: var(--bg-card-hover); color: var(--text-heading); }
 
         /* --- MODAL CHI TIẾT AI (Dành cho Chart) --- */
-        .modal-skill { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(15px); z-index: 10000; display: none; justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: 0.3s; }
-        .modal-skill.show { display: flex; opacity: 1; }
+        .modal-skill { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(15px); z-index: 10000; display: flex; justify-content: center; align-items: center; padding: 20px; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s, visibility 0.3s; }
+        .modal-skill.show { opacity: 1; visibility: visible; pointer-events: auto; }
         .modal-skill-box { 
             background: var(--bg-card); width: 100%; max-width: 1000px; max-height: 90vh; 
             border-radius: 40px; border: 1px solid var(--border-ui); padding: 40px;
