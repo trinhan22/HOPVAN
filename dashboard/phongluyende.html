@@ -46,13 +46,13 @@
         /* BỘ MÀU TỐI */
         html.dark {
             --bg-body: #0B1120;
-            --bg-glass: rgba(15, 23, 42, 0.7);
-            --bg-panel: rgba(30, 41, 59, 0.9); 
-            --bg-panel-hover: #1e293b;
-            --border-panel: #334155; 
-            --border-ui: #334155;
-            --text-heading: #f8fafc;
-            --text-sub: #94a3b8;
+            --bg-glass: rgba(17, 24, 39, 0.7);
+            --bg-panel: #111827; 
+            --bg-panel-hover: #1F2937;
+            --border-panel: #1F2937; 
+            --border-ui: #1F2937;
+            --text-heading: #F8FAFC;
+            --text-sub: #94A3B8;
             --shadow-sm: 0 4px 15px rgba(0,0,0,0.3);
             --shadow-md: 0 10px 30px rgba(0,0,0,0.5);
             --shadow-hover: 0 20px 40px rgba(0,0,0,0.6);
@@ -70,18 +70,7 @@
         html.dark .blob { opacity: 0.1; }
         @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(40px, 60px) scale(1.05); } }
 
-        /* --- ĐỒNG BỘ DARK MODE CHO MENU.JS --- */
-        html.dark #menu-placeholder aside { background-color: var(--bg-panel) !important; border-color: var(--border-panel) !important; }
-        html.dark #menu-placeholder aside > div { background-color: transparent !important; border-color: var(--border-panel) !important; }
-        html.dark #menu-placeholder button { background-color: var(--bg-body) !important; border: 1px solid var(--border-panel) !important; color: var(--text-sub) !important; box-shadow: none !important; }
-        html.dark #menu-placeholder button:hover { background-color: var(--bg-panel-hover) !important; border-color: var(--primary) !important; color: var(--primary) !important; }
-        html.dark #menu-placeholder .nav-item.active { background: var(--primary-gradient) !important; color: white !important; border-color: transparent !important; box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4) !important; }
-        html.dark #menu-placeholder div[style*="background-color"] { background-color: var(--bg-body) !important; border-color: var(--border-panel) !important; }
-        html.dark #menu-placeholder [class*="border-"] { border-color: var(--border-panel) !important; }
-        html.dark #menu-placeholder .text-gray-800, html.dark #menu-placeholder h1 { color: var(--text-heading) !important; }
-        html.dark #menu-placeholder .text-gray-500, html.dark #menu-placeholder .text-gray-400 { color: var(--text-sub) !important; }
-        html.dark #menu-placeholder .nav-item { color: var(--text-sub) !important; transition: 0.3s; }
-        html.dark #menu-placeholder .nav-item:hover { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
+
 
         /* --- LAYOUT CHÍNH --- */
         .mobile-header { display: none; position: fixed; top: 0; left: 0; right: 0; height: 70px; background: var(--bg-panel); z-index: 100; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border-panel); }
@@ -120,7 +109,14 @@
             background: var(--bg-panel); z-index: 1;
         }
         
-        html.dark .card { border-color: var(--border-ui); }
+        html.dark .card { border-color: var(--border-ui); background: var(--bg-panel); }
+        html.dark .ext-card { background: var(--bg-panel); border-color: var(--border-ui); }
+        html.dark .ext-card:hover { background: var(--bg-panel-hover); border-color: var(--primary); }
+        html.dark .history-card { background: var(--bg-panel); border-color: var(--border-ui); }
+        html.dark .history-card:hover { background: var(--bg-panel-hover); border-color: var(--primary); }
+        html.dark .topic-item { background: var(--bg-panel); border-color: var(--border-ui); }
+        html.dark .topic-item:hover { background: var(--bg-panel-hover); border-color: var(--primary); }
+        html.dark .modal-box { background: var(--bg-panel); border-color: var(--border-ui); }
 
         /* Card Màu Sắc Nổi Bật (Ngẫu Nhiên & Tổng Hợp) */
         .card-colored { color: white; border: none; }

@@ -258,12 +258,12 @@
 
         /* 2. Theme Dark Tech (Phá cách, dành cho AI) */
         .theme-dark {
-            background: #0f172a; border: 1px solid #1e293b;
+            background: #0B1120; border: 1px solid #111827;
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
         .theme-dark::before { /* Lưới grid mờ nền ảo diệu */
             content: ''; position: absolute; inset: 0; opacity: 0.1;
-            background-image: linear-gradient(#334155 1px, transparent 1px), linear-gradient(90deg, #334155 1px, transparent 1px);
+            background-image: linear-gradient(#1F2937 1px, transparent 1px), linear-gradient(90deg, #1F2937 1px, transparent 1px);
             background-size: 20px 20px; pointer-events: none;
         }
         .theme-dark h3 { color: #f8fafc; font-weight: 900; font-size: 1.6rem; margin-bottom: 15px; }
@@ -363,8 +363,8 @@
         .stars { color: #f59e0b; font-size: 0.85rem; display: flex; gap: 3px; background: #fffbeb; padding: 6px 12px; border-radius: 50px;}
 
         /* Dark Mode cho Reviews */
-        html.dark .review-card { background: rgba(30, 41, 59, 0.6); border-color: #334155; }
-        html.dark .review-card:hover { background: rgba(30, 41, 59, 0.95); }
+        html.dark .review-card { background: #111827; border-color: #1F2937; }
+        html.dark .review-card:hover { background: #1F2937; }
         html.dark .review-text { color: #f8fafc; }
         html.dark .user-details h4 { color: #f8fafc; }
         html.dark .review-footer { border-top-color: rgba(255,255,255,0.05); }
@@ -463,17 +463,17 @@
         .mp-socials a:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 8px 15px rgba(255, 143, 80, 0.25);}
 
         /* --- Dark Mode Sync --- */
-        html.dark .about-compact-card { background: rgba(30, 41, 59, 0.6); border-color: #334155; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
-        html.dark .about-compact-card:hover { background: rgba(30, 41, 59, 0.95); border-color: var(--primary);}
-        html.dark .about-menu { background: transparent; border-color: #1f2937; }
+        html.dark .about-compact-card { background: #111827; border-color: #1F2937; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+        html.dark .about-compact-card:hover { background: #1F2937; border-color: var(--primary);}
+        html.dark .about-menu { background: transparent; border-color: #1F2937; }
         html.dark .about-tab-btn:hover { background: rgba(255, 143, 80, 0.1); }
-        html.dark .about-tab-btn.active { background: #1e293b; border-color: rgba(255, 143, 80, 0.4); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        html.dark .tab-icon { background: #1e293b; border-color: #334155; }
+        html.dark .about-tab-btn.active { background: #111827; border-color: rgba(255, 143, 80, 0.4); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        html.dark .tab-icon { background: #111827; border-color: #1F2937; }
         html.dark .about-content-area { background: transparent; }
-        html.dark .mission-item { background: #1e293b; border-color: #334155; color: #f8fafc; }
+        html.dark .mission-item { background: #111827; border-color: #1F2937; color: #f8fafc; }
         html.dark .mission-item:hover { background: #0b1120; border-color: var(--primary); }
-        html.dark .mp-avatar { border-color: #1e293b; background: #111827; }
-        html.dark .mp-socials a { background: #1e293b; border-color: #334155; color: #94a3b8; }
+        html.dark .mp-avatar { border-color: #111827; background: #111827; }
+        html.dark .mp-socials a { background: #111827; border-color: #1F2937; color: #94a3b8; }
         html.dark .mp-socials a:hover { background: var(--primary); color: white; border-color: var(--primary); }
         html.dark .mp-role { background: rgba(255, 143, 80, 0.15); }
 
@@ -609,7 +609,7 @@
         .download-container { display: flex; flex-direction: column; gap: 12px; }
         .btn-app {
             display: flex; align-items: center; gap: 12px;
-            background: #1e293b; /* Nền xanh đen slate */
+            background: #111827; /* Nền xanh đen slate */
             padding: 12px 22px; border-radius: 16px;
             text-decoration: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border: 1px solid rgba(255,255,255,0.1);
@@ -617,7 +617,7 @@
         }
         
         .btn-app:hover {
-            background: #0f172a;
+            background: #0B1120;
             transform: translateY(-3px); /* Cả card bay lên */
             border-color: var(--primary);
             box-shadow: 0 15px 30px rgba(0,0,0,0.2);
@@ -877,8 +877,8 @@
 
         /* Dark mode cho Lộ Trình */
         html.dark .roadmap-grid::before { background: linear-gradient(90deg, rgba(255,143,80,0), rgba(255,143,80,0.15), rgba(255,143,80,0)); }
-        html.dark .rm-card { background: rgba(30, 41, 59, 0.6); border-color: #334155; }
-        html.dark .rm-card:hover { background: rgba(30, 41, 59, 0.95); border-color: var(--primary);}
+        html.dark .rm-card { background: #111827; border-color: #1F2937; }
+        html.dark .rm-card:hover { background: #1F2937; border-color: var(--primary);}
         html.dark .rm-title { color: #f8fafc; }
         html.dark .rm-list li { color: #94a3b8; }
         html.dark .rm-list li .tick-icon { background: rgba(255, 143, 80, 0.15); color: var(--primary); }
@@ -1009,12 +1009,12 @@
            TRẠNG THÁI BẬT (DARK MODE) 
            ===================================== */
         input:checked + .slider { 
-            background-color: #1e293b; /* Nền xanh đen */
+            background-color: #111827; /* Nền xanh đen */
             border: 1px solid rgba(255,255,255,0.05); 
         }
         input:checked + .slider:before {
             transform: translateX(25px); /* Trượt sang phải */
-            background-color: #0f172a; /* Cục gạt đổi sang đen sâu */
+            background-color: #0B1120; /* Cục gạt đổi sang đen sâu */
             box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1), 0 2px 5px rgba(0,0,0,0.5);
         }
         /* Đổi màu Icon khi sang Dark Mode */
@@ -1037,16 +1037,16 @@
         /* Fix màu các Card trên trang chủ */
         html.dark .main-card, html.dark .floating-badge, 
         html.dark .review-card, html.dark .rm-card, html.dark .about-img {
-            background-color: #1E293B; border-color: #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background-color: #111827; border-color: #1F2937; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         /* ĐÃ FIX: Màu nền Dark Mode cho Hệ sinh thái (Bento V2) */
         html.dark .theme-glass { 
-            background: rgba(30, 41, 59, 0.6); 
-            border-color: #334155; 
+            background: #111827; 
+            border-color: #1F2937; 
         }
         html.dark .theme-glass:hover { 
-            background: rgba(30, 41, 59, 0.95); 
+            background: #1F2937; 
             border-color: var(--primary); 
         }
         html.dark .theme-glass h3 { color: #f8fafc; }
@@ -1054,28 +1054,28 @@
         html.dark .bento-card .bc-watermark { color: #cbd5e1; opacity: 0.05; }
         html.dark .theme-gradient .bc-watermark { color: white; opacity: 0.15; }
 
-        html.dark .rm-card:hover { border-color: var(--primary); background-color: #0F172A; }
-        html.dark .tick-icon { background-color: #0F172A !important; }
+        html.dark .rm-card:hover { border-color: var(--primary); background-color: #0B1120; }
+        html.dark .tick-icon { background-color: #0B1120 !important; }
         html.dark .rm-grade-pill { background: rgba(255, 143, 80, 0.15) !important; color: #FF8F50 !important; border-color: rgba(255, 143, 80, 0.4); }
-        html.dark .nav-links { background-color: #1E293B; border-color: #334155; }
+        html.dark .nav-links { background-color: #111827; border-color: #1F2937; }
         
         /* ----- FIX ĐỒNG BỘ FOOTER ----- */
-        html.dark footer { background-color: #0F172A; border-top: 1px solid #1E293B; }
+        html.dark footer { background-color: #0B1120; border-top: 1px solid #111827; }
         html.dark .footer-brand p, html.dark .footer-col a { color: #94A3B8; }
         html.dark .footer-col h4 { color: #F8FAFC; }
-        html.dark .footer-bottom { border-top-color: #1E293B; color: #64748B; }
-        html.dark .social-item { background-color: #1E293B; border-color: #334155; color: #94A3B8; }
+        html.dark .footer-bottom { border-top-color: #111827; color: #64748B; }
+        html.dark .social-item { background-color: #111827; border-color: #1F2937; color: #94A3B8; }
         html.dark .social-item:hover { background-color: var(--primary); color: white; border-color: transparent; }
 
         /* ----- FIX ĐỒNG BỘ POPUP HỖ TRỢ ----- */
-        html.dark .sm-box { background: #1E293B; border-color: #334155; }
-        html.dark .sm-header { background: #0F172A; border-bottom-color: #334155; }
-        html.dark .btn-sm-close { background: #0F172A; border-color: #334155; color: #94A3B8; }
-        html.dark .faq-item { background: #0F172A; border-color: #334155; }
-        html.dark .faq-a { background: #1E293B; }
-        html.dark .faq-item.active .faq-a-content { border-top-color: #334155; }
-        html.dark .contact-card { background: #0F172A; border-color: #334155; }
-        html.dark .contact-card:hover { background: #1E293B; border-color: var(--primary); }
+        html.dark .sm-box { background: #111827; border-color: #1F2937; }
+        html.dark .sm-header { background: #0B1120; border-bottom-color: #1F2937; }
+        html.dark .btn-sm-close { background: #0B1120; border-color: #1F2937; color: #94A3B8; }
+        html.dark .faq-item { background: #0B1120; border-color: #1F2937; }
+        html.dark .faq-a { background: #111827; }
+        html.dark .faq-item.active .faq-a-content { border-top-color: #1F2937; }
+        html.dark .contact-card { background: #0B1120; border-color: #1F2937; }
+        html.dark .contact-card:hover { background: #111827; border-color: var(--primary); }
 
 
         /* =========================================
@@ -1132,7 +1132,23 @@
             .btn-promo-close { top: 12px; right: 12px; width: 36px; height: 36px; background: rgba(255,255,255,0.9); }
         }
 
-    </style>
+    
+        /* --- ĐÃ FIX LỖI TEXT VÀ FOOTER --- */
+        html.dark .mp-desc { color: #94A3B8; }
+        
+        .footer-bottom { margin-top: 60px; padding: 25px 0; border-top: 1px solid rgba(0,0,0,0.05); width: 100%; background-color: #fff; }
+        html.dark .footer-bottom { background-color: transparent; border-top: 1px solid #1F2937; }
+        
+        .footer-divider { width: 1px; height: 14px; background-color: #e2e8f0; }
+        html.dark .footer-divider { background-color: #374151; }
+        
+        .footer-version-pill { display: flex; align-items: center; gap: 6px; padding: 0 12px; height: 26px; border-radius: 999px; background-color: #f8fafc; border: 1px solid #f1f3f5; cursor: default; }
+        html.dark .footer-version-pill { background-color: #1F2937; border-color: #374151; }
+        
+        html.dark .j2-badge-light { display: none !important; }
+        .j2-badge-dark { display: none !important; }
+        html.dark .j2-badge-dark { display: block !important; }
+\n    </style>
 </head>
 <body>
 
@@ -1171,7 +1187,7 @@
             <a href="#reviews">Đánh giá</a>
             <a href="khungchuongtrinh.html">Chương trình GDPT 2018</a>
             <a href="huongdansudung.html">Hướng dẫn sử dụng</a>
-            <a href="#about">Về chúng tôi</a>
+            <a href="about.html">Về chúng tôi</a>
         </nav>
 
         <div style="display: flex; gap: 20px; align-items: center;">
@@ -1242,7 +1258,7 @@
                         <i class="fas fa-book bc-watermark" style="color: var(--text-main);"></i>
                     </div>
 
-                    <div class="bento-card bc-span-2 theme-glass" onclick="window.location.href='dashboard/tacpham.html'">
+                    <div class="bento-card bc-span-2 theme-glass" onclick="window.location.href=''">
                         <div class="bc-icon-wrap" style="background: rgba(255, 143, 80, 0.15); color: #FF8F50;"><i class="fas fa-swatchbook"></i></div>
                         <h3>Tác phẩm Văn học</h3>
                         <p>Thư viện tác phẩm cao cấp với chế độ đọc tập trung và tự động lưu tiến độ.</p>
@@ -1466,7 +1482,12 @@
                             <div id="tab-hopvan" class="about-pane active">
                                 <i class="fas fa-rocket pane-watermark"></i>
                                 <div class="hopvan-mission">
-                                    <h3>Xóa bỏ nỗi sợ môn Văn</h3>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 10px;">
+                                        <h3 style="margin-bottom: 0;">Xóa bỏ nỗi sợ môn Văn</h3>
+                                        <a href="about.html" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; color: var(--primary); font-size: 0.9rem; font-weight: 700; text-decoration: none; transition: 0.2s; white-space: nowrap;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                                            Xem chi tiết dự án <i class="fas fa-arrow-right text-xs"></i>
+                                        </a>
+                                    </div>
                                     <p>Được xây dựng bởi những người trẻ đam mê văn học và công nghệ, HopVan mang trong mình sứ mệnh ứng dụng Trí tuệ nhân tạo (AI) để tạo ra một phương pháp học tập hoàn toàn mới: <b>Cá nhân hóa, Tư duy logic và Khơi nguồn sáng tạo.</b></p>
                                     <div class="mission-grid">
                                         <div class="mission-item"><i class="fas fa-check-circle"></i> Chuẩn GDPT 2018</div>
@@ -1613,7 +1634,7 @@
         </div>
 
         <!-- CHỈ SỬA PHẦN FOOTER BOTTOM (BADGE) NÀY -->
-        <div class="footer-bottom" style="margin-top: 60px; padding: 25px 0; border-top: 1px solid rgba(0,0,0,0.05); width: 100%; background-color: #fff;">
+        <div class="footer-bottom">
             <div class="container" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
                 
                 <!-- NHÓM BÊN TRÁI: Copyright & Version (Dóng hàng với bên trái) -->
@@ -1623,10 +1644,10 @@
                     </p>
                     
                     <!-- Vạch ngăn cách dọc mờ -->
-                    <div style="width: 1px; height: 14px; background-color: #e2e8f0;" class="hidden-mobile"></div>
+                    <div class="footer-divider hidden-mobile"></div>
 
                     <!-- Badge Version kiểu cũ của HopVan (Giữ nguyên màu cam/xanh của bạn) -->
-                    <div style="display: flex; align-items: center; gap: 6px; padding: 0 12px; height: 26px; border-radius: 999px; background-color: #f8fafc; border: 1px solid #f1f3f5; cursor: default;">
+                    <div class="footer-version-pill">
                         <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; line-height: 1;">HopVan Platform</span>
                         <span style="width: 4px; height: 4px; border-radius: 50%; background-color: #22c55e;"></span>
                         <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace; line-height: 1;">v1.3.7</span>
@@ -1649,7 +1670,7 @@
                     </a>
 
                     <!-- Vạch ngăn cách dọc giữa 2 Badge -->
-                    <div style="width: 1px; height: 20px; background-color: #e2e8f0;"></div>
+                    <div class="footer-divider" style="height: 20px;"></div>
 
                     <!-- J2TEAM Launch Badge -->
                     <a href="https://launch.j2team.dev/products/hopvan-nen-tang-hoc-luyen-thi-ngu-van?utm_source=badge-launched&utm_medium=badge&utm_campaign=badge-hopvan-nen-tang-hoc-luyen-thi-ngu-van"  
@@ -1658,10 +1679,8 @@
                        style="display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;" 
                        onmouseover="this.style.transform='translateY(-2px)'" 
                        onmouseout="this.style.transform='translateY(0)'">
-                        <img src="https://launch.j2team.dev/badge/hopvan-nen-tang-hoc-luyen-thi-ngu-van/light" 
-                             alt="HopVan - J2TEAM Launch" 
-                             style="height: 38px; width: auto; border-radius: 6px;" 
-                             loading="lazy" />
+                        <img src="https://launch.j2team.dev/badge/hopvan-nen-tang-hoc-luyen-thi-ngu-van/light" alt="HopVan - J2TEAM Launch" style="height: 38px; width: auto; border-radius: 6px;" loading="lazy" class="j2-badge-light" />
+                        <img src="https://launch.j2team.dev/badge/hopvan-nen-tang-hoc-luyen-thi-ngu-van/dark" alt="HopVan - J2TEAM Launch" style="height: 38px; width: auto; border-radius: 6px;" loading="lazy" class="j2-badge-dark" />
                     </a>
                 </div>
 
@@ -2085,23 +2104,68 @@
         const themeCheckbox = document.getElementById('checkbox-theme');
         const htmlElement = document.documentElement;
 
-        // 1. Kiểm tra trạng thái lưu trong localStorage khi tải trang
-        const currentTheme = localStorage.getItem('theme');
-        if (currentTheme === 'dark') {
-            htmlElement.classList.add('dark');
-            if (themeCheckbox) themeCheckbox.checked = true;
-        }
-
-        // 2. Xử lý sự kiện khi gạt công tắc
-        if (themeCheckbox) {
-            themeCheckbox.addEventListener('change', function() {
-                if (this.checked) {
+        const applyTheme = (isDark, animate = false) => {
+            const applyChanges = () => {
+                if (isDark) {
                     htmlElement.classList.add('dark');
                     localStorage.setItem('theme', 'dark');
                 } else {
                     htmlElement.classList.remove('dark');
                     localStorage.setItem('theme', 'light');
                 }
+            };
+            
+            if (animate) {
+                const overlay = document.createElement('div');
+                Object.assign(overlay.style, {
+                    position: 'fixed', inset: '0', zIndex: '999999',
+                    display: 'flex', justifyContent: 'center', alignItems: 'center',
+                    backgroundColor: isDark ? '#0B1120' : '#FFF5EC',
+                    opacity: '0', pointerEvents: 'none',
+                    transition: 'opacity 0.4s ease'
+                });
+                
+                const icon = document.createElement('i');
+                icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+                Object.assign(icon.style, {
+                    fontSize: '8rem', color: isDark ? '#F8FAFC' : '#FF8F50',
+                    transform: 'scale(0.2) translateY(50px)', opacity: '0',
+                    transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                    textShadow: isDark ? '0 0 40px rgba(248,250,252,0.4)' : '0 0 40px rgba(255,143,80,0.4)'
+                });
+                
+                overlay.appendChild(icon);
+                document.body.appendChild(overlay);
+                
+                requestAnimationFrame(() => {
+                    overlay.style.opacity = '1';
+                    icon.style.transform = 'scale(1) translateY(0)';
+                    icon.style.opacity = '1';
+                });
+                
+                setTimeout(() => {
+                    applyChanges();
+                    setTimeout(() => {
+                        overlay.style.opacity = '0';
+                        icon.style.transform = 'scale(1.5) translateY(-50px)';
+                        icon.style.opacity = '0';
+                        setTimeout(() => overlay.remove(), 400); 
+                    }, 600); 
+                }, 400); 
+            } else {
+                applyChanges();
+            }
+        };
+
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'dark') {
+            applyTheme(true, false);
+            if (themeCheckbox) themeCheckbox.checked = true;
+        }
+
+        if (themeCheckbox) {
+            themeCheckbox.addEventListener('change', function() {
+                applyTheme(this.checked, true);
             });
         }
     </script>

@@ -38,15 +38,15 @@
 
         /* BỘ MÀU TỐI (Khi có class .dark) */
         html.dark {
-            --bg-body: #0f172a;       /* slate-900 */
-            --bg-glass: rgba(15, 23, 42, 0.6);
-            --bg-card: rgba(30, 41, 59, 0.85); /* slate-800 */
-            --bg-search: #1e293b;
-            --bg-nav: rgba(30, 41, 59, 0.6);
-            --border-card: #334155;    /* slate-700 */
-            --text-heading: #f8fafc;
-            --text-body: #cbd5e1;
-            --text-muted: #94a3b8;
+            --bg-body: #0B1120;
+            --bg-glass: rgba(17, 24, 39, 0.6);
+            --bg-card: #111827; 
+            --bg-search: #1F2937;
+            --bg-nav: rgba(17, 24, 39, 0.6);
+            --border-card: #1F2937;
+            --text-heading: #F8FAFC;
+            --text-body: #CBD5E1;
+            --text-muted: #94A3B8;
             --shadow-card: 0 15px 35px rgba(0,0,0,0.3);
         }
 
@@ -56,53 +56,7 @@
         /* --- LAYOUT FIX --- */
         #menu-placeholder { position: fixed; top: 0; left: 0; height: 100vh; z-index: 900; }
 
-        /* --- ĐỒNG BỘ DARK MODE CHO MENU.JS --- */
-        /* Chỉ áp dụng các CSS này khi HTML có class "dark" */
-        
-        html.dark #menu-placeholder aside, 
-        html.dark #menu-placeholder .sidebar {
-            background-color: var(--bg-card) !important;
-            border-color: var(--border-card) !important;
-        }
 
-        html.dark #menu-placeholder aside > div,
-        html.dark #menu-placeholder .sidebar > div {
-            background-color: transparent !important;
-            border-color: var(--border-card) !important;
-        }
-
-        html.dark #menu-placeholder button {
-            background-color: var(--bg-body) !important; 
-            border: 1px solid var(--border-card) !important;
-            color: var(--text-muted) !important;
-            box-shadow: none !important;
-        }
-        html.dark #menu-placeholder button:hover {
-            background-color: var(--bg-search) !important;
-            border-color: var(--primary) !important;
-            color: var(--primary) !important;
-        }
-
-        html.dark #menu-placeholder .nav-item.active { 
-            background: var(--primary-gradient) !important; 
-            color: white !important; 
-            border-color: transparent !important; 
-            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4) !important;
-        }
-
-        html.dark #menu-placeholder div[style*="background-color"] {
-            background-color: var(--bg-body) !important;
-            border-color: var(--border-card) !important;
-        }
-
-        html.dark #menu-placeholder [class*="border-"] { border-color: var(--border-card) !important; }
-        html.dark #menu-placeholder .text-gray-800, 
-        html.dark #menu-placeholder h1 { color: var(--text-heading) !important; }
-        html.dark #menu-placeholder .text-gray-500, 
-        html.dark #menu-placeholder .text-gray-400 { color: var(--text-muted) !important; }
-        
-        html.dark #menu-placeholder .nav-item { color: var(--text-muted) !important; transition: 0.3s; }
-        html.dark #menu-placeholder .nav-item:hover { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
 
         .main-content {
             margin-left: var(--sidebar-width);
@@ -603,7 +557,7 @@
             animation: gradientBreathe 4s ease infinite;
             z-index: 5;
         }
-        html.dark .hero-loading-wrapper { background: linear-gradient(120deg, #0f172a, #1e293b); }
+        html.dark .hero-loading-wrapper { background: linear-gradient(120deg, #0B1120, #111827); }
 
         @keyframes gradientBreathe {
             0% { background-position: 0% 50%; }
@@ -618,7 +572,7 @@
 
         /* Các khối "Xương" */
         .skel-line { background: #e2e8f0; border-radius: 12px; position: relative; overflow: hidden; }
-        html.dark .skel-line { background: #334155; }
+        html.dark .skel-line { background: #1F2937; }
         
         /* Hiệu ứng ánh sáng Shimmer lướt qua */
         .skel-line::after {

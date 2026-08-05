@@ -101,6 +101,15 @@ const menuStyles = `
     .btn-logout { background: #fef2f2; color: #ef4444; border: 1.5px solid transparent; }
     .btn-logout:hover { background: #ef4444; color: white; }
 
+    .sb-version-pill {
+        display: inline-flex; align-items: center; gap: 6px; 
+        padding: 4px 12px; border-radius: 999px; 
+        background-color: rgba(249, 250, 251, 0.8); border: 1px solid #f3f4f6;
+        cursor: default; transition: 0.3s;
+    }
+    .sb-vp-text { font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; }
+    .sb-vp-version { font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace; }
+
     /* MODAL OVERLAY CHUNG */
     .menu-modal-overlay {
         position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
@@ -155,7 +164,13 @@ const menuStyles = `
     html.dark .sb-link:hover { background: rgba(255,143,80,0.1); color: var(--sb-primary); }
     html.dark .sb-link:hover i { color: var(--sb-primary); }
     html.dark .sb-footer { border-color: #334155; background: transparent; }
-    html.dark .btn-feedback { background: transparent; border-color: var(--sb-primary); }
+    
+    html.dark .btn-feedback { background: transparent; border-color: rgba(249, 115, 22, 0.5); }
+    html.dark .btn-feedback:hover { background: rgba(249, 115, 22, 0.1); }
+    html.dark .btn-logout { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+    html.dark .btn-logout:hover { background: #ef4444; color: white; }
+    html.dark .sb-version-pill { background-color: rgba(31, 41, 55, 0.5); border-color: #374151; }
+    html.dark .sb-vp-text { color: #6b7280; }
 
     /* MOBILE RESPONSIVE TWEAKS */
     @media (max-width: 1024px) {
@@ -229,15 +244,10 @@ const menuHTML = `
         </div>
 
         <div style="margin-top: 5px; width: 100%; display: flex; justify-content: center;">
-            <div style="
-                display: inline-flex; align-items: center; gap: 6px; 
-                padding: 4px 12px; border-radius: 999px; 
-                background-color: rgba(249, 250, 251, 0.8); border: 1px solid #f3f4f6;
-                cursor: default;
-            ">
-                <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px;">HopVan Platform</span>
+            <div class="sb-version-pill">
+                <span class="sb-vp-text">HopVan Platform</span>
                 <span style="width: 4px; height: 4px; border-radius: 50%; background-color: #22c55e;"></span>
-                <span style="font-size: 9px; font-weight: 700; color: #f97316; font-family: monospace;">v1.3.7</span>
+                <span class="sb-vp-version">v1.3.7</span>
             </div>
         </div>
     </div>

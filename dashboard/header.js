@@ -295,14 +295,14 @@ const modalHTML = `
                                     <img src="../IMG/minhthien.png" onerror="this.src='../LOGO.WEBP'" class="w-14 h-14 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-sm">
                                     <div>
                                         <p class="font-black text-sm text-gray-900 dark:text-white leading-tight mb-1">Trang Minh Thiên</p>
-                                        <p class="text-[10px] uppercase font-bold text-purple-500">GV Cố vấn</p>
+                                        <p class="text-[10px] uppercase font-bold text-purple-500">Cố vấn kỹ thuật</p>
                                     </div>
                                 </div>
                                 <div onclick="showCreditDetail('cobinh')" class="cursor-pointer flex items-center gap-4 bg-gray-50 dark:bg-slate-800 rounded-2xl p-4 border border-gray-100 dark:border-slate-700 transition-transform hover:-translate-y-1 hover:shadow-md">
                                     <img src="../IMG/thanhbinh.png" onerror="this.src='../LOGO.WEBP'" class="w-14 h-14 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-sm">
                                     <div>
                                         <p class="font-black text-sm text-gray-900 dark:text-white leading-tight mb-1">Mai Thị Thanh Bình</p>
-                                        <p class="text-[10px] uppercase font-bold text-pink-500">GV Cố vấn</p>
+                                        <p class="text-[10px] uppercase font-bold text-pink-500">Cố vấn học thuật</p>
                                     </div>
                                 </div>
                             </div>
@@ -370,14 +370,14 @@ const creditData = {
         socials: { fb: 'https://www.facebook.com/ven.ste.351', email: 'mailto:khoanhdfct30731@gmail.com' }
     },
     'thaythien': {
-        name: 'Thầy Trang Minh Thiên', role: 'Giáo Viên Cố Vấn',
+        name: 'Thầy Trang Minh Thiên', role: 'Giáo Viên Cố Vấn Kỹ Thuật',
         avatar: '../IMG/minhthien.png', fallback: '../LOGO.WEBP',
         badgeColor: 'bg-purple-500', icon: 'fa-chalkboard-teacher',
         bio: 'Giáo viên Công nghệ & Robotics hiện đang công tác tại Trường THPT Nguyễn Việt Dũng và Trường THPT FPT Cần Thơ, đồng thời là người phụ trách kỹ thuật của dự án HOPVAN.',
         socials: { fb: 'https://www.facebook.com/thien.trangminh', email: 'mailto:' }
     },
     'cobinh': {
-        name: 'Cô Mai Thị Thanh Bình', role: 'Giáo Viên Cố Vấn',
+        name: 'Cô Mai Thị Thanh Bình', role: 'Giáo Viên Cố Vấn Học Thuật',
         avatar: '../IMG/thanhbinh.png', fallback: '../LOGO.WEBP',
         badgeColor: 'bg-pink-500', icon: 'fa-chalkboard-teacher',
         bio: 'Giáo viên bộ môn Ngữ văn – Trường THPT FPT Cần Thơ, đồng thời là người phụ trách học thuật của HOPVAN.',
@@ -564,23 +564,63 @@ export function initHeader(containerId) {
     }
 
     // --- 3. LOGIC XỬ LÝ THEME (SÁNG / TỐI) ĐỒNG BỘ LOCALSTORAGE VÀ TAB ---
-    window.applyTheme = function(theme) {
+    window.applyTheme = function(theme, animate = false) {
         if (!theme) return;
         const isDark = theme === 'dark';
         
-        if (isDark) {
-            document.documentElement.classList.add('dark');
+        const applyChanges = () => {
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            updateThemeUI();
+            const loader = document.getElementById('global-loader');
+            if(loader) loader.style.background = isDark ? '#0B1120' : '#FFF5EC';
+            window.dispatchEvent(new CustomEvent('themeChanged', { detail: { isDark } }));
+        };
+
+        if (animate) {
+            const overlay = document.createElement('div');
+            Object.assign(overlay.style, {
+                position: 'fixed', inset: '0', zIndex: '999999',
+                display: 'flex', justifyContent: 'center', alignItems: 'center',
+                backgroundColor: isDark ? '#0B1120' : '#FFF5EC',
+                opacity: '0', pointerEvents: 'none',
+                transition: 'opacity 0.4s ease'
+            });
+            
+            const icon = document.createElement('i');
+            icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+            Object.assign(icon.style, {
+                fontSize: '8rem', color: isDark ? '#F8FAFC' : '#FF8F50',
+                transform: 'scale(0.2) translateY(50px)', opacity: '0',
+                transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                textShadow: isDark ? '0 0 40px rgba(248,250,252,0.4)' : '0 0 40px rgba(255,143,80,0.4)'
+            });
+            
+            overlay.appendChild(icon);
+            document.body.appendChild(overlay);
+            
+            requestAnimationFrame(() => {
+                overlay.style.opacity = '1';
+                icon.style.transform = 'scale(1) translateY(0)';
+                icon.style.opacity = '1';
+            });
+            
+            setTimeout(() => {
+                applyChanges();
+                setTimeout(() => {
+                    overlay.style.opacity = '0';
+                    icon.style.transform = 'scale(1.5) translateY(-50px)';
+                    icon.style.opacity = '0';
+                    setTimeout(() => overlay.remove(), 400); 
+                }, 600); 
+            }, 400); 
+            
         } else {
-            document.documentElement.classList.remove('dark');
+            applyChanges();
         }
-        
-        updateThemeUI();
-        
-        const loader = document.getElementById('global-loader');
-        if(loader) loader.style.background = isDark ? '#0B1120' : '#FFF5EC';
-        
-        // Trigger event so other components (like charts) can react
-        window.dispatchEvent(new CustomEvent('themeChanged', { detail: { isDark } }));
     };
 
     function updateThemeUI() {
@@ -602,7 +642,7 @@ export function initHeader(containerId) {
         const newTheme = isDarkNow ? 'dark' : 'light';
         
         localStorage.setItem('theme', newTheme);
-        window.applyTheme(newTheme);
+        window.applyTheme(newTheme, true); // Kích hoạt hiệu ứng
 
         // Lưu Firebase
         try {

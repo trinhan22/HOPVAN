@@ -199,15 +199,7 @@
         html.dark .main-content { background-color: var(--bg-body) !important; backdrop-filter: none !important; border-left: 1px solid var(--border-ui) !important; }
         html.dark .blob { opacity: 0.1 !important; }
 
-        /* ĐỒNG BỘ DARK MODE MENU.JS */
-        html.dark #menu-placeholder aside { background-color: var(--bg-card) !important; border-color: var(--border-ui) !important; }
-        html.dark #menu-placeholder aside > div { background-color: transparent !important; }
-        html.dark #menu-placeholder button { background-color: transparent !important; border: 1px solid var(--border-ui) !important; color: var(--text-light) !important; box-shadow: none !important; }
-        html.dark #menu-placeholder button:hover { background-color: var(--bg-panel-hover) !important; border-color: var(--primary) !important; color: var(--primary) !important;}
-        html.dark #menu-placeholder div[style*="background-color"] { background-color: var(--bg-body) !important; border: 1px solid var(--border-ui) !important;}
-        html.dark #menu-placeholder .nav-item.active { background: var(--primary-gradient) !important; color: white !important; border-color: transparent !important; box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3) !important; }
-        html.dark #menu-placeholder .nav-item { color: var(--text-light) !important; }
-        html.dark #menu-placeholder .nav-item:hover:not(.active) { background-color: rgba(255, 143, 80, 0.1) !important; color: var(--primary) !important; }
+
 
         /* CÁC THẺ CARD CHUNG */
         html.dark .stat-card, html.dark .activity-box, html.dark .chart-box, html.dark .leaderboard-box, html.dark .tip-card, html.dark .theory-progress-card { background-color: var(--bg-panel) !important; border: 1px solid var(--border-ui) !important; box-shadow: 0 10px 20px rgba(0,0,0,0.4) !important; }
@@ -576,6 +568,22 @@
                     if (overlay) {
                         overlay.style.display = 'block'; 
                         document.body.style.overflow = 'hidden'; // Khóa cuộn dashboard
+                    }
+                } else if (data && data.role !== 'admin' && data.role !== 'teacher') {
+                    // KIỂM TRA HỒ SƠ CHƯA HOÀN THIỆN
+                    if (!data.school || data.school.includes('Chưa cập nhật') || !data.grade || !data.name) {
+                        const profileModal = document.getElementById('incomplete-profile-modal');
+                        if (profileModal) {
+                            setTimeout(() => {
+                                profileModal.classList.remove('opacity-0', 'invisible', 'pointer-events-none');
+                                profileModal.classList.add('opacity-100');
+                                const innerBox = profileModal.querySelector('.max-w-md');
+                                if (innerBox) {
+                                    innerBox.classList.remove('scale-95', 'opacity-0', 'translate-y-4');
+                                    innerBox.classList.add('scale-100', 'opacity-100', 'translate-y-0');
+                                }
+                            }, 1200); // Đợi 1.2s cho giao diện load mượt mà rồi mới bật
+                        }
                     }
                 }
 
@@ -1204,5 +1212,37 @@
             </div>
         </div>
     </div>
+
+    <!-- INCOMPLETE PROFILE MODAL -->
+    <div id="incomplete-profile-modal" class="fixed inset-0 z-[2147483647] flex items-center justify-center bg-black/60 backdrop-blur-md transition-all duration-500 opacity-0 invisible pointer-events-none">
+        <div class="max-w-md w-full mx-4 bg-white dark:bg-[#111827] rounded-3xl p-8 relative shadow-2xl transform scale-95 opacity-0 translate-y-4 transition-all duration-500 border border-gray-100 dark:border-gray-800">
+            <!-- Icon Glow Background -->
+            <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 bg-orange-100 dark:bg-orange-500/20 rounded-full flex items-center justify-center shadow-lg border-4 border-white dark:border-[#111827]">
+                <div class="absolute inset-0 bg-orange-400 rounded-full animate-ping opacity-20"></div>
+                <i class="fas fa-user-edit text-3xl text-orange-500 relative z-10"></i>
+            </div>
+            
+            <button onclick="document.getElementById('incomplete-profile-modal').classList.add('opacity-0', 'invisible', 'pointer-events-none');" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="mt-8 text-center">
+                <h3 class="text-2xl font-black text-gray-800 dark:text-white mb-2">Hồ Sơ Chưa Hoàn Thiện!</h3>
+                <p class="text-gray-500 dark:text-gray-400 font-medium text-sm leading-relaxed mb-6">
+                    Hãy cập nhật <span class="font-bold text-orange-500">Họ tên</span>, <span class="font-bold text-orange-500">Trường</span> và <span class="font-bold text-orange-500">Khối lớp</span> để hệ thống cá nhân hóa lộ trình học tập & nhiệm vụ phù hợp nhất với bạn nhé!
+                </p>
+                
+                <div class="flex gap-3 mt-4">
+                    <button onclick="document.getElementById('incomplete-profile-modal').classList.add('opacity-0', 'invisible', 'pointer-events-none');" class="flex-1 py-3 px-4 rounded-xl font-bold text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition duration-300">
+                        Để sau
+                    </button>
+                    <button onclick="window.location.href='account.html'" class="flex-[1.5] py-3 px-4 rounded-xl font-bold text-white bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 shadow-lg shadow-orange-500/30 hover:-translate-y-0.5 transition duration-300">
+                        Cập nhật ngay
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
