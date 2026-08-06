@@ -3118,7 +3118,7 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
                 const data = userDoc.data();
                 const currentMonth = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
                 
-                let currentKeys = data.keys || 0;
+                let currentKeys = parseInt(data.keys) || 0;
                 
                 const newTotal = currentKeys + amount;
                 await updateDoc(userRef, { keys: newTotal });
@@ -3130,10 +3130,16 @@ window.syncSlug = (v) => { document.getElementById('news-slug').value = v.toLowe
                 
                 // Cập nhật giao diện Modal
                 document.getElementById('ud-keys').innerText = newTotal;
+                
+                // Refresh bảng dữ liệu bên ngoài
+                if (typeof window.loadUsers === 'function') {
+                    window.loadUsers();
+                }
+                
                 alert(`Đã cộng thành công ${amount} keys cho ${name}!`);
                 
                 // Gửi thông báo cho học viên
-                const notiRef = collection(db, "notifications");
+                const notiRef = collection(db, "users", uid, "notifications");
                 await addDoc(notiRef, {
                     title: "🎁 Bạn vừa được tặng Keys!",
                     body: `Ban quản trị Hopvan vừa cộng ${amount} keys vào tài khoản của bạn. Chúc bạn học tốt!`,
