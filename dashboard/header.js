@@ -244,75 +244,75 @@ const modalHTML = `
                 <div id="credits-slider" style="display: flex; width: 200%; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);">
                     
                     <!-- TỜ 1: DANH SÁCH -->
-                    <div class="custom-scrollbar" style="width: 50%; padding: 20px 25px; max-height: 70vh; overflow-y: auto;">
+                    <div style="width: 50%; padding: 30px; max-height: 70vh; overflow-y: auto;">
                         
                         <!-- NHÓM SÁNG LẬP -->
-                        <div class="mb-5">
-                            <div class="flex items-center gap-3 mb-3">
+                        <div class="mb-8">
+                            <div class="flex items-center gap-3 mb-5">
                                 <div class="h-[2px] flex-1 bg-gray-100 dark:bg-slate-700"></div>
-                                <span class="font-black text-gray-400 text-[10px] uppercase tracking-widest"><i class="fas fa-code text-orange-400 mr-2"></i>Nhóm Sáng Lập</span>
+                                <span class="font-black text-gray-400 text-[11px] uppercase tracking-widest"><i class="fas fa-code text-orange-400 mr-2"></i>Nhóm Sáng Lập</span>
                                 <div class="h-[2px] flex-1 bg-gray-100 dark:bg-slate-700"></div>
                             </div>
                             
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <div onclick="showCreditDetail('trinhan')" class="cursor-pointer bg-gray-50 dark:bg-slate-800 rounded-2xl p-3 text-center transition-transform hover:-translate-y-1 hover:shadow-md border border-gray-100 dark:border-slate-700">
-                                    <div class="relative w-16 h-16 mx-auto mb-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div onclick="showCreditDetail('trinhan')" class="cursor-pointer bg-gray-50 dark:bg-slate-800 rounded-2xl p-4 text-center transition-transform hover:-translate-y-1 hover:shadow-md border border-gray-100 dark:border-slate-700">
+                                    <div class="relative w-20 h-20 mx-auto mb-3">
                                         <img src="../IMG/trinhan.png" onerror="this.src='../LOGO.WEBP'" class="w-full h-full rounded-full object-cover border-[3px] border-white dark:border-slate-700 shadow-sm">
-                                        <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center text-white text-[10px]" title="Developer"><i class="fas fa-laptop-code"></i></div>
+                                        <div class="absolute -bottom-1 -right-1 w-7 h-7 bg-blue-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center text-white text-[11px]" title="Developer"><i class="fas fa-laptop-code"></i></div>
                                     </div>
-                                    <p class="font-black text-sm text-gray-900 dark:text-white mb-0.5">Trí Nhân</p>
-                                    <p class="text-[9px] uppercase font-bold text-blue-500">Dev & Design</p>
+                                    <p class="font-black text-[15px] text-gray-900 dark:text-white mb-0.5">Trí Nhân</p>
+                                    <p class="text-[10px] uppercase font-bold text-blue-500">Dev & Design</p>
                                 </div>
-                                <div onclick="showCreditDetail('cattuong')" class="cursor-pointer bg-gray-50 dark:bg-slate-800 rounded-2xl p-3 text-center transition-transform hover:-translate-y-1 hover:shadow-md border border-gray-100 dark:border-slate-700">
-                                    <div class="relative w-16 h-16 mx-auto mb-2">
+                                <div onclick="showCreditDetail('cattuong')" class="cursor-pointer bg-gray-50 dark:bg-slate-800 rounded-2xl p-4 text-center transition-transform hover:-translate-y-1 hover:shadow-md border border-gray-100 dark:border-slate-700">
+                                    <div class="relative w-20 h-20 mx-auto mb-3">
                                         <img src="../IMG/cattuong.png" onerror="this.src='../LOGO.WEBP'" class="w-full h-full rounded-full object-cover border-[3px] border-white dark:border-slate-700 shadow-sm">
-                                        <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-pink-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center text-white text-[10px]" title="Content"><i class="fas fa-pen-nib"></i></div>
+                                        <div class="absolute -bottom-1 -right-1 w-7 h-7 bg-pink-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center text-white text-[11px]" title="Content"><i class="fas fa-pen-nib"></i></div>
                                     </div>
-                                    <p class="font-black text-sm text-gray-900 dark:text-white mb-0.5">Cát Tường</p>
-                                    <p class="text-[9px] uppercase font-bold text-pink-500">Content Dev</p>
+                                    <p class="font-black text-[15px] text-gray-900 dark:text-white mb-0.5">Cát Tường</p>
+                                    <p class="text-[10px] uppercase font-bold text-pink-500">Content Dev</p>
                                 </div>
-                                <div onclick="showCreditDetail('dangkhoa')" class="cursor-pointer bg-gray-50 dark:bg-slate-800 rounded-2xl p-3 text-center transition-transform hover:-translate-y-1 hover:shadow-md border border-gray-100 dark:border-slate-700">
-                                    <div class="relative w-16 h-16 mx-auto mb-2">
+                                <div onclick="showCreditDetail('dangkhoa')" class="cursor-pointer bg-gray-50 dark:bg-slate-800 rounded-2xl p-4 text-center transition-transform hover:-translate-y-1 hover:shadow-md border border-gray-100 dark:border-slate-700">
+                                    <div class="relative w-20 h-20 mx-auto mb-3">
                                         <img src="../IMG/dangkhoa.png" onerror="this.src='../LOGO.WEBP'" class="w-full h-full rounded-full object-cover border-[3px] border-white dark:border-slate-700 shadow-sm">
-                                        <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center text-white text-[10px]" title="Content"><i class="fas fa-book-open"></i></div>
+                                        <div class="absolute -bottom-1 -right-1 w-7 h-7 bg-green-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center text-white text-[11px]" title="Content"><i class="fas fa-book-open"></i></div>
                                     </div>
-                                    <p class="font-black text-sm text-gray-900 dark:text-white mb-0.5">Đăng Khoa</p>
-                                    <p class="text-[9px] uppercase font-bold text-green-500">Content Dev</p>
+                                    <p class="font-black text-[15px] text-gray-900 dark:text-white mb-0.5">Đăng Khoa</p>
+                                    <p class="text-[10px] uppercase font-bold text-green-500">Content Dev</p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- GIÁO VIÊN HƯỚNG DẪN -->
-                        <div class="mb-3">
-                            <div class="flex items-center gap-3 mb-3">
+                        <div class="mb-4">
+                            <div class="flex items-center gap-3 mb-5">
                                 <div class="h-[2px] flex-1 bg-gray-100 dark:bg-slate-700"></div>
-                                <span class="font-black text-gray-400 text-[10px] uppercase tracking-widest"><i class="fas fa-chalkboard-teacher text-purple-400 mr-2"></i>Giáo Viên Cố Vấn</span>
+                                <span class="font-black text-gray-400 text-[11px] uppercase tracking-widest"><i class="fas fa-chalkboard-teacher text-purple-400 mr-2"></i>Giáo Viên Cố Vấn</span>
                                 <div class="h-[2px] flex-1 bg-gray-100 dark:bg-slate-700"></div>
                             </div>
                             
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div onclick="showCreditDetail('thaythien')" class="cursor-pointer flex items-center gap-3 bg-gray-50 dark:bg-slate-800 rounded-2xl p-3 border border-gray-100 dark:border-slate-700 transition-transform hover:-translate-y-1 hover:shadow-md">
-                                    <img src="../IMG/minhthien.png" onerror="this.src='../LOGO.WEBP'" class="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-sm">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div onclick="showCreditDetail('thaythien')" class="cursor-pointer flex items-center gap-4 bg-gray-50 dark:bg-slate-800 rounded-2xl p-4 border border-gray-100 dark:border-slate-700 transition-transform hover:-translate-y-1 hover:shadow-md">
+                                    <img src="../IMG/minhthien.png" onerror="this.src='../LOGO.WEBP'" class="w-14 h-14 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-sm">
                                     <div>
-                                        <p class="font-black text-sm text-gray-900 dark:text-white leading-tight mb-0.5">Trang Minh Thiên</p>
-                                        <p class="text-[9px] uppercase font-bold text-purple-500">Cố vấn kỹ thuật</p>
+                                        <p class="font-black text-sm text-gray-900 dark:text-white leading-tight mb-1">Trang Minh Thiên</p>
+                                        <p class="text-[10px] uppercase font-bold text-purple-500">Cố vấn kỹ thuật</p>
                                     </div>
                                 </div>
-                                <div onclick="showCreditDetail('cobinh')" class="cursor-pointer flex items-center gap-3 bg-gray-50 dark:bg-slate-800 rounded-2xl p-3 border border-gray-100 dark:border-slate-700 transition-transform hover:-translate-y-1 hover:shadow-md">
-                                    <img src="../IMG/thanhbinh.png" onerror="this.src='../LOGO.WEBP'" class="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-sm">
+                                <div onclick="showCreditDetail('cobinh')" class="cursor-pointer flex items-center gap-4 bg-gray-50 dark:bg-slate-800 rounded-2xl p-4 border border-gray-100 dark:border-slate-700 transition-transform hover:-translate-y-1 hover:shadow-md">
+                                    <img src="../IMG/thanhbinh.png" onerror="this.src='../LOGO.WEBP'" class="w-14 h-14 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-sm">
                                     <div>
-                                        <p class="font-black text-sm text-gray-900 dark:text-white leading-tight mb-0.5">Mai Thị Thanh Bình</p>
-                                        <p class="text-[9px] uppercase font-bold text-pink-500">Cố vấn học thuật</p>
+                                        <p class="font-black text-sm text-gray-900 dark:text-white leading-tight mb-1">Mai Thị Thanh Bình</p>
+                                        <p class="text-[10px] uppercase font-bold text-pink-500">Cố vấn học thuật</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
                         <!-- FOOTER -->
-                        <div class="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-gray-100 dark:border-slate-800">
-                            <img src="../LOGO.WEBP" alt="HopVan" class="h-7 opacity-70 hover:opacity-100 transition-opacity">
-                            <div class="h-5 w-px bg-gray-200 dark:bg-slate-700"></div>
-                            <img src="../fpt.png" alt="FPT High School" class="h-7 opacity-70 hover:opacity-100 transition-opacity">
+                        <div class="flex items-center justify-center gap-6 mt-5 pt-5 mb-4 border-t border-gray-100 dark:border-slate-800">
+                            <img src="../LOGO.WEBP" alt="HopVan" class="h-8 opacity-70 hover:opacity-100 transition-opacity">
+                            <div class="h-6 w-px bg-gray-200 dark:bg-slate-700"></div>
+                            <img src="../fpt.png" alt="FPT High School" class="h-8 opacity-70 hover:opacity-100 transition-opacity">
                         </div>
                     </div>
                     
