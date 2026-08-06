@@ -371,7 +371,7 @@ const menuHTML = `
             <div class="sb-version-pill">
                 <span class="sb-vp-text">HopVan Platform</span>
                 <span style="width: 4px; height: 4px; border-radius: 50%; background-color: #22c55e;"></span>
-                <span class="sb-vp-version">v1.3.7</span>
+                <span class="sb-vp-version">v1.3.8</span>
             </div>
         </div>
     </div>
