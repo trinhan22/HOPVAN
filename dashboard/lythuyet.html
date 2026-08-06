@@ -18,7 +18,8 @@
             --primary: #FF8F50; 
             --primary-gradient: linear-gradient(135deg, #FF8F50, #FF5E62);
             --glass-bg: rgba(255, 255, 255, 0.6); 
-            --sidebar-width: 330px; 
+            --sidebar-width: 260px; 
+            --toc-width: 330px;
             --bg-body: #FFF5EC; 
             --bg-card: rgba(255, 255, 255, 0.85); 
             --border-ui: rgba(255, 255, 255, 0.8);
@@ -50,9 +51,9 @@
         @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
 
         .main-content { 
-            width: calc(100% - 280px); margin-left: 280px;
+            width: calc(100% - var(--sidebar-width)); margin-left: var(--sidebar-width);
             height: 100vh; background: var(--glass-bg); backdrop-filter: blur(var(--blur));
-            padding: 30px 40px; display: flex; flex-direction: column; transition: all 0.3s ease;
+            padding: 30px 40px; display: flex; flex-direction: column; transition: margin-left 0.4s cubic-bezier(0.16, 1, 0.3, 1), width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative; border-left: 1px solid var(--border-ui);
         }
 
@@ -60,7 +61,7 @@
 
         /* --- TOC SIDEBAR --- */
         .toc-sidebar {
-            width: var(--sidebar-width); background: var(--bg-card); border-radius: 32px;
+            width: var(--toc-width); background: var(--bg-card); border-radius: 32px;
             border: 1px solid var(--border-ui); box-shadow: 0 10px 30px rgba(0,0,0,0.02);
             display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0;
             transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);

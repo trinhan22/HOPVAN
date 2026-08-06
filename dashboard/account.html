@@ -625,18 +625,56 @@
         }
 
         window.toggleDarkModeLogic = async () => {
+            if (document.getElementById('theme-transition-overlay')) return;
             const html = document.documentElement;
             const isCurrentlyDark = html.classList.contains('dark');
             const newTheme = isCurrentlyDark ? 'light' : 'dark';
+            const isDark = newTheme === 'dark';
 
-            if (newTheme === 'dark') html.classList.add('dark');
-            else html.classList.remove('dark');
-
-            localStorage.setItem('theme', newTheme);
-
-            if (currentUser) {
-                try { await setDoc(doc(db, "users", currentUser.uid), { theme: newTheme }, { merge: true }); } catch(e) {}
-            }
+            const overlay = document.createElement('div');
+            overlay.id = 'theme-transition-overlay';
+            Object.assign(overlay.style, {
+                position: 'fixed', inset: '0', zIndex: '999999',
+                display: 'flex', justifyContent: 'center', alignItems: 'center',
+                backgroundColor: isDark ? '#0B1120' : '#FFF5EC',
+                opacity: '0', pointerEvents: 'none',
+                transition: 'opacity 0.4s ease'
+            });
+            
+            const icon = document.createElement('i');
+            icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+            Object.assign(icon.style, {
+                fontSize: '8rem', color: isDark ? '#F8FAFC' : '#FF8F50',
+                transform: 'scale(0.2) translateY(50px)', opacity: '0',
+                transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                textShadow: isDark ? '0 0 40px rgba(248,250,252,0.4)' : '0 0 40px rgba(255,143,80,0.4)'
+            });
+            
+            overlay.appendChild(icon);
+            document.body.appendChild(overlay);
+            
+            requestAnimationFrame(() => {
+                overlay.style.opacity = '1';
+                icon.style.transform = 'scale(1) translateY(0)';
+                icon.style.opacity = '1';
+            });
+            
+            setTimeout(async () => {
+                if (isDark) html.classList.add('dark');
+                else html.classList.remove('dark');
+                localStorage.setItem('theme', newTheme);
+                
+                setTimeout(() => {
+                    overlay.style.opacity = '0';
+                    icon.style.transform = 'scale(1.5) translateY(-50px)';
+                    icon.style.opacity = '0';
+                    setTimeout(() => overlay.remove(), 400); 
+                }, 600);
+                
+                if (currentUser) {
+                    try { await setDoc(doc(db, "users", currentUser.uid), { theme: newTheme }, { merge: true }); } catch(e) {}
+                }
+            }, 400);
         };
 
         // --- ẢNH ĐẠI DIỆN ---

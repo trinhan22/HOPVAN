@@ -1,8 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <script>
+        window.addEventListener('error', function(e) {
+            alert('Lỗi kịch bản: ' + e.message + ' tại ' + e.filename + ':' + e.lineno);
+        });
+        window.addEventListener('unhandledrejection', function(e) {
+            alert('Lỗi Promise: ' + e.reason);
+        });
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>HopVan - Bảng Điều Khiển</title>
     <meta property="og:title" content="HOPVAN - Nền Tảng Học & Luyện Thi Ngữ Văn" />
@@ -262,6 +269,7 @@
         ::-webkit-scrollbar-thumb:hover { background-color: #FF8F50; border: 1px solid transparent; }
         ::-webkit-scrollbar-button { display: none; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -552,11 +560,13 @@
                     }
 
 
-                    // Nếu đã làm bài test thì gán thành true
-                    if (data.diagnosticCompleted === true) {
+                    // Nếu đã làm bài test (hoặc là admin) thì gán thành true
+                    if (data.diagnosticCompleted === true || user.email === 'admin@hopvan.com' || data.role === 'admin') {
                         isDiagnosticCompleted = true;
                     }
                 }
+                
+                window.isDiagnosticCompleted = isDiagnosticCompleted;
 
                 // =================================================================
                 // KIỂM TRA USER MỚI (CHƯA LÀM TEST) VÀ KHÔNG PHẢI ADMIN
@@ -624,6 +634,12 @@
                     await updateDoc(doc(db, "users", currentUser.uid), {
                         diagnosticCompleted: true
                     });
+                    
+                    window.isDiagnosticCompleted = true;
+                    // Bật popup bảng vàng ngay sau khi làm xong test (nếu chưa xem trong ngày)
+                    if (typeof checkAndShowDailyRanking === 'function') {
+                        checkAndShowDailyRanking();
+                    }
                 } catch(e) {
                     console.error("Lỗi cập nhật Firestore: ", e);
                 }
@@ -638,6 +654,8 @@
             document.getElementById('total-exams').textContent = allActivities.length;
             updateMiniActivityList(allActivities.slice(0, 3));
             drawMiniChart(allActivities);
+        }, (error) => {
+            console.warn("Lỗi đọc dữ liệu hoạt động:", error);
         });
     }
 
@@ -823,43 +841,49 @@
     };
 
     async function updateUserStreak(user) {
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-        const todayStr = new Date().toLocaleDateString('en-CA');
-        const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = yesterday.toLocaleDateString('en-CA');
-        
-        let currentStreak = 1; let userData = {};
-        if (userSnap.exists()) {
-            userData = userSnap.data();
-            if (user.photoURL && userData.photoURL !== user.photoURL) { await updateDoc(userRef, { photoURL: user.photoURL }); userData.photoURL = user.photoURL; }
-            document.getElementById('keys-value').textContent = userData.keys || 0;
-            currentStreak = userData.streak || 1;
-            if (userData.lastLoginDate !== todayStr) {
-                currentStreak = (userData.lastLoginDate === yesterdayStr) ? currentStreak + 1 : 1;
-                await updateDoc(userRef, { lastLoginDate: todayStr, streak: currentStreak });
+        try {
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            const todayStr = new Date().toLocaleDateString('en-CA');
+            const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toLocaleDateString('en-CA');
+            
+            let currentStreak = 1; let userData = {};
+            if (userSnap.exists()) {
+                userData = userSnap.data();
+                if (user.photoURL && userData.photoURL !== user.photoURL) { await updateDoc(userRef, { photoURL: user.photoURL }); userData.photoURL = user.photoURL; }
+                document.getElementById('keys-value').textContent = userData.keys || 0;
+                currentStreak = userData.streak || 1;
+                if (userData.lastLoginDate !== todayStr) {
+                    currentStreak = (userData.lastLoginDate === yesterdayStr) ? currentStreak + 1 : 1;
+                    await updateDoc(userRef, { lastLoginDate: todayStr, streak: currentStreak });
+                }
+                document.getElementById('streak-value').textContent = currentStreak;
+                updateRankDisplay(currentStreak);
+            } else {
+                userData = { lastLoginDate: todayStr, streak: 1, email: user.email, keys: 0, photoURL: user.photoURL || null };
+                await setDoc(userRef, userData);
+                document.getElementById('streak-value').textContent = 1;
+                document.getElementById('keys-value').textContent = 0; 
+                updateRankDisplay(1);
             }
-            document.getElementById('streak-value').textContent = currentStreak;
-            updateRankDisplay(currentStreak);
-        } else {
-            userData = { lastLoginDate: todayStr, streak: 1, email: user.email, keys: 0, photoURL: user.photoURL || null };
-            await setDoc(userRef, userData);
-            document.getElementById('streak-value').textContent = 1;
-            document.getElementById('keys-value').textContent = 0; 
-            updateRankDisplay(1);
+        } catch (error) {
+            console.warn("Lỗi khi cập nhật streak (có thể do quyền Firebase):", error);
         }
 
         const avatarEl = document.getElementById('avatar-initial');
-        const displayName = userData.name || user.displayName || user.email.split('@')[0];
-        if (userData.customAvatar) {
-            avatarEl.innerHTML = `<img src="${userData.customAvatar}" alt="User" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
-            avatarEl.style.background = 'transparent';
-        } else if (userData.photoURL || user.photoURL) {
-            avatarEl.innerHTML = `<img src="${userData.photoURL || user.photoURL}" alt="User" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
-            avatarEl.style.background = 'transparent';
-        } else {
-            avatarEl.innerHTML = ""; avatarEl.textContent = displayName.charAt(0).toUpperCase();
-            avatarEl.style.background = 'linear-gradient(135deg, #FF8F50, #FF5E62)';
+        if (avatarEl) {
+            const displayName = userData.name || user.displayName || user.email.split('@')[0];
+            if (userData.customAvatar) {
+                avatarEl.innerHTML = `<img src="${userData.customAvatar}" alt="User" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
+                avatarEl.style.background = 'transparent';
+            } else if (userData.photoURL || user.photoURL) {
+                avatarEl.innerHTML = `<img src="${userData.photoURL || user.photoURL}" alt="User" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
+                avatarEl.style.background = 'transparent';
+            } else {
+                avatarEl.innerHTML = ""; avatarEl.textContent = displayName.charAt(0).toUpperCase();
+                avatarEl.style.background = 'linear-gradient(135deg, #FF8F50, #FF5E62)';
+            }
         }
     }
 
@@ -910,7 +934,11 @@
             renderMiniLeaderboard(users, currentUser.uid);
             
             // Trigger daily ranking popup check
-            checkAndShowDailyRanking();
+            if (typeof checkAndShowDailyRanking === 'function') {
+                checkAndShowDailyRanking();
+            }
+        }, (error) => {
+            console.warn("Lỗi đọc dữ liệu bảng xếp hạng:", error);
         });
     }
 
@@ -919,7 +947,8 @@
         const myRankEl = document.getElementById('my-rank-footer');
         const topUsers = users.slice(0, 4); 
         
-        container.innerHTML = topUsers.map((u, index) => {
+        if (container) {
+            container.innerHTML = topUsers.map((u, index) => {
             let rankBadge = `<span class="w-6 h-6 flex items-center justify-center rounded-full font-bold text-xs bg-gray-100 text-gray-500">${index + 1}</span>`;
             if (index === 0) rankBadge = `<i class="fas fa-crown text-yellow-400 text-lg"></i>`;
             if (index === 1) rankBadge = `<i class="fas fa-medal text-gray-400 text-lg"></i>`;
@@ -932,11 +961,14 @@
 
             return `<div class="flex items-center justify-between p-2 rounded-xl border ${isMe} relative z-10"><div class="flex items-center gap-3"><div class="w-6 text-center">${rankBadge}</div><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-[10px] font-bold overflow-hidden shadow-sm">${avatarContent}</div><span class="font-bold text-gray-700 text-sm truncate max-w-[80px]">${name}</span></div></div><div class="font-black text-orange-500 text-sm flex items-center gap-1">${u.keys || 0} <i class="fas fa-key text-[10px] text-gray-300"></i></div></div>`;
         }).join('');
+        }
 
         const myIndex = users.findIndex(u => u.id === myUid);
         const myRank = myIndex !== -1 ? myIndex + 1 : "--";
         const myKeys = myIndex !== -1 ? (users[myIndex].keys || 0) : 0;
-        myRankEl.innerHTML = `<span class="text-gray-500">Hạng của bạn:</span><div class="flex items-center gap-2"><span class="font-black text-gray-800">#${myRank}</span><span class="bg-orange-100 text-orange-600 px-2 py-0.5 rounded text-[10px] font-bold">${myKeys} keys</span></div>`;
+        if (myRankEl) {
+            myRankEl.innerHTML = `<span class="text-gray-500">Hạng của bạn:</span><div class="flex items-center gap-2"><span class="font-black text-gray-800">#${myRank}</span><span class="bg-orange-100 text-orange-600 px-2 py-0.5 rounded text-[10px] font-bold">${myKeys} keys</span></div>`;
+        }
     }
 
     window.openLeaderboardModal = () => {
@@ -1070,9 +1102,10 @@
 
     <script>
     function checkAndShowDailyRanking() {
+        if (!window.isDiagnosticCompleted) return;
         if (!window.fullLeaderboardData || window.fullLeaderboardData.length === 0) return;
         
-        const validUsers = window.fullLeaderboardData;
+        const validUsers = [...window.fullLeaderboardData].sort((a, b) => (b.streak || 0) - (a.streak || 0));
         if (validUsers.length === 0) return;
         
         const top3 = validUsers.slice(0, 3);
@@ -1089,33 +1122,41 @@
         podium.forEach((u) => {
             const index = u.rank - 1; // 0, 1, or 2
             const isFirst = (index === 0);
+            const isSecond = (index === 1);
             
             let badgeInfo = '';
             let ringColor = '';
             let cardClasses = "";
+            let shadowGlow = "";
             
             if (isFirst) {
-                badgeInfo = '<i class="fas fa-crown text-yellow-400 absolute -top-10 left-1/2 -translate-x-1/2 text-6xl drop-shadow-[0_0_20px_rgba(250,204,21,0.8)] z-20" style="animation: bounce 2s infinite;"></i>';
-                ringColor = 'ring-yellow-400';
-                cardClasses = "flex flex-col items-center w-36 sm:w-44 relative z-10";
-            } else if (index === 1) {
+                badgeInfo = '<i class="fas fa-crown text-yellow-500 absolute -top-8 sm:-top-10 left-1/2 -translate-x-1/2 text-5xl sm:text-6xl drop-shadow-[0_0_20px_rgba(234,179,8,0.7)] z-20"></i>';
+                ringColor = 'border-4 border-yellow-400';
+                shadowGlow = 'shadow-[0_-5px_30px_rgba(234,179,8,0.4)]';
+                cardClasses = "w-28 sm:w-44 z-10";
+            } else if (isSecond) {
                 badgeInfo = '';
-                ringColor = 'ring-slate-300';
-                cardClasses = "flex flex-col items-center w-32 sm:w-36 relative z-0 mt-6";
+                ringColor = 'border-4 border-slate-200';
+                shadowGlow = 'shadow-[0_-5px_20px_rgba(148,163,184,0.3)]';
+                cardClasses = "w-24 sm:w-36 z-0 mt-12 sm:mt-16";
             } else {
                 badgeInfo = '';
-                ringColor = 'ring-orange-600';
-                cardClasses = "flex flex-col items-center w-32 sm:w-36 relative z-0 mt-10";
+                ringColor = 'border-4 border-orange-300';
+                shadowGlow = 'shadow-[0_-5px_20px_rgba(251,146,60,0.3)]';
+                cardClasses = "w-24 sm:w-36 z-0 mt-16 sm:mt-24";
             }
             
-            let podiumHeight = isFirst ? 'h-40' : (index === 1 ? 'h-32' : 'h-24');
-            let podiumColor = isFirst ? 'from-yellow-400 to-orange-500' : (index === 1 ? 'from-slate-300 to-slate-400' : 'from-orange-700 to-orange-800');
-            let numberColor = isFirst ? 'text-yellow-200/50' : (index === 1 ? 'text-slate-200/50' : 'text-orange-500/50');
-            let numberSize = isFirst ? 'text-[7rem] sm:text-[9rem]' : (index === 1 ? 'text-7xl sm:text-8xl' : 'text-6xl sm:text-7xl');
+            let podiumHeight = isFirst ? 'h-48 sm:h-56' : (isSecond ? 'h-40 sm:h-44' : 'h-32 sm:h-36');
+            let pillarPadding = isFirst ? 'pt-16 sm:pt-20' : 'pt-12 sm:pt-14';
+            let podiumColor = isFirst ? 'from-[#FF8F50] to-[#FF5E62] shadow-[0_15px_40px_-10px_rgba(255,94,98,0.5)] border-orange-300' : 
+                             (isSecond ? 'from-slate-400 to-slate-300 shadow-[0_10px_30px_-10px_rgba(148,163,184,0.4)] border-slate-200' : 
+                             'from-[#fca5a5] to-[#f87171] shadow-[0_10px_30px_-10px_rgba(248,113,113,0.4)] border-red-300');
+            
             let rankNum = index + 1;
-            let rankIcon = isFirst ? '<div class="absolute -bottom-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full border-2 border-white flex items-center justify-center text-white shadow-md"><i class="fas fa-star text-xs"></i></div>' : 
-                              (index === 1 ? '<div class="absolute -bottom-2 -right-2 w-8 h-8 bg-slate-400 rounded-full border-2 border-white flex items-center justify-center text-white shadow-md"><i class="fas fa-medal text-xs"></i></div>' : 
-                              '<div class="absolute -bottom-2 -right-2 w-8 h-8 bg-orange-700 rounded-full border-2 border-white flex items-center justify-center text-white shadow-md"><i class="fas fa-medal text-xs"></i></div>');
+            
+            let rankIcon = isFirst ? '<div class="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-0.5 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full text-white text-[10px] sm:text-xs font-bold tracking-widest uppercase shadow-lg border-2 border-white whitespace-nowrap z-30">Hạng 1</div>' : 
+                              (isSecond ? '<div class="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-0.5 bg-gradient-to-r from-slate-400 to-slate-500 rounded-full text-white text-[10px] sm:text-xs font-bold tracking-widest uppercase shadow-lg border-2 border-white whitespace-nowrap z-30">Hạng 2</div>' : 
+                              '<div class="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-0.5 bg-gradient-to-r from-orange-400 to-red-400 rounded-full text-white text-[10px] sm:text-xs font-bold tracking-widest uppercase shadow-lg border-2 border-white whitespace-nowrap z-30">Hạng 3</div>');
             
             const name = u.name ? u.name : (u.email ? u.email.split('@')[0] : "Ẩn danh");
             let avatarContent = name.charAt(0).toUpperCase();
@@ -1123,27 +1164,33 @@
             else if (u.photoURL) avatarContent = `<img src="${u.photoURL}" class="w-full h-full object-cover">`;
 
             html += `
-                <div class="${cardClasses}">
-                    <div class="relative z-10 flex flex-col items-center -translate-y-2">
-                        <div class="${isFirst ? 'w-24 h-24' : 'w-20 h-20'} rounded-full bg-white p-1 shadow-xl relative mb-3">
-                            ${badgeInfo}
-                            <div class="w-full h-full rounded-full bg-gray-200 flex items-center justify-center text-3xl font-black text-gray-400 overflow-hidden relative ring-4 ${ringColor}">
-                                ${avatarContent}
-                            </div>
-                            ${rankIcon}
+                <div class="${cardClasses} flex flex-col relative transition-transform duration-300 hover:-translate-y-2">
+                    
+                    <!-- Avatar sitting ON TOP of the pillar (Outside overflow-hidden) -->
+                    <div class="absolute -top-12 sm:-top-14 left-1/2 -translate-x-1/2 ${isFirst ? 'w-24 h-24 sm:w-28 sm:h-28' : 'w-20 h-20 sm:w-24 sm:h-24'} rounded-full bg-white p-1 mb-4 ${shadowGlow} z-20">
+                        ${badgeInfo}
+                        <div class="w-full h-full rounded-full bg-gray-100 flex items-center justify-center text-3xl font-bold text-gray-400 overflow-hidden relative ${ringColor}">
+                            ${avatarContent}
                         </div>
-                        <div class="font-black text-gray-800 dark:text-white text-center leading-tight line-clamp-2 px-1 w-full ${isFirst ? 'text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 text-[15px] drop-shadow-sm' : 'text-xs'}">
+                        ${rankIcon}
+                    </div>
+
+                    <!-- Sleek Glowing Pillar -->
+                    <div class="w-full ${podiumHeight} bg-gradient-to-b ${podiumColor} rounded-t-[2rem] rounded-b-2xl relative overflow-hidden flex flex-col items-center ${pillarPadding} border-t-2 border-x border-white/40 backdrop-blur-md z-10">
+                        
+                        <!-- User Name inside Pillar -->
+                        <div class="font-bold text-white text-center leading-tight line-clamp-2 px-2 w-full ${isFirst ? 'text-[13px] sm:text-[15px]' : 'text-[11px] sm:text-[13px]'} mt-2 sm:mt-3 drop-shadow-md z-10">
                             ${name}
                         </div>
-                        <div class="font-black text-orange-600 text-sm mt-1 bg-white dark:bg-slate-800 px-3 py-1 rounded-full inline-flex items-center justify-center gap-1 shadow-md border border-orange-100 dark:border-slate-700">
-                            ${u.keys || 0} <i class="fas fa-key text-[10px] text-yellow-500"></i>
+                        
+                        <!-- Streak inside Pillar -->
+                        <div class="font-black text-white text-[12px] sm:text-sm mt-2 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full inline-flex items-center justify-center gap-1.5 shadow-sm border border-white/30 z-10">
+                            ${u.streak || 0} <i class="fas fa-fire text-yellow-300"></i>
                         </div>
-                    </div>
-                    
-                    <!-- 3D Podium Block -->
-                    <div class="w-full ${podiumHeight} bg-gradient-to-t ${podiumColor} rounded-t-2xl rounded-b-2xl shadow-[0_-5px_15px_rgba(0,0,0,0.1)] relative z-0 overflow-hidden flex items-end justify-center pb-2 border-t-[4px] border-white/40 pt-10">
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <span class="${numberSize} font-black ${numberColor}">${rankNum}</span>
+                        
+                        <!-- Giant Rank Number (Background text) -->
+                        <div class="absolute -bottom-4 sm:-bottom-6 left-1/2 -translate-x-1/2 text-[8rem] sm:text-[10rem] font-black text-white/10 leading-none tracking-tighter select-none pointer-events-none z-0">
+                            ${rankNum}
                         </div>
                     </div>
                 </div>
@@ -1152,18 +1199,42 @@
         
         top3Container.innerHTML = html;
         
-        // Mở modal nếu chưa xem trong phiên này
+        ['share-streak-btn-desktop', 'share-streak-btn-mobile'].forEach(id => {
+            const btnContainer = document.getElementById(id);
+            if (btnContainer) {
+                btnContainer.classList.remove('hidden');
+                const btnShare = btnContainer.querySelector('.btn-share');
+                const btnContinue = btnContainer.querySelector('.btn-continue');
+                
+                const myRankIndex = top3WithRank.findIndex(u => (u.id || u.uid) === window.currentUserId);
+                if (myRankIndex !== -1) {
+                    if(btnShare) btnShare.classList.remove('hidden');
+                    if(btnContinue) btnContinue.classList.add('hidden');
+                    
+                    const me = top3WithRank[myRankIndex];
+                    window.shareStreakData = {
+                        rank: me.rank,
+                        streak: me.streak || 0,
+                        name: me.name || (me.email ? me.email.split('@')[0] : "Ẩn danh"),
+                        avatar: me.customAvatar || me.photoURL || 'LOGO.WEBP'
+                    };
+                } else {
+                    if(btnShare) btnShare.classList.add('hidden');
+                    if(btnContinue) btnContinue.classList.remove('hidden');
+                }
+            }
+        });
+        
         const lastSeen = sessionStorage.getItem('rankingPopupShown');
         if (lastSeen !== 'true') {
             const modal = document.getElementById('daily-ranking-modal');
             if (modal) {
                 sessionStorage.setItem('rankingPopupShown', 'true');
-                // Delay 2 seconds before fading in
                 setTimeout(() => {
                     modal.classList.remove('opacity-0', 'invisible', 'pointer-events-none');
                     modal.classList.add('opacity-100');
                     
-                    const innerBox = modal.querySelector('.max-w-4xl');
+                    const innerBox = document.getElementById('daily-ranking-inner');
                     if (innerBox) {
                         innerBox.classList.remove('scale-95', 'opacity-0', 'translate-y-4');
                         innerBox.classList.add('scale-100', 'opacity-100', 'translate-y-0');
@@ -1179,44 +1250,71 @@
             modal.classList.add('opacity-0', 'invisible', 'pointer-events-none');
             modal.classList.remove('opacity-100');
             
-            const innerBox = modal.querySelector('.max-w-4xl');
+            const innerBox = document.getElementById('daily-ranking-inner');
             if (innerBox) {
-                innerBox.classList.add('scale-95', 'opacity-0', 'translate-y-4');
+                innerBox.classList.add('scale-95', 'opacity-0', 'translate-y-8');
                 innerBox.classList.remove('scale-100', 'opacity-100', 'translate-y-0');
             }
         }
     };
     </script>
     
-    <!-- DAILY RANKING MODAL -->
-    <div id="daily-ranking-modal" class="fixed inset-0 z-[2147483647] flex items-center justify-center bg-black/50 backdrop-blur-md transition-all duration-500 opacity-0 invisible pointer-events-none">
-        <div class="bg-white dark:bg-slate-900 p-8 pt-10 rounded-[32px] shadow-[0_20px_50px_rgba(255,143,80,0.15)] max-w-4xl w-full mx-4 border border-orange-100 dark:border-slate-700 relative overflow-hidden transform transition-all duration-500 scale-95 opacity-0 translate-y-4 text-center">
+    <div id="daily-ranking-modal" class="fixed inset-0 z-[2147483647] flex items-center justify-center bg-[#0B1120]/60 backdrop-blur-md transition-all duration-500 opacity-0 invisible pointer-events-none p-4 sm:p-8 overflow-y-auto py-10">
+        <div id="daily-ranking-inner" class="bg-white dark:bg-[#111827] px-10 py-16 sm:px-14 sm:py-20 rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(255,143,80,0.3)] max-w-[1000px] w-full relative overflow-hidden transform transition-all duration-500 scale-95 opacity-0 translate-y-8 flex flex-col md:flex-row items-center md:items-stretch gap-10 sm:gap-12 border border-orange-100 dark:border-gray-800 my-auto">
             
-            <!-- X Close Button -->
-            <button onclick="closeDailyRankingModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-slate-800 text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:hover:bg-slate-700 transition z-20">
+            <div class="absolute -top-24 -right-24 w-72 h-72 bg-orange-400/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-red-400/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <button onclick="closeDailyRankingModal()" class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all z-20">
                 <i class="fas fa-times"></i>
             </button>
-
-            <!-- Confetti / Decor elements -->
-            <div class="absolute -top-10 -left-10 w-40 h-40 bg-orange-400 opacity-20 blur-3xl rounded-full pointer-events-none"></div>
-            <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-pink-500 opacity-20 blur-3xl rounded-full pointer-events-none"></div>
             
-            <div class="relative z-10">
-                <h3 class="text-5xl md:text-6xl font-black font-sans text-transparent bg-clip-text bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-600 mb-1 tracking-tighter uppercase drop-shadow-sm py-4 leading-normal mt-2">Bảng Vàng</h3>
-                <p class="text-base text-gray-500 dark:text-gray-400 mb-2 px-4 font-medium italic">"Vinh danh những học viên xuất sắc nhất đang dẫn đầu bảng xếp hạng"</p>
+            <!-- LEFT COLUMN (Info & Button) -->
+            <div class="relative z-10 flex-1 w-full text-center md:text-left flex flex-col justify-center">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-50 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-bold uppercase tracking-wider mb-5 w-max mx-auto md:mx-0 shadow-sm">
+                    <i class="fas fa-fire"></i> Bảng Vàng Thành Tích
+                </div>
+                <!-- Font size adjusted slightly to ensure "Chuỗi Học Tập" stays on one line -->
+                <h3 class="text-4xl sm:text-[2.85rem] font-extrabold text-gray-900 dark:text-white mb-5 leading-tight tracking-tight whitespace-nowrap">Xếp Hạng<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-[#FF8F50] to-[#FF5E62]">Chuỗi Học Tập</span></h3>
+                <p class="text-[15px] sm:text-[16px] text-gray-500 dark:text-gray-400 mb-2 md:mb-8 leading-relaxed max-w-[95%] mx-auto md:mx-0 whitespace-normal">Tôn vinh những cá nhân xuất sắc với tinh thần học tập bền bỉ nhất trên Hopvan.</p>
                 
-                <!-- TOP 3 CONTAINER -->
-                <div id="daily-top3-container" class="flex items-end justify-center gap-2 sm:gap-8 mb-4 mt-16">
-                    <!-- Javascript sẽ render vào đây -->
+                <!-- SHARE BUTTON CONTAINER (DESKTOP) -->
+                <div class="hidden md:flex justify-start w-full">
+                    <div id="share-streak-btn-desktop" class="hidden w-full">
+                        <button onclick="openShareStreakModal()" class="btn-share group flex items-center justify-center gap-3 w-auto bg-gradient-to-r from-[#FF8F50] to-[#FF5E62] text-white font-semibold text-base py-3.5 px-8 rounded-xl hover:shadow-[0_8px_25px_rgba(255,94,98,0.35)] hover:-translate-y-0.5 transition-all">
+                            <i class="fas fa-share transition-transform group-hover:scale-110"></i> Chia Sẻ Thành Tích
+                        </button>
+                        <button onclick="closeDailyRankingModal()" class="btn-continue hidden group flex items-center justify-center gap-3 w-auto bg-gradient-to-r from-[#FF8F50] to-[#FF5E62] text-white font-semibold text-base py-3.5 px-8 rounded-xl hover:shadow-[0_8px_25px_rgba(255,94,98,0.35)] hover:-translate-y-0.5 transition-all">
+                            Tiếp Tục Hành Trình <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
+            
+            <!-- RIGHT COLUMN (Podium) -->
+            <div class="relative z-10 flex-[1.3] w-full mt-8 md:mt-0 pt-8 sm:pt-12 flex flex-col justify-end">
+                <div id="daily-top3-container" class="flex items-end justify-center gap-3 sm:gap-5 w-full pb-2 md:translate-y-2">
+                    <!-- Javascript sẽ render vào đây -->
+                </div>
+                
+                <!-- SHARE BUTTON CONTAINER (MOBILE) -->
+                <div class="flex md:hidden justify-center w-full mt-6 mb-4">
+                    <div id="share-streak-btn-mobile" class="hidden w-full flex justify-center">
+                        <button onclick="openShareStreakModal()" class="btn-share group flex items-center justify-center gap-3 w-full max-w-[280px] bg-gradient-to-r from-[#FF8F50] to-[#FF5E62] text-white font-semibold text-sm py-3.5 px-8 rounded-xl hover:shadow-[0_8px_25px_rgba(255,94,98,0.35)] hover:-translate-y-0.5 transition-all">
+                            <i class="fas fa-share transition-transform group-hover:scale-110"></i> Chia Sẻ Thành Tích
+                        </button>
+                        <button onclick="closeDailyRankingModal()" class="btn-continue hidden group flex items-center justify-center gap-3 w-full max-w-[280px] bg-gradient-to-r from-[#FF8F50] to-[#FF5E62] text-white font-semibold text-sm py-3.5 px-8 rounded-xl hover:shadow-[0_8px_25px_rgba(255,94,98,0.35)] hover:-translate-y-0.5 transition-all">
+                            Tiếp Tục Hành Trình <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
         </div>
     </div>
 
-    <!-- INCOMPLETE PROFILE MODAL -->
     <div id="incomplete-profile-modal" class="fixed inset-0 z-[2147483647] flex items-center justify-center bg-black/60 backdrop-blur-md transition-all duration-500 opacity-0 invisible pointer-events-none">
         <div class="max-w-md w-full mx-4 bg-white dark:bg-[#111827] rounded-3xl p-8 relative shadow-2xl transform scale-95 opacity-0 translate-y-4 transition-all duration-500 border border-gray-100 dark:border-gray-800">
-            <!-- Icon Glow Background -->
             <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 bg-orange-100 dark:bg-orange-500/20 rounded-full flex items-center justify-center shadow-lg border-4 border-white dark:border-[#111827]">
                 <div class="absolute inset-0 bg-orange-400 rounded-full animate-ping opacity-20"></div>
                 <i class="fas fa-user-edit text-3xl text-orange-500 relative z-10"></i>
@@ -1244,5 +1342,183 @@
         </div>
     </div>
 
+    <div id="share-streak-modal" class="fixed inset-0 z-[2147483648] flex items-center justify-center bg-black/60 backdrop-blur-md transition-all duration-500 opacity-0 invisible pointer-events-none p-4 sm:p-0">
+        
+        <div class="relative max-w-sm w-full mx-4 transform scale-95 opacity-0 translate-y-8 transition-all duration-500" id="share-streak-inner">
+            
+            <!-- Tight wrapper for exact alignment with the 340px card -->
+            <div class="relative mx-auto w-[340px]">
+                
+                <button onclick="closeShareStreakModal()" class="absolute -top-12 right-0 w-10 h-10 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white hover:bg-white/30 hover:scale-105 transition-all z-50 border border-white/30 shadow-lg">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                <div id="streak-card-capture" class="bg-white rounded-[2rem] overflow-hidden relative p-8 flex flex-col w-full border-2 border-gray-100 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)]" style="min-height: 420px;">
+                
+                <!-- Background Pattern -->
+                <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 16px 16px;"></div>
+                
+                <!-- Top Bar: Avatar & Logo -->
+                <div class="flex justify-between items-center w-full relative z-10 mb-8">
+                    <div class="flex items-center gap-3">
+                        <img id="share-card-avatar" crossorigin="anonymous" src="" class="w-10 h-10 rounded-full object-cover border-2 border-orange-100 shadow-sm bg-gray-50">
+                        <div class="text-left">
+                            <div class="text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-0.5">Học viên</div>
+                            <div id="share-card-name" class="text-xs font-black text-gray-800 w-[120px] whitespace-nowrap overflow-hidden text-ellipsis uppercase tracking-wide pb-1">Name</div>
+                        </div>
+                    </div>
+                    <img src="../LOGO.WEBP" crossorigin="anonymous" class="h-6 object-contain opacity-40 grayscale" alt="HopVan">
+                </div>
+                
+                <!-- Middle: The Achievement -->
+                <div class="flex-1 w-full flex flex-col items-center justify-center relative z-10">
+                    <!-- Badges Row -->
+                    <div class="flex items-center justify-center gap-2 mb-6 w-full">
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-100 text-[10px] font-bold tracking-widest uppercase text-orange-600">
+                            <i class="fas fa-medal text-orange-500"></i> Kỷ Lục Mới
+                        </div>
+                        <div id="share-card-rank-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 text-[10px] font-bold tracking-widest uppercase text-white shadow-[0_4px_10px_rgba(0,0,0,0.15)]">
+                            <i class="fas fa-crown text-yellow-400"></i> <span>TOP X</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Big Number & Faded Icon -->
+                    <div class="relative w-full flex justify-center items-center h-32 my-2">
+                        <!-- Faded Background Icon -->
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
+                            <i id="share-card-trophy-icon" class="fas fa-fire text-8xl text-orange-100" style="transform: scale(1.6);"></i>
+                        </div>
+                        
+                        <!-- Streak Number - REMOVED bg-clip-text for html2canvas compatibility -->
+                        <span id="share-card-streak" class="text-[8rem] font-black text-[#FF5E62] tracking-tighter leading-none relative z-10 pb-2">0</span>
+                    </div>
+                    
+                    <p class="text-[1.1rem] font-black text-gray-800 mt-8 w-full text-center leading-tight tracking-[0.15em] uppercase">Ngày Học Tập<br>Liên Tục</p>
+                </div>
+                
+                <!-- Footer decorative line -->
+                <div class="w-full h-1.5 bg-gradient-to-r from-[#FF8F50] to-[#FF5E62] absolute bottom-0 left-0 opacity-80"></div>
+            </div>
+            </div>
+            
+            <!-- ACTION BUTTONS -->
+            <div class="flex gap-4 mt-8 w-full max-w-[340px] mx-auto">
+                <button onclick="downloadStreakCard(this)" class="flex-1 bg-white text-[#FF5E62] font-bold text-[13px] py-4 px-4 rounded-[1.25rem] hover:bg-gray-50 hover:-translate-y-0.5 transition-all uppercase tracking-wider text-center shadow-lg border border-white">
+                    <i class="fas fa-download mr-1"></i> LƯU ẢNH
+                </button>
+                
+                <button onclick="shareStreakCard(this)" class="flex-1 bg-gradient-to-r from-[#FF8F50] to-[#FF5E62] text-white font-bold text-[13px] py-4 px-4 rounded-[1.25rem] hover:brightness-110 hover:-translate-y-0.5 transition-all uppercase tracking-wider text-center shadow-[0_10px_25px_rgba(255,94,98,0.4)] border border-transparent">
+                    <i class="fas fa-share mr-1"></i> CHIA SẺ
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        window.openShareStreakModal = () => {
+            if(!window.shareStreakData) return;
+            const data = window.shareStreakData;
+            
+            document.getElementById('share-card-avatar').src = data.avatar;
+            document.getElementById('share-card-name').textContent = data.name;
+            document.getElementById('share-card-streak').textContent = data.streak;
+            
+            const trophyIcon = document.getElementById('share-card-trophy-icon');
+            const rankBadge = document.getElementById('share-card-rank-badge');
+            
+            if(data.rank === 1) {
+                trophyIcon.innerHTML = '<i class="fas fa-crown text-yellow-400"></i>';
+                if(rankBadge) rankBadge.innerHTML = '<i class="fas fa-crown text-yellow-400"></i> <span class="text-white">TOP 1</span>';
+            } else if (data.rank === 2) {
+                trophyIcon.innerHTML = '<i class="fas fa-medal text-slate-300"></i>';
+                if(rankBadge) rankBadge.innerHTML = '<i class="fas fa-medal text-slate-300"></i> <span class="text-white">TOP 2</span>';
+            } else {
+                trophyIcon.innerHTML = '<i class="fas fa-award text-orange-600"></i>';
+                if(rankBadge) rankBadge.innerHTML = '<i class="fas fa-award text-orange-400"></i> <span class="text-white">TOP 3</span>';
+            }
+            
+            const modal = document.getElementById('share-streak-modal');
+            modal.classList.remove('opacity-0', 'invisible', 'pointer-events-none');
+            
+            const inner = document.getElementById('share-streak-inner');
+            setTimeout(() => {
+                inner.classList.remove('scale-95', 'opacity-0', 'translate-y-4');
+                inner.classList.add('scale-100', 'opacity-100', 'translate-y-0');
+            }, 50);
+        };
+        
+        window.closeShareStreakModal = () => {
+            const modal = document.getElementById('share-streak-modal');
+            const inner = document.getElementById('share-streak-inner');
+            inner.classList.remove('scale-100', 'opacity-100', 'translate-y-0');
+            inner.classList.add('scale-95', 'opacity-0', 'translate-y-4');
+            setTimeout(() => {
+                modal.classList.add('opacity-0', 'invisible', 'pointer-events-none');
+            }, 300);
+        };
+        
+        window.downloadStreakCard = async (btn) => {
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            try {
+                const element = document.getElementById('streak-card-capture');
+                const canvas = await html2canvas(element, { 
+                    scale: 2, 
+                    useCORS: true, 
+                    backgroundColor: null,
+                    scrollY: -window.scrollY
+                });
+                const link = document.createElement('a');
+                link.download = 'hopvan-streak.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (error) {
+                console.error("Error generating card", error);
+                alert("Có lỗi xảy ra khi tạo ảnh.");
+            }
+            btn.innerHTML = originalHTML;
+        };
+        
+        window.shareStreakCard = async (btn) => {
+            const originalHTML = btn.innerHTML;
+            
+            try {
+                const element = document.getElementById('streak-card-capture');
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                const canvas = await html2canvas(element, { 
+                    scale: 2, 
+                    useCORS: true, 
+                    backgroundColor: null,
+                    scrollY: -window.scrollY
+                });
+                canvas.toBlob(async (blob) => {
+                    const file = new File([blob], 'hopvan-streak.png', { type: 'image/png' });
+                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            title: 'Kỷ Lục Chuỗi HopVan',
+                            text: 'Mình vừa lọt top chuỗi học tập dài nhất trên HopVan!',
+                            files: [file]
+                        });
+                        btn.innerHTML = originalHTML;
+                    } else {
+                        // Fallback
+                        const link = document.createElement('a');
+                        link.download = 'hopvan-streak.png';
+                        link.href = URL.createObjectURL(blob);
+                        link.click();
+                        btn.innerHTML = originalHTML;
+                    }
+                });
+            } catch (error) {
+                console.error("Error sharing card", error);
+                const link = document.createElement('a');
+                link.download = 'hopvan-streak.png';
+                // Need to re-render or just alert
+                alert("Trình duyệt không hỗ trợ chia sẻ trực tiếp.");
+                btn.innerHTML = originalHTML;
+            }
+        };
+    </script>
 </body>
 </html>

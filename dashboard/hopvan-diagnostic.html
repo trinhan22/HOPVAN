@@ -42,20 +42,22 @@
 
         .main-content { width: 100%; max-width: 850px; padding: 20px; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 10; }
 
-        .step-container { display: none; width: 100%; animation: popIn 0.5s forwards; opacity: 0; transform: scale(0.97) translateY(20px); }
-        .step-container.active { display: block; }
+        .step-container { display: none; width: 100%; height: 100%; animation: popIn 0.5s forwards; opacity: 0; transform: scale(0.97) translateY(20px); flex-direction: column; }
+        .step-container.active { display: flex; }
         @keyframes popIn { to { opacity: 1; transform: scale(1) translateY(0); } }
 
         .wizard-card {
             background: var(--card-bg); padding: 40px; border-radius: 32px;
             box-shadow: 0 20px 50px rgba(255, 143, 80, 0.08), 0 1px 3px rgba(0,0,0,0.02);
             border: 1px solid rgba(255, 143, 80, 0.1); width: 100%;
-            max-height: 90vh; display: flex; flex-direction: column;
+            height: 85vh; min-height: 600px; max-height: 800px;
+            display: flex; flex-direction: column;
+            position: relative;
         }
 
         /* --- STEP 1: KHẢO SÁT --- */
         .option-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 40px; perspective: 1000px;}
-        .option-card { background: #FAFAFA; border: 2px solid transparent; padding: 35px 25px; border-radius: 28px; cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04); position: relative; z-index: 1; overflow: hidden;}
+        .option-card { background: #FFFFFF; border: 2px solid #E2E8F0; padding: 35px 25px; border-radius: 28px; cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0,0,0,0.02); position: relative; z-index: 1; overflow: hidden; transition: all 0.3s ease;}
         .option-card::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition: 0.5s; z-index: -1; }
         .option-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 25px 50px rgba(255, 143, 80, 0.15); border-color: rgba(255, 143, 80, 0.2); }
         .option-card:hover::before { left: 100%; }
@@ -69,7 +71,7 @@
         .option-text p { font-size: 0.9rem; color: #64748B; line-height: 1.6; font-weight: 500; }
 
         /* --- STEP 2: BÀI TEST --- */
-        .test-body-scroll { flex: 1; overflow-y: auto; padding-right: 15px; margin-bottom: 20px; }
+        .test-body-scroll { flex: 1; min-height: 0; overflow-y: auto; padding-right: 15px; margin-bottom: 20px; }
         .q-card { background: white; border: 1px solid #f1f5f9; border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
         .q-num { background: #fff7ed; color: #ea580c; font-weight: 800; padding: 4px 12px; border-radius: 8px; font-size: 0.8rem; border: 1px solid #fed7aa; display: inline-block; margin-bottom: 15px; }
         .q-content { font-size: 1.05rem; color: #1e293b; font-weight: 500; margin-bottom: 20px; line-height: 1.6;}
@@ -78,7 +80,7 @@
         .opt-label.selected { background: #fff7ed; border-color: var(--primary); }
         
         .prompt-box { background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 20px; border-radius: 0 16px 16px 0; margin-bottom: 20px; }
-        .writing-area { width: 100%; height: 250px; padding: 20px; border-radius: 20px; border: 2px solid #E2E8F0; outline: none; resize: none; font-size: 1.05rem; line-height: 1.8; color: var(--text-main); background: #F8FAFC; font-family: 'Merriweather', serif; transition: 0.25s; }
+        .writing-area { width: 100%; height: 400px; padding: 20px; border-radius: 20px; border: 2px solid #E2E8F0; outline: none; resize: none; font-size: 1.05rem; line-height: 1.8; color: var(--text-main); background: #F8FAFC; font-family: 'Merriweather', serif; transition: 0.25s; }
         .writing-area:focus { border-color: var(--primary); background: #FFFFFF; box-shadow: 0 0 0 4px rgba(255, 143, 80, 0.1); }
 
         /* --- UI ELEMENTS --- */
@@ -199,6 +201,38 @@
         </div>
     </div>
 
+    <!-- Question Menu Modal -->
+    <div id="question-menu-modal" class="custom-modal" style="align-items: center; z-index: 21000;">
+        <div class="modal-box" style="width: calc(100% - 40px); max-width: 550px; padding: 24px; text-align: left; animation: popIn 0.3s forwards; border-radius: 28px; box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.3);">
+            <div class="flex justify-between items-center mb-5 border-b border-gray-100 dark:border-gray-700 pb-4 flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-orange-100 dark:bg-orange-900/30 text-orange-500 flex items-center justify-center text-lg shadow-sm">
+                        <i class="fas fa-th"></i>
+                    </div>
+                    <h3 class="font-black text-xl text-gray-800 dark:text-gray-100 tracking-tight">Bảng câu hỏi</h3>
+                </div>
+                <button onclick="toggleQuestionMenu()" class="w-9 h-9 rounded-full bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 dark:bg-gray-800 dark:hover:bg-red-900/30 transition-colors flex items-center justify-center shadow-sm"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="overflow-y-auto custom-scrollbar pr-2" style="max-height: 60vh;">
+                <div class="mb-6">
+                    <h4 class="font-black text-[11px] text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-orange-400"></span> Trắc Nghiệm (30 Câu)
+                    </h4>
+                    <div class="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2.5" id="mcq-grid"></div>
+                </div>
+                <div class="pt-2 border-t border-gray-50 dark:border-gray-800">
+                    <h4 class="font-black text-[11px] text-gray-400 uppercase tracking-widest mt-4 mb-3 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span> Tự Luận (1 Câu)
+                    </h4>
+                    <div class="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2.5">
+                        <button id="grid-essay" class="w-9 h-9 rounded-xl bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center font-bold text-xs text-gray-600 dark:text-gray-300 hover:bg-orange-50 hover:border-orange-300 hover:text-orange-600 transition-colors shadow-sm" onclick="scrollToQuestion('diagnostic-essay')">TL</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div class="background-blobs">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
@@ -206,60 +240,105 @@
     </div>
 
     <main class="main-content" id="main-wrapper" style="display: none;">
-        
-        <div id="step-1" class="step-container active">
-            <div class="wizard-card text-center">
-                <div class="inline-flex items-center justify-center p-3 bg-white-50 rounded-2xl text-white-500 mb-4 dark:bg-white-900/30">
-                </div>
-                <h2 class="text-2xl md:text-3xl font-black text-gray-800 mb-3">Bài Thi Khảo Sát Năng Lực</h2>
-                <p class="text-gray-500 text-sm md:text-base max-w-lg mx-auto">Chọn mục tiêu để hệ thống cá nhân hóa đề thi và định chuẩn thang điểm phù hợp nhất cho bạn.</p>
-
-                <div class="option-grid text-left md:text-center">
-                    <div class="option-card" onclick="selectOption(this, 'Mất gốc / Điểm dưới 5')">
-                        <div class="option-icon"><i class="fas fa-seedling"></i></div>
-                        <div class="option-text">
-                            <h4>Lấy lại căn bản</h4>
-                            <p>Em thường <b class="text-orange-500 dark:text-orange-400">mất điểm Đọc hiểu</b>, làm văn còn lúng túng.</p>
-                        </div>
+        <div class="wizard-card w-full" id="main-wizard-card">
+            
+            <div id="step-0" class="step-container active">
+                <div class="flex flex-col items-center justify-center text-center w-full h-full max-w-3xl mx-auto px-4 py-8 relative">
+                    
+                    <!-- Decorative Background Elements (Simple but premium) -->
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-orange-100/50 via-transparent to-transparent dark:from-orange-900/10 pointer-events-none -z-10"></div>
+                    
+                    <!-- Icon/Logo with premium rings -->
+                    <div class="relative w-32 h-32 mb-10 mx-auto flex items-center justify-center group">
+                        <!-- Outer rotating dashed ring -->
+                        <div class="absolute inset-[-20px] rounded-full border border-dashed border-orange-300 dark:border-orange-700 opacity-50 animate-[spin_10s_linear_infinite] group-hover:border-orange-500 transition-colors duration-500"></div>
+                        <!-- Inner glowing ring -->
+                        <div class="absolute inset-[-10px] rounded-full border-[2px] border-orange-100 dark:border-orange-900 opacity-80 group-hover:scale-110 transition-transform duration-500"></div>
+                        <!-- Core glow -->
+                        <div class="absolute inset-0 bg-gradient-to-tr from-[#FF8F50] to-[#FF5E62] rounded-full blur-[25px] opacity-40 group-hover:opacity-60 transition-opacity duration-500 animate-pulse"></div>
+                        
+                        <img src="../LOGO.WEBP" alt="HopVan Logo" class="relative z-10 w-full h-full object-contain drop-shadow-[0_10px_20px_rgba(255,143,80,0.4)] transform transition-transform group-hover:scale-110 duration-500 group-hover:-rotate-3">
                     </div>
-                    <div class="option-card" onclick="selectOption(this, 'Viết lẹt đẹt / Điểm 6-7')">
-                        <div class="option-icon"><i class="fas fa-pencil-alt"></i></div>
-                        <div class="option-text">
-                            <h4>Mục tiêu 7+</h4>
-                            <p>Em nắm được ý nhưng <b class="text-orange-500 dark:text-orange-400">diễn đạt lủng củng</b>, lan man.</p>
-                        </div>
+                    
+                    <!-- Text Content -->
+                    <h2 class="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-6 leading-tight tracking-tight relative z-10">
+                        Chào mừng bạn đến với <br>
+                        <span class="relative inline-block mt-2">
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#FF8F50] to-[#FF5E62] drop-shadow-sm relative z-10">HopVan Platform</span>
+                            <span class="absolute bottom-1 left-0 w-full h-3 bg-orange-200 dark:bg-orange-900/50 -z-10 rounded-full transform -skew-x-12 opacity-70"></span>
+                        </span>
+                    </h2>
+                    
+                    <p class="text-gray-500 dark:text-gray-400 text-base md:text-lg mb-12 leading-relaxed font-medium max-w-xl relative z-10">
+                        Một hành trình mới chuẩn bị bắt đầu. Hãy để trí tuệ nhân tạo của chúng tôi giúp bạn định vị bản thân và vẽ nên lộ trình chinh phục điểm cao.
+                    </p>
+                    
+                    <!-- Button -->
+                    <div>
+                        <button onclick="goToStep(1)" class="btn-primary px-8 py-3 text-base hover:-translate-y-1 transition-all">Bắt đầu khám phá <i class="fas fa-arrow-right ml-2"></i></button>
                     </div>
-                    <div class="option-card" onclick="selectOption(this, 'Mục tiêu bứt phá 8+, 9+')">
-                        <div class="option-icon"><i class="fas fa-rocket"></i></div>
-                        <div class="option-text">
-                            <h4>Bứt phá 8+, 9+</h4>
-                            <p>Cần rèn <b class="text-orange-500 dark:text-orange-400">lí luận văn học</b> và tư duy nghị luận sắc bén.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8">
-                    <button id="btn-next-1" onclick="startTest()" class="btn-primary" disabled>Bắt Đầu Bài Thi <i class="fas fa-arrow-right ml-2"></i></button>
+                    
                 </div>
             </div>
-        </div>
-
-        <div id="step-2" class="step-container">
-            <div class="wizard-card">
+    
+            <div id="step-1" class="step-container">
+                <div class="text-center w-full h-full flex flex-col justify-center">
+                    <div class="inline-flex items-center justify-center p-3 bg-white-50 rounded-2xl text-white-500 mb-4 dark:bg-white-900/30">
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF8F50] to-[#FF5E62] mb-3 drop-shadow-sm">Bài Thi Khảo Sát Năng Lực</h2>
+                    <p class="text-gray-500 text-sm md:text-base max-w-lg mx-auto">Chọn mục tiêu để hệ thống cá nhân hóa đề thi và định chuẩn thang điểm phù hợp nhất cho bạn.</p>
+    
+                    <div class="option-grid text-left md:text-center">
+                        <div class="option-card" onclick="selectOption(this, 'Mất gốc / Điểm dưới 5')">
+                            <div class="option-icon"><i class="fas fa-seedling"></i></div>
+                            <div class="option-text">
+                                <h4>Lấy lại căn bản</h4>
+                                <p>Em thường <b class="text-orange-500 dark:text-orange-400">mất điểm Đọc hiểu</b>, làm văn còn lúng túng.</p>
+                            </div>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'Viết lẹt đẹt / Điểm 6-7')">
+                            <div class="option-icon"><i class="fas fa-pencil-alt"></i></div>
+                            <div class="option-text">
+                                <h4>Mục tiêu 7+</h4>
+                                <p>Em nắm được ý nhưng <b class="text-orange-500 dark:text-orange-400">diễn đạt lủng củng</b>, lan man.</p>
+                            </div>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'Mục tiêu bứt phá 8+, 9+')">
+                            <div class="option-icon"><i class="fas fa-rocket"></i></div>
+                            <div class="option-text">
+                                <h4>Bứt phá 8+, 9+</h4>
+                                <p>Cần rèn <b class="text-orange-500 dark:text-orange-400">lí luận văn học</b> và tư duy nghị luận sắc bén.</p>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="mt-10 flex justify-between items-center w-full">
+                        <button onclick="goToStep(0)" class="btn-outline px-6 py-3 text-base hover:-translate-y-1 transition-all"><i class="fas fa-arrow-left mr-2"></i> Trở về</button>
+                        <button id="btn-next-1" onclick="startTest()" class="btn-primary px-8 py-3 text-base" disabled>Bắt đầu bài thi <i class="fas fa-arrow-right ml-2"></i></button>
+                    </div>
+                </div>
+            </div>
+    
+            <div id="step-2" class="step-container">
                 <div class="flex justify-between items-end mb-4 flex-shrink-0">
                     <div>
                         <span class="text-xs font-black text-orange-500 uppercase tracking-widest block mb-1">Đề đánh giá năng lực</span>
-                        <h2 class="text-xl md:text-2xl font-black text-gray-800">Trắc Nghiệm & Tự Luận</h2>
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF8F50] to-[#FF5E62]">Trắc Nghiệm & Tự Luận</h2>
                     </div>
-                    <div class="text-xs font-bold text-white bg-gray-800 px-4 py-2 rounded-lg shadow-md flex items-center gap-2 font-mono text-sm transition-colors duration-300">
-                        <i class="fas fa-clock text-orange-400"></i> <span id="diag-timer">45:00</span>
+                    <div class="flex items-center gap-3">
+                        <button onclick="toggleQuestionMenu()" class="w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-orange-50 hover:text-orange-500 transition-colors shadow-sm border border-gray-200 dark:border-gray-700">
+                            <i class="fas fa-bars text-lg"></i>
+                        </button>
+                        <div class="text-xs font-bold text-white bg-gray-800 px-4 py-2 rounded-lg shadow-md flex items-center gap-2 font-mono text-sm transition-colors duration-300">
+                            <i class="fas fa-clock text-orange-400"></i> <span id="diag-timer">45:00</span>
+                        </div>
                     </div>
                 </div>
-
+    
                 <div class="test-body-scroll custom-scrollbar" id="quiz-list-container">
                     <h3 class="font-black text-lg text-blue-800 mb-4 uppercase">PHẦN I. TRẮC NGHIỆM KHÁCH QUAN (7.5đ)</h3>
                     <div id="mcq-container"></div>
-
+    
                     <h3 class="font-black text-lg text-blue-800 mt-10 mb-4 uppercase">PHẦN II. LÀM VĂN (2.5đ)</h3>
                     <div class="prompt-box">
                         <p class="font-bold text-blue-900 mb-1"><i class="fas fa-pen-nib"></i> Đề bài:</p>
@@ -268,29 +347,29 @@
                     <textarea id="diagnostic-essay" class="writing-area custom-scrollbar" placeholder="Viết đoạn văn của bạn tại đây..."></textarea>
                     <div id="word-count" class="text-xs font-bold text-gray-400 text-right mt-2">0 từ</div>
                 </div>
-
-                <div class="flex justify-end items-center pt-4 border-t border-gray-100 flex-shrink-0">
-                    <button onclick="submitDiagnosticTest()" class="btn-primary w-full md:w-auto px-10">Nộp bài cho AI <i class="fas fa-paper-plane ml-2"></i></button>
+    
+                <div class="flex justify-between items-center pt-6 border-t border-gray-100 flex-shrink-0 mt-6">
+                    <button onclick="goToStep(1)" class="btn-outline px-6 py-3 text-sm md:text-base hover:-translate-y-1 transition-all flex items-center gap-2"><i class="fas fa-arrow-left"></i> Trở về</button>
+                    <button onclick="submitDiagnosticTest()" class="btn-primary w-full md:w-auto px-10">Nộp bài <i class="fas fa-paper-plane ml-2"></i></button>
                 </div>
             </div>
-        </div>
-
-        <div id="step-3" class="step-container">
-            <div class="wizard-card text-center py-16 justify-center">
-                <div class="ai-pulse-ring"><i class="fas fa-brain text-4xl text-orange-500"></i></div>
-                <h2 class="text-2xl font-black text-gray-800 mb-2">AI đang chấm điểm!</h2>
-                <p class="text-gray-500 text-sm md:text-base">Hệ thống đang quét đáp án trắc nghiệm và phân tích lập luận tự luận...</p>
-                <div class="w-full max-w-xs mx-auto bg-gray-100 rounded-full h-2 mt-8 overflow-hidden">
-                    <div class="bg-gradient-to-r from-orange-400 to-red-500 h-full rounded-full w-0 transition-all duration-[1000ms] ease-out" id="ai-progress-bar"></div>
+    
+            <div id="step-3" class="step-container">
+                <div class="flex flex-col items-center justify-center text-center w-full h-full">
+                    <div class="ai-pulse-ring"><i class="fas fa-brain text-4xl text-orange-500"></i></div>
+                    <h2 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF8F50] to-[#FF5E62] mb-2 drop-shadow-sm">AI đang chấm điểm!</h2>
+                    <p class="text-gray-500 text-sm md:text-base">Hệ thống đang quét đáp án trắc nghiệm và phân tích lập luận tự luận...</p>
+                    <div class="w-full max-w-xs mx-auto bg-gray-100 rounded-full h-2 mt-8 overflow-hidden">
+                        <div class="bg-gradient-to-r from-orange-400 to-red-500 h-full rounded-full w-0 transition-all duration-[1000ms] ease-out" id="ai-progress-bar"></div>
+                    </div>
+                    <p class="text-xs text-orange-500 mt-3 font-bold uppercase tracking-widest" id="ai-status-text">Khởi tạo...</p>
                 </div>
-                <p class="text-xs text-orange-500 mt-3 font-bold uppercase tracking-widest" id="ai-status-text">Khởi tạo...</p>
+            </div>
+
+            <div id="step-4" class="step-container">
+                <div class="w-full h-full custom-scrollbar" id="result-content" style="overflow-y: auto;"></div>
             </div>
         </div>
-
-        <div id="step-4" class="step-container">
-            <div class="wizard-card custom-scrollbar" id="result-content" style="overflow-y: auto;"></div>
-        </div>
-
     </main>
 
     <script type="module">
@@ -398,6 +477,7 @@
         ];
 
         const mcqContainer = document.getElementById('mcq-container');
+        const mcqGrid = document.getElementById('mcq-grid');
         mcqData.forEach((q, i) => {
             let optsHtml = q.opts.map((opt, oi) => `
                 <label class="opt-label" id="lbl-${i}-${oi}">
@@ -406,7 +486,12 @@
                     <span>${opt}</span>
                 </label>
             `).join('');
-            mcqContainer.innerHTML += `<div class="q-card"><span class="q-num">Câu ${i+1}</span><div class="q-content">${q.q}</div><div class="mt-3">${optsHtml}</div></div>`;
+            mcqContainer.innerHTML += `<div class="q-card" id="q-${i}"><span class="q-num">Câu ${i+1}</span><div class="q-content">${q.q}</div><div class="mt-3">${optsHtml}</div></div>`;
+            
+            // Render grid button
+            if (mcqGrid) {
+                mcqGrid.innerHTML += `<button id="grid-q-${i}" class="w-10 h-10 rounded-lg bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center font-bold text-sm text-gray-600 dark:text-gray-300 hover:bg-orange-50 hover:border-orange-300 transition-colors shadow-sm" onclick="scrollToQuestion('q-${i}')">${i+1}</button>`;
+            }
         });
 
         window.selectOption = function(element, levelStr) {
@@ -420,13 +505,57 @@
             diagnosticData.mcAnswers[qIndex] = optIndex;
             document.querySelectorAll(`#lbl-${qIndex}-0, #lbl-${qIndex}-1, #lbl-${qIndex}-2, #lbl-${qIndex}-3`).forEach(el => el.classList.remove('selected'));
             document.getElementById(`lbl-${qIndex}-${optIndex}`).classList.add('selected');
+            
+            // Update grid button style
+            const gridBtn = document.getElementById(`grid-q-${qIndex}`);
+            if (gridBtn) {
+                gridBtn.classList.remove('bg-gray-50', 'dark:bg-gray-800', 'border-gray-200', 'dark:border-gray-700', 'text-gray-600', 'dark:text-gray-300');
+                gridBtn.classList.add('bg-orange-100', 'dark:bg-orange-900/30', 'border-orange-500', 'text-orange-600', 'dark:text-orange-400');
+            }
         }
 
         const essayInput = document.getElementById('diagnostic-essay');
         essayInput.addEventListener('input', function() {
             const words = this.value.trim() === "" ? 0 : this.value.trim().split(/\s+/).length;
             document.getElementById('word-count').innerText = `${words} từ`;
+            
+            // Update essay grid button style
+            const tlBtn = document.getElementById('grid-essay');
+            if (tlBtn) {
+                if (words > 0) {
+                    tlBtn.classList.remove('bg-gray-50', 'dark:bg-gray-800', 'border-gray-200', 'dark:border-gray-700', 'text-gray-600', 'dark:text-gray-300');
+                    tlBtn.classList.add('bg-orange-100', 'dark:bg-orange-900/30', 'border-orange-500', 'text-orange-600', 'dark:text-orange-400');
+                } else {
+                    tlBtn.classList.remove('bg-orange-100', 'dark:bg-orange-900/30', 'border-orange-500', 'text-orange-600', 'dark:text-orange-400');
+                    tlBtn.classList.add('bg-gray-50', 'dark:bg-gray-800', 'border-gray-200', 'dark:border-gray-700', 'text-gray-600', 'dark:text-gray-300');
+                }
+            }
         });
+
+        window.scrollToQuestion = function(id) {
+            toggleQuestionMenu();
+            const el = document.getElementById(id);
+            const container = document.getElementById('quiz-list-container');
+            if (el && container) {
+                container.scrollTo({
+                    top: el.offsetTop - 20,
+                    behavior: 'smooth'
+                });
+                
+                // Highlight momentarily
+                el.classList.add('ring-2', 'ring-orange-400', 'ring-offset-2', 'transition-all');
+                setTimeout(() => {
+                    el.classList.remove('ring-2', 'ring-orange-400', 'ring-offset-2');
+                }, 1500);
+            }
+        }
+        
+        window.toggleQuestionMenu = function() {
+            const modal = document.getElementById('question-menu-modal');
+            if (modal) {
+                modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+            }
+        }
 
         window.goToStep = function(step) {
             document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));

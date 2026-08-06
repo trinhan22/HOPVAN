@@ -31,13 +31,14 @@ const menuStyles = `
         display: flex; flex-direction: column; padding: 0;
         position: fixed; top: 0; left: 0; z-index: 9999;
         font-family: 'Plus Jakarta Sans', sans-serif;
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow: hidden;
     }
 
     /* HEADER SIDEBAR */
-    .sb-header { display: flex; align-items: center; justify-content: space-between; padding-right: 15px; }
+    .sb-header { display: flex; align-items: center; justify-content: space-between; padding: 30px 20px 25px 30px; transition: padding 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
     .sb-logo-link {
-        padding: 30px 20px 25px 30px; display: flex; align-items: center; gap: 10px; text-decoration: none; transition: all 0.3s ease; flex: 1;
+        padding: 0; display: flex; align-items: center; gap: 10px; text-decoration: none; transition: all 0.3s ease; flex: 1;
     }
     .logo-card-box {
         width: 48px; height: 48px; background: white; border-radius: 14px;
@@ -55,12 +56,131 @@ const menuStyles = `
     .sb-logo-link:hover .logo-card-box { transform: scale(1.05); box-shadow: 0 15px 35px rgba(255, 143, 80, 0.25); }
     
     .sb-close-btn {
-        background: #f1f5f9; border: none; color: #64748b; font-size: 1.2rem;
-        width: 36px; height: 36px; border-radius: 10px; display: none; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
+        background: #f1f5f9; border: none; color: #64748b; font-size: 1.1rem;
+        width: 32px; height: 32px; border-radius: 10px; display: none; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
     }
-    .sb-close-btn:hover { background: #fee2e2; color: #ef4444; }
+    .sb-close-btn:hover { background: #e2e8f0; color: #334155; }
+    
+    /* SOFT COLLAPSE BUTTON */
+    .sb-collapse-btn {
+        width: 32px; height: 32px; border-radius: 50%;
+        background: transparent; border: 1px solid rgba(255, 143, 80, 0.3);
+        color: var(--sb-primary); display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 10000; font-size: 0.9rem;
+    }
+    .sb-collapse-btn:hover { background: #fff7ed; color: var(--sb-primary); transform: scale(1.1); }
+    html.dark .sb-collapse-btn { color: var(--text-light); }
+    html.dark .sb-collapse-btn:hover { background: rgba(255, 143, 80, 0.1); border-radius: 50%; color: var(--sb-primary); }
 
-    /* MENU LIST */
+    /* COLLAPSED STATE */
+    .sidebar-comp.collapsed {
+        width: 100px !important;
+    }
+    /* Smooth transitions for text and logo hiding */
+    .sb-logo-link {
+        transition: opacity 0.3s ease, visibility 0.3s, max-width 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+        opacity: 1; visibility: visible; max-width: 250px; overflow: hidden;
+    }
+    .sb-section-title {
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        max-height: 20px; overflow: hidden;
+    }
+    .sb-link span, .menu-btn span, .sb-version-pill {
+        transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), max-width 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        opacity: 1; max-width: 200px; transform: translateX(0); overflow: hidden; white-space: nowrap; display: inline-block;
+    }
+    .sb-link, .menu-btn {
+        transition: gap 0.3s ease, padding 0.3s ease;
+    }
+
+    .sidebar-comp.collapsed {
+        overflow: visible;
+    }
+    .sidebar-comp.collapsed .sb-logo-link {
+        padding: 0; justify-content: center; width: 100%; margin: 0; opacity: 1; pointer-events: auto; gap: 0;
+    }
+    .sidebar-comp.collapsed .sb-logo-link div:last-child {
+        display: none !important;
+    }
+    .sidebar-comp.collapsed .sb-section-title {
+        display: none !important;
+    }
+    .sidebar-comp.collapsed .sb-link span,
+    .sidebar-comp.collapsed .menu-btn span,
+    .sidebar-comp.collapsed .sb-version-pill {
+        opacity: 0 !important; position: absolute !important; pointer-events: none;
+    }
+    .sidebar-comp.collapsed .sb-list {
+        gap: 12px;
+    }
+    .sidebar-comp.collapsed .sb-link,
+    .sidebar-comp.collapsed .menu-btn {
+        justify-content: center; padding: 10px 0; gap: 0 !important;
+    }
+    .sidebar-comp.collapsed .sb-link i {
+        font-size: 1.3rem; width: 24px; text-align: center;
+    }
+    .sidebar-comp.collapsed .sb-collapse-btn {
+        position: absolute; right: -16px; top: 54px; transform: translateY(-50%);
+        margin: 0; background: white; border: 1px solid rgba(255,143,80,0.3);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 32px; height: 32px; font-size: 0.9rem;
+        display: flex; align-items: center; justify-content: center;
+        flex: 0 0 auto; border-radius: 50%; color: var(--sb-primary); z-index: 100;
+    }
+    .sidebar-comp.collapsed .sb-collapse-btn:hover {
+        background: #fff7ed; color: var(--sb-primary); transform: translateY(-50%) scale(1.1);
+    }
+    .sidebar-comp.collapsed .sb-header {
+        position: relative; flex-direction: row; justify-content: center; align-items: center; 
+        padding: 30px 0 25px 0; gap: 0;
+    }
+    .sidebar-comp.collapsed .sb-footer {
+        padding: 15px 10px;
+    }
+    .sidebar-comp.collapsed .sb-footer .grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .sidebar-comp.collapsed .menu-btn {
+        padding: 14px 0;
+    }
+    .sidebar-comp.collapsed .menu-btn i {
+        font-size: 1.3rem; margin: 0;
+    }
+
+    /* GLOBAL LAYOUT TRANSITIONS FOR MAIN CONTENT AND HEADER */
+    @media (min-width: 1025px) {
+        .main-content, .header-comp, #menu-placeholder {
+            transition: margin-left 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                        width 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                        left 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        
+        /* GLOBAL CONTENT CENTERING TO MATCH INDEX.HTML */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .main-content > * {
+            width: 100%;
+            max-width: 1100px;
+        }
+        /* Except fixed/overlay elements */
+        .main-content > style,
+        .main-content > script,
+        .main-content > #toast-container,
+        .main-content > #fav-toast,
+        .main-content > .custom-modal-overlay,
+        .main-content > .background-blobs {
+            max-width: none;
+            width: auto;
+        }
+    }
+
+
+    /* FEEDBACK TABS & LIST */
     .sb-list-container { flex: 1; overflow-y: auto; overflow-x: hidden; padding-bottom: 20px; }
     .sb-list-container::-webkit-scrollbar { width: 5px; }
     .sb-list-container::-webkit-scrollbar-thumb { background: rgba(255,143,80,0.3); border-radius: 10px; }
@@ -174,9 +294,10 @@ const menuStyles = `
 
     /* MOBILE RESPONSIVE TWEAKS */
     @media (max-width: 1024px) {
-        .sidebar-comp { transform: translateX(-100%); width: 280px; }
+        .sidebar-comp { transform: translateX(-100%); width: 280px !important; }
         .sidebar-comp.open { transform: translateX(0); }
         .sb-close-btn { display: flex; }
+        .sb-collapse-btn { display: none !important; } /* Hide collapse button on mobile */
     }
 </style>
 `;
@@ -193,6 +314,9 @@ const menuHTML = `
             </div>
             <div><h1 class="block">HOPVAN</h1></div>
         </a>
+        <button id="sb-collapse-btn" class="sb-collapse-btn hidden lg:flex" onclick="toggleSidebarCollapse()" title="Thu gọn/Mở rộng">
+            <i class="fas fa-chevron-left transition-transform duration-300"></i>
+        </button>
         <button id="sb-close-btn" class="sb-close-btn" onclick="toggleSidebarGlobal()">
             <i class="fas fa-times"></i>
         </button>
@@ -200,46 +324,46 @@ const menuHTML = `
 
     <div class="sb-list-container">
         <nav class="sb-list">
-            <a href="../dashboard" class="sb-link" data-page="index">
-                <i class="fas fa-home"></i> Tổng quan
+            <a href="../dashboard" class="sb-link" data-page="index" title="Tổng quan">
+                <i class="fas fa-home"></i> <span>Tổng quan</span>
             </a>
 
             <div class="sb-section-title">Quản Lý Học Tập</div>
             
-            <a href="lythuyet.html" class="sb-link" data-page="lythuyet">
-                <i class="fas fa-feather-alt"></i> Kiến thức nền
+            <a href="lythuyet.html" class="sb-link" data-page="lythuyet" title="Kiến thức nền">
+                <i class="fas fa-feather-alt"></i> <span>Kiến thức nền</span>
             </a>
-            <a href="phongluyende.html" class="sb-link" data-page="phongluyende">
-                <i class="fas fa-pen-nib"></i> Phòng luyện đề
+            <a href="phongluyende.html" class="sb-link" data-page="phongluyende" title="Phòng luyện đề">
+                <i class="fas fa-pen-nib"></i> <span>Phòng luyện đề</span>
             </a>
-            <a href="nhatkyhoctap.html" class="sb-link" data-page="nhatkyhoctap">
-                <i class="fas fa-book-journal-whills"></i> Nhật ký học tập
+            <a href="nhatkyhoctap.html" class="sb-link" data-page="nhatkyhoctap" title="Nhật ký học tập">
+                <i class="fas fa-book-journal-whills"></i> <span>Nhật ký học tập</span>
             </a>
 
             <div class="sb-section-title">Khám Phá</div>
             
-            <a href="bantinvanhoc.html" class="sb-link" data-page="bantinvanhoc">
-                <i class="fas fa-newspaper"></i> Bản tin Văn học
+            <a href="bantinvanhoc.html" class="sb-link" data-page="bantinvanhoc" title="Bản tin Văn học">
+                <i class="fas fa-newspaper"></i> <span>Bản tin Văn học</span>
             </a>
-            <a href="congdong.html" class="sb-link" data-page="congdong">
-                <i class="fas fa-users"></i> Cộng đồng
+            <a href="congdong.html" class="sb-link" data-page="congdong" title="Cộng đồng">
+                <i class="fas fa-users"></i> <span>Cộng đồng</span>
             </a>        
 
             <div class="sb-section-title">Cá Nhân</div>
             
-            <a href="account.html" class="sb-link" data-page="account">
-                <i class="fas fa-user-cog"></i> Quản lý tài khoản
+            <a href="account.html" class="sb-link" data-page="account" title="Quản lý tài khoản">
+                <i class="fas fa-user-cog"></i> <span>Quản lý tài khoản</span>
             </a>
         </nav>
     </div>
 
     <div class="sb-footer">
         <div class="grid grid-cols-2 gap-2">
-            <button id="menu-btn-feedback" class="menu-btn btn-feedback">
-                <i class="far fa-comment-dots"></i> Góp ý
+            <button id="menu-btn-feedback" class="menu-btn btn-feedback" title="Góp ý">
+                <i class="far fa-comment-dots"></i> <span>Góp ý</span>
             </button>
-            <button id="menu-btn-logout" class="menu-btn btn-logout">
-                <i class="fas fa-sign-out-alt"></i> Thoát
+            <button id="menu-btn-logout" class="menu-btn btn-logout" title="Đăng xuất">
+                <i class="fas fa-sign-out-alt"></i> <span>Thoát</span>
             </button>
         </div>
 
@@ -300,6 +424,7 @@ const menuHTML = `
 export function initMenu(app) {
     const auth = getAuth(app);
     const db = getFirestore(app);
+    // 1. CHÈN CSS & HTML VÀO CONTAINER
     const container = document.getElementById('menu-placeholder');
 
     if (container) {
@@ -311,14 +436,53 @@ export function initMenu(app) {
 }
 
 function startMenuLogic(auth, db) {
-    // 1. HIGHLIGHT MENU
-    const currentPath = window.location.pathname.toLowerCase();
+    // Restore Collapse State Before Animations
+    window.toggleSidebarCollapse = () => {
+        const sidebar = document.getElementById('main-sidebar');
+        if (!sidebar) return;
+        const isCollapsed = sidebar.classList.toggle('collapsed');
+        document.documentElement.classList.toggle('sidebar-collapsed', isCollapsed);
+        localStorage.setItem('sidebarCollapsed', isCollapsed ? 'true' : 'false');
+        
+        requestAnimationFrame(() => {
+            document.documentElement.style.setProperty('--sidebar-width', isCollapsed ? '100px' : '260px');
+            document.documentElement.style.setProperty('--sb-w', isCollapsed ? '100px' : '280px');
+        });
+        
+        // Handle icon rotation properly for bars-staggered
+        const icon = document.querySelector('#sb-collapse-btn i');
+        if (icon) {
+            if (isCollapsed) {
+                icon.style.transform = 'scaleX(-1)'; // Flips the staggered bars elegantly
+            } else {
+                icon.style.transform = 'scaleX(1)';
+            }
+        }
+    };
+
+    if (localStorage.getItem('sidebarCollapsed') === 'true') {
+        const sb = document.getElementById('main-sidebar');
+        if (sb) sb.classList.add('collapsed');
+        document.documentElement.classList.add('sidebar-collapsed');
+        
+        document.documentElement.style.setProperty('--sidebar-width', '100px');
+        document.documentElement.style.setProperty('--sb-w', '100px');
+        
+        // Update icon immediately without animation
+        setTimeout(() => {
+            const icon = document.querySelector('#sb-collapse-btn i');
+            if (icon) icon.style.transform = 'scaleX(-1)';
+        }, 50);
+    }
+
+    // 2. HIGHLIGHT MENU ITEM ĐANG CHỌN
+    const path = window.location.pathname.toLowerCase();
     const links = document.querySelectorAll('.sb-link');
     links.forEach(link => {
         link.classList.remove('active');
         const page = link.getAttribute('data-page');
         
-        if (currentPath.includes(page) || (page === 'index' && (currentPath.endsWith('/') || currentPath.includes('index.html')))) {
+        if (path.includes(page) || (page === 'index' && (path.endsWith('/') || path.includes('index.html')))) {
             link.classList.add('active');
         }
         
