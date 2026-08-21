@@ -47,10 +47,11 @@ export default async (req, context) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile", // Model Llama 3.3 70B (Rất mạnh & Nhanh)
+        model: "openai/gpt-oss-120b", // Model Llama 3.3 70B (Rất mạnh & Nhanh)
         messages: conversation,
         temperature: 0.3, // Giữ ở mức thấp để chấm điểm ổn định
-        max_tokens: 2000, // Đủ dài cho bài sửa chi tiết
+        max_completion_tokens: 2048,
+                    reasoning_effort: "medium", // Đủ dài cho bài sửa chi tiết
         response_format: { type: "json_object" } // Bắt buộc trả về JSON
       }),
     });

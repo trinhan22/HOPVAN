@@ -732,13 +732,14 @@
                     'Content-Type': 'application/json' 
                 },
                 body: JSON.stringify({ 
-                    model: "llama-3.3-70b-versatile",
+                    model: "openai/gpt-oss-120b",
                     messages: [
                         { role: "system", content: systemPrompt },
                         { role: "user", content: messages }
                     ],
                     temperature: 0.3, // Hạ temperature xuống để AI chấm điểm chuẩn xác, bớt ngẫu hứng
-                    max_tokens: 2000, // Đủ dài cho một bài phân tích sâu
+                    max_completion_tokens: 2048,
+                    reasoning_effort: "medium", // Đủ dài cho một bài phân tích sâu
                     response_format: { type: "json_object" } 
                 })
             });
