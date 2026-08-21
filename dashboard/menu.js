@@ -362,7 +362,7 @@ const menuHTML = `
             <button id="menu-btn-feedback" class="menu-btn btn-feedback" title="Góp ý">
                 <i class="far fa-comment-dots"></i> <span>Góp ý</span>
             </button>
-            <button id="menu-btn-logout" class="menu-btn btn-logout" title="Đăng xuất">
+            <button id="menu-btn-logout" class="menu-btn btn-logout" title="Thoát">
                 <i class="fas fa-sign-out-alt"></i> <span>Thoát</span>
             </button>
         </div>
